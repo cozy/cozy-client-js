@@ -1,20 +1,22 @@
+/* global fetch */
+
 import promiser from './promiser'
 
-export function create(doctype, attributes) {
+export function create (doctype, attributes) {
   throw new Error('not implemented')
 }
 
-export function find(doctype, id, optCallback) {
+export function find (doctype, id, optCallback) {
   let p = fetch('/data/' + doctype + '/' + id)
-          .then( (response) => response.json() )
+          .then((response) => response.json())
 
   return promiser(p, optCallback)
 }
 
-export function updateAttributes(doctype, doc) {
+export function updateAttributes (doctype, doc) {
   throw new Error('not implemented')
 }
 
-export function destroy(doctype, doc) {
+export function destroy (doctype, doc) {
   throw new Error('not implemented')
 }
