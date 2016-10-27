@@ -1,15 +1,14 @@
 // webpack.config.js
 
-var webpack = require('webpack');
-var nodeExternals = require('webpack-node-externals');
-var path = require('path');
+var nodeExternals = require('webpack-node-externals')
+var path = require('path')
 
 var config = {
-  entry: ['babel-polyfill', 'whatwg-fetch', __dirname + '/src/index.js'],
+  entry: ['whatwg-fetch', path.join(__dirname, 'src', 'index.js')],
   devtool: 'source-map',
   target: 'node',
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, '/dist'),
     filename: 'cozy-api.js',
     library: 'cozy-api',
     libraryTarget: 'umd',
@@ -24,8 +23,8 @@ var config = {
       },
       {
         test: /\.js$/,
-        loader: "standard-loader",
-        exclude: /node_modules/
+        loader: 'standard-loader',
+        exclude: /node_modules|.tmp\/mocha-webpack/
       }
     ]
   },
@@ -33,9 +32,10 @@ var config = {
     root: path.resolve('./src'),
     extensions: ['', '.js']
   }
-};
+}
 
-if(process.env.NODE_ENV==='test')
+if (process.env.NODE_ENV === 'test') {
   config.externals = [nodeExternals()]
+}
 
-module.exports = config;
+module.exports = config
