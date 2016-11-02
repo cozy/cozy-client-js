@@ -1,3 +1,29 @@
 language: node_js
+
 node_js:
   - "6"
+
+services:
+  - docker
+
+env:
+  GOPATH: ${TRAVIS_BUILD_DIR}/_workspace
+
+hosts:
+    - alice.cozy.io
+    - bob.cozy.io
+    - charlie.cozy.io
+
+before_script:
+  # setup couchdb 2 (docker)
+  - docker run -d -p 5984:5984 --name couch klaemo/couchdb:2.0.0
+  - sleep 10
+  - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
+  # go 1.7
+  - eval "$(gimme 1.7)"
+  # start a stack instance from master
+  - mkdir $GOPATH
+  - go get -u github.com/cozy/cozy-stack
+  - go run $GOPATH/src/github.com/cozy/cozy-stack/main.go instances add dev
+  - go run $GOPATH/src/github.com/cozy/cozy-stack/main.go serve &
+  - sleep 5 # give it time to start
