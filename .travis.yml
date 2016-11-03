@@ -10,9 +10,9 @@ env:
   GOPATH: ${TRAVIS_BUILD_DIR}/_workspace
 
 hosts:
-    - alice.cozy.io
-    - bob.cozy.io
-    - charlie.cozy.io
+    - alice.cozy.local
+    - bob.cozy.local
+    - charlie.cozy.local
 
 before_script:
   # setup couchdb 2 (docker)
@@ -24,6 +24,6 @@ before_script:
   # start a stack instance from master
   - mkdir $GOPATH
   - go get -u github.com/cozy/cozy-stack
-  - go run $GOPATH/src/github.com/cozy/cozy-stack/main.go instances add dev
-  - go run $GOPATH/src/github.com/cozy/cozy-stack/main.go serve &
+  - $GOPATH/bin/cozy-stack instances add dev
+  - $GOPATH/bin/cozy-stack serve &
   - sleep 5 # give it time to start
