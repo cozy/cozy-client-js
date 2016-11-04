@@ -2,6 +2,7 @@
 
 var nodeExternals = require('webpack-node-externals')
 var path = require('path')
+var webpack = require('webpack')
 
 var config = {
   entry: ['whatwg-fetch', path.join(__dirname, 'src', 'index.js')],
@@ -36,6 +37,10 @@ var config = {
 
 if (process.env.NODE_ENV === 'test') {
   config.externals = [nodeExternals()]
+  config.plugins = [
+    new webpack.ProvidePlugin({ 'btoa': 'btoa' }),
+    new webpack.EnvironmentPlugin(Object.keys(process.env))
+  ]
 }
 
 module.exports = config

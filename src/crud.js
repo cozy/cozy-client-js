@@ -1,33 +1,46 @@
-/* global fetch */
+/* global fetch, btoa */
 
-import {promiser, waitConfig} from './utils'
+import {waitConfig} from './utils'
+
+const NOREV = 'stack-v1-no-rev'
 
 function doFetch (config, method, path, body) {
-  const options = {method: method}
+  const options = {method: method, headers: {}}
   if (body !== undefined) {
-    options.headers = {'Content-Type': 'application/json'}
+    options.headers['Content-Type'] = 'application/json'
     options.body = JSON.stringify(body)
+  }
+  if (config.auth) {
+    let auth = config.auth.appName + ':' + config.auth.token
+    options.headers['Authorization'] = 'Basic ' + btoa(auth)
   }
 
   let target = config.target || ''
-  let fullpath = target + path
-
+  let pathprefix = config.isV1 ? '/ds-api' : ''
+  let fullpath = target + pathprefix + path
   return fetch(fullpath, options).then(res => res.json())
 }
 
-function request (method, path, body) {
-  return waitConfig().then(conf => doFetch(conf, method, path, body))
+export async function create (doctype, attributes) {
+  const config = await waitConfig()
+
+  let path = '/data/' + (config.isV1 ? '' : `${doctype}/`)
+  let response = await doFetch(config, 'POST', path, attributes)
+
+  if (config.isV1) return await find(doctype, response._id)
+
+  return response.data
 }
 
-export function create (doctype, attributes, optCallback) {
-  let p = request('POST', `/data/${doctype}/`, attributes)
-  .then((response) => response.data)
-  return promiser(p, optCallback)
-}
+export async function find (doctype, id) {
+  const config = await waitConfig()
 
-export function find (doctype, id, optCallback) {
-  let p = request('GET', `/data/${doctype}/${id}`)
-  return promiser(p, optCallback)
+  let path = '/data/' + (config.isV1 ? '' : `${doctype}/`) + id
+  let response = await doFetch(config, 'GET', path)
+
+  if (config.isV1) Object.assign(response, {_rev: NOREV})
+
+  return response
 }
 
 export function updateAttributes (doctype, doc) {

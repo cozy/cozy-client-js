@@ -5,8 +5,8 @@ export function configure (opts) {
   config = opts
 }
 
-export function waitConfig (opts) {
-  return Promise.resolve(config)
+export async function waitConfig (opts) {
+  return config
 }
 
 export function promiser (promise, optCallback) {
@@ -17,4 +17,5 @@ export function promiser (promise, optCallback) {
     function (result) { optCallback(null, result) },
     function (err) { optCallback(err, null) }
   )
+  return null
 }
