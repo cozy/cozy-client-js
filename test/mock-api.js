@@ -2,6 +2,12 @@ import fetchMock from 'fetch-mock'
 
 const ROUTES = [
   {
+    name: 'Status',
+    method: 'GET',
+    matcher: '/status',
+    response: { 'couchdb': 'ok' }
+  },
+  {
     name: 'GetDoc',
     method: 'GET',
     matcher: '/data/io.cozy.testobject/42',

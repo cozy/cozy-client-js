@@ -8,6 +8,14 @@ import mock from '../mock-api'
 describe('crud API', function () {
   afterEach(() => mock.restore())
 
+  describe('Init', function () {
+    before(mock.mockAPI('Status'))
+
+    it('Does nothing', async function () {
+      await cozy.init()
+    })
+  })
+
   describe('Create document', function () {
     before(mock.mockAPI('CreateDoc'))
 

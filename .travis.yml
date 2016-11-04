@@ -4,10 +4,11 @@ node_js:
   - "6"
 
 services:
+  - couchdb
   - docker
 
 env:
-  GOPATH: ${TRAVIS_BUILD_DIR}/_workspace
+  - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
 
 hosts:
     - alice.cozy.local
@@ -21,9 +22,18 @@ before_script:
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   # go 1.7
   - eval "$(gimme 1.7)"
-  # start a stack instance from master
+  # start a stack v2 instance from master (listening on 8080)
   - mkdir $GOPATH
   - go get -u github.com/cozy/cozy-stack
   - $GOPATH/bin/cozy-stack instances add dev
   - $GOPATH/bin/cozy-stack serve &
-  - sleep 5 # give it time to start
+  # start a stack v1 from NPM (listening on 9104 & 9101)
+  - npm install -g coffee-script
+  - npm install cozy-data-system cozy-proxy
+  - NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start &
+  - sleep 3
+  - NODE_ENV=test NAME=proxy TOKEN=token npm explore cozy-proxy npm run start &
+  - sleep 3
+  - npm explore cozy-data-system coffee commands.coffee test-install api ../../test/package.json
+  - export NAME=api
+  - export TOKEN=apptoken
