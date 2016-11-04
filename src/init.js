@@ -14,8 +14,10 @@ function getV1Token () {
     } else {
       const origin = window.origin
       const intent = {action: 'getToken'}
+      let timeout = null
       const receiver = function (event) {
         window.removeEventListener('message', receiver)
+        clearTimeout(timeout)
         resolve({
           appName: event.data.appName,
           token: event.data.token
@@ -23,7 +25,7 @@ function getV1Token () {
       }
       window.addEventListener('message', receiver, false)
       window.parent.postMessage(intent, origin)
-      setTimeout(function () {
+      timeout = setTimeout(function () {
         reject(new Error('No response from parent iframe after 3s'))
       }, V1TOKEN_ABORT_TIMEOUT)
     }
