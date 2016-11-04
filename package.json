@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "build": "NODE_ENV=production webpack",
-    "test": "NODE_ENV=test mocha-webpack",
+    "test": "npm run test:unit && npm run test:integ",
+    "test:unit": "NODE_ENV=test mocha-webpack test/unit/**.js",
+    "test:integ": "NODE_ENV=test mocha-webpack test/integration/**.js",
     "clean": "rm -r dist && rm -r .tmp"
   },
   "repository": {

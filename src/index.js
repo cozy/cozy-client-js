@@ -1,6 +1,11 @@
 import * as crud from './crud'
+import {configure} from './utils'
 
 export default {
+  init: async function (opts) {
+    return configure(opts)
+    // TODO authentication
+  },
   // create(doctype, attributes) add a document to the database
   create: crud.create,
   // find(doctype, id) retrieve a document by its doctype & ID.
