@@ -50,4 +50,47 @@ describe('crud API', function () {
       fetched.should.have.property('test', 'value')
     })
   })
+
+  describe('Update document', function () {
+    before(mock.mockAPI('UpdateDoc'))
+
+    it('Call the proper route', async function () {
+      const changes = { 'test': 'value2' }
+      const updated = await cozy.update('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' }, changes)
+
+      mock.calls('UpdateDoc').should.have.length(1)
+      mock.lastUrl('UpdateDoc').should.equal('/data/io.cozy.testobject/42')
+      mock.lastOptions('UpdateDoc').should.have.property('body',
+        '{"_id":"42","_rev":"1-5444878785445","test":"value2"}'
+      )
+
+      updated.should.have.property('_id', '42')
+      updated.should.have.property('_rev', '2-5444878785445')
+      updated.should.have.property('test', 'value2')
+    })
+
+    it('Fails when doc is missing _id or _rev field', async function () {
+      let err = null
+
+      const changes = { 'test': 'value2' }
+
+      try {
+        await cozy.update('io.cozy.testobject', { _rev: '1-5444878785445' }, changes)
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('Missing _id field in passed document'))
+      }
+
+      err = null
+
+      try {
+        await cozy.update('io.cozy.testobject', { _id: '42' }, changes)
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('Missing _rev field in passed document'))
+      }
+    })
+  })
 })

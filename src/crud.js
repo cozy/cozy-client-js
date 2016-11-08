@@ -18,7 +18,14 @@ function doFetch (config, method, path, body) {
   let target = config.target || ''
   let pathprefix = config.isV1 ? '/ds-api' : ''
   let fullpath = target + pathprefix + path
-  return fetch(fullpath, options).then(res => res.json())
+  return fetch(fullpath, options).then((res) => {
+    const json = res.json()
+    if (!res.ok) {
+      return json.then(err => { throw err })
+    } else {
+      return json
+    }
+  })
 }
 
 export async function create (doctype, attributes) {
@@ -41,6 +48,27 @@ export async function find (doctype, id) {
   if (config.isV1) Object.assign(response, {_rev: NOREV})
 
   return response
+}
+
+export async function update (doctype, doc, changes) {
+  const config = await waitConfig()
+
+  const {_id, _rev} = doc
+
+  if (!_id) {
+    throw new Error('Missing _id field in passed document')
+  }
+
+  if (!_rev) {
+    throw new Error('Missing _rev field in passed document')
+  }
+
+  let path = '/data/' + (config.isV1 ? '' : `${doctype}/`) + _id
+  let response = await doFetch(config, 'PUT', path, Object.assign({ _id, _rev }, changes))
+
+  if (config.isV1) return await find(doctype, response._id)
+
+  return response.data
 }
 
 export function updateAttributes (doctype, doc) {

@@ -59,4 +59,16 @@ describe('crud API', function () {
       fetched.should.have.property('test', 'value')
     })
   })
+
+  describe('Update document', function () {
+    it('Works', async function () {
+      const changes = {
+        'test': 'value2'
+      }
+      const updated = await cozy.update('io.cozy.testobject', { _id: docID, _rev: docRev }, changes)
+      updated.should.have.property('_id', docID)
+      updated.should.have.property('_rev')
+      updated.should.have.property('test', 'value2')
+    })
+  })
 })

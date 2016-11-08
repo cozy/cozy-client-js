@@ -30,6 +30,20 @@ const ROUTES = [
         'test': 'value'
       }
     }
+  },
+  {
+    name: 'UpdateDoc',
+    method: 'PUT',
+    matcher: '/data/io.cozy.testobject/42',
+    response: {
+      '_id': '42',
+      '_rev': '2-5444878785445',
+      'data': {
+        '_id': '42',
+        '_rev': '2-5444878785445',
+        'test': 'value2'
+      }
+    }
   }
 ]
 
