@@ -44,6 +44,15 @@ const ROUTES = [
         'test': 'value2'
       }
     }
+  },
+  {
+    name: 'DeleteDoc',
+    method: 'DELETE',
+    matcher: '/data/io.cozy.testobject/42?rev=1-5444878785445',
+    response: {
+      'id': '42',
+      'rev': '1-5444878785445'
+    }
   }
 ]
 

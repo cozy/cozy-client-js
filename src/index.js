@@ -15,6 +15,9 @@ export default {
   update: function (doctype, doc, changes, optCallback) {
     return promiser(crud.update(doctype, doc, changes), optCallback)
   },
+  delete: function (doctype, doc, optCallback) {
+    return promiser(crud._delete(doctype, doc), optCallback)
+  },
   // updateAttributes(doctype, {_id, _rev}, changes) performs a patch.
   updateAttribute: crud.updateAttributes,
   // destroy(doctype, {_id, _rev}) removes a document from the database

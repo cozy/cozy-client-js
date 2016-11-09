@@ -93,4 +93,19 @@ describe('crud API', function () {
       }
     })
   })
+
+  describe('Delete document', function () {
+    before(mock.mockAPI('DeleteDoc'))
+
+    it('Call the proper route', async function () {
+      const deleted = await cozy.delete('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' })
+
+      mock.calls('DeleteDoc').should.have.length(1)
+      mock.lastUrl('DeleteDoc').should.equal('/data/io.cozy.testobject/42?rev=1-5444878785445')
+      mock.lastOptions('DeleteDoc').should.not.have.property('body')
+
+      deleted.should.have.property('id', '42')
+      deleted.should.have.property('rev', '1-5444878785445')
+    })
+  })
 })

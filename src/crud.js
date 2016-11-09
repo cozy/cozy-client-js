@@ -93,6 +93,27 @@ export async function update (doctype, doc, changes) {
   return response.data
 }
 
+export async function _delete (doctype, doc) {
+  const config = await waitConfig()
+
+  const {_id, _rev} = doc
+
+  if (!_id) {
+    throw new Error('Missing _id field in passed document')
+  }
+
+  if (!_rev) {
+    throw new Error('Missing _rev field in passed document')
+  }
+
+  let path = createPath(config, doctype, _id, { rev: _rev })
+  let response = await doFetch(config, 'DELETE', path)
+
+  if (config.isV1) Object.assign(response, {rev: NOREV})
+
+  return response
+}
+
 export function updateAttributes (doctype, doc) {
   throw new Error('not implemented')
 }

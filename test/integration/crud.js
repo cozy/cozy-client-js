@@ -69,6 +69,16 @@ describe('crud API', function () {
       updated.should.have.property('_id', docID)
       updated.should.have.property('_rev')
       updated.should.have.property('test', 'value2')
+      docID = updated._id
+      docRev = updated._rev
+    })
+  })
+
+  describe('Delete document', function () {
+    it('Works', async function () {
+      const deleted = await cozy.delete('io.cozy.testobject', { _id: docID, _rev: docRev })
+      deleted.should.have.property('id', docID)
+      deleted.should.have.property('rev')
     })
   })
 })
