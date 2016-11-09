@@ -37,7 +37,7 @@ async function getV2Token () {
 }
 
 async function isV1 (opts) {
-  let response = await fetch((opts.target || '') + '/status')
+  let response = await fetch((opts.target || '') + '/status/')
   let status = await response.json()
   return status.datasystem !== undefined
 }

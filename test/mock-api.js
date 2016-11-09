@@ -4,7 +4,7 @@ const ROUTES = [
   {
     name: 'Status',
     method: 'GET',
-    matcher: '/status',
+    matcher: '/status/',
     response: { 'couchdb': 'ok' }
   },
   {
