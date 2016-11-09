@@ -28,10 +28,28 @@ function doFetch (config, method, path, body) {
   })
 }
 
+function createPath (config, doctype, id = '', query = null) {
+  let route = '/data/'
+  if (!config.isV1) {
+    route += `${encodeURIComponent(doctype)}/`
+  }
+  if (id !== '') {
+    route += encodeURIComponent(id)
+  }
+  if (query) {
+    const q = []
+    for (const qname in query) {
+      q.push(`${encodeURIComponent(qname)}=${encodeURIComponent(query[qname])}`)
+    }
+    route += `?${q.join('&')}`
+  }
+  return route
+}
+
 export async function create (doctype, attributes) {
   const config = await waitConfig()
 
-  let path = '/data/' + (config.isV1 ? '' : `${doctype}/`)
+  let path = createPath(config, doctype)
   let response = await doFetch(config, 'POST', path, attributes)
 
   if (config.isV1) return await find(doctype, response._id)
@@ -42,7 +60,11 @@ export async function create (doctype, attributes) {
 export async function find (doctype, id) {
   const config = await waitConfig()
 
-  let path = '/data/' + (config.isV1 ? '' : `${doctype}/`) + id
+  if (!id) {
+    throw new Error('Missing id parameter')
+  }
+
+  let path = createPath(config, doctype, id)
   let response = await doFetch(config, 'GET', path)
 
   if (config.isV1) Object.assign(response, {_rev: NOREV})
@@ -63,7 +85,7 @@ export async function update (doctype, doc, changes) {
     throw new Error('Missing _rev field in passed document')
   }
 
-  let path = '/data/' + (config.isV1 ? '' : `${doctype}/`) + _id
+  let path = createPath(config, doctype, _id)
   let response = await doFetch(config, 'PUT', path, Object.assign({ _id, _rev }, changes))
 
   if (config.isV1) return await find(doctype, response._id)
