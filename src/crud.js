@@ -85,10 +85,16 @@ export async function update (doctype, doc, changes) {
     throw new Error('Missing _rev field in passed document')
   }
 
-  let path = createPath(config, doctype, _id)
-  let response = await doFetch(config, 'PUT', path, Object.assign({ _id, _rev }, changes))
+  if (_rev === NOREV) {
+    changes = Object.assign({ _id }, changes)
+  } else {
+    changes = Object.assign({ _id, _rev }, changes)
+  }
 
-  if (config.isV1) return await find(doctype, response._id)
+  let path = createPath(config, doctype, _id)
+  let response = await doFetch(config, 'PUT', path, changes)
+
+  if (config.isV1) return await find(doctype, _id)
 
   return response.data
 }
@@ -109,7 +115,7 @@ export async function _delete (doctype, doc) {
   let path = createPath(config, doctype, _id, { rev: _rev })
   let response = await doFetch(config, 'DELETE', path)
 
-  if (config.isV1) Object.assign(response, {rev: NOREV})
+  if (config.isV1) Object.assign(response, {id: _id, rev: NOREV})
 
   return response
 }
