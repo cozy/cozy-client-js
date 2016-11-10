@@ -81,11 +81,11 @@ export async function update (doctype, doc, changes) {
     throw new Error('Missing _id field in passed document')
   }
 
-  if (!_rev) {
+  if (!config.isV1 && !_rev) {
     throw new Error('Missing _rev field in passed document')
   }
 
-  if (_rev === NOREV) {
+  if (config.isV1) {
     changes = Object.assign({ _id }, changes)
   } else {
     changes = Object.assign({ _id, _rev }, changes)
@@ -108,11 +108,12 @@ export async function _delete (doctype, doc) {
     throw new Error('Missing _id field in passed document')
   }
 
-  if (!_rev) {
+  if (!config.isV1 && !_rev) {
     throw new Error('Missing _rev field in passed document')
   }
 
-  let path = createPath(config, doctype, _id, { rev: _rev })
+  let query = config.isV1 ? null : { rev: _rev }
+  let path = createPath(config, doctype, _id, query)
   let response = await doFetch(config, 'DELETE', path)
 
   if (config.isV1) Object.assign(response, {id: _id, rev: NOREV})
