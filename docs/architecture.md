@@ -5,7 +5,7 @@
 Cozy-api is written in ES6 and built using webpack and babel.
 
 **TODO:** As a developer, I can `import`/`require` cozy-client-js using any build tool
-**TODO:** As a developer, I can add `<script src="/cozy-client-js.js">` to my page and get started.
+**TODO:** As a developer, I can add `<script src="/cozy-client.js">` to my page and get started.
 
 ## Polyfills
 
