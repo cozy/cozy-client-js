@@ -1,4 +1,4 @@
-# How to transition your app from cozy-browser-sdk to cozy-api
+# How to transition your app from cozy-browser-sdk to cozy-client-js
 
 ## Full doctype qualification
 
@@ -14,13 +14,13 @@ To ensure retrocompatibility, when used on stack v2, all known doctypes will be 
 
 
 ```javascript
-// cozy sdk
+// cozy-browser-sdk
 cozy.create("Contact", {})
 cozy.create("Book", {})
-// cozy api
+// cozy-client-js
 cozy.create("io.cozy.contact", {})
 cozy.create("com.mydomain.book", {})
-// cozy api (retrocompatibility - DO NOT DO THIS)
+// cozy-client-js (retrocompatibility - DO NOT DO THIS)
 cozy.create("Contact", {})
 ```
 
@@ -33,10 +33,10 @@ When used on a stack-v1 cozy, the `defineIndex` and `findDocuments` calls will b
 If you need the full power of MapReduce, please open a issue on cozy-stack with your usecase.
 
 ```javascript
-// cozy sdk
+// cozy-browser-sdk
 cozysdk.defineMapReduceView('Event', 'all', function(doc) { emit(doc.year); })
 cozysdk.queryView('Event', 'all', {key: 2016, limit: 10})
-// cozy api
+// cozy-client-js
 index = cozysdk.defineIndex('Event', ['year'])
 cozysdk.findSelectors('Event', {use_index: index, selector: {year: 2016}, limit: 10})
 ```

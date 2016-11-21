@@ -1,6 +1,6 @@
-# Cozy-api API
+# Cozy-client-js API
 
-**The cozy-api API is still a work in progress**
+**The cozy-client-js API is still a work in progress**
 
 
 ## Initialization

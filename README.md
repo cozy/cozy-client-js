@@ -1,7 +1,7 @@
-![Travis build status shield](https://img.shields.io/travis/cozy/cozy-api.svg)
-![NPM release version shield](https://img.shields.io/npm/v/cozy-api.svg)
-![Github Release version shield](https://img.shields.io/github/release/cozy/cozy-api.svg)
-![NPM Licence shield](https://img.shields.io/npm/l/cozy-api.svg)
+![Travis build status shield](https://img.shields.io/travis/cozy/cozy-client-js.svg)
+![NPM release version shield](https://img.shields.io/npm/v/cozy-client-js.svg)
+![Github Release version shield](https://img.shields.io/github/release/cozy/cozy-client-js.svg)
+![NPM Licence shield](https://img.shields.io/npm/l/cozy-client-js.svg)
 
 
 [Cozy][cozy] API
@@ -19,7 +19,7 @@ What's Cozy?
 What's API?
 ------------------
 
-`cozy-api` is a javascript library made by Cozy. It enables client-side  applications to make requests to the cozy stack.
+`cozy-client-js` is a javascript library made by Cozy. It enables client-side  applications to make requests to the cozy stack.
 
 Cozy-api is compatible with both cozy architectures.
 
@@ -27,7 +27,7 @@ Cozy-api is compatible with both cozy architectures.
 
 To learn more about the stack-v2, head over to [its repository](https://github.com/cozy/cozy-stack).
 
-If you are getting started on cozy application development, you should follow this [tutorial](https://dev.cozy.io/clientsideapp.html) and use the current `cozy-browser-sdk`. Transitioning from the cozy-browser-sdk library to this one should imply minimal changes (see [transition doc](https://github.com/cozy/cozy-api/blob/master/docs/browser-sdk-transition.md]) )
+If you are getting started on cozy application development, you should follow this [tutorial](https://dev.cozy.io/clientsideapp.html) and use the current `cozy-browser-sdk`. Transitioning from the cozy-browser-sdk library to this one should imply minimal changes (see [transition doc](https://github.com/cozy/cozy-client-js/blob/master/docs/browser-sdk-transition.md]) )
 
 
 
@@ -39,8 +39,8 @@ Hack
 You can clone the repository and install dependencies:
 
 ```sh
-$ git clone https://github.com/cozy/cozy-api.git
-$ cd cozy-api
+$ git clone https://github.com/cozy/cozy-client-js.git
+$ cd cozy-client-js
 $ npm install
 ```
 
@@ -52,7 +52,7 @@ $ npm install
 Tests are run by [mocha] under the hood, and written using [should]. You can easily run the tests suite with:
 
 ```sh
-$ cd cozy-api
+$ cd cozy-client-js
 $ npm run test
 ```
 
@@ -76,7 +76,7 @@ Community
 
 ### Maintainer
 
-The lead maintainer for Cozy API is @aenario, send him/her a :beers: to say hello!
+The lead maintainer for cozy-client-js is @aenario, send him/her a :beers: to say hello!
 
 
 ### Get in touch
@@ -92,7 +92,7 @@ You can reach the Cozy Community by:
 Licence
 -------
 
-Cozy API is developed by Cozy Cloud and distributed under the [MIT][MIT].
+cozy-client-js is developed by Cozy Cloud and distributed under the [MIT][MIT].
 
 
 

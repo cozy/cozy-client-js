@@ -1,5 +1,5 @@
 {
-  "name": "cozy-api-test",
+  "name": "cozy-client-js-test",
   "version": "1.0.0",
   "description": "Necessary for v1 permissions",
   "cozy-permissions": {

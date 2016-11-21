@@ -10,8 +10,8 @@ var config = {
   target: 'node',
   output: {
     path: path.join(__dirname, '/dist'),
-    filename: 'cozy-api.js',
-    library: 'cozy-api',
+    filename: 'cozy-client.js',
+    library: 'cozy-client-js',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
