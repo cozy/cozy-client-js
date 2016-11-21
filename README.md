@@ -4,8 +4,8 @@
 ![NPM Licence shield](https://img.shields.io/npm/l/cozy-client-js.svg)
 
 
-[Cozy][cozy] API
-=======================
+[Cozy][cozy] Javascript Client
+==============================
 
 
 What's Cozy?
