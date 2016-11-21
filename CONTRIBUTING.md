@@ -1,4 +1,4 @@
-How to contribute to Cozy API?
+How to contribute to cozy-client-js?
 ====================================
 
 Thank you for your interest in contributing to Cozy! There are many ways to contribute, and we appreciate all of them.
@@ -23,7 +23,7 @@ Opening an issue is as easy as following [this link][issues] and filling out the
 - What did you try, step by step?
 - What did you expect?
 - What did happen instead?
-- What is the version of the Cozy API?
+- What is the version of the cozy-client-js?
 
 
 Pull Requests
@@ -47,9 +47,9 @@ Pull requests are the primary mechanism we use to change Cozy. GitHub itself has
 Fork the project on GitHub and [check out your copy locally][forking].
 
 ```
-$ git clone github.com/cozy/cozy-api.git
-$ cd cozy-api
-$ git remote add fork git://github.com/yourusername/cozy-api.git
+$ git clone github.com/cozy/cozy-client-js.git
+$ cd cozy-client-js
+$ git remote add fork git://github.com/yourusername/cozy-client-js.git
 ```
 
 #### Step 2: Branch
@@ -69,7 +69,7 @@ Well, we think you know how to do that. Just be sure to follow the coding guidel
 Don't forget to add tests and be sure they are green:
 
 ```
-$ cd cozy-api
+$ cd cozy-client-js
 $ npm run test
 ```
 
@@ -92,7 +92,7 @@ $ git rebase origin/development my-branch
 $ git push -u fork my-branch
 ```
 
-Go to https://github.com/username/cozy-api and select your branch. Click the 'Pull Request' button and fill out the form. **Do not forget** to select the `development` branch as base branch.
+Go to https://github.com/username/cozy-client-js and select your branch. Click the 'Pull Request' button and fill out the form. **Do not forget** to select the `development` branch as base branch.
 
 Alternatively, you can use [hub] to open the pull request from your terminal:
 
@@ -116,11 +116,11 @@ You can help us by making our community even more vibrant. For example, you can 
 
 
 
-[issues]: https://github.com/cozy/cozy-api/issues/new
+[issues]: https://github.com/cozy/cozy-client-js/issues/new
 [pr]: https://help.github.com/categories/collaborating-with-issues-and-pull-requests/
 [forking]: http://blog.campoy.cat/2014/03/github-and-go-forking-pull-requests-and.html
 [stdjs]: http://standardjs.com/
 [commitmsg]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[localization]: https://github.com/cozy/cozy-api/blob/master/README.md#localization
+[localization]: https://github.com/cozy/cozy-client-js/blob/master/README.md#localization
 [hub]: https://hub.github.com/
 [forum]: https://forum.cozy.io/

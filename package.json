@@ -1,5 +1,5 @@
 {
-  "name": "cozy-api",
+  "name": "cozy-client-js",
   "version": "0.0.1",
   "description": "Javascript library to interact with a cozy",
   "main": "src/index.js",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cozy/cozy-api"
+    "url": "https://github.com/cozy/cozy-client-js"
   },
   "keywords": [
     "cozy",
@@ -24,9 +24,9 @@
   "author": "cozycloud.cc",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cozy/cozy-api/issues"
+    "url": "https://github.com/cozy/cozy-client-js/issues"
   },
-  "homepage": "https://github.com/cozy/cozy-api",
+  "homepage": "https://github.com/cozy/cozy-client-js",
   "devDependencies": {
     "babel-core": "6.18.0",
     "babel-loader": "6.2.6",
