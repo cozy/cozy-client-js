@@ -80,11 +80,11 @@ async function queryV2 (config, indexRef, options) {
 
   let opts = {
     use_index: indexRef.name,
-    fields: query.fields,
-    selector: query.selector,
-    limit: query.limit,
-    since: query.since,
-    sort: indexRef.fields // sort is frankly useless with mango
+    fields: options.fields,
+    selector: options.selector,
+    limit: options.limit,
+    since: options.since,
+    sort: indexRef.fields // sort is useless with mango
   }
 
   let path = createPath(config, indexRef.doctype, '_find')

@@ -47,7 +47,10 @@ describe('selector to MR query', function () {
     let indexDef = {type: 'v1', fields: ['folderID', 'date'], name: 'testindex'}
     let mrq = makeMapReduceQuery(indexDef, {selector: {'folderID': '42'}})
 
-    mrq.should.deepEqual({startkey: ['42'], endkey: ['42', {'\uFFFF': '\uFFFF'}]})
+    mrq.should.deepEqual({
+      startkey: ['42'],
+      reduce: false,
+      endkey: ['42', {'\uFFFF': '\uFFFF'}]})
   })
 
   it('double selector', function () {
@@ -59,7 +62,10 @@ describe('selector to MR query', function () {
       }
     })
 
-    mrq.should.deepEqual({startkey: ['42', '2101'], endkey: ['42', '2101']})
+    mrq.should.deepEqual({
+      startkey: ['42', '2101'],
+      reduce: false,
+      endkey: ['42', '2101']})
   })
 
   it('operator selector', function () {
@@ -71,7 +77,10 @@ describe('selector to MR query', function () {
       }
     })
 
-    mrq.should.deepEqual({startkey: ['42', '2101'], endkey: ['42', {'\uFFFF': '\uFFFF'}]})
+    mrq.should.deepEqual({
+      startkey: ['42', '2101'],
+      reduce: false,
+      endkey: ['42', {'\uFFFF': '\uFFFF'}]})
   })
 
   it('double operator selector', function () {
@@ -83,6 +92,10 @@ describe('selector to MR query', function () {
       }
     })
 
-    mrq.should.deepEqual({startkey: ['42', '2101'], endkey: ['42', '2201'], inclusive_end: false})
+    mrq.should.deepEqual({
+      startkey: ['42', '2101'],
+      reduce: false,
+      endkey: ['42', '2201'],
+      inclusive_end: false})
   })
 })
