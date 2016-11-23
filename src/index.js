@@ -26,7 +26,5 @@ export default {
     return promiser(mango.query(indexRef, query), optCallback)
   },
   // updateAttributes(doctype, {_id, _rev}, changes) performs a patch.
-  updateAttribute: crud.updateAttributes,
-  // destroy(doctype, {_id, _rev}) removes a document from the database
-  destroy: crud.destroy
+  updateAttribute: crud.updateAttributes
 }
