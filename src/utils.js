@@ -62,3 +62,35 @@ export function doFetch (config, method, path, body) {
     }
   })
 }
+
+const KNOWN_DOCTYPES = {
+  'files': 'io.cozy.files',
+  'folder': 'io.cozy.folders',
+  'contact': 'io.cozy.contacts',
+  'event': 'io.cozy.events',
+  'track': 'io.cozy.labs.music.track',
+  'playlist': 'io.cozy.labs.music.playlist'
+}
+export function normalizeDoctype (config, doctype) {
+  let isQualified = doctype.indexOf('.') !== -1
+  if (config.isV1 && isQualified) {
+    return doctype.replace(/\./g, '-')
+  }
+  if (config.isV2 && !isQualified) {
+    let known = KNOWN_DOCTYPES[doctype]
+    if (known) {
+      warn('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + known)
+      return known
+    }
+    throw new Error('Doctype ' + doctype + ' should be qualified.')
+  }
+  return doctype
+}
+
+let warned = []
+export function warn (text) {
+  if (warned.indexOf(text) === -1) {
+    warned.push(text)
+    console.log('Warning', text)
+  }
+}
