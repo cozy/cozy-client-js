@@ -53,6 +53,27 @@ const ROUTES = [
       'id': '42',
       'rev': '1-5444878785445'
     }
+  },
+  {
+    name: 'CreateIndex',
+    method: 'POST',
+    matcher: '/data/io.cozy.testobject/_index',
+    response: {
+      'id': '_design/generatedindexname',
+      'name': 'generatedindexname',
+      'result': 'created'
+    }
+  },
+  {
+    name: 'FindDocuments',
+    method: 'POST',
+    matcher: '/data/io.cozy.testobject/_find',
+    response: {
+      'docs': [
+        {'_id': '42', 'test': 'value'},
+        {'_id': '43', 'test': 'value'}
+      ]
+    }
   }
 ]
 
