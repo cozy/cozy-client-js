@@ -6,9 +6,9 @@
   "scripts": {
     "build": "NODE_ENV=production webpack",
     "test": "npm run test:unit && npm run test:v1 && npm run test:v2",
-    "test:unit": "NODE_ENV=test mocha-webpack test/unit/**.js",
-    "test:v1": "NODE_ENV=test TARGET=http://localhost:9104 mocha-webpack test/integration/**.js",
-    "test:v2": "NODE_ENV=test TARGET=http://localhost:8080 mocha-webpack test/integration/**.js",
+    "test:unit": "NODE_ENV=test mocha-webpack \"test/unit/**.js\"",
+    "test:v1": "NODE_ENV=test TARGET=http://localhost:9104 mocha-webpack \"test/integration/**.js\"",
+    "test:v2": "NODE_ENV=test TARGET=http://localhost:8080 mocha-webpack \"test/integration/**.js\"",
     "clean": "rm -r dist && rm -r .tmp"
   },
   "repository": {
