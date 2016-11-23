@@ -18,7 +18,7 @@ To ensure retrocompatibility, when used on stack v2, all known doctypes will be 
 cozy.create("Contact", {})
 cozy.create("Book", {})
 // cozy-client-js
-cozy.create("io.cozy.contact", {})
+cozy.create("io.cozy.contacts", {})
 cozy.create("com.mydomain.book", {})
 // cozy-client-js (retrocompatibility - DO NOT DO THIS)
 cozy.create("Contact", {})
