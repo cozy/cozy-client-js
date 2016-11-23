@@ -1,50 +1,6 @@
-/* global fetch, btoa */
-
-import {waitConfig} from './utils'
+import {waitConfig, createPath, doFetch} from './utils'
 
 const NOREV = 'stack-v1-no-rev'
-
-function doFetch (config, method, path, body) {
-  const options = {method: method, headers: {}}
-  if (body !== undefined) {
-    options.headers['Content-Type'] = 'application/json'
-    options.body = JSON.stringify(body)
-  }
-  if (config.auth) {
-    let auth = config.auth.appName + ':' + config.auth.token
-    options.headers['Authorization'] = 'Basic ' + btoa(auth)
-  }
-
-  let target = config.target || ''
-  let pathprefix = config.isV1 ? '/ds-api' : ''
-  let fullpath = target + pathprefix + path
-  return fetch(fullpath, options).then((res) => {
-    const json = res.json()
-    if (!res.ok) {
-      return json.then(err => { throw err })
-    } else {
-      return json
-    }
-  })
-}
-
-function createPath (config, doctype, id = '', query = null) {
-  let route = '/data/'
-  if (!config.isV1) {
-    route += `${encodeURIComponent(doctype)}/`
-  }
-  if (id !== '') {
-    route += encodeURIComponent(id)
-  }
-  if (query) {
-    const q = []
-    for (const qname in query) {
-      q.push(`${encodeURIComponent(qname)}=${encodeURIComponent(query[qname])}`)
-    }
-    route += `?${q.join('&')}`
-  }
-  return route
-}
 
 export async function create (doctype, attributes) {
   const config = await waitConfig()
