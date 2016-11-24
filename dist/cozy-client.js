@@ -1723,7 +1723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            doctype = (0, _utils.normalizeDoctype)(config, doctype);
 	
-	            if (!(Object.prototype.toString.call(fields) !== '[object Array]' || fields.length === 0)) {
+	            if (!(!Array.isArray(fields) || fields.length === 0)) {
 	              _context.next = 6;
 	              break;
 	            }
@@ -2002,10 +2002,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function makeMapFunction(doctype, fields) {
-	  if (Object.prototype.toString.call(fields) !== '[object Array]' || fields.length === 0) {
-	    throw new Error('makeMapFunction fields should be a non-empty array');
-	  }
-	
 	  fields = '[' + fields.map(function (name) {
 	    return 'doc.' + name;
 	  }).join(',') + ']';
