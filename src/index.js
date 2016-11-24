@@ -1,4 +1,5 @@
 import * as crud from './crud'
+import * as mango from './mango'
 import init from './init'
 import {promiser} from './utils'
 
@@ -18,8 +19,12 @@ export default {
   delete: function (doctype, doc, optCallback) {
     return promiser(crud._delete(doctype, doc), optCallback)
   },
+  defineIndex: function (doctype, indexDef, optCallback) {
+    return promiser(mango.defineIndex(doctype, indexDef), optCallback)
+  },
+  query: function (indexRef, query, optCallback) {
+    return promiser(mango.query(indexRef, query), optCallback)
+  },
   // updateAttributes(doctype, {_id, _rev}, changes) performs a patch.
-  updateAttribute: crud.updateAttributes,
-  // destroy(doctype, {_id, _rev}) removes a document from the database
-  destroy: crud.destroy
+  updateAttribute: crud.updateAttributes
 }

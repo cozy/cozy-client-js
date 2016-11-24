@@ -4,27 +4,10 @@
 import should from 'should'
 import cozy from '../../src'
 import fetch from 'isomorphic-fetch'
+import mockTokenRetrieve from '../mock-iframe-token'
 global.fetch = fetch
 
 const TARGET = process.env && process.env.TARGET || ''
-
-function mockTokenRetrieve () {
-  if (typeof global.window === 'undefined') global.window = {}
-  let listener = null
-  global.window.addEventListener = (n, l) => { listener = l }
-  global.window.removeEventListener = () => null
-  global.window.parent = {}
-  global.window.parent.postMessage = function (payload, origin) {
-    if (payload.action === 'getToken') {
-      listener({
-        data: {
-          appName: process.env.NAME,
-          token: process.env.TOKEN
-        }
-      })
-    }
-  }
-}
 
 describe('crud API', function () {
   let docID = null

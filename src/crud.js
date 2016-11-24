@@ -1,53 +1,12 @@
-/* global fetch, btoa */
-
-import {waitConfig} from './utils'
+import {waitConfig, createPath, doFetch, normalizeDoctype} from './utils'
 
 const NOREV = 'stack-v1-no-rev'
 
-function doFetch (config, method, path, body) {
-  const options = {method: method, headers: {}}
-  if (body !== undefined) {
-    options.headers['Content-Type'] = 'application/json'
-    options.body = JSON.stringify(body)
-  }
-  if (config.auth) {
-    let auth = config.auth.appName + ':' + config.auth.token
-    options.headers['Authorization'] = 'Basic ' + btoa(auth)
-  }
-
-  let target = config.target || ''
-  let pathprefix = config.isV1 ? '/ds-api' : ''
-  let fullpath = target + pathprefix + path
-  return fetch(fullpath, options).then((res) => {
-    const json = res.json()
-    if (!res.ok) {
-      return json.then(err => { throw err })
-    } else {
-      return json
-    }
-  })
-}
-
-function createPath (config, doctype, id = '', query = null) {
-  let route = '/data/'
-  if (!config.isV1) {
-    route += `${encodeURIComponent(doctype)}/`
-  }
-  if (id !== '') {
-    route += encodeURIComponent(id)
-  }
-  if (query) {
-    const q = []
-    for (const qname in query) {
-      q.push(`${encodeURIComponent(qname)}=${encodeURIComponent(query[qname])}`)
-    }
-    route += `?${q.join('&')}`
-  }
-  return route
-}
-
 export async function create (doctype, attributes) {
   const config = await waitConfig()
+  doctype = normalizeDoctype(config, doctype)
+
+  if (config.isV1) attributes.docType = doctype
 
   let path = createPath(config, doctype)
   let response = await doFetch(config, 'POST', path, attributes)
@@ -59,6 +18,7 @@ export async function create (doctype, attributes) {
 
 export async function find (doctype, id) {
   const config = await waitConfig()
+  doctype = normalizeDoctype(config, doctype)
 
   if (!id) {
     throw new Error('Missing id parameter')
@@ -74,6 +34,7 @@ export async function find (doctype, id) {
 
 export async function update (doctype, doc, changes) {
   const config = await waitConfig()
+  doctype = normalizeDoctype(config, doctype)
 
   const {_id, _rev} = doc
 
@@ -101,6 +62,7 @@ export async function update (doctype, doc, changes) {
 
 export async function _delete (doctype, doc) {
   const config = await waitConfig()
+  doctype = normalizeDoctype(config, doctype)
 
   const {_id, _rev} = doc
 
@@ -122,9 +84,5 @@ export async function _delete (doctype, doc) {
 }
 
 export function updateAttributes (doctype, doc) {
-  throw new Error('not implemented')
-}
-
-export function destroy (doctype, doc) {
   throw new Error('not implemented')
 }

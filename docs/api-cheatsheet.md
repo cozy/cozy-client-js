@@ -8,13 +8,7 @@
 ```javascript
 // cozy.init() retrieves the token either from the URL, a cookie, or
 // parent.postMessage depending on auth mechanism, context and stack version.
-await cozy.init({
-  appName: "your_app_name"
-  onlyV2: false      // crash with helpful message if the application is used on
-                     // v1
-  onlyV1: false      // crash with helpful message if the application is used on
-                     // v2, useful if you are doing dark map reduce magic.
-});
+await cozy.init();
 ```
 
 **TODO:** more options will probably be necessary for auth.
@@ -50,27 +44,23 @@ console.log(doc2._id === doc._id, doc2.title, doc2.year)
 await cozy.destroy("my.domain.book", doc._id)
 await cozy.destroy("my.domain.book", doc2)
 
-// defineIndex(doctype, fields...) creates an index for a doctype
+// defineIndex(doctype, fields) creates an index for a doctype
 // here documents will be sorted by year first and then rating
 // if used on cozy v2, a mango index is created.
 // if used on cozy v1, a map-reduce view is created
 // defineIndex is idempotent, it can be called several time.
-index = await cozy.defineIndex("my.domain.book", 'year', 'rating')
-// Still not clear if index will be a string or an object
+// defineIndex returns an indexRef object, which should be passed to query.
+booksByYear = await cozy.defineIndex("my.domain.book", 'year', 'rating')
 
-// query(doctype, options) find documents, see couchdb/_find docs.
+// query(indexRef, options) find documents, see couchdb/_find docs.
 // We can perform this query because we have an index on year & rating.
-// use_index is optional with stack v2, but necessary for compatibility with
-// stack v1. Stack v1 query will be very very limited
-results = await cozy.query("my.domain.book", {
-  use_index: index
-  fields: ["title"] // ignored by stack v1
-  selector: {year: 1851},
-  limit: 3,
-  skip: 1,
-  sort: ['rating']
+// Stack v1 query will be limited
+results = await cozy.query(booksByYear, {
+  "selector": {year: 1851),
+  "limit": 3,
+  "skip": 1
 })
-results.total_rows == 10 // there are 10 books from 1851
+
 results.length == 3 // but we only asked for 3
 resuts[0]._id === doc._id
 resuts[0].title === "Moby Dick"
@@ -79,6 +69,8 @@ resuts[0].author === undefined // we only asked for field title
 ```
 
 ## VFS API
+
+**Warning** This API is not implemented. It is not yet decided if it should be made compatible with v1.
 
 ```javascript
 
