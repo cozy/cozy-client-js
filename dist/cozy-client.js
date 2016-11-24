@@ -1190,9 +1190,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var mango = _interopRequireWildcard(_mango);
 	
-	var _init = __webpack_require__(7);
+	var _init2 = __webpack_require__(7);
 	
-	var _init2 = _interopRequireDefault(_init);
+	var _init3 = _interopRequireDefault(_init2);
 	
 	var _utils = __webpack_require__(5);
 	
@@ -1201,7 +1201,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	var cozy = {
-	  init: _init2.default,
+	  init: function init(opts, optCallback) {
+	    return (0, _utils.promiser)((0, _init3.default)(opts), optCallback);
+	  },
 	  // create(doctype, attributes) add a document to the database
 	  create: function create(doctype, attributes, optCallback) {
 	    return (0, _utils.promiser)(crud.create(doctype, attributes), optCallback);
@@ -1222,8 +1224,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  query: function query(indexRef, _query, optCallback) {
 	    return (0, _utils.promiser)(mango.query(indexRef, _query), optCallback);
 	  },
-	  // updateAttributes(doctype, {_id, _rev}, changes) performs a patch.
-	  updateAttribute: crud.updateAttributes
+	  // updateAttributes(doctype, id, changes) performs a patch.
+	  updateAttribute: function updateAttribute(doctype, id, changes, optCallback) {
+	    return (0, _utils.promiser)(crud.updateAttributes(doctype, id, changes), optCallback);
+	  },
+	  // aliased delete to destroy fo browser-sdk compatibility
+	  destroy: function destroy(doctype, doc, optCallback) {
+	    (0, _utils.warn)('destroy is deprecated, use cozy.delete instead.');
+	    return (0, _utils.promiser)(crud._delete(doctype, doc), optCallback);
+	  }
 	};
 	
 	if (typeof window !== 'undefined') window.cozy = cozy;
@@ -1239,7 +1248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports._delete = exports.update = exports.find = exports.create = undefined;
+	exports._delete = exports.updateAttributes = exports.update = exports.find = exports.create = undefined;
 	
 	var create = exports.create = function () {
 	  var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(doctype, attributes) {
@@ -1415,10 +1424,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}();
 	
-	var _delete = exports._delete = function () {
-	  var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(doctype, doc) {
-	    var config, _id, _rev, query, path, response;
-	
+	var updateAttributes = exports.updateAttributes = function () {
+	  var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(doctype, _id, changes) {
+	    var tries = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 3;
+	    var config, doc, updated;
 	    return regeneratorRuntime.wrap(function _callee4$(_context4) {
 	      while (1) {
 	        switch (_context4.prev = _context4.next) {
@@ -1430,11 +1439,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	            config = _context4.sent;
 	
 	            doctype = (0, _utils.normalizeDoctype)(config, doctype);
+	            _context4.next = 6;
+	            return find(doctype, _id);
+	
+	          case 6:
+	            doc = _context4.sent;
+	            updated = Object.assign({ _id: _id }, doc, changes);
+	            _context4.prev = 8;
+	            _context4.next = 11;
+	            return update(doctype, doc, updated);
+	
+	          case 11:
+	            _context4.next = 20;
+	            break;
+	
+	          case 13:
+	            _context4.prev = 13;
+	            _context4.t0 = _context4['catch'](8);
+	
+	            if (!(tries > 0)) {
+	              _context4.next = 19;
+	              break;
+	            }
+	
+	            updateAttributes(doctype, _id, changes, tries - 1);
+	            _context4.next = 20;
+	            break;
+	
+	          case 19:
+	            throw _context4.t0;
+	
+	          case 20:
+	          case 'end':
+	            return _context4.stop();
+	        }
+	      }
+	    }, _callee4, this, [[8, 13]]);
+	  }));
+	
+	  return function updateAttributes(_x8, _x9, _x10, _x11) {
+	    return _ref4.apply(this, arguments);
+	  };
+	}();
+	
+	var _delete = exports._delete = function () {
+	  var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(doctype, doc) {
+	    var config, _id, _rev, query, path, response;
+	
+	    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+	      while (1) {
+	        switch (_context5.prev = _context5.next) {
+	          case 0:
+	            _context5.next = 2;
+	            return (0, _utils.waitConfig)();
+	
+	          case 2:
+	            config = _context5.sent;
+	
+	            doctype = (0, _utils.normalizeDoctype)(config, doctype);
 	
 	            _id = doc._id, _rev = doc._rev;
 	
 	            if (_id) {
-	              _context4.next = 7;
+	              _context5.next = 7;
 	              break;
 	            }
 	
@@ -1442,7 +1509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          case 7:
 	            if (!(!config.isV1 && !_rev)) {
-	              _context4.next = 9;
+	              _context5.next = 9;
 	              break;
 	            }
 	
@@ -1451,41 +1518,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	          case 9:
 	            query = config.isV1 ? null : { rev: _rev };
 	            path = (0, _utils.createPath)(config, doctype, _id, query);
-	            _context4.next = 13;
+	            _context5.next = 13;
 	            return (0, _utils.doFetch)(config, 'DELETE', path);
 	
 	          case 13:
-	            response = _context4.sent;
+	            response = _context5.sent;
 	
 	
 	            if (config.isV1) Object.assign(response, { id: _id, rev: NOREV });
 	
-	            return _context4.abrupt('return', response);
+	            return _context5.abrupt('return', response);
 	
 	          case 16:
 	          case 'end':
-	            return _context4.stop();
+	            return _context5.stop();
 	        }
 	      }
-	    }, _callee4, this);
+	    }, _callee5, this);
 	  }));
 	
-	  return function _delete(_x8, _x9) {
-	    return _ref4.apply(this, arguments);
+	  return function _delete(_x13, _x14) {
+	    return _ref5.apply(this, arguments);
 	  };
 	}();
-	
-	exports.updateAttributes = updateAttributes;
 	
 	var _utils = __webpack_require__(5);
 	
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	var NOREV = 'stack-v1-no-rev';
-	
-	function updateAttributes(doctype, doc) {
-	  throw new Error('not implemented');
-	}
 
 /***/ },
 /* 5 */
@@ -1602,16 +1663,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'track': 'io.cozy.labs.music.track',
 	  'playlist': 'io.cozy.labs.music.playlist'
 	};
+	var REVERSE_KNOWN = {};
+	Object.keys(KNOWN_DOCTYPES).forEach(function (k) {
+	  REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k;
+	});
 	function normalizeDoctype(config, doctype) {
 	  var isQualified = doctype.indexOf('.') !== -1;
 	  if (config.isV1 && isQualified) {
+	    var known = REVERSE_KNOWN[doctype];
+	    if (known) return known;
 	    return doctype.replace(/\./g, '-');
 	  }
 	  if (config.isV2 && !isQualified) {
-	    var known = KNOWN_DOCTYPES[doctype];
-	    if (known) {
-	      warn('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + known);
-	      return known;
+	    var _known = KNOWN_DOCTYPES[doctype];
+	    if (_known) {
+	      warn('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + _known);
+	      return _known;
 	    }
 	    throw new Error('Doctype ' + doctype + ' should be qualified.');
 	  }
@@ -2208,7 +2275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      reject(new Error('getV1Token should be used in modern browser'));
 	    } else {
 	      (function () {
-	        var origin = window.origin;
+	        var origin = window.location.origin;
 	        var intent = { action: 'getToken' };
 	        var timeout = null;
 	        var receiver = function receiver(event) {
