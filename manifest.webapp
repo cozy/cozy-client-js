@@ -1,0 +1,12 @@
+{
+  "description": "Test cozy-client-js",
+  "developer": {
+    "name": "Cozy",
+    "url": "cozy.io"
+  },
+  "license": "MIT",
+  "name": "Test cozy-client-js",
+  "permissions": {},
+  "slug": "cozy-client-js-test",
+  "version": "0.0.1"
+}
