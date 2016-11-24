@@ -1,10 +1,12 @@
 import * as crud from './crud'
 import * as mango from './mango'
 import init from './init'
-import {promiser} from './utils'
+import {promiser, warn} from './utils'
 
-export default {
-  init: init,
+let cozy = {
+  init: function (opts, optCallback) {
+    return promiser(init(opts), optCallback)
+  },
   // create(doctype, attributes) add a document to the database
   create: function (doctype, attributes, optCallback) {
     return promiser(crud.create(doctype, attributes), optCallback)
@@ -25,6 +27,17 @@ export default {
   query: function (indexRef, query, optCallback) {
     return promiser(mango.query(indexRef, query), optCallback)
   },
-  // updateAttributes(doctype, {_id, _rev}, changes) performs a patch.
-  updateAttribute: crud.updateAttributes
+  // updateAttributes(doctype, id, changes) performs a patch.
+  updateAttribute: function (doctype, id, changes, optCallback) {
+    return promiser(crud.updateAttributes(doctype, id, changes), optCallback)
+  },
+  // aliased delete to destroy fo browser-sdk compatibility
+  destroy: function (doctype, doc, optCallback) {
+    warn('destroy is deprecated, use cozy.delete instead.')
+    return promiser(crud._delete(doctype, doc), optCallback)
+  }
 }
+
+if ((typeof window) !== 'undefined') window.cozy = cozy
+
+export default cozy

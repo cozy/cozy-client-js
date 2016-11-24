@@ -4,8 +4,9 @@ export default function mockTokenRetrieve () {
   global.window.addEventListener = (n, l) => { listener = l }
   global.window.removeEventListener = () => null
   global.window.parent = {}
+  global.window.location = {origin: 'fakecozy.local'}
   global.window.parent.postMessage = function (payload, origin) {
-    if (payload.action === 'getToken') {
+    if (payload.action === 'getToken' && origin === 'fakecozy.local') {
       listener({
         data: {
           appName: process.env.NAME,

@@ -60,6 +60,19 @@ export async function update (doctype, doc, changes) {
   return response.data
 }
 
+export async function updateAttributes (doctype, _id, changes, tries = 3) {
+  const config = await waitConfig()
+  doctype = normalizeDoctype(config, doctype)
+  let doc = await find(doctype, _id)
+  let updated = Object.assign({ _id }, doc, changes)
+  try {
+    await update(doctype, doc, updated)
+  } catch (err) {
+    if (tries > 0) updateAttributes(doctype, _id, changes, tries - 1)
+    else throw err
+  }
+}
+
 export async function _delete (doctype, doc) {
   const config = await waitConfig()
   doctype = normalizeDoctype(config, doctype)
@@ -81,8 +94,4 @@ export async function _delete (doctype, doc) {
   if (config.isV1) Object.assign(response, {id: _id, rev: NOREV})
 
   return response
-}
-
-export function updateAttributes (doctype, doc) {
-  throw new Error('not implemented')
 }

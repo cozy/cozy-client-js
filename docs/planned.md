@@ -1,76 +1,11 @@
-# Cozy-client-js API
+# Cozy-client-js API - Planned features
 
-**The cozy-client-js API is still a work in progress**
-
-
-## Initialization
-
-```javascript
-// cozy.init() retrieves the token either from the URL, a cookie, or
-// parent.postMessage depending on auth mechanism, context and stack version.
-await cozy.init();
-```
-
-**TODO:** more options will probably be necessary for auth.
-
-## Crud API
-
-```javascript
-
-book = { title: "Moby Dick", author:"Herman Melville" }
-
-// create(doctype, attributes) add a document to the database
-// COMPATIBLE SDK V1
-created = await cozy.create("my.domain.book", book)
-console.log(created._id, created._rev, created.title, created.author));
-
-// find(doctype, id) retrieve a document by its doctype & ID.
-// COMPATIBLE SDK V1
-doc = await cozy.find("my.domain.book", doc._id)
-console.log(doc._id, doc._rev, doc.title, doc.author));
-
-// updateAttributes(doctype, {_id, _rev}, changes) performs a patch of the document.
-// COMPATIBLE SDK V1
-// if called with only an ID, this functions performs a GET & PUT
-// Passing a {_id, _rev, ...} object is more efficient and recommended.
-doc2 = await cozy.updateAttributes("my.domain.book", doc._id, {year: 1851})
-doc2 = await cozy.updateAttributes("my.domain.book", doc, {year: 1851})
-console.log(doc2._id === doc._id, doc2.title, doc2.year)
-
-// destroy(doctype, document: {_id, _rev}) removes a document from the database
-// COMPATIBLE SDK V1
-// if called with only an ID on stack v2, this functions performs a GET & DELETE
-// Passing a {_id, _rev, ...} object is more efficient and recommended.
-await cozy.destroy("my.domain.book", doc._id)
-await cozy.destroy("my.domain.book", doc2)
-
-// defineIndex(doctype, fields) creates an index for a doctype
-// here documents will be sorted by year first and then rating
-// if used on cozy v2, a mango index is created.
-// if used on cozy v1, a map-reduce view is created
-// defineIndex is idempotent, it can be called several time.
-// defineIndex returns an indexRef object, which should be passed to query.
-booksByYear = await cozy.defineIndex("my.domain.book", 'year', 'rating')
-
-// query(indexRef, options) find documents, see couchdb/_find docs.
-// We can perform this query because we have an index on year & rating.
-// Stack v1 query will be limited
-results = await cozy.query(booksByYear, {
-  "selector": {year: 1851),
-  "limit": 3,
-  "skip": 1
-})
-
-results.length == 3 // but we only asked for 3
-resuts[0]._id === doc._id
-resuts[0].title === "Moby Dick"
-resuts[0].author === undefined // we only asked for field title
-
-```
+This document define the APIs we will be implementing in the future, feel free
+to comment on them through issues or PR !
 
 ## VFS API
 
-**Warning** This API is not implemented. It is not yet decided if it should be made compatible with v1.
+**TO BE DETERMINED** should this be made compatible with v1?
 
 ```javascript
 
