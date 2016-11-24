@@ -70,7 +70,7 @@ booksByYear = await cozy.defineIndex(myType, 'year', 'rating')
 // We can perform this query because we have an index on year & rating.
 // Not all mango capability are supported by stack v1
 results = await cozy.query(booksByYear, {
-  "selector": {year: 1851),
+  "selector": {year: 1851},
   "limit": 3,
   "skip": 1
 })
