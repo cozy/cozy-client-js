@@ -21,9 +21,9 @@ What's API?
 
 `cozy-client-js` is a javascript library made by Cozy. It enables client-side  applications to make requests to the cozy stack.
 
-Cozy-api is compatible with both cozy architectures.
+cozy-client-js is compatible with both cozy architectures.
 
-## This repository is a stub where the stack-v2 companion javascript library is being developed.
+## This repository is a work-in-progress where the stack-v2 companion javascript library is being developed.
 
 To learn more about the stack-v2, head over to [its repository](https://github.com/cozy/cozy-stack).
 
