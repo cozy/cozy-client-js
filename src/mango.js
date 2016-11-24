@@ -3,8 +3,7 @@ import {warn, waitConfig, createPath, doFetch, normalizeDoctype} from './utils'
 export async function defineIndex (doctype, fields) {
   const config = await waitConfig()
   doctype = normalizeDoctype(config, doctype)
-  if (Object.prototype.toString.call(fields) !== '[object Array]' ||
-      fields.length === 0) {
+  if (!Array.isArray(fields) || fields.length === 0) {
     throw new Error('defineIndex fields should be a non-empty array')
   }
   if (config.isV1) return await defineIndexV1(config, doctype, fields)
@@ -98,11 +97,6 @@ function capitalize (name) {
 }
 
 function makeMapFunction (doctype, fields) {
-  if (Object.prototype.toString.call(fields) !== '[object Array]' ||
-      fields.length === 0) {
-    throw new Error('makeMapFunction fields should be a non-empty array')
-  }
-
   fields = '[' + fields.map(name => 'doc.' + name).join(',') + ']'
 
   return MAP_TEMPLATE.replace('DOCTYPEPLACEHOLDER', doctype.toLowerCase())
