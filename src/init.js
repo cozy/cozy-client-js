@@ -12,7 +12,7 @@ function getV1Token () {
     } else if (!window.parent.postMessage) {
       reject(new Error('getV1Token should be used in modern browser'))
     } else {
-      const origin = window.origin
+      const origin = window.location.origin
       const intent = {action: 'getToken'}
       let timeout = null
       const receiver = function (event) {
