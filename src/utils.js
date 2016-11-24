@@ -71,9 +71,13 @@ const KNOWN_DOCTYPES = {
   'track': 'io.cozy.labs.music.track',
   'playlist': 'io.cozy.labs.music.playlist'
 }
+const REVERSE_KNOWN = {}
+Object.keys(KNOWN_DOCTYPES).forEach(k => { REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k })
 export function normalizeDoctype (config, doctype) {
   let isQualified = doctype.indexOf('.') !== -1
   if (config.isV1 && isQualified) {
+    let known = REVERSE_KNOWN[doctype]
+    if (known) return known
     return doctype.replace(/\./g, '-')
   }
   if (config.isV2 && !isQualified) {
