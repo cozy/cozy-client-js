@@ -14,21 +14,19 @@ To ensure retrocompatibility, when used on stack v2, all known doctypes will be 
 
 
 ```javascript
-// cozy-browser-sdk
+// old version, using cozy-browser-sdk
 cozy.create("Contact", {})
 cozy.create("Book", {})
-// cozy-client-js
+// new version, with cozy-client-js
 cozy.create("io.cozy.contacts", {})
 cozy.create("com.mydomain.book", {})
-// cozy-client-js (retrocompatibility - DO NOT DO THIS)
-cozy.create("Contact", {})
 ```
 
 ## MapReduce Views vs Mango queries
 
 Cozy stack-v2 recommends using Couchdb 2 indexes & mango queries instead of Couchdb 1.X map-reduce views. We feel they are [simpler to understand and explain](http://cozy.github.io/cozy-browser-sdk/tutorial-mapreduce.html) and avoid useless overindexing.
 
-When used on a stack-v1 cozy, the `defineIndex` and `findDocuments` calls will be translated to equivalent MapReduce views.
+When used on a stack-v1 cozy, the `defineIndex` and `query` calls will be translated to equivalent MapReduce views.
 
 If you need the full power of MapReduce, please open a issue on cozy-stack with your usecase.
 
@@ -38,10 +36,21 @@ cozysdk.defineMapReduceView('Event', 'all', function(doc) { emit(doc.year); })
 cozysdk.queryView('Event', 'all', {key: 2016, limit: 10})
 // cozy-client-js
 index = cozysdk.defineIndex('Event', ['year'])
-cozysdk.findSelectors('Event', {use_index: index, selector: {year: 2016}, limit: 10})
+cozysdk.query(index, {selector: {year: 2016}, limit: 10})
+
 ```
 
 ## Binaries
 
 We do not yet have a plan for binaries attachments to documents.
 They will be probably placed in the VFS under a special path.
+
+## Crud is fully compatible
+
+The following functions have the same signature than the cozy-browser-sdk
+```
+created = await cozy.create(myType, book)
+doc = await cozy.find(myType, doc._id)
+doc2 = await cozy.updateAttributes(myType, doc._id, {year: 1851})
+cozy.destroy("my.domain.book", doc2)
+```
