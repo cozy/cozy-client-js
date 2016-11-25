@@ -11,18 +11,18 @@ cozy-client-js is compatible with both cozy architectures.
 Reminder about cozy architectures
 ---------------------------------
 
-There is currently two actives cozy architectures :
+There is two actives cozy architectures :
 
-- The first, thereafter named **v2** is the existing cozy structure. It is based on 1 container / user with several node.js process in each container (cozy-data-system, cozy-proxy, cozy-home, 1 process per app).
-- The second, thereafter named **v3** is the new cozy-stack ([repository](https://github.com/cozy/cozy-stack)). It is based on go and aim to support multiple user on a single process.
+- The first, thereafter named **v2** is the existing cozy structure. It's based on 1 container / user with many node.js processes in each container (cozy-data-system, cozy-proxy, cozy-home, 1 process per app).
+- The second, thereafter named **v3** is the new cozy-stack ([repository](https://github.com/cozy/cozy-stack)). It's based on go and aim to support multiple user on a single process.
 
-**v2** supported both **server-side** applications with their own node.js process and **client-side** application which only run in the user browser.
+**v2** supported both **server-side** applications with their own node.js process and **client-side** applications which run in the user browser.
 
-**v3** will only support **client-side** application.
+**v3** will not support **server-side** applications. We will support server side modules managed by server administrator, but the applications themselves will all be **client-side** application.
 
 This repository provides a library which allows you build a **client-side** application compatible with both version.
 
-The former javascript library for making client-side application was `cozy-browser-sdk`. We aim to deprecate it once the new `cozy-client-js` is feature equivalent.
+The former javascript library for making client-side application was `cozy-browser-sdk`. We aim to deprecate it once `cozy-client-js` reaches feature-parity.
 
 If you already have an application using `cozy-browser-sdk`, you can see what will change in the [transition document](./browser-sdk-transition.md). If you have any doubt, please open an issue!
 
@@ -32,7 +32,7 @@ Include the library in your application
 You can `import`/`require` cozy-client-js using npm & webpack
 **TODO** test if `cozy-client-js` compatible with browserify, rollup, ect...
 
-You can also simply copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
+You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
 
 
 
@@ -45,7 +45,7 @@ Implemented API
 
 Supported options are:
 
- - `target` : if the cozy you want to speak to is not on the same origin than the app. Only useful for test, should not used for app installed inside Cozy.
+ - `target` : if the cozy you want to speak to is not on the same origin than the app. Useful for test, should not used for app installed inside Cozy.
 
 ```javascript
 await cozy.init()
@@ -63,7 +63,7 @@ All doctypes designed by the cozy's team will be prefixed with `io.cozy.`, or `i
 
 Any doctype you introduce is expected to be prefixed with the reverse notation of a domain you own (JLS#7.7). If you do not own a domain, you can also use a reverse notation of your email address.
 
-You are free to reuse another applications documents by using their doctypes but you **SHOULD** discuss with the domain owner if you want to add fields or format things differently.
+You are free to reuse another applications documents by using their doctypes but you **SHOULD** discuss with the domain owner if you want to add fields or format them differently.
 
 To ensure retrocompatibility, when used on stack v2, all known doctypes will be auto-prefixed, but a warning will be written to the console. Unknown doctype will cause a fatal error. DO NOT rely on this behaviour in new applications, use qualified doctypes.
 
@@ -118,11 +118,11 @@ cozy.create(myBooksDoctype, doc, function(err, result){
 
 `create(doctype, attributes)` adds a document to the database.
 
-If you use an existing doctype, you should follow its expected format. **v2** does not enforce this, but we plan to on **v3**. Anyway, do you really want to be the app that creates empty contacts in the native app?
+If you use an existing doctype, you should follow its expected format. **v2** does not enforce this, but we plan to on **v3**. Anyway, do you want to be the app that creates empty contacts in the native app?
 
-The attributes will be passed to `JSON.stringify`, if it is a complex or cyclic object, simply add a `toJSON` method to it (native behaviour of JSON.stringify).
+The attributes will be passed to `JSON.stringify`, if it is a complex or cyclic object, add a `toJSON` method to it (native behaviour of JSON.stringify).
 
-This function returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It is the unique identifier for the created document.
+This function returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It's the unique identifier for the created document.
 
 On **v3**, an extra field `_rev` is added, it is the unique identifier for the document revision, after creation, it will be of the shape `1-xxxxxxxxx` for first revision.
 
@@ -188,7 +188,7 @@ updated = await cozy.updateAttributes(myBooksDoctype, id, updates)
 console.log(updated._id === doc._id) // _id does not change
 console.log(updated._rev) // 2-xxxxxx
 console.log(updated.year) // fields are changed
-console.log(updated.isbn) // updateAttributes preserve other fields fields
+console.log(updated.isbn) // updateAttributes preserve other fields
 ```
 
 # cozy.destroy(doctype, doc)

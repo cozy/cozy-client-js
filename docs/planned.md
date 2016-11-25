@@ -53,9 +53,9 @@ await cozy.vfs.trash("path/to/dir_or_file")
 
 ## Binary
 
-These functions exist only for retro-compatibility with browser-sdk and will warn in the console about it. If you are making a new app, do not use them and rely instead on the new attachment API (which is still not determined)
+These functions are for retro-compatibility with browser-sdk and will warn in the console about it. If you are making a new app, do not use them and rely instead on the new attachment API (which is still not determined)
 
-**TODO** Quickly figures out what the attachment of binaries to documents should look like and specify new functions accordingly.
+**TODO** Rapidly figures out what the attachment of binaries to documents should look like and specify new functions accordingly.
 
 While the behaviour is similar, these functions DO NOT manipulate couchdb attachments, instead they work with cozy vfs.
 
