@@ -1,7 +1,7 @@
-![Travis build status shield](https://img.shields.io/travis/cozy/cozy-client-js.svg)
-![NPM release version shield](https://img.shields.io/npm/v/cozy-client-js.svg)
-![Github Release version shield](https://img.shields.io/github/release/cozy/cozy-client-js.svg)
-![NPM Licence shield](https://img.shields.io/npm/l/cozy-client-js.svg)
+[![Travis build status shield](https://img.shields.io/travis/cozy/cozy-client-js.svg?branch=master)](https://travis-ci.org/cozy/cozy-client-js)
+[![NPM release version shield](https://img.shields.io/npm/v/cozy-client-js.svg)](https://www.npmjs.com/package/cozy-client-js)
+[![Github Release version shield](https://img.shields.io/github/release/cozy/cozy-client-js.svg)](https://github.com/cozy/cozy-client-js/releases)
+[![NPM Licence shield](https://img.shields.io/npm/l/cozy-client-js.svg)](https://github.com/cozy/cozy-client-js/blob/master/LICENSE)
 
 
 [Cozy][cozy] Javascript Client
