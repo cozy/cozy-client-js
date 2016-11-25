@@ -30,7 +30,7 @@ Include the library in your application
 ----------------------
 
 You can `import`/`require` cozy-client-js using npm & webpack
-**TODO** test if `cozy-client-js` compatible with browserify, rollup, ect...
+**TODO** test if `cozy-client-js` compatible with browserify, rollup, ect.
 
 You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
 
@@ -41,7 +41,7 @@ Implemented API
 
 # cozy.init(options)
 
-`cozy.init(options)` setup cozy-client-js and perform the necessary steps to retrieve the application token. Our goal is for you developer to not worry about how the token is retrieved, as it will depends on cozy version and context.
+`cozy.init(options)` setup cozy-client-js and perform the necessary steps to retrieve the application token. Our goal is for you developer to not worry about how the token is retrieved, as it will depend on cozy version and context.
 
 Supported options are:
 
@@ -54,7 +54,7 @@ await cozy.init()
 
 # Doctypes & Permissions
 
-A doctype, is a simple javascript string identifying a type of document.
+A doctype is a simple javascript string identifying a type of document.
 Some basic doctypes are provided by cozy, but you can pick your own.
 
 Cozy **v3** expects doctypes to be qualified to ensure uniqueness.
@@ -133,7 +133,7 @@ var book = { title: "Moby Dick", author:"Herman Melville", isbn: "42" }
 
 created = await cozy.create(myBooksDoctype, book)
 // same fields
-console.log(created.title, created.author, created.isbn));
+console.log(created.title, created.author, created.isbn)
 // _id, _rev are added
 console.log(created._id, created._rev)
 // let's keep it for later
@@ -150,12 +150,12 @@ If the document does not exist, the promise will reject or the callback will be 
 
 ```javascript
 doc = await cozy.find(myBooksDoctype, createdBookId)
-console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn));
+console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
 # cozy.update(doctype, doc, newdoc)
 
-`cozy.update(doctype, doc, newdoc)` replace the document by a new version.
+`cozy.update(doctype, doc, newdoc)` replaces the document by a new version.
 
 This function returns a promise for the updated document. The updated document will have the same fields and values than provided newdoc, the same `_id` than doc, and a `_rev` incremented from doc's number.
 
@@ -186,7 +186,7 @@ This functions give 3 attempts not to conflicts.
 var updates = { year: 1852}
 updated = await cozy.updateAttributes(myBooksDoctype, id, updates)
 console.log(updated._id === doc._id) // _id does not change
-console.log(updated._rev) // 2-xxxxxx
+console.log(updated._rev) // 3-xxxxxx
 console.log(updated.year) // fields are changed
 console.log(updated.isbn) // updateAttributes preserve other fields
 ```
@@ -209,7 +209,7 @@ await cozy.destroy(myBooksDoctype, updated)
 
 # cozy.defineIndex(doctype, fields)
 
-`cozy.defineIndex(doctype, fields)` create an index for a document type.
+`cozy.defineIndex(doctype, fields)` creates an index for a document type.
 
 Fields is an array of fields to index on.
 
@@ -233,7 +233,7 @@ query supports the following fields:
 - **limit** : maximum number of results
 - **skip** : ignore the first x results (pagination)
 
-Results will be returned in order acording to the index.
+Results will be returned in order according to the index.
 
 **Warning** Complex mango queries are not, and may never be compatible with **v2**
 
