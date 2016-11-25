@@ -98,13 +98,3 @@ export function warn (text) {
     console.log('Warning', text)
   }
 }
-
-export function getParentDomain () {
-  if (typeof document === 'undefined') {
-    return ''
-  }
-  const host = document.location.host
-  const subs = host.split('.')
-  subs.shift()
-  return `//${subs.join('.')}`
-}

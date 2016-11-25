@@ -1,10 +1,15 @@
 /* global fetch Blob File */
-import { getParentDomain } from './utils'
+import {waitConfig} from './utils'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
 // @data can be Blob | File | ArrayBuffer | ArrayBufferView | string
 export async function upload (data, args) {
+  const config = await waitConfig()
+  if (config.isV1) {
+    throw new Error('not implemented on V1')
+  }
+
   let { name, folderId } = args || {}
 
   if (!data) {
@@ -41,11 +46,10 @@ export async function upload (data, args) {
     throw new Error('missing name argument')
   }
 
-  const domain = getParentDomain()
   const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
   const path = `/files/${encodeURIComponent(folderId)}`
 
-  return fetch(`${domain}${path}${query}`, options)
+  return fetch(`${config.target}${path}${query}`, options)
     .then((res) => {
       const json = res.json()
       if (!res.ok) {
@@ -57,5 +61,10 @@ export async function upload (data, args) {
 }
 
 export async function uploadFiles (files) {
+  const config = await waitConfig()
+  if (config.isV1) {
+    throw new Error('not implemented on V1')
+  }
+
   return Promise.all(Array.from(files).map(upload))
 }
