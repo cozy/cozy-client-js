@@ -5,12 +5,12 @@ to comment on them through issues or PR !
 
 ## VFS API
 
-**TO BE DETERMINED** should this be made compatible with v1?
+**TO BE DETERMINED** should this be made compatible with v2?
 
 ```javascript
 
 // All these functions do not exist in cozy-browser-sdk and can be
-// inefficiently made compatible with stack v1 by manipulating files
+// inefficiently made compatible with stack v2 by manipulating files
 // and folders docTypes.
 
 // vfs.mkdir(path) creates a directory at the given path
@@ -53,9 +53,9 @@ await cozy.vfs.trash("path/to/dir_or_file")
 
 ## Binary
 
-These functions exist only for retro-compatibility with browser-sdk and will warn in the console about it. If you are making a new app, do not use them and rely instead on the new attachment API
+These functions are for retro-compatibility with browser-sdk and will warn in the console about it. If you are making a new app, do not use them and rely instead on the new attachment API (which is still not determined)
 
-**TODO** Quickly figures out what the attachment of binaries to documents should look like and specify new functions accordingly.
+**TODO** Rapidly figures out what the attachment of binaries to documents should look like and specify new functions accordingly.
 
 While the behaviour is similar, these functions DO NOT manipulate couchdb attachments, instead they work with cozy vfs.
 
@@ -73,27 +73,4 @@ url === "https://app.example.cozycloud.cc/xxxxxxxxx"
 // removeBinary(doctype, docid, attachment_name) remove the attachment from a
 // document.
 await cozysdk.removeBinary('Contact', "45545454554", 'avatar')
-```
-
-## Promises
-
-As in the browser-sdk, all the functions support callback or promise.
-
-
-```javascript
-
-// If no callback is provided, a promise is returned.
-cozy.destroy("my.domain.book", doc2)
-    .then(function(){
-        console.log('done');
-    });
-
-// if your build pipeline supports it, use async/await for sweet sweet async
-await cozy.destroy("my.domain.book", doc2)
-
-// if a callback is provided, no promise is returned.
-// DO NOT mix promises and callback in a codebase.
-cozy.destroy("my.domain.book", doc2, function(err){
-    console.log('done');
-});
 ```

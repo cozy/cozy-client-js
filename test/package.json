@@ -1,7 +1,7 @@
 {
   "name": "cozy-client-js-test",
   "version": "1.0.0",
-  "description": "Necessary for v1 permissions",
+  "description": "Necessary for v2 permissions",
   "cozy-permissions": {
     "All": {
       "description": "Can do everything"

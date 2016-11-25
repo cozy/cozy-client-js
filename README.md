@@ -16,59 +16,37 @@ What's Cozy?
 [Cozy][cozy] is a platform that brings all your web services in the same private space.  With it, your webapps and your devices can share data easily, providing you with a new experience. You can install Cozy on your own hardware where no one's tracking you.
 
 
-What's API?
+What's cozy-client-js?
 ------------------
 
 `cozy-client-js` is a javascript library made by Cozy. It enables client-side  applications to make requests to the cozy stack.
 
 cozy-client-js is compatible with both cozy architectures.
 
-## This repository is a work-in-progress where the stack-v2 companion javascript library is being developed.
+## This repository is a work-in-progress where the cozy-stack companion javascript library is being developed.
 
-To learn more about the stack-v2, head over to [its repository](https://github.com/cozy/cozy-stack).
+To learn more about cozy-stack, head over to [its repository](https://github.com/cozy/cozy-stack).
 
-If you are getting started on cozy application development, you should follow this [tutorial](https://dev.cozy.io/clientsideapp.html) and use the current `cozy-browser-sdk`. Transitioning from the cozy-browser-sdk library to this one should imply minimal changes (see [transition doc](https://github.com/cozy/cozy-client-js/blob/master/docs/browser-sdk-transition.md) )
-
-
-
-Hack
-----
-
-### Install
-
-You can clone the repository and install dependencies:
-
-```sh
-$ git clone https://github.com/cozy/cozy-client-js.git
-$ cd cozy-client-js
-$ npm install
-```
-
-:pushpin: If you use a node environment wrapper like [nvm] or [ndenv], don't forget to set your local node version before doing a `npm install`.
+If you are getting started on cozy application development, you should follow this [tutorial](https://dev.cozy.io/clientsideapp.html) and use the current `cozy-browser-sdk`. Transitioning from the cozy-browser-sdk library to this one should imply minimal changes (see [transition doc](https://github.com/cozy/cozy-client-js/blob/master/docs/browser-sdk-transition.md))
 
 
-### Tests
+Use
+---
 
-Tests are run by [mocha] under the hood, and written using [should]. You can easily run the tests suite with:
+You can `import`/`require` cozy-client-js using webpack
+**TODO** test if `cozy-client-js` compatible with browserify, rollup, ect...
 
-```sh
-$ cd cozy-client-js
-$ npm run test
-```
+You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application with  `<script src="./cozy-client.js">`.
 
-:pushpin: Don't forget to update / create new tests when you contribute to code to keep the app the consistent.
+**polyfills** : cozy-client-js uses [fetch](https://fetch.spec.whatwg.org/) and bundle all necessary polyfills (promise, fetch, reGenerator). **TODO:** We should move the polyfills to a separate bundle and require them only if needed.
 
-
-### Resources
-
-All documentation is located in the `/docs` app directory. It provides an exhaustive documentation about workflows (installation, development, pull-requests…), architecture, code consistency, data structures, dependencies, and more.
-
-Feel free to read it and fix / update it if needed, all comments and feedback to improve it are welcome!
+Once you have the library included in your application, head over to [the doc](./docs/index.md) to see what you can do with it!
 
 
-### Open a Pull-Request
+Contribute
+----------
 
-If you want to work on API and submit code modifications, feel free to open pull-requests! See the [contributing guide][contribute] for more information about how to properly open pull-requests.
+If you want to work on cozy-client-js itself and submit code modifications, feel free to open pull-requests! See the [contributing guide][contribute] for more information about this repository structure, testing, linting and how to properly open pull-requests.
 
 
 Community

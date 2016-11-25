@@ -44,7 +44,7 @@ describe('selector parsing', function () {
 
 describe('selector to MR query', function () {
   it('simple selector', function () {
-    let indexDef = {type: 'v1', fields: ['folderID', 'date'], name: 'testindex'}
+    let indexDef = {type: 'mapreduce', fields: ['folderID', 'date'], name: 'testindex'}
     let mrq = makeMapReduceQuery(indexDef, {selector: {'folderID': '42'}})
 
     mrq.should.deepEqual({
@@ -54,7 +54,7 @@ describe('selector to MR query', function () {
   })
 
   it('double selector', function () {
-    let indexDef = {type: 'v1', fields: ['folderID', 'date'], name: 'testindex'}
+    let indexDef = {type: 'mapreduce', fields: ['folderID', 'date'], name: 'testindex'}
     let mrq = makeMapReduceQuery(indexDef, {
       selector: {
         'folderID': '42',
@@ -69,7 +69,7 @@ describe('selector to MR query', function () {
   })
 
   it('operator selector', function () {
-    let indexDef = {type: 'v1', fields: ['folderID', 'date'], name: 'testindex'}
+    let indexDef = {type: 'mapreduce', fields: ['folderID', 'date'], name: 'testindex'}
     let mrq = makeMapReduceQuery(indexDef, {
       selector: {
         'folderID': '42',
@@ -84,7 +84,7 @@ describe('selector to MR query', function () {
   })
 
   it('double operator selector', function () {
-    let indexDef = {type: 'v1', fields: ['folderID', 'date'], name: 'testindex'}
+    let indexDef = {type: 'mapreduce', fields: ['folderID', 'date'], name: 'testindex'}
     let mrq = makeMapReduceQuery(indexDef, {
       selector: {
         'folderID': '42',

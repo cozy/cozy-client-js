@@ -22,12 +22,12 @@ before_script:
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   # go 1.7
   - eval "$(gimme 1.7)"
-  # start a stack v2 instance from master (listening on 8080)
+  # start a stack v3 instance from master (listening on 8080)
   - mkdir $GOPATH
   - go get -u github.com/cozy/cozy-stack
   - $GOPATH/bin/cozy-stack instances add dev
   - $GOPATH/bin/cozy-stack serve &
-  # start a stack v1 from NPM (listening on 9104 & 9101)
+  # start a stack v2 from NPM (listening on 9104 & 9101)
   - npm install -g coffee-script
   - npm install cozy-data-system cozy-proxy
   - NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start &

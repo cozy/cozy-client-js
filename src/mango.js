@@ -6,8 +6,8 @@ export async function defineIndex (doctype, fields) {
   if (!Array.isArray(fields) || fields.length === 0) {
     throw new Error('defineIndex fields should be a non-empty array')
   }
-  if (config.isV1) return await defineIndexV1(config, doctype, fields)
-  else return await defineIndexV2(config, doctype, fields)
+  if (config.isV2) return await defineIndexV2(config, doctype, fields)
+  else return await defineIndexV3(config, doctype, fields)
 }
 
 export async function query (indexRef, options) {
@@ -17,8 +17,8 @@ export async function query (indexRef, options) {
     throw new Error('query should be passed the indexRef')
   }
 
-  if (config.isV1) return await queryV1(config, indexRef, options)
-  else return await queryV2(config, indexRef, options)
+  if (config.isV2) return await queryV2(config, indexRef, options)
+  else return await queryV3(config, indexRef, options)
 }
 
 // Internals
@@ -36,9 +36,9 @@ const COUCHDB_INFINITY = {"\uFFFF": "\uFFFF"}
 const COUCHDB_LOWEST = null
 /* eslint-enable */
 
-// defineIndexV1 is equivalent to defineIndex but only works for V1.
+// defineIndexV2 is equivalent to defineIndex but only works for V2.
 // It transforms the index fields into a map reduce view.
-async function defineIndexV1 (config, doctype, fields) {
+async function defineIndexV2 (config, doctype, fields) {
   let indexName = 'by' + fields.map(capitalize).join('')
   let indexDefinition = { map: makeMapFunction(doctype, fields), reduce: '_count' }
   let path = `/request/${doctype}/${indexName}/`
@@ -46,23 +46,23 @@ async function defineIndexV1 (config, doctype, fields) {
   return { doctype: doctype, type: 'mapreduce', name: indexName, fields: fields }
 }
 
-// defineIndexV1 is equivalent to defineIndex but only works for V1.
+// defineIndexV2 is equivalent to defineIndex but only works for V2.
 // It transforms the index fields into a map reduce view.
-async function defineIndexV2 (config, doctype, fields) {
+async function defineIndexV3 (config, doctype, fields) {
   let path = createPath(config, doctype, '_index')
   let indexDefinition = {'index': {fields}}
   let response = await doFetch(config, 'POST', path, indexDefinition)
   return { doctype: doctype, type: 'mango', name: response.id, fields: fields }
 }
 
-// queryV1 is equivalent to query but only works for V1.
+// queryV2 is equivalent to query but only works for V2.
 // It transforms the query into a _views call using makeMapReduceQuery
-async function queryV1 (config, indexRef, options) {
+async function queryV2 (config, indexRef, options) {
   if (indexRef.type !== 'mapreduce') {
-    throw new Error('query indexRef should be the return value of defineIndexV1')
+    throw new Error('query indexRef should be the return value of defineIndexV2')
   }
   if (options.fields) {
-    warn('query fields will be ignored on v1')
+    warn('query fields will be ignored on v2')
   }
 
   let path = `/request/${indexRef.doctype}/${indexRef.name}/`
@@ -71,10 +71,10 @@ async function queryV1 (config, indexRef, options) {
   return response.map(r => r.value)
 }
 
-// queryV2 is equivalent to query but only works for V2
-async function queryV2 (config, indexRef, options) {
+// queryV3 is equivalent to query but only works for V3
+async function queryV3 (config, indexRef, options) {
   if (indexRef.type !== 'mango') {
-    throw new Error('indexRef should be the return value of defineIndexV2')
+    throw new Error('indexRef should be the return value of defineIndexV3')
   }
 
   let opts = {
