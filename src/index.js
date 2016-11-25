@@ -1,5 +1,6 @@
 import * as crud from './crud'
 import * as mango from './mango'
+import * as files from './files'
 import init from './init'
 import {promiser, warn} from './utils'
 
@@ -35,6 +36,12 @@ let cozy = {
   destroy: function (doctype, doc, optCallback) {
     warn('destroy is deprecated, use cozy.delete instead.')
     return promiser(crud._delete(doctype, doc), optCallback)
+  },
+  upload: function (data, args, optCallback) {
+    return promiser(files.upload(data, args), optCallback)
+  },
+  uploadFiles: function (data, args, optCallback) {
+    return promiser(files.uploadFiles(data, args), optCallback)
   }
 }
 
