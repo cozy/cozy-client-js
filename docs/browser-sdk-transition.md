@@ -2,7 +2,7 @@
 
 ## Full doctype qualification
 
-Cozy stack-v2 expects doctypes to be qualified to ensure uniqueness.
+Cozy **v3** expects doctypes to be qualified to ensure uniqueness.
 
 All doctypes designed by the cozy's team will be prefixed with `io.cozy.`
 
@@ -24,9 +24,9 @@ cozy.create("com.mydomain.book", {})
 
 ## MapReduce Views vs Mango queries
 
-Cozy stack-v2 recommends using Couchdb 2 indexes & mango queries instead of Couchdb 1.X map-reduce views. We feel they are [simpler to understand and explain](http://cozy.github.io/cozy-browser-sdk/tutorial-mapreduce.html) and avoid useless overindexing.
+Cozy **v3** recommends using Couchdb 2 indexes & mango queries instead of Couchdb 1.X map-reduce views. We feel they are [simpler to understand and explain](http://cozy.github.io/cozy-browser-sdk/tutorial-mapreduce.html) and avoid useless overindexing.
 
-When used on a stack-v1 cozy, the `defineIndex` and `query` calls will be translated to equivalent MapReduce views.
+When used on a **v2** cozy, the `defineIndex` and `query` calls will be translated to equivalent MapReduce views.
 
 If you need the full power of MapReduce, please open a issue on cozy-stack with your usecase.
 
@@ -48,9 +48,9 @@ They will be probably placed in the VFS under a special path.
 ## Crud is fully compatible
 
 The following functions have the same signature than the cozy-browser-sdk
-```
+```javascript
 created = await cozy.create(myType, book)
-doc = await cozy.find(myType, doc._id)
-doc2 = await cozy.updateAttributes(myType, doc._id, {year: 1851})
-cozy.destroy("my.domain.book", doc2)
+doc = await cozy.find(myType, id)
+doc2 = await cozy.updateAttributes(myType, id, {year: 1851})
+await cozy.destroy("my.domain.book", id)
 ```

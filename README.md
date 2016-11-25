@@ -16,23 +16,36 @@ What's Cozy?
 [Cozy][cozy] is a platform that brings all your web services in the same private space.  With it, your webapps and your devices can share data easily, providing you with a new experience. You can install Cozy on your own hardware where no one's tracking you.
 
 
-What's API?
+What's cozy-client-js?
 ------------------
 
 `cozy-client-js` is a javascript library made by Cozy. It enables client-side  applications to make requests to the cozy stack.
 
 cozy-client-js is compatible with both cozy architectures.
 
-## This repository is a work-in-progress where the stack-v2 companion javascript library is being developed.
+## This repository is a work-in-progress where the cozy-stack companion javascript library is being developed.
 
-To learn more about the stack-v2, head over to [its repository](https://github.com/cozy/cozy-stack).
+To learn more about cozy-stack, head over to [its repository](https://github.com/cozy/cozy-stack).
 
 If you are getting started on cozy application development, you should follow this [tutorial](https://dev.cozy.io/clientsideapp.html) and use the current `cozy-browser-sdk`. Transitioning from the cozy-browser-sdk library to this one should imply minimal changes (see [transition doc](https://github.com/cozy/cozy-client-js/blob/master/docs/browser-sdk-transition.md) )
 
 
+Use
+---
+
+You can `import`/`require` cozy-client-js using webpack
+**TODO** test if `cozy-client-js` compatible with browserify, rollup, ect...
+
+You can also simply copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application with  `<script src="./cozy-client.js">`.
+
+**polyfills** : cozy-client-js uses [fetch](https://fetch.spec.whatwg.org/) and bundle all necessary polyfills (promise, fetch, reGenerator). **TODO:** We should move the polyfills to a separate bundle and require them only if needed.
+
+Once you have the library included in your application, head over to [the doc](./docs/index.md) to see what you can do with it!
 
 Hack
 ----
+
+This section is only if you want to modify the cozy-client-js library. If you just want to make an app, head over to [the doc](./docs/index.md).
 
 ### Install
 
@@ -44,26 +57,42 @@ $ cd cozy-client-js
 $ npm install
 ```
 
-:pushpin: If you use a node environment wrapper like [nvm] or [ndenv], don't forget to set your local node version before doing a `npm install`.
+### Build
 
+cozy-client-js is written in ES7 and built using webpack and babel, you can run a build with `npm run build`
 
-### Tests
+### Lint
 
-Tests are run by [mocha] under the hood, and written using [should]. You can easily run the tests suite with:
+cozy-client-js is linted using [standard](http://standardjs.com/), this is included in the build.
+
+### Test
+
+Tests are written in ES7, use [assert] and run using [webpack-mocha].
+
+They are two types of test :
+
+- In **test/unit**, we mock `fetch` and ensure each function calls the proper route(s) and parse the results as expected if the server is correct.
+- In **test/integration**, we run a complex scenario against both **v2** and **v3** cozy and ensure compatibility.
+
+To run integration tests, you will need one or both versions of cozy started. Have a look at the [.travis.yml](./travis.yml) to see how it can be done.
+
 
 ```sh
 $ cd cozy-client-js
-$ npm run test
+$ npm run test:unit # unit tests only
+$ npm run test:v2   # integration tests against a node.js cozy
+$ npm run test:v3   # integration tests against a go cozy
+$ npm run test      # all of the above
 ```
-
-:pushpin: Don't forget to update / create new tests when you contribute to code to keep the app the consistent.
 
 
 ### Resources
 
-All documentation is located in the `/docs` app directory. It provides an exhaustive documentation about workflows (installation, development, pull-requests…), architecture, code consistency, data structures, dependencies, and more.
+All documentation is located in the `/docs` app directory.
 
 Feel free to read it and fix / update it if needed, all comments and feedback to improve it are welcome!
+
+If you add a function or change the behaviour of an existing one, doc should be updated to reflect the change.
 
 
 ### Open a Pull-Request
