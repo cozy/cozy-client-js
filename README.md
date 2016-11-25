@@ -36,68 +36,17 @@ Use
 You can `import`/`require` cozy-client-js using webpack
 **TODO** test if `cozy-client-js` compatible with browserify, rollup, ect...
 
-You can also simply copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application with  `<script src="./cozy-client.js">`.
+You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application with  `<script src="./cozy-client.js">`.
 
 **polyfills** : cozy-client-js uses [fetch](https://fetch.spec.whatwg.org/) and bundle all necessary polyfills (promise, fetch, reGenerator). **TODO:** We should move the polyfills to a separate bundle and require them only if needed.
 
 Once you have the library included in your application, head over to [the doc](./docs/index.md) to see what you can do with it!
 
-Hack
-----
 
-This section is only if you want to modify the cozy-client-js library. If you just want to make an app, head over to [the doc](./docs/index.md).
+Contribute
+----------
 
-### Install
-
-You can clone the repository and install dependencies:
-
-```sh
-$ git clone https://github.com/cozy/cozy-client-js.git
-$ cd cozy-client-js
-$ npm install
-```
-
-### Build
-
-cozy-client-js is written in ES7 and built using webpack and babel, you can run a build with `npm run build`
-
-### Lint
-
-cozy-client-js is linted using [standard](http://standardjs.com/), this is included in the build.
-
-### Test
-
-Tests are written in ES7, use [assert] and run using [webpack-mocha].
-
-They are two types of test :
-
-- In **test/unit**, we mock `fetch` and ensure each function calls the proper route(s) and parse the results as expected if the server is correct.
-- In **test/integration**, we run a complex scenario against both **v2** and **v3** cozy and ensure compatibility.
-
-To run integration tests, you will need one or both versions of cozy started. Have a look at the [.travis.yml](./travis.yml) to see how it can be done.
-
-
-```sh
-$ cd cozy-client-js
-$ npm run test:unit # unit tests only
-$ npm run test:v2   # integration tests against a node.js cozy
-$ npm run test:v3   # integration tests against a go cozy
-$ npm run test      # all of the above
-```
-
-
-### Resources
-
-All documentation is located in the `/docs` app directory.
-
-Feel free to read it and fix / update it if needed, all comments and feedback to improve it are welcome!
-
-If you add a function or change the behaviour of an existing one, doc should be updated to reflect the change.
-
-
-### Open a Pull-Request
-
-If you want to work on API and submit code modifications, feel free to open pull-requests! See the [contributing guide][contribute] for more information about how to properly open pull-requests.
+If you want to work on cozy-client-js itself and submit code modifications, feel free to open pull-requests! See the [contributing guide][contribute] for more information about this repository structure, testing, linting and how to properly open pull-requests.
 
 
 Community
