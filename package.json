@@ -5,10 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "build": "NODE_ENV=production webpack",
-    "test": "npm run test:unit && npm run test:v1 && npm run test:v2",
+    "test": "npm run test:unit && npm run test:v2 && npm run test:v3",
     "test:unit": "NODE_ENV=test mocha-webpack \"test/unit/**.js\"",
-    "test:v1": "NODE_ENV=test TARGET=http://localhost:9104 mocha-webpack \"test/integration/**.js\"",
-    "test:v2": "NODE_ENV=test TARGET=http://localhost:8080 mocha-webpack \"test/integration/**.js\"",
+    "test:v2": "NODE_ENV=test TARGET=http://localhost:9104 mocha-webpack \"test/integration/**.js\"",
+    "test:v3": "NODE_ENV=test TARGET=http://localhost:8080 mocha-webpack \"test/integration/**.js\"",
     "clean": "rm -r dist && rm -r .tmp"
   },
   "repository": {
@@ -19,7 +19,7 @@
     "cozy",
     "api",
     "v2",
-    "v1"
+    "v3"
   ],
   "author": "cozycloud.cc",
   "license": "MIT",
@@ -50,7 +50,7 @@
     "whatwg-fetch": "1.0.0"
   },
   "/#######################################################": "",
-  "# this repo works as a cozy v1 client-side application #": "",
+  "# this repo works as a cozy v2 client-side application #": "",
   "#######################################################/": "",
   "cozy-type": "static",
   "cozy-displayName": "Test cozy-client-js",
