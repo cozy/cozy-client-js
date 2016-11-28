@@ -96,3 +96,13 @@ export async function createDirectory (options) {
   const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.folders`
   return doFetch(config, 'POST', `${path}${query}`)
 }
+
+export async function trash (id) {
+  const config = await waitConfig({ nocompat: true })
+
+  if (typeof id !== 'string' || id === '') {
+    throw new Error('missing id argument')
+  }
+
+  return doFetch(config, 'DELETE', `/files/${encodeURIComponent(id)}`)
+}

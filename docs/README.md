@@ -313,6 +313,12 @@ const updated = await cozy.updateFile(blob, {
   * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
 
 
+### `cozy.trash(id)`
+
+`cozy.trash(id)` is used to move the file or directory identified by the given id to trash.
+
+- `id` is a string specying the identifier of the file or directory
+
 Future APIs
 -----------
 

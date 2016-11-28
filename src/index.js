@@ -45,6 +45,9 @@ let cozy = {
   },
   createDirectory: function (options, optCallback) {
     return promiser(files.createDirectory(options), optCallback)
+  },
+  trash: function (options, optCallback) {
+    return promiser(files.trash(options), optCallback)
   }
 }
 

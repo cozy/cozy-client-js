@@ -165,4 +165,51 @@ describe('Files', function () {
       err = null
     })
   })
+
+  describe('Create directory', function () {
+    before(mock.mockAPI('Trash'))
+
+    it('should work', async function () {
+      const res1 = await cozy.trash('1234')
+
+      mock.calls('Trash').should.have.length(1)
+      mock.lastUrl('Trash').should.equal('/files/1234')
+
+      res1.data.should.have.property('attributes')
+    })
+
+    it('should fail with wrong arguments', async function () {
+      let err = null
+
+      try {
+        await cozy.trash(null)
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing id argument'))
+      }
+
+      err = null
+
+      try {
+        await cozy.trash({})
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing id argument'))
+      }
+
+      err = null
+
+      try {
+        await cozy.trash('')
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing id argument'))
+      }
+
+      err = null
+    })
+  })
 })

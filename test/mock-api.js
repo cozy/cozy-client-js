@@ -123,6 +123,28 @@ const ROUTES = [
         relationships: {}
       }
     }
+  },
+  {
+    name: 'Trash',
+    method: 'DELETE',
+    matcher: /^\/files\//,
+    response: {
+      data: {
+        type: 'io.cozy.files',
+        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+        attributes: {
+          type: 'directory',
+          name: 'hospi.pdf',
+          folder_id: 'io.cozy.files.rootdir',
+          created_at: '2016-11-25T16:07:45.398867198+01:00',
+          updated_at: '2016-11-25T16:07:45.398867198+01:00',
+          tags: []
+        },
+        meta: {},
+        links: {},
+        relationships: {}
+      }
+    }
   }
 ]
 

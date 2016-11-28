@@ -60,4 +60,19 @@ describe('files API', function () {
       created.data.should.have.property('attributes')
     })
   })
+
+  describe('Trash file or directory', function () {
+    it('Works', async function () {
+      if (config.isV2) {
+        return
+      }
+
+      const dirname = 'foo_' + Math.random()
+
+      const created = await cozy.createDirectory({ name: dirname })
+      const createdId = created.data.id
+
+      await cozy.trash(createdId)
+    })
+  })
 })
