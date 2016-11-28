@@ -245,7 +245,7 @@ booksByYearRef = await cozy.defineIndex(myType, 'year', 'rating')
 
 - `query` is an object with the following fields:
   * `selector`: a mango selector
-  * ``limit`: maximum number of results
+  * `limit`: maximum number of results
   * `skip`: ignore the first x results (pagination)
 
 Results will be returned in order according to the index.
