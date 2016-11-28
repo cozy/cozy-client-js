@@ -8,6 +8,7 @@ var config = {
   entry: ['whatwg-fetch', 'regenerator-runtime/runtime', path.join(__dirname, 'src', 'index.js')],
   devtool: 'source-map',
   target: 'node',
+  bail: true,
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'cozy-client.js',
