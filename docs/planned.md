@@ -22,15 +22,6 @@ children = await cozy.vfs.ls("path/to/dir")
 // vfs.stat(path) returns the metadata of a given directory of file
 metada = await cozy.vfs.stat("path/to/dir_or_file")
 
-// vfs.create(path, blob) creates a file at the given path
-// it throws if the path's dirname doesnt exists
-// it throws if the path exists
-await cozy.vfs.create("path/to/file.ext", Blob)
-
-// vfs.update(path, blob) update the content of a file at the given path
-// it throws if the path doesnt exists
-await cozy.vfs.update("path/to/file.ext", Blob)
-
 // vfs.getURL(path) returns an url for this path
 // the url can be used in an <image> or <audio> tag
 url = await cozy.vfs.getURL("path/to/file.ext")

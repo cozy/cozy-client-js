@@ -4,6 +4,7 @@ export let config = {}
 
 export function configure (opts) {
   config = opts
+  return config
 }
 
 export async function waitConfig (opts) {

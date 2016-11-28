@@ -6,50 +6,82 @@ const contentTypeOctetStream = 'application/octet-stream'
 // @data can be Blob | File | ArrayBuffer | ArrayBufferView | string
 export async function upload (data, args) {
   const config = await waitConfig()
-  if (config.isV1) {
+  if (config.isV2) {
     throw new Error('not implemented on V1')
   }
 
-  let { name, folderId } = args || {}
+  let { name, fileId, folderId, mode, contentType } = args || {}
 
   if (!data) {
     throw new Error('missing data argument')
   }
 
   if (!folderId) folderId = ''
+  if (!mode) mode = 'create'
 
   const headers = {}
-  const options = { method: 'POST', headers }
+  const options = { headers }
+
+  if (mode === 'create') {
+    options.method = 'POST'
+  } else if (mode === 'update') {
+    options.method = 'PUT'
+  } else {
+    throw new Error('unknown upload mode: "' + mode + '"')
+  }
 
   // transform any ArrayBufferView to ArrayBuffer
   if (data.buffer && data.buffer instanceof ArrayBuffer) {
     data = data.buffer
   }
 
-  let contentType
-  if (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer) {
-    contentType = contentTypeOctetStream
-  } else if (typeof File !== 'undefined' && data instanceof File) {
-    contentType = data.type || contentTypeOctetStream
-    if (!name) name = data.name
-  } else if (typeof Blob !== 'undefined' && data instanceof Blob) {
-    contentType = contentTypeOctetStream
-  } else if (typeof data === 'string') {
-    contentType = 'text/plain'
-  } else {
+  const isBuffer = (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer)
+  const isFile = (typeof File !== 'undefined' && data instanceof File)
+  const isBlob = (typeof Blob !== 'undefined' && data instanceof Blob)
+  const isString = (typeof data === 'string')
+
+  if (!isBuffer && !isFile && !isBlob && !isString) {
     throw new Error('invalid data type')
+  }
+
+  if (isFile && !name) {
+    name = data.name
+  }
+
+  if (!contentType) {
+    if (isBuffer) {
+      contentType = contentTypeOctetStream
+    } else if (isFile) {
+      contentType = data.type || contentTypeOctetStream
+    } else if (isBlob) {
+      contentType = contentTypeOctetStream
+    } else if (typeof data === 'string') {
+      contentType = 'text/plain'
+    }
   }
 
   headers['content-type'] = contentType
 
-  if (typeof name !== 'string' || name === '') {
-    throw new Error('missing name argument')
+  let path
+  let query
+  if (mode === 'create') {
+    if (typeof name !== 'string' || name === '') {
+      throw new Error('missing name argument')
+    }
+
+    path = `/files/${encodeURIComponent(folderId)}`
+    query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
+  } else {
+    if (typeof fileId !== 'string' || fileId === '') {
+      throw new Error('missing fileId argument')
+    }
+
+    path = `/files/${encodeURIComponent(fileId)}`
+    query = ''
   }
 
-  const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
-  const path = `/files/${encodeURIComponent(folderId)}`
-
-  return fetch(`${config.target}${path}${query}`, options)
+  const target = config.target || ''
+  return fetch(`${target}${path}${query}`, options)
     .then((res) => {
       const json = res.json()
       if (!res.ok) {
@@ -60,9 +92,9 @@ export async function upload (data, args) {
     })
 }
 
-export async function uploadFiles (files) {
+export async function createFiles (files) {
   const config = await waitConfig()
-  if (config.isV1) {
+  if (config.isV2) {
     throw new Error('not implemented on V1')
   }
 

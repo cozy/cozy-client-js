@@ -1,5 +1,5 @@
 [Cozy](https://cozy.io) Javascript Client
-==============================
+=========================================
 
 `cozy-client-js` is a javascript library made by Cozy. It enables client-side  applications to make requests to the cozy stack.
 
@@ -35,24 +35,8 @@ You can `import`/`require` cozy-client-js using npm & webpack
 You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
 
 
-
-Implemented API
------------------------
-
-# cozy.init(options)
-
-`cozy.init(options)` setup cozy-client-js and perform the necessary steps to retrieve the application token. Our goal is for you developer to not worry about how the token is retrieved, as it will depend on cozy version and context.
-
-Supported options are:
-
- - `target` : if the cozy you want to speak to is not on the same origin than the app. Useful for test, should not used for app installed inside Cozy.
-
-```javascript
-await cozy.init()
-// let's do something
-```
-
-# Doctypes & Permissions
+Doctypes & Permissions
+----------------------
 
 A doctype is a simple javascript string identifying a type of document.
 Some basic doctypes are provided by cozy, but you can pick your own.
@@ -79,7 +63,8 @@ When you use a doctype, even one created by your application, you need to ask fo
 **TODO** Have some docs about **v2** package.json vs **v3** manifest.webapp
 
 
-# Promises & callback
+Promises & Callbacks
+--------------------
 
 All cozy-client-js functions support callback or promise.
 
@@ -114,7 +99,23 @@ cozy.create(myBooksDoctype, doc, function(err, result){
 ```
 
 
-# cozy.create(doctype, attributes)
+Implemented API
+---------------
+
+### `cozy.init(options)`
+
+`cozy.init(options)` setup cozy-client-js and perform the necessary steps to retrieve the application token. Our goal is for you developer to not worry about how the token is retrieved, as it will depend on cozy version and context.
+
+Supported options are:
+
+ - `target` : if the cozy you want to speak to is not on the same origin than the app. Useful for test, should not used for app installed inside Cozy.
+
+```javascript
+await cozy.init()
+// let's do something
+```
+
+### `cozy.create(doctype, attributes)`
 
 `create(doctype, attributes)` adds a document to the database.
 
@@ -126,7 +127,6 @@ This function returns a promise for the created object. The created object has t
 
 On **v3**, an extra field `_rev` is added, it is the unique identifier for the document revision, after creation, it will be of the shape `1-xxxxxxxxx` for first revision.
 
-### Example :
 ```javascript
 // simple object
 var book = { title: "Moby Dick", author:"Herman Melville", isbn: "42" }
@@ -140,7 +140,7 @@ console.log(created._id, created._rev)
 createdBookId = created._id
 ```
 
-# cozy.find(doctype, id)
+### `cozy.find(doctype, id)`
 
 `cozy.find(doctype, id)` returns the document with the given ID.
 
@@ -153,7 +153,7 @@ doc = await cozy.find(myBooksDoctype, createdBookId)
 console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
-# cozy.update(doctype, doc, newdoc)
+### `cozy.update(doctype, doc, newdoc)`
 
 `cozy.update(doctype, doc, newdoc)` replaces the document by a new version.
 
@@ -173,7 +173,7 @@ console.log(updated.title, updated.year) // fields are changed
 console.log(updated.isbn === undefined) // update erase fields
 ```
 
-# cozy.updateAttributes(doctype, id, changes)
+### `cozy.updateAttributes(doctype, id, changes)`
 
 `cozy.updateAttributes(doctype, id, changes)` applies change to the document.
 
@@ -191,7 +191,7 @@ console.log(updated.year) // fields are changed
 console.log(updated.isbn) // updateAttributes preserve other fields
 ```
 
-# cozy.destroy(doctype, doc)
+### `cozy.destroy(doctype, doc)`
 
 `cozy.destroy(doctype, doc )` will erase the document from the database.
 
@@ -207,7 +207,7 @@ await cozy.destroy(myBooksDoctype, updated)
 ```
 
 
-# cozy.defineIndex(doctype, fields)
+### `cozy.defineIndex(doctype, fields)`
 
 `cozy.defineIndex(doctype, fields)` creates an index for a document type.
 
@@ -223,7 +223,7 @@ defineIndex is idempotent, it can be called several time with no bad effect
 booksByYearRef = await cozy.defineIndex(myType, 'year', 'rating')
 ```
 
-# cozy.query(indexReference, query)
+### `cozy.query(indexReference, query)`
 
 `cozy.query(indexReference, query)` find documents using an index.
 
@@ -250,6 +250,37 @@ resuts[0].title === "Moby Dick"
 resuts[0].rating < 2 // lowest rating first
 ```
 
+### `cozy.upload(data, options)`
+
+`upload(data, options)` is used to upload a new file onto your cozy, or update an already existing one.
+
+`data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
+
+`options` is an object with the following fields:
+
+  - **mode**: specify the upload mode `create` or `update`. default: `create`
+  - **name**: in `create` mode, specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
+  - **folderId**: in `create` mode, specify identifier of the file's folder. if empty, it is the root folder.
+  - **fileId**: in `update` mode, specify the identifier of the file to modify.
+  - **contentType**: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+
+**Warning** This API is not V2 compatible.
+
+```javascript
+const created = await cozy.upload(blob, {
+    mode: "create",
+    name: "filename",
+    folderId: "123456",
+})
+
+const updated = await cozy.upload(blob, {
+    mode: "update",
+    fileId: "654321",
+    contentType: "text/plain",
+})
+
+const fileUpdated = await cozy.upload(fileInput.files[0], { folderId: "" })
+```
 
 Future APIs
 -----------
