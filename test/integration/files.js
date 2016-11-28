@@ -47,4 +47,17 @@ describe('files API', function () {
       updated.data.should.have.property('attributes')
     })
   })
+
+  describe('Create directory', function () {
+    it('Works', async function () {
+      if (config.isV2) {
+        return
+      }
+
+      const dirname = 'foo_' + Math.random()
+
+      const created = await cozy.createDirectory({ name: dirname })
+      created.data.should.have.property('attributes')
+    })
+  })
 })

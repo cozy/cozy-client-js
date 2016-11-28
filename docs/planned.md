@@ -13,9 +13,6 @@ to comment on them through issues or PR !
 // inefficiently made compatible with stack v2 by manipulating files
 // and folders docTypes.
 
-// vfs.mkdir(path) creates a directory at the given path
-await cozy.vfs.mkdir("path/to/dir")
-
 // vfs.ls(path) returns the children of a given directory
 children = await cozy.vfs.ls("path/to/dir")
 

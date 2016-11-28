@@ -1,5 +1,5 @@
 /* global fetch Blob File */
-import {waitConfig} from './utils'
+import {waitConfig, doFetch} from './utils'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
@@ -52,10 +52,7 @@ function doUpload (config, data, contentType, method, path) {
 }
 
 export async function createFile (data, options) {
-  const config = await waitConfig()
-  if (config.isV2) {
-    throw new Error('not implemented on v2')
-  }
+  const config = await waitConfig({ nocompat: true })
 
   let {name, folderId, contentType} = options || {}
 
@@ -74,10 +71,7 @@ export async function createFile (data, options) {
 }
 
 export async function updateFile (data, options) {
-  const config = await waitConfig()
-  if (config.isV2) {
-    throw new Error('not implemented on v2')
-  }
+  const config = await waitConfig({ nocompat: true })
 
   let {fileId, contentType} = options || {}
 
@@ -87,4 +81,18 @@ export async function updateFile (data, options) {
 
   const path = `/files/${encodeURIComponent(fileId)}`
   return doUpload(config, data, contentType, 'PUT', path)
+}
+
+export async function createDirectory (options) {
+  const config = await waitConfig({ nocompat: true })
+
+  let {name, folderId} = options || {}
+
+  if (typeof name !== 'string' || name === '') {
+    throw new Error('missing name argument')
+  }
+
+  const path = `/files/${encodeURIComponent(folderId || '')}`
+  const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.folders`
+  return doFetch(config, 'POST', `${path}${query}`)
 }

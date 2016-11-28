@@ -116,4 +116,53 @@ describe('Files', function () {
       err = null
     })
   })
+
+  describe('Create directory', function () {
+    before(mock.mockAPI('CreateDirectory'))
+
+    it('should work', async function () {
+      const res1 = await cozy.createDirectory({ name: 'foo' })
+      const res2 = await cozy.createDirectory({ name: 'foo', folderId: '12345' })
+
+      mock.calls('CreateDirectory').should.have.length(2)
+      mock.lastUrl('CreateDirectory').should.equal('/files/12345?Name=foo&Type=io.cozy.folders')
+
+      res1.data.should.have.property('attributes')
+      res2.data.should.have.property('attributes')
+    })
+
+    it('should fail with wrong arguments', async function () {
+      let err = null
+
+      try {
+        await cozy.createDirectory(null)
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing name argument'))
+      }
+
+      err = null
+
+      try {
+        await cozy.createDirectory({})
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing name argument'))
+      }
+
+      err = null
+
+      try {
+        await cozy.createDirectory({ name: '' })
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing name argument'))
+      }
+
+      err = null
+    })
+  })
 })

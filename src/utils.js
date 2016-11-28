@@ -8,6 +8,9 @@ export function configure (opts) {
 }
 
 export async function waitConfig (opts) {
+  if (opts && opts.nocompat === true && config.isV2) {
+    throw new Error('not implemented on v2')
+  }
   return config
 }
 

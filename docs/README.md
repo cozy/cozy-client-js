@@ -304,6 +304,15 @@ const updated = await cozy.updateFile(blob, {
 ```
 
 
+### `cozy.createDirectory(options)`
+
+`cozy.createDirectory(options)` is used to create a new directory.
+
+- `options` is an object with the following fields:
+  * `name`: specify the name of the directory
+  * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
+
+
 Future APIs
 -----------
 

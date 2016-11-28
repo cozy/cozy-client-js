@@ -42,6 +42,9 @@ let cozy = {
   },
   updateFile: function (data, options, optCallback) {
     return promiser(files.updateFile(data, options), optCallback)
+  },
+  createDirectory: function (options, optCallback) {
+    return promiser(files.createDirectory(options), optCallback)
   }
 }
 

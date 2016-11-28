@@ -78,7 +78,7 @@ const ROUTES = [
   {
     name: 'UploadFile',
     method: 'POST',
-    matcher: /^\/files\//,
+    matcher: /^\/files\/.*Type=io\.cozy\.files.*/,
     response: {
       data: {
         type: 'io.cozy.files',
@@ -94,6 +94,28 @@ const ROUTES = [
           mime: 'application/pdf',
           class: 'application',
           executable: false,
+          tags: []
+        },
+        meta: {},
+        links: {},
+        relationships: {}
+      }
+    }
+  },
+  {
+    name: 'CreateDirectory',
+    method: 'POST',
+    matcher: /^\/files\/.*Type=io\.cozy\.folders.*/,
+    response: {
+      data: {
+        type: 'io.cozy.files',
+        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+        attributes: {
+          type: 'directory',
+          name: 'hospi.pdf',
+          folder_id: 'io.cozy.files.rootdir',
+          created_at: '2016-11-25T16:07:45.398867198+01:00',
+          updated_at: '2016-11-25T16:07:45.398867198+01:00',
           tags: []
         },
         meta: {},
