@@ -283,7 +283,7 @@ const created = await cozy.createFile(blob, {
     name: "filename",
     folderId: "123456",
 })
-const fileUpdated = await cozy.createFile(fileInput.files[0], { folderId: "" })
+const fileCreated = await cozy.createFile(fileInput.files[0], { folderId: "" })
 ```
 
 
