@@ -39,9 +39,6 @@ let cozy = {
   },
   upload: function (data, args, optCallback) {
     return promiser(files.upload(data, args), optCallback)
-  },
-  uploadFiles: function (data, args, optCallback) {
-    return promiser(files.uploadFiles(data, args), optCallback)
   }
 }
 

@@ -7,7 +7,7 @@ const contentTypeOctetStream = 'application/octet-stream'
 export async function upload (data, args) {
   const config = await waitConfig()
   if (config.isV2) {
-    throw new Error('not implemented on V1')
+    throw new Error('not implemented on v2')
   }
 
   let { name, fileId, folderId, mode, contentType } = args || {}
@@ -90,13 +90,4 @@ export async function upload (data, args) {
         return json
       }
     })
-}
-
-export async function createFiles (files) {
-  const config = await waitConfig()
-  if (config.isV2) {
-    throw new Error('not implemented on V1')
-  }
-
-  return Promise.all(Array.from(files).map(upload))
 }
