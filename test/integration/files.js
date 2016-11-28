@@ -8,71 +8,48 @@ global.fetch = fetch
 
 const TARGET = process.env && process.env.TARGET || ''
 
-describe('files API', function () {
+describe('files API', async function () {
   let config
 
-  describe('Config', function () {
-    it('When called against a real instance', async function () {
-      config = await cozy.init({ target: TARGET })
-    })
+  beforeEach(async function () {
+    config = await cozy.init({ target: TARGET })
+    if (!config.isV2) {
+      this.skip()
+    }
   })
 
-  describe('Create file', function () {
-    it('Works', async function () {
-      if (config.isV2) {
-        return
-      }
+  it('creates a file', async function () {
+    const filename = 'foo_' + Math.random()
 
-      const filename = 'foo_' + Math.random()
-
-      const created = await cozy.createFile('datastring1', { name: filename })
-      created.data.should.have.property('attributes')
-    })
+    const created = await cozy.createFile('datastring1', { name: filename })
+    created.data.should.have.property('attributes')
   })
 
-  describe('Update file', function () {
-    it('Works', async function () {
-      if (config.isV2) {
-        return
-      }
+  it('updates a file', async function () {
+    const filename = 'foo_' + Math.random()
 
-      const filename = 'foo_' + Math.random()
+    const created = await cozy.createFile('datastring1', { name: filename })
+    created.data.should.have.property('attributes')
 
-      const created = await cozy.createFile('datastring1', { name: filename })
-      created.data.should.have.property('attributes')
+    const createdId = created.data.id
 
-      const createdId = created.data.id
-
-      const updated = await cozy.updateFile('datastring2', { fileId: createdId })
-      updated.data.should.have.property('attributes')
-    })
+    const updated = await cozy.updateFile('datastring2', { fileId: createdId })
+    updated.data.should.have.property('attributes')
   })
 
-  describe('Create directory', function () {
-    it('Works', async function () {
-      if (config.isV2) {
-        return
-      }
+  it('creates directory', async function () {
+    const dirname = 'foo_' + Math.random()
 
-      const dirname = 'foo_' + Math.random()
-
-      const created = await cozy.createDirectory({ name: dirname })
-      created.data.should.have.property('attributes')
-    })
+    const created = await cozy.createDirectory({ name: dirname })
+    created.data.should.have.property('attributes')
   })
 
-  describe('Trash file or directory', function () {
-    it('Works', async function () {
-      if (config.isV2) {
-        return
-      }
+  it('trashes file or directory', async function () {
+    const dirname = 'foo_' + Math.random()
 
-      const dirname = 'foo_' + Math.random()
+    const created = await cozy.createDirectory({ name: dirname })
+    const createdId = created.data.id
 
-      const created = await cozy.createDirectory({ name: dirname })
-      const createdId = created.data.id
-
-      await cozy.trash(createdId)
-    })
+    await cozy.trash(createdId)
   })
 })
