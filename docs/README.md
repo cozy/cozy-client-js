@@ -11,7 +11,7 @@ cozy-client-js is compatible with both cozy architectures.
 Reminder about cozy architectures
 ---------------------------------
 
-There is two actives cozy architectures :
+There is two actives cozy architectures:
 
 - The first, thereafter named **v2** is the existing cozy structure. It's based on 1 container / user with many node.js processes in each container (cozy-data-system, cozy-proxy, cozy-home, 1 process per app).
 - The second, thereafter named **v3** is the new cozy-stack ([repository](https://github.com/cozy/cozy-stack)). It's based on go and aim to support multiple user on a single process.
@@ -102,28 +102,29 @@ cozy.create(myBooksDoctype, doc, function(err, result){
 Implemented API
 ---------------
 
+
 ### `cozy.init(options)`
 
 `cozy.init(options)` setup cozy-client-js and perform the necessary steps to retrieve the application token. Our goal is for you developer to not worry about how the token is retrieved, as it will depend on cozy version and context.
 
-Supported options are:
-
- - `target` : if the cozy you want to speak to is not on the same origin than the app. Useful for test, should not used for app installed inside Cozy.
+- `options` is an object with the following fields:
+  * `target`: if the cozy you want to speak to is not on the same origin than the app. Useful for test, should not used for app installed inside Cozy.
 
 ```javascript
 await cozy.init()
 // let's do something
 ```
 
+
 ### `cozy.create(doctype, attributes)`
 
 `create(doctype, attributes)` adds a document to the database.
 
-If you use an existing doctype, you should follow its expected format. **v2** does not enforce this, but we plan to on **v3**. Anyway, do you want to be the app that creates empty contacts in the native app?
+It returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It's the unique identifier for the created document.
+
+If you use an existing doctype, you should follow its expected format. **v2** does not enforce this, but we plan to on **v3**. Anyway, do you want to be the app that creates empty contacts in the native app ?
 
 The attributes will be passed to `JSON.stringify`, if it is a complex or cyclic object, add a `toJSON` method to it (native behaviour of JSON.stringify).
-
-This function returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It's the unique identifier for the created document.
 
 On **v3**, an extra field `_rev` is added, it is the unique identifier for the document revision, after creation, it will be of the shape `1-xxxxxxxxx` for first revision.
 
@@ -140,29 +141,37 @@ console.log(created._id, created._rev)
 createdBookId = created._id
 ```
 
+
 ### `cozy.find(doctype, id)`
 
-`cozy.find(doctype, id)` returns the document with the given ID.
+`cozy.find(doctype, id)` returns the document associated to the given ID.
 
-This functions returns a promise for the document. It will have the same fields as the return value from `create`, including `_id` and `_rev`.
+It returns a promise for the document. It will have the same fields as the return value from `create`, including `_id` and `_rev`.
 
 If the document does not exist, the promise will reject or the callback will be passed an error.
+
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `id` is a string specifying the identifier of the document you search for
 
 ```javascript
 doc = await cozy.find(myBooksDoctype, createdBookId)
 console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
+
 ### `cozy.update(doctype, doc, newdoc)`
 
 `cozy.update(doctype, doc, newdoc)` replaces the document by a new version.
 
-This function returns a promise for the updated document. The updated document will have the same fields and values than provided newdoc, the same `_id` than doc, and a `_rev` incremented from doc's number.
-
-The only field read from doc are `_id` and `_rev`.
+It returns a promise for the updated document. The updated document will have the same fields and values than provided newdoc, the same `_id` than doc, and a `_rev` incremented from doc's number.
 
 If the document does not exist, the promise will reject with an error.
+
 If the document current `_rev` does not match the passed one, it means there is a conflict and the promise reject with an error.
+
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `doc` is an object with *at least* the fields `_id` and `_rev` containing the identifier and revision of the file you want to update.
+- `newdoc` is an object, specifying the new content of the document
 
 ```javascript
 var updates = { title: "Moby Dick !", author:"THE Herman Melville"}
@@ -173,14 +182,20 @@ console.log(updated.title, updated.year) // fields are changed
 console.log(updated.isbn === undefined) // update erase fields
 ```
 
+
 ### `cozy.updateAttributes(doctype, id, changes)`
 
 `cozy.updateAttributes(doctype, id, changes)` applies change to the document.
 
-This function returns a promise for the updated document. The updated document will be the result of merging changes into the document with given `_id` and a incremented `_rev`.
+It returns a promise for the updated document. The updated document will be the result of merging changes into the document with given `_id` and a incremented `_rev`.
 
 If the document does not exist, the promise will reject or the callback will be passed an error.
-This functions give 3 attempts not to conflicts.
+
+This function gives 3 attempts not to conflict.
+
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `id` is a string specifying the identifier of the document to update
+- `changes` is an object
 
 ```javascript
 var updates = { year: 1852}
@@ -191,16 +206,17 @@ console.log(updated.year) // fields are changed
 console.log(updated.isbn) // updateAttributes preserve other fields
 ```
 
+
 ### `cozy.destroy(doctype, doc)`
 
 `cozy.destroy(doctype, doc )` will erase the document from the database.
 
-The only field read from doc are `_id` and `_rev`.
+It returns a promise which will resolve when the document has been deleted.
 
-This function returns a promise which will resolve when the document has been deleted.
+If the document does not exist, the promise will reject with an error. If the document current `_rev` does not match the passed one, it means there is a conflict and the promise reject with an error.
 
-If the document does not exist, the promise will reject with an error.
-If the document current `_rev` does not match the passed one, it means there is a conflict and the promise reject with an error.
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `doc` is an object with *at least* the fields `_id` and `_rev` containing the identifier and revision of the file you want to destroy.
 
 ```javascript
 await cozy.destroy(myBooksDoctype, updated)
@@ -209,29 +225,28 @@ await cozy.destroy(myBooksDoctype, updated)
 
 ### `cozy.defineIndex(doctype, fields)`
 
-`cozy.defineIndex(doctype, fields)` creates an index for a document type.
+`defineIndex(doctype, fields)` creates an index for a document type. It is idempotent, it can be called several time with no bad effect.
 
-Fields is an array of fields to index on.
+It returns a promise for an **indexReference**, which can be passed to `cozy.query`.
 
-This function returns a promise for an **indexReference**, which can be passed to `cozy.query`
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `fields` is an array of the fields name to index
 
-When used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries. **Warning** because of this, more complex queries are not (yet) supported with **v2**
-
-defineIndex is idempotent, it can be called several time with no bad effect
+**Warning**: when used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries. Because of this, more complex queries are not (yet) supported with **v2**.
 
 ```javascript
 booksByYearRef = await cozy.defineIndex(myType, 'year', 'rating')
 ```
 
+
 ### `cozy.query(indexReference, query)`
 
 `cozy.query(indexReference, query)` find documents using an index.
 
-query supports the following fields:
-
-- **selector** : a mango selector
-- **limit** : maximum number of results
-- **skip** : ignore the first x results (pagination)
+- `query` is an object with the following fields:
+  * `selector`: a mango selector
+  * ``limit`: maximum number of results
+  * `skip`: ignore the first x results (pagination)
 
 Results will be returned in order according to the index.
 
@@ -250,19 +265,19 @@ resuts[0].title === "Moby Dick"
 resuts[0].rating < 2 // lowest rating first
 ```
 
+
 ### `cozy.upload(data, options)`
 
 `upload(data, options)` is used to upload a new file onto your cozy, or update an already existing one.
 
 `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 
-`options` is an object with the following fields:
-
-  - **mode**: specify the upload mode `create` or `update`. default: `create`
-  - **name**: in `create` mode, specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
-  - **folderId**: in `create` mode, specify identifier of the file's folder. if empty, it is the root folder.
-  - **fileId**: in `update` mode, specify the identifier of the file to modify.
-  - **contentType**: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+- `options` is an object with the following fields:
+  * `mode`: specify the upload mode `create` or `update`. default: `create`
+  * `name`: in `create` mode, specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
+  * `folderId`: in `create` mode, specify identifier of the file's folder. if empty, it is the root folder.
+  * `fileId`: in `update` mode, specify the identifier of the file to modify.
+  * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
 **Warning** This API is not V2 compatible.
 
@@ -282,9 +297,10 @@ const updated = await cozy.upload(blob, {
 const fileUpdated = await cozy.upload(fileInput.files[0], { folderId: "" })
 ```
 
+
 Future APIs
 -----------
 
-This is the end of what we already have implemented, if you want to do something else (manipulating binary file, sharing, ...), you will have to wait a bit :smile: .
+This is the end of what we already have implemented, if you want to do something else (manipulating binary file, sharing, ...), you will have to wait a bit:smile: .
 
 As a teaser, you can go to our [planned API document](./planned.md) to see APIs we plan to add to this library. Feel free to open an issue if you see something missing, or if you disagree with the API design !
