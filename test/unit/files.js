@@ -20,9 +20,9 @@ describe('Files', function () {
     before(mock.mockAPI('UploadFile'))
 
     it('should work for supported data types', async function () {
-      const res1 = await cozy.upload('somestringdata', { name: 'foo', folderId: '12345', mode: 'create' })
-      const res2 = await cozy.upload(new Uint8Array(10), { name: 'foo', folderId: '12345', mode: 'create' })
-      const res3 = await cozy.upload(new ArrayBuffer(10), { name: 'foo', folderId: '12345', mode: 'create' })
+      const res1 = await cozy.createFile('somestringdata', { name: 'foo', folderId: '12345' })
+      const res2 = await cozy.createFile(new Uint8Array(10), { name: 'foo', folderId: '12345' })
+      const res3 = await cozy.createFile(new ArrayBuffer(10), { name: 'foo', folderId: '12345' })
 
       mock.calls('UploadFile').should.have.length(3)
       mock.lastUrl('UploadFile').should.equal('/files/12345?Name=foo&Type=io.cozy.files')
@@ -36,7 +36,7 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.upload(1)
+        await cozy.createFile(1, { name: 'name' })
       } catch (e) {
         err = e
       } finally {
@@ -46,7 +46,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.upload({})
+        await cozy.createFile({}, { name: 'name' })
       } catch (e) {
         err = e
       } finally {
@@ -56,7 +56,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.upload('')
+        await cozy.createFile('', { name: 'name' })
       } catch (e) {
         err = e
       } finally {
@@ -66,7 +66,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.upload('somestringdata')
+        await cozy.createFile('somestringdata')
       } catch (e) {
         err = e
       } finally {
@@ -76,11 +76,41 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.upload('somestringdata', { name: 'foo', mode: 'wat' })
+        await cozy.updateFile(1, { fileId: '12345' })
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('unknown upload mode: "wat"'))
+        err.should.eql(new Error('invalid data type'))
+      }
+
+      err = null
+
+      try {
+        await cozy.updateFile({}, { fileId: '12345' })
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('invalid data type'))
+      }
+
+      err = null
+
+      try {
+        await cozy.updateFile('', { fileId: '12345' })
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing data argument'))
+      }
+
+      err = null
+
+      try {
+        await cozy.updateFile('somestringdata')
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing fileId argument'))
       }
 
       err = null

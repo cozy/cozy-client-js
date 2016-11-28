@@ -37,8 +37,11 @@ let cozy = {
     warn('destroy is deprecated, use cozy.delete instead.')
     return promiser(crud._delete(doctype, doc), optCallback)
   },
-  upload: function (data, args, optCallback) {
-    return promiser(files.upload(data, args), optCallback)
+  createFile: function (data, options, optCallback) {
+    return promiser(files.createFile(data, options), optCallback)
+  },
+  updateFile: function (data, options, optCallback) {
+    return promiser(files.updateFile(data, options), optCallback)
   }
 }
 

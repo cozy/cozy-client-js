@@ -3,32 +3,13 @@ import {waitConfig} from './utils'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
-// @data can be Blob | File | ArrayBuffer | ArrayBufferView | string
-export async function upload (data, args) {
-  const config = await waitConfig()
-  if (config.isV2) {
-    throw new Error('not implemented on v2')
-  }
-
-  let { name, fileId, folderId, mode, contentType } = args || {}
-
+function doUpload (config, data, contentType, method, path) {
   if (!data) {
     throw new Error('missing data argument')
   }
 
-  if (!folderId) folderId = ''
-  if (!mode) mode = 'create'
-
   const headers = {}
-  const options = { headers }
-
-  if (mode === 'create') {
-    options.method = 'POST'
-  } else if (mode === 'update') {
-    options.method = 'PUT'
-  } else {
-    throw new Error('unknown upload mode: "' + mode + '"')
-  }
+  const options = { method, headers }
 
   // transform any ArrayBufferView to ArrayBuffer
   if (data.buffer && data.buffer instanceof ArrayBuffer) {
@@ -42,10 +23,6 @@ export async function upload (data, args) {
 
   if (!isBuffer && !isFile && !isBlob && !isString) {
     throw new Error('invalid data type')
-  }
-
-  if (isFile && !name) {
-    name = data.name
   }
 
   if (!contentType) {
@@ -62,26 +39,8 @@ export async function upload (data, args) {
 
   headers['content-type'] = contentType
 
-  let path
-  let query
-  if (mode === 'create') {
-    if (typeof name !== 'string' || name === '') {
-      throw new Error('missing name argument')
-    }
-
-    path = `/files/${encodeURIComponent(folderId)}`
-    query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
-  } else {
-    if (typeof fileId !== 'string' || fileId === '') {
-      throw new Error('missing fileId argument')
-    }
-
-    path = `/files/${encodeURIComponent(fileId)}`
-    query = ''
-  }
-
   const target = config.target || ''
-  return fetch(`${target}${path}${query}`, options)
+  return fetch(`${target}${path}`, options)
     .then((res) => {
       const json = res.json()
       if (!res.ok) {
@@ -90,4 +49,42 @@ export async function upload (data, args) {
         return json
       }
     })
+}
+
+export async function createFile (data, options) {
+  const config = await waitConfig()
+  if (config.isV2) {
+    throw new Error('not implemented on v2')
+  }
+
+  let {name, folderId, contentType} = options || {}
+
+  // handle case where data is a file and contains the name
+  if (!name && typeof data.name === 'string') {
+    name = data.name
+  }
+
+  if (typeof name !== 'string' || name === '') {
+    throw new Error('missing name argument')
+  }
+
+  const path = `/files/${encodeURIComponent(folderId || '')}`
+  const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
+  return doUpload(config, data, contentType, 'POST', `${path}${query}`)
+}
+
+export async function updateFile (data, options) {
+  const config = await waitConfig()
+  if (config.isV2) {
+    throw new Error('not implemented on v2')
+  }
+
+  let {fileId, contentType} = options || {}
+
+  if (typeof fileId !== 'string' || fileId === '') {
+    throw new Error('missing fileId argument')
+  }
+
+  const path = `/files/${encodeURIComponent(fileId)}`
+  return doUpload(config, data, contentType, 'PUT', path)
 }

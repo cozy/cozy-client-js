@@ -17,7 +17,7 @@ describe('files API', function () {
     })
   })
 
-  describe('Upload file', function () {
+  describe('Create file', function () {
     it('Works', async function () {
       if (config.isV2) {
         return
@@ -25,12 +25,25 @@ describe('files API', function () {
 
       const filename = 'foo_' + Math.random()
 
-      const created = await cozy.upload('datastring1', { name: filename })
+      const created = await cozy.createFile('datastring1', { name: filename })
+      created.data.should.have.property('attributes')
+    })
+  })
+
+  describe('Update file', function () {
+    it('Works', async function () {
+      if (config.isV2) {
+        return
+      }
+
+      const filename = 'foo_' + Math.random()
+
+      const created = await cozy.createFile('datastring1', { name: filename })
       created.data.should.have.property('attributes')
 
       const createdId = created.data.id
 
-      const updated = await cozy.upload('datastring2', { fileId: createdId, mode: 'update' })
+      const updated = await cozy.updateFile('datastring2', { fileId: createdId })
       updated.data.should.have.property('attributes')
     })
   })

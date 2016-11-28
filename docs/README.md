@@ -266,34 +266,41 @@ resuts[0].rating < 2 // lowest rating first
 ```
 
 
-### `cozy.upload(data, options)`
+### `cozy.createFile(data, options)`
 
-`upload(data, options)` is used to upload a new file onto your cozy, or update an already existing one.
+`upload(data, options)` is used to upload a new file onto your cozy
 
 - `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 - `options` is an object with the following fields:
-  * `mode`: specify the upload mode `create` or `update`. default: `create`
-  * `name`: in `create` mode, specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
-  * `folderId`: in `create` mode, specify identifier of the file's folder. if empty, it is the root folder.
-  * `fileId`: in `update` mode, specify the identifier of the file to modify.
+  * `name`: specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
+  * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
 **Warning** This API is not V2 compatible.
 
 ```javascript
-const created = await cozy.upload(blob, {
-    mode: "create",
+const created = await cozy.createFile(blob, {
     name: "filename",
     folderId: "123456",
 })
+const fileUpdated = await cozy.createFile(fileInput.files[0], { folderId: "" })
+```
 
-const updated = await cozy.upload(blob, {
-    mode: "update",
+
+### `cozy.updateFile(data, options)`
+
+`cozy.updateFile(data, options)` is used to update the content of an already existing file.
+
+- `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
+- `options` is an object with the following fields:
+  * `fileId`: specify the identifier of the file to modify.
+  * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+
+```javascript
+const updated = await cozy.updateFile(blob, {
     fileId: "654321",
     contentType: "text/plain",
 })
-
-const fileUpdated = await cozy.upload(fileInput.files[0], { folderId: "" })
 ```
 
 
