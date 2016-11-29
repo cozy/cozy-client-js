@@ -8,9 +8,6 @@ function doUpload (config, data, contentType, method, path) {
     throw new Error('missing data argument')
   }
 
-  const headers = {}
-  const options = { method, headers }
-
   // transform any ArrayBufferView to ArrayBuffer
   if (data.buffer && data.buffer instanceof ArrayBuffer) {
     data = data.buffer
@@ -37,10 +34,15 @@ function doUpload (config, data, contentType, method, path) {
     }
   }
 
-  headers['content-type'] = contentType
+  const headers = {}
+  headers['Content-Type'] = contentType
 
   const target = config.target || ''
-  return fetch(`${target}${path}`, options)
+  return fetch(`${target}${path}`, {
+    method,
+    headers,
+    body: data
+  })
     .then((res) => {
       const json = res.json()
       if (!res.ok) {

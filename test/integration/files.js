@@ -13,7 +13,7 @@ describe('files API', async function () {
 
   beforeEach(async function () {
     config = await cozy.init({ target: TARGET })
-    if (!config.isV2) {
+    if (config.isV2) {
       this.skip()
     }
   })
@@ -21,8 +21,13 @@ describe('files API', async function () {
   it('creates a file', async function () {
     const filename = 'foo_' + Math.random()
 
-    const created = await cozy.createFile('datastring1', { name: filename })
+    const created = await cozy.createFile('datastring1', {
+      name: filename,
+      contentType: 'application/json'
+    })
+
     created.data.should.have.property('attributes')
+    created.data.attributes.md5sum.should.equal('7Zfd8PaeeXsm5WJesf/KJw==')
   })
 
   it('updates a file', async function () {
@@ -35,6 +40,7 @@ describe('files API', async function () {
 
     const updated = await cozy.updateFile('datastring2', { fileId: createdId })
     updated.data.should.have.property('attributes')
+    updated.data.attributes.md5sum.should.equal('iWpp8tcTP/DWTJSLf0hoyQ==')
   })
 
   it('creates directory', async function () {
