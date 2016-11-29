@@ -1,9 +1,10 @@
 /* global fetch Blob File */
 import {waitConfig, doFetch} from './utils'
+import jsonapi from './jsonapi'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
-function doUpload (config, data, contentType, method, path) {
+async function doUpload (config, data, contentType, method, path) {
   if (!data) {
     throw new Error('missing data argument')
   }
@@ -66,7 +67,8 @@ export async function create (data, options) {
 
   const path = `/files/${encodeURIComponent(folderId || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
-  return doUpload(config, data, contentType, 'POST', `${path}${query}`)
+  let result = await doUpload(config, data, contentType, 'POST', `${path}${query}`)
+  return jsonapi(result)
 }
 
 export async function update (data, options) {
@@ -79,7 +81,8 @@ export async function update (data, options) {
   }
 
   const path = `/files/${encodeURIComponent(fileId)}`
-  return doUpload(config, data, contentType, 'PUT', path)
+  let result = await doUpload(config, data, contentType, 'PUT', path)
+  return jsonapi(result)
 }
 
 export async function updateAttributes (attrs, options) {
@@ -102,7 +105,8 @@ export async function updateAttributes (attrs, options) {
   }
 
   const body = { data: { attributes: attrs } }
-  return doFetch(config, 'PATCH', `${path}${query}`, body)
+  let result = await doFetch(config, 'PATCH', `${path}${query}`, body)
+  return jsonapi(result)
 }
 
 export async function createDirectory (options) {
@@ -116,7 +120,8 @@ export async function createDirectory (options) {
 
   const path = `/files/${encodeURIComponent(folderId || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.folders`
-  return doFetch(config, 'POST', `${path}${query}`)
+  let result = await doFetch(config, 'POST', `${path}${query}`)
+  return jsonapi(result)
 }
 
 export async function trash (id) {
@@ -126,5 +131,34 @@ export async function trash (id) {
     throw new Error('missing id argument')
   }
 
-  return doFetch(config, 'DELETE', `/files/${encodeURIComponent(id)}`)
+  let result = await doFetch(config, 'DELETE', `/files/${encodeURIComponent(id)}`)
+  return jsonapi(result)
+}
+
+export async function stat (pathOrID) {
+  const config = await waitConfig({ nocompat: true })
+
+  if (isID(pathOrID)) {
+    // GET /files/:id
+    let path = `/files/${encodeURIComponent(pathOrID)}`
+    let response = await doFetch(config, 'GET', path)
+    let out = jsonapi(response)
+    out.isDir = isDir(out)
+    return out
+  } else {
+    // GET /files/metadata?Path=/Documents/hello.txt
+    let path = `/files/metadata?Path=${encodeURIComponent(pathOrID)}`
+    let response = await doFetch(config, 'GET', path)
+    let out = jsonapi(response)
+    out.isDir = isDir(out)
+    return out
+  }
+}
+
+function isID (text) {
+  return text.indexOf('/') !== 0
+}
+
+function isDir (obj) {
+  return obj.attributes.type === 'directory'
 }

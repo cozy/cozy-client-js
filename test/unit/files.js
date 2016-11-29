@@ -27,9 +27,9 @@ describe('Files', function () {
       mock.calls('UploadFile').should.have.length(3)
       mock.lastUrl('UploadFile').should.equal('/files/12345?Name=foo&Type=io.cozy.files')
 
-      res1.data.should.have.property('attributes')
-      res2.data.should.have.property('attributes')
-      res3.data.should.have.property('attributes')
+      res1.should.have.property('attributes')
+      res2.should.have.property('attributes')
+      res3.should.have.property('attributes')
     })
 
     it('should fail for unsupported data types', async function () {
@@ -127,8 +127,8 @@ describe('Files', function () {
       mock.calls('CreateDirectory').should.have.length(2)
       mock.lastUrl('CreateDirectory').should.equal('/files/12345?Name=foo&Type=io.cozy.folders')
 
-      res1.data.should.have.property('attributes')
-      res2.data.should.have.property('attributes')
+      res1.should.have.property('attributes')
+      res2.should.have.property('attributes')
     })
 
     it('should fail with wrong arguments', async function () {
@@ -175,7 +175,7 @@ describe('Files', function () {
       mock.calls('Trash').should.have.length(1)
       mock.lastUrl('Trash').should.equal('/files/1234')
 
-      res1.data.should.have.property('attributes')
+      res1.should.have.property('attributes')
     })
 
     it('should fail with wrong arguments', async function () {
@@ -229,8 +229,8 @@ describe('Files', function () {
 
       mock.calls('UpdateAttributes').should.have.length(2)
 
-      res1.data.should.have.property('attributes')
-      res2.data.should.have.property('attributes')
+      res1.should.have.property('attributes')
+      res2.should.have.property('attributes')
     })
 
     it('should fail with bad arguments', async function () {
@@ -253,6 +253,38 @@ describe('Files', function () {
       }
 
       err = null
+    })
+  })
+
+  describe('Files stat by ID', function () {
+    before(mock.mockAPI('StatByID'))
+
+    it('should work', async function () {
+      const res1 = await cozy.files.stat('id42')
+
+      mock.calls('StatByID').should.have.length(1)
+      mock.lastUrl('StatByID').should.equal('/files/id42')
+
+      res1.should.have.property('_id', 'id42')
+      res1.should.have.property('isDir', true)
+      res1.should.have.property('attributes')
+      res1.attributes.should.have.property('name', 'bills')
+    })
+  })
+
+  describe('Files stat by Path', function () {
+    before(mock.mockAPI('StatByPath'))
+
+    it('should work', async function () {
+      const res1 = await cozy.files.stat('/bills/hôpital.pdf')
+
+      mock.calls('StatByPath').should.have.length(1)
+      mock.lastUrl('StatByPath').should.equal('/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+
+      res1.should.have.property('_id', 'cb1c159a8db1ee7aeb9441c3ff001753')
+      res1.should.have.property('isDir', false)
+      res1.should.have.property('attributes')
+      res1.attributes.should.have.property('name', 'hospi.pdf')
     })
   })
 })

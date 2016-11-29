@@ -19,6 +19,9 @@ let filesProto = {
   },
   trash: function (options, optCallback) {
     return promiser(files.trash(options), optCallback)
+  },
+  stat: function (options, optCallback) {
+    return promiser(files.stat(options), optCallback)
   }
 }
 
