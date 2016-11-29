@@ -118,15 +118,16 @@ await cozy.init()
 
 ### `cozy.create(doctype, attributes)`
 
-`create(doctype, attributes)` adds a document to the database.
+`cozy.create(doctype, attributes)` adds a document to the database.
 
 It returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It's the unique identifier for the created document.
 
 If you use an existing doctype, you should follow its expected format. **v2** does not enforce this, but we plan to on **v3**. Anyway, do you want to be the app that creates empty contacts in the native app ?
 
-The attributes will be passed to `JSON.stringify`, if it is a complex or cyclic object, add a `toJSON` method to it (native behaviour of JSON.stringify).
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `attributes` is an object that can be stringified using `JSON.stringify`: if it is a complex or cyclic object, add a `toJSON` method to it (native behaviour of `JSON.stringify`).
 
-On **v3**, an extra field `_rev` is added, it is the unique identifier for the document revision, after creation, it will be of the shape `1-xxxxxxxxx` for first revision.
+**Warning**: on **v3**, an extra field `_rev` is added, it is the unique identifier for the document revision, after creation, it will be of the shape `1-xxxxxxxxx` for first revision.
 
 ```javascript
 // simple object
@@ -243,14 +244,14 @@ booksByYearRef = await cozy.defineIndex(myType, 'year', 'rating')
 
 `cozy.query(indexReference, query)` find documents using an index.
 
+It returns a promise with a list of documents matching the query. Results will be returned in order according to the index.
+
 - `query` is an object with the following fields:
   * `selector`: a mango selector
   * `limit`: maximum number of results
   * `skip`: ignore the first x results (pagination)
 
-Results will be returned in order according to the index.
-
-**Warning** Complex mango queries are not, and may never be compatible with **v2**
+**Warning**: complex mango queries are not, and may never be compatible with **v2**
 
 ```javascript
 results = await cozy.query(booksByYearRef, {
@@ -268,7 +269,9 @@ resuts[0].rating < 2 // lowest rating first
 
 ### `cozy.createFile(data, options)`
 
-`upload(data, options)` is used to upload a new file onto your cozy
+`cozy.createFile(data, options)` is used to upload a new file onto your cozy
+
+It returns a promise for the document of the file created.
 
 - `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 - `options` is an object with the following fields:
@@ -276,7 +279,7 @@ resuts[0].rating < 2 // lowest rating first
   * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
-**Warning** This API is not V2 compatible.
+**Warning**: this API is not V2 compatible.
 
 ```javascript
 const created = await cozy.createFile(blob, {
@@ -290,6 +293,8 @@ const fileCreated = await cozy.createFile(fileInput.files[0], { folderId: "" })
 ### `cozy.updateFile(data, options)`
 
 `cozy.updateFile(data, options)` is used to update the content of an already existing file.
+
+It returns a promise for the document of the file updated.
 
 - `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 - `options` is an object with the following fields:
@@ -308,6 +313,8 @@ const updated = await cozy.updateFile(blob, {
 
 `cozy.createDirectory(options)` is used to create a new directory.
 
+It returns a promise for the document of the directory created.
+
 - `options` is an object with the following fields:
   * `name`: specify the name of the directory
   * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
@@ -317,11 +324,13 @@ const updated = await cozy.updateFile(blob, {
 
 `cozy.trash(id)` is used to move the file or directory identified by the given id to trash.
 
+It returns a promise for the document of the file or directory moved to trash.
+
 - `id` is a string specying the identifier of the file or directory
 
 Future APIs
 -----------
 
-This is the end of what we already have implemented, if you want to do something else (manipulating binary file, sharing, ...), you will have to wait a bit:smile: .
+This is the end of what we already have implemented, if you want to do something else (manipulating binary file, sharing, ...), you will have to wait a bit :smile:.
 
 As a teaser, you can go to our [planned API document](./planned.md) to see APIs we plan to add to this library. Feel free to open an issue if you see something missing, or if you disagree with the API design !
