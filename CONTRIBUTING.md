@@ -29,7 +29,7 @@ Opening an issue is as easy as following [this link][issues] and filling out the
 Hack
 ----
 
-This section is only if you want to modify the cozy-client-js library. If you just want to make an app, head over to [the doc](./docs/index.md).
+This section is only if you want to modify the cozy-client-js library. If you just want to make an app, head over to [the doc](./docs/README.md).
 
 ### Install
 

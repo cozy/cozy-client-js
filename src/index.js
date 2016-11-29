@@ -4,6 +4,24 @@ import * as files from './files'
 import init from './init'
 import {promiser, warn} from './utils'
 
+let filesProto = {
+  create: function (data, options, optCallback) {
+    return promiser(files.create(data, options), optCallback)
+  },
+  createDirectory: function (options, optCallback) {
+    return promiser(files.createDirectory(options), optCallback)
+  },
+  update: function (data, options, optCallback) {
+    return promiser(files.update(data, options), optCallback)
+  },
+  updateAttributes: function (attrs, options, optCallback) {
+    return promiser(files.updateAttributes(attrs, options), optCallback)
+  },
+  trash: function (options, optCallback) {
+    return promiser(files.trash(options), optCallback)
+  }
+}
+
 let cozy = {
   init: function (opts, optCallback) {
     return promiser(init(opts), optCallback)
@@ -37,18 +55,8 @@ let cozy = {
     warn('destroy is deprecated, use cozy.delete instead.')
     return promiser(crud._delete(doctype, doc), optCallback)
   },
-  createFile: function (data, options, optCallback) {
-    return promiser(files.createFile(data, options), optCallback)
-  },
-  updateFile: function (data, options, optCallback) {
-    return promiser(files.updateFile(data, options), optCallback)
-  },
-  createDirectory: function (options, optCallback) {
-    return promiser(files.createDirectory(options), optCallback)
-  },
-  trash: function (options, optCallback) {
-    return promiser(files.trash(options), optCallback)
-  }
+
+  files: filesProto
 }
 
 if ((typeof window) !== 'undefined') window.cozy = cozy

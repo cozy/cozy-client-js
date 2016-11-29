@@ -40,7 +40,7 @@ You can also copy-paste the `dist/cozy-client.js` bundle file into your applicat
 
 **polyfills** : cozy-client-js uses [fetch](https://fetch.spec.whatwg.org/) and bundle all necessary polyfills (promise, fetch, reGenerator). **TODO:** We should move the polyfills to a separate bundle and require them only if needed.
 
-Once you have the library included in your application, head over to [the doc](./docs/index.md) to see what you can do with it!
+Once you have the library included in your application, head over to [the doc](./docs/README.md) to see what you can do with it!
 
 
 Contribute
