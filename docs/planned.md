@@ -14,29 +14,26 @@ to comment on them through issues or PR !
 // and folders docTypes.
 
 // vfs.ls(path) returns the children of a given directory
-children = await cozy.vfs.ls("path/to/dir")
-
-// vfs.stat(path) returns the metadata of a given directory of file
-metada = await cozy.vfs.stat("path/to/dir_or_file")
+children = await cozy.files.ls("/path/to/dir")
 
 // vfs.getURL(path) returns an url for this path
 // the url can be used in an <image> or <audio> tag
-url = await cozy.vfs.getURL("path/to/file.ext")
+url = await cozy.files.getURL("/path/to/file.ext")
 
 // vfs.read(path, blob) read a file at the given path
 // it returns a dom.Blob.
-blob = await cozy.vfs.read("path/to/file.ext")
+blob = await cozy.files.read("/path/to/file.ext")
 
 // vfs.move(current, next) move the directory or file at the given path then
 // another path
-await cozy.vfs.move("path/to/dir_or_file", "new/path/to/dir_or_file")
+await cozy.files.move("/path/to/dir_or_file", "/new/path/to/dir_or_file")
 
 // vfs.copy(current, next) copy the directory or file at the given path to
 // another path
-await cozy.vfs.move("path/to/dir_or_file", "new/path/to/dir_or_file")
+await cozy.files.copy("/path/to/dir_or_file", "/new/path/to/dir_or_file")
 
 // vfs.rm(path) move the directory or file at the given path to the trash
-await cozy.vfs.trash("path/to/dir_or_file")
+await cozy.files.trash("/path/to/dir_or_file")
 ```
 
 ## Binary
