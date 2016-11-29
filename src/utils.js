@@ -4,9 +4,13 @@ export let config = {}
 
 export function configure (opts) {
   config = opts
+  return config
 }
 
 export async function waitConfig (opts) {
+  if (opts && opts.nocompat === true && config.isV2) {
+    throw new Error('not implemented on v2')
+  }
   return config
 }
 
