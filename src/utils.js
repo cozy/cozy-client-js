@@ -45,10 +45,12 @@ export function createPath (config, doctype, id = '', query = null) {
 
 export function doFetch (config, method, path, body) {
   const options = {method: method, headers: {}}
+
   if (body !== undefined) {
     options.headers['Content-Type'] = 'application/json'
     options.body = JSON.stringify(body)
   }
+
   if (config.auth) {
     let auth = config.auth.appName + ':' + config.auth.token
     options.headers['Authorization'] = 'Basic ' + btoa(auth)

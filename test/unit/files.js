@@ -166,7 +166,7 @@ describe('Files', function () {
     })
   })
 
-  describe('Create directory', function () {
+  describe('Trash', function () {
     before(mock.mockAPI('Trash'))
 
     it('should work', async function () {
@@ -207,6 +207,49 @@ describe('Files', function () {
         err = e
       } finally {
         err.should.eql(new Error('missing id argument'))
+      }
+
+      err = null
+    })
+  })
+
+  describe('Update attributes', function () {
+    before(mock.mockAPI('UpdateAttributes'))
+
+    it('should work with good arguments', async function () {
+      const attrs = { tags: ['foo', 'bar'] }
+
+      const res1 = await cozy.updateAttributes(attrs, { id: '12345' })
+      mock.lastUrl('UpdateAttributes').should.equal('/files/12345')
+      JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
+
+      const res2 = await cozy.updateAttributes(attrs, { path: '/foo/bar' })
+      mock.lastUrl('UpdateAttributes').should.equal('/files/metadata?Path=%2Ffoo%2Fbar')
+      JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
+
+      mock.calls('UpdateAttributes').should.have.length(2)
+
+      res1.data.should.have.property('attributes')
+      res2.data.should.have.property('attributes')
+    })
+
+    it('should fail with bad arguments', async function () {
+      let err = null
+
+      try {
+        await cozy.updateAttributes(null, {})
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing attrs argument'))
+      }
+
+      try {
+        await cozy.updateAttributes({}, {})
+      } catch (e) {
+        err = e
+      } finally {
+        err.should.eql(new Error('missing id or path argument'))
       }
 
       err = null

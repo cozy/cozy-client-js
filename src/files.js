@@ -34,13 +34,10 @@ function doUpload (config, data, contentType, method, path) {
     }
   }
 
-  const headers = {}
-  headers['Content-Type'] = contentType
-
   const target = config.target || ''
   return fetch(`${target}${path}`, {
-    method,
-    headers,
+    method: method,
+    headers: { 'Content-Type': contentType },
     body: data
   })
     .then((res) => {
@@ -83,6 +80,29 @@ export async function updateFile (data, options) {
 
   const path = `/files/${encodeURIComponent(fileId)}`
   return doUpload(config, data, contentType, 'PUT', path)
+}
+
+export async function updateAttributes (attrs, options) {
+  const config = await waitConfig({ nocompat: true })
+  const {id, path: filePath} = options || {}
+
+  if (!attrs || typeof attrs !== 'object') {
+    throw new Error('missing attrs argument')
+  }
+
+  let path, query
+  if (id) {
+    path = `/files/${encodeURIComponent(id)}`
+    query = ''
+  } else if (filePath) {
+    path = '/files/metadata'
+    query = `?Path=${encodeURIComponent(filePath)}`
+  } else {
+    throw new Error('missing id or path argument')
+  }
+
+  const body = { data: { attributes: attrs } }
+  return doFetch(config, 'PATCH', `${path}${query}`, body)
 }
 
 export async function createDirectory (options) {
