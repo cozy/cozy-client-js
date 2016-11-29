@@ -267,9 +267,9 @@ resuts[0].rating < 2 // lowest rating first
 ```
 
 
-### `cozy.createFile(data, options)`
+### `cozy.files.create(data, options)`
 
-`cozy.createFile(data, options)` is used to upload a new file onto your cozy
+`cozy.files.create(data, options)` is used to upload a new file onto your cozy
 
 It returns a promise for the document of the file created.
 
@@ -282,17 +282,35 @@ It returns a promise for the document of the file created.
 **Warning**: this API is not V2 compatible.
 
 ```javascript
-const created = await cozy.createFile(blob, {
+const created = await cozy.files.create(blob, {
     name: "filename",
     folderId: "123456",
 })
-const fileCreated = await cozy.createFile(fileInput.files[0], { folderId: "" })
+const fileCreated = await cozy.files.create(fileInput.files[0], { folderId: "" })
 ```
 
 
-### `cozy.updateFile(data, options)`
+### `cozy.files.createDirectory(options)`
 
-`cozy.updateFile(data, options)` is used to update the content of an already existing file.
+`cozy.files.createDirectory(options)` is used to create a new directory.
+
+It returns a promise for the document of the directory created.
+
+- `options` is an object with the following fields:
+  * `name`: specify the name of the directory
+  * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
+
+```javascript
+const created = await cozy.files.createDirectory({
+  name: "mydir",
+  folderId: "123456"
+})
+```
+
+
+### `cozy.files.update(data, options)`
+
+`cozy.files.update(data, options)` is used to update the content of an already existing file.
 
 It returns a promise for the document of the file updated.
 
@@ -302,27 +320,16 @@ It returns a promise for the document of the file updated.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
 ```javascript
-const updated = await cozy.updateFile(blob, {
+const updated = await cozy.files.update(blob, {
     fileId: "654321",
     contentType: "text/plain",
 })
 ```
 
 
-### `cozy.createDirectory(options)`
+### `cozy.files.updateAttributes(attrs, options)`
 
-`cozy.createDirectory(options)` is used to create a new directory.
-
-It returns a promise for the document of the directory created.
-
-- `options` is an object with the following fields:
-  * `name`: specify the name of the directory
-  * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
-
-
-### `cozy.updateAttributes(attrs, options)`
-
-`cozy.updateAttributes(attrs, options)` is used to update the attributes associated to a file or directory.
+`cozy.files.updateAttributes(attrs, options)` is used to update the attributes associated to a file or directory.
 
 It returns a promise for the document of the updated directory or file.
 
@@ -331,13 +338,28 @@ It returns a promise for the document of the updated directory or file.
   * `id`: string specifying the identifier of the file or directory to update
   * `path`: string specifying the path of the file or directory to update
 
-### `cozy.trash(id)`
+```javascript
+const updated = await cozy.files.updateAttributes({ tags: ["foo"] }, {
+  id: "12345"
+})
 
-`cozy.trash(id)` is used to move the file or directory identified by the given id to trash.
+const updated = await cozy.files.updateAttributes({ executable: true }, {
+  path: "/foo/bar"
+})
+```
+
+### `cozy.files.trash(id)`
+
+`cozy.files.trash(id)` is used to move the file or directory identified by the given id to trash.
 
 It returns a promise for the document of the file or directory moved to trash.
 
 - `id` is a string specying the identifier of the file or directory
+
+```javascript
+const trashed = await cozy.files.trash("1234567")
+```
+
 
 Future APIs
 -----------

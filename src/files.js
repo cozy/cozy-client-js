@@ -50,7 +50,7 @@ function doUpload (config, data, contentType, method, path) {
     })
 }
 
-export async function createFile (data, options) {
+export async function create (data, options) {
   const config = await waitConfig({ nocompat: true })
 
   let {name, folderId, contentType} = options || {}
@@ -69,7 +69,7 @@ export async function createFile (data, options) {
   return doUpload(config, data, contentType, 'POST', `${path}${query}`)
 }
 
-export async function updateFile (data, options) {
+export async function update (data, options) {
   const config = await waitConfig({ nocompat: true })
 
   let {fileId, contentType} = options || {}
