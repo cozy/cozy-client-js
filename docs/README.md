@@ -320,6 +320,17 @@ It returns a promise for the document of the directory created.
   * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
 
 
+### `cozy.updateAttributes(attrs, options)`
+
+`cozy.updateAttributes(attrs, options)` is used to update the attributes associated to a file or directory.
+
+It returns a promise for the document of the updated directory or file.
+
+- `attrs` is an object containing the changes
+- `options` is an object with one of the following fields:
+  * `id`: string specifying the identifier of the file or directory to update
+  * `path`: string specifying the path of the file or directory to update
+
 ### `cozy.trash(id)`
 
 `cozy.trash(id)` is used to move the file or directory identified by the given id to trash.
