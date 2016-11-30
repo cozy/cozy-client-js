@@ -78,7 +78,7 @@ const ROUTES = [
   {
     name: 'UploadFile',
     method: 'POST',
-    matcher: /^\/files\/.*Type=io\.cozy\.files.*/,
+    matcher: /^\/files\/.*Type=file.*/,
     response: {
       data: {
         type: 'io.cozy.files',
@@ -86,7 +86,7 @@ const ROUTES = [
         attributes: {
           type: 'file',
           name: 'hospi.pdf',
-          folder_id: 'io.cozy.files.rootdir',
+          dir_id: 'io.cozy.files.root-dir',
           created_at: '2016-11-25T16:07:45.398867198+01:00',
           updated_at: '2016-11-25T16:07:45.398867198+01:00',
           size: '0',
@@ -105,7 +105,7 @@ const ROUTES = [
   {
     name: 'CreateDirectory',
     method: 'POST',
-    matcher: /^\/files\/.*Type=io\.cozy\.folders.*/,
+    matcher: /^\/files\/.*Type=directory.*/,
     response: {
       data: {
         type: 'io.cozy.files',
@@ -113,7 +113,7 @@ const ROUTES = [
         attributes: {
           type: 'directory',
           name: 'hospi.pdf',
-          folder_id: 'io.cozy.files.rootdir',
+          dir_id: 'io.cozy.files.root-dir',
           created_at: '2016-11-25T16:07:45.398867198+01:00',
           updated_at: '2016-11-25T16:07:45.398867198+01:00',
           tags: []
@@ -135,7 +135,7 @@ const ROUTES = [
         attributes: {
           type: 'directory',
           name: 'hospi.pdf',
-          folder_id: 'io.cozy.files.rootdir',
+          dir_id: 'io.cozy.files.root-dir',
           created_at: '2016-11-25T16:07:45.398867198+01:00',
           updated_at: '2016-11-25T16:07:45.398867198+01:00',
           tags: []
@@ -157,7 +157,7 @@ const ROUTES = [
         attributes: {
           type: 'directory',
           name: 'hospi.pdf',
-          folder_id: 'io.cozy.files.rootdir',
+          dir_id: 'io.cozy.files.root-dir',
           created_at: '2016-11-25T16:07:45.398867198+01:00',
           updated_at: '2016-11-25T16:07:45.398867198+01:00',
           tags: []
@@ -179,7 +179,7 @@ const ROUTES = [
         attributes: {
           type: 'file',
           name: 'hospi.pdf',
-          folder_id: 'io.cozy.files.rootdir',
+          dir_id: 'io.cozy.files.root-dir',
           created_at: '2016-11-25T16:07:45.398867198+01:00',
           updated_at: '2016-11-25T16:07:45.398867198+01:00',
           tags: []
@@ -201,7 +201,7 @@ const ROUTES = [
         attributes: {
           type: 'directory',
           name: 'bills',
-          folder_id: 'io.cozy.files.rootdir',
+          dir_id: 'io.cozy.files.root-dir',
           created_at: '2016-11-25T16:07:45.398867198+01:00',
           updated_at: '2016-11-25T16:07:45.398867198+01:00',
           tags: []

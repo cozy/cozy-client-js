@@ -54,7 +54,7 @@ async function doUpload (config, data, contentType, method, path) {
 export async function create (data, options) {
   const config = await waitConfig({ nocompat: true })
 
-  let {name, folderId, contentType} = options || {}
+  let {name, dirID, contentType} = options || {}
 
   // handle case where data is a file and contains the name
   if (!name && typeof data.name === 'string') {
@@ -65,8 +65,8 @@ export async function create (data, options) {
     throw new Error('missing name argument')
   }
 
-  const path = `/files/${encodeURIComponent(folderId || '')}`
-  const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.files`
+  const path = `/files/${encodeURIComponent(dirID || '')}`
+  const query = `?Name=${encodeURIComponent(name)}&Type=file`
   let result = await doUpload(config, data, contentType, 'POST', `${path}${query}`)
   return jsonapi(result)
 }
@@ -112,14 +112,14 @@ export async function updateAttributes (attrs, options) {
 export async function createDirectory (options) {
   const config = await waitConfig({ nocompat: true })
 
-  let {name, folderId} = options || {}
+  let {name, dirID} = options || {}
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
   }
 
-  const path = `/files/${encodeURIComponent(folderId || '')}`
-  const query = `?Name=${encodeURIComponent(name)}&Type=io.cozy.folders`
+  const path = `/files/${encodeURIComponent(dirID || '')}`
+  const query = `?Name=${encodeURIComponent(name)}&Type=directory`
   let result = await doFetch(config, 'POST', `${path}${query}`)
   return jsonapi(result)
 }

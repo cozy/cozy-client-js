@@ -276,7 +276,7 @@ It returns a promise for the document of the file created.
 - `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 - `options` is an object with the following fields:
   * `name`: specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
-  * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
+  * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
 **Warning**: this API is not V2 compatible.
@@ -284,9 +284,9 @@ It returns a promise for the document of the file created.
 ```javascript
 const created = await cozy.files.create(blob, {
     name: "filename",
-    folderId: "123456",
+    dirID: "123456",
 })
-const fileCreated = await cozy.files.create(fileInput.files[0], { folderId: "" })
+const fileCreated = await cozy.files.create(fileInput.files[0], { dirID: "" })
 ```
 
 
@@ -298,12 +298,12 @@ It returns a promise for the document of the directory created.
 
 - `options` is an object with the following fields:
   * `name`: specify the name of the directory
-  * `folderId`: specify identifier of the file's folder. if empty, it is the root folder.
+  * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
 
 ```javascript
 const created = await cozy.files.createDirectory({
   name: "mydir",
-  folderId: "123456"
+  dirID: "123456"
 })
 ```
 

@@ -20,12 +20,12 @@ describe('Files', function () {
     before(mock.mockAPI('UploadFile'))
 
     it('should work for supported data types', async function () {
-      const res1 = await cozy.files.create('somestringdata', { name: 'foo', folderId: '12345' })
-      const res2 = await cozy.files.create(new Uint8Array(10), { name: 'foo', folderId: '12345' })
-      const res3 = await cozy.files.create(new ArrayBuffer(10), { name: 'foo', folderId: '12345' })
+      const res1 = await cozy.files.create('somestringdata', { name: 'foo', dirID: '12345' })
+      const res2 = await cozy.files.create(new Uint8Array(10), { name: 'foo', dirID: '12345' })
+      const res3 = await cozy.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
 
       mock.calls('UploadFile').should.have.length(3)
-      mock.lastUrl('UploadFile').should.equal('/files/12345?Name=foo&Type=io.cozy.files')
+      mock.lastUrl('UploadFile').should.equal('/files/12345?Name=foo&Type=file')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
@@ -122,10 +122,10 @@ describe('Files', function () {
 
     it('should work', async function () {
       const res1 = await cozy.files.createDirectory({ name: 'foo' })
-      const res2 = await cozy.files.createDirectory({ name: 'foo', folderId: '12345' })
+      const res2 = await cozy.files.createDirectory({ name: 'foo', dirID: '12345' })
 
       mock.calls('CreateDirectory').should.have.length(2)
-      mock.lastUrl('CreateDirectory').should.equal('/files/12345?Name=foo&Type=io.cozy.folders')
+      mock.lastUrl('CreateDirectory').should.equal('/files/12345?Name=foo&Type=directory')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')

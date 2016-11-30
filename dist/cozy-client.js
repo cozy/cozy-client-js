@@ -1189,7 +1189,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var mango = _interopRequireWildcard(_mango);
 	
-	var _init2 = __webpack_require__(7);
+	var _files = __webpack_require__(7);
+	
+	var files = _interopRequireWildcard(_files);
+	
+	var _init2 = __webpack_require__(9);
 	
 	var _init3 = _interopRequireDefault(_init2);
 	
@@ -1198,6 +1202,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	var filesProto = {
+	  create: function create(data, options, optCallback) {
+	    return (0, _utils.promiser)(files.create(data, options), optCallback);
+	  },
+	  createDirectory: function createDirectory(options, optCallback) {
+	    return (0, _utils.promiser)(files.createDirectory(options), optCallback);
+	  },
+	  update: function update(data, options, optCallback) {
+	    return (0, _utils.promiser)(files.update(data, options), optCallback);
+	  },
+	  updateAttributes: function updateAttributes(attrs, options, optCallback) {
+	    return (0, _utils.promiser)(files.updateAttributes(attrs, options), optCallback);
+	  },
+	  trash: function trash(options, optCallback) {
+	    return (0, _utils.promiser)(files.trash(options), optCallback);
+	  },
+	  stat: function stat(options, optCallback) {
+	    return (0, _utils.promiser)(files.stat(options), optCallback);
+	  }
+	};
 	
 	var cozy = {
 	  init: function init(opts, optCallback) {
@@ -1231,7 +1256,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  destroy: function destroy(doctype, doc, optCallback) {
 	    (0, _utils.warn)('destroy is deprecated, use cozy.delete instead.');
 	    return (0, _utils.promiser)(crud._delete(doctype, doc), optCallback);
-	  }
+	  },
+	
+	  files: filesProto
 	};
 	
 	if (typeof window !== 'undefined') window.cozy = cozy;
@@ -1563,9 +1590,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      while (1) {
 	        switch (_context.prev = _context.next) {
 	          case 0:
+	            if (!(opts && opts.nocompat === true && config.isV2)) {
+	              _context.next = 2;
+	              break;
+	            }
+	
+	            throw new Error('not implemented on v2');
+	
+	          case 2:
 	            return _context.abrupt('return', config);
 	
-	          case 1:
+	          case 3:
 	          case 'end':
 	            return _context.stop();
 	        }
@@ -1593,6 +1628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function configure(opts) {
 	  exports.config = config = opts;
+	  return config;
 	}
 	
 	function promiser(promise, optCallback) {
@@ -1630,10 +1666,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function doFetch(config, method, path, body) {
 	  var options = { method: method, headers: {} };
+	
 	  if (body !== undefined) {
 	    options.headers['Content-Type'] = 'application/json';
 	    options.body = JSON.stringify(body);
 	  }
+	
 	  if (config.auth) {
 	    var auth = config.auth.appName + ':' + config.auth.token;
 	    options.headers['Authorization'] = 'Basic ' + btoa(auth);
@@ -2139,6 +2177,483 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.stat = exports.trash = exports.createDirectory = exports.updateAttributes = exports.update = exports.create = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
+	var doUpload = function () {
+	  var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(config, data, contentType, method, path) {
+	    var isBuffer, isFile, isBlob, isString, target;
+	    return regeneratorRuntime.wrap(function _callee$(_context) {
+	      while (1) {
+	        switch (_context.prev = _context.next) {
+	          case 0:
+	            if (data) {
+	              _context.next = 2;
+	              break;
+	            }
+	
+	            throw new Error('missing data argument');
+	
+	          case 2:
+	
+	            // transform any ArrayBufferView to ArrayBuffer
+	            if (data.buffer && data.buffer instanceof ArrayBuffer) {
+	              data = data.buffer;
+	            }
+	
+	            isBuffer = typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer;
+	            isFile = typeof File !== 'undefined' && data instanceof File;
+	            isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
+	            isString = typeof data === 'string';
+	
+	            if (!(!isBuffer && !isFile && !isBlob && !isString)) {
+	              _context.next = 9;
+	              break;
+	            }
+	
+	            throw new Error('invalid data type');
+	
+	          case 9:
+	
+	            if (!contentType) {
+	              if (isBuffer) {
+	                contentType = contentTypeOctetStream;
+	              } else if (isFile) {
+	                contentType = data.type || contentTypeOctetStream;
+	              } else if (isBlob) {
+	                contentType = contentTypeOctetStream;
+	              } else if (typeof data === 'string') {
+	                contentType = 'text/plain';
+	              }
+	            }
+	
+	            target = config.target || '';
+	            return _context.abrupt('return', fetch('' + target + path, {
+	              method: method,
+	              headers: { 'Content-Type': contentType },
+	              body: data
+	            }).then(function (res) {
+	              var json = res.json();
+	              if (!res.ok) {
+	                return json.then(function (err) {
+	                  throw err;
+	                });
+	              } else {
+	                return json;
+	              }
+	            }));
+	
+	          case 12:
+	          case 'end':
+	            return _context.stop();
+	        }
+	      }
+	    }, _callee, this);
+	  }));
+	
+	  return function doUpload(_x, _x2, _x3, _x4, _x5) {
+	    return _ref.apply(this, arguments);
+	  };
+	}();
+	
+	var create = exports.create = function () {
+	  var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(data, options) {
+	    var config, _ref3, name, dirID, contentType, path, query, result;
+	
+	    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	      while (1) {
+	        switch (_context2.prev = _context2.next) {
+	          case 0:
+	            _context2.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context2.sent;
+	            _ref3 = options || {}, name = _ref3.name, dirID = _ref3.dirID, contentType = _ref3.contentType;
+	
+	            // handle case where data is a file and contains the name
+	
+	            if (!name && typeof data.name === 'string') {
+	              name = data.name;
+	            }
+	
+	            if (!(typeof name !== 'string' || name === '')) {
+	              _context2.next = 7;
+	              break;
+	            }
+	
+	            throw new Error('missing name argument');
+	
+	          case 7:
+	            path = '/files/' + encodeURIComponent(dirID || '');
+	            query = '?Name=' + encodeURIComponent(name) + '&Type=file';
+	            _context2.next = 11;
+	            return doUpload(config, data, contentType, 'POST', '' + path + query);
+	
+	          case 11:
+	            result = _context2.sent;
+	            return _context2.abrupt('return', (0, _jsonapi2.default)(result));
+	
+	          case 13:
+	          case 'end':
+	            return _context2.stop();
+	        }
+	      }
+	    }, _callee2, this);
+	  }));
+	
+	  return function create(_x6, _x7) {
+	    return _ref2.apply(this, arguments);
+	  };
+	}();
+	
+	var update = exports.update = function () {
+	  var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(data, options) {
+	    var config, _ref5, fileId, contentType, path, result;
+	
+	    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+	      while (1) {
+	        switch (_context3.prev = _context3.next) {
+	          case 0:
+	            _context3.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context3.sent;
+	            _ref5 = options || {}, fileId = _ref5.fileId, contentType = _ref5.contentType;
+	
+	            if (!(typeof fileId !== 'string' || fileId === '')) {
+	              _context3.next = 6;
+	              break;
+	            }
+	
+	            throw new Error('missing fileId argument');
+	
+	          case 6:
+	            path = '/files/' + encodeURIComponent(fileId);
+	            _context3.next = 9;
+	            return doUpload(config, data, contentType, 'PUT', path);
+	
+	          case 9:
+	            result = _context3.sent;
+	            return _context3.abrupt('return', (0, _jsonapi2.default)(result));
+	
+	          case 11:
+	          case 'end':
+	            return _context3.stop();
+	        }
+	      }
+	    }, _callee3, this);
+	  }));
+	
+	  return function update(_x8, _x9) {
+	    return _ref4.apply(this, arguments);
+	  };
+	}();
+	
+	var updateAttributes = exports.updateAttributes = function () {
+	  var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(attrs, options) {
+	    var config, _ref7, id, filePath, path, query, body, result;
+	
+	    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+	      while (1) {
+	        switch (_context4.prev = _context4.next) {
+	          case 0:
+	            _context4.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context4.sent;
+	            _ref7 = options || {}, id = _ref7.id, filePath = _ref7.path;
+	
+	            if (!(!attrs || (typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs)) !== 'object')) {
+	              _context4.next = 6;
+	              break;
+	            }
+	
+	            throw new Error('missing attrs argument');
+	
+	          case 6:
+	            path = void 0, query = void 0;
+	
+	            if (!id) {
+	              _context4.next = 12;
+	              break;
+	            }
+	
+	            path = '/files/' + encodeURIComponent(id);
+	            query = '';
+	            _context4.next = 18;
+	            break;
+	
+	          case 12:
+	            if (!filePath) {
+	              _context4.next = 17;
+	              break;
+	            }
+	
+	            path = '/files/metadata';
+	            query = '?Path=' + encodeURIComponent(filePath);
+	            _context4.next = 18;
+	            break;
+	
+	          case 17:
+	            throw new Error('missing id or path argument');
+	
+	          case 18:
+	            body = { data: { attributes: attrs } };
+	            _context4.next = 21;
+	            return (0, _utils.doFetch)(config, 'PATCH', '' + path + query, body);
+	
+	          case 21:
+	            result = _context4.sent;
+	            return _context4.abrupt('return', (0, _jsonapi2.default)(result));
+	
+	          case 23:
+	          case 'end':
+	            return _context4.stop();
+	        }
+	      }
+	    }, _callee4, this);
+	  }));
+	
+	  return function updateAttributes(_x10, _x11) {
+	    return _ref6.apply(this, arguments);
+	  };
+	}();
+	
+	var createDirectory = exports.createDirectory = function () {
+	  var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(options) {
+	    var config, _ref9, name, dirID, path, query, result;
+	
+	    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+	      while (1) {
+	        switch (_context5.prev = _context5.next) {
+	          case 0:
+	            _context5.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context5.sent;
+	            _ref9 = options || {}, name = _ref9.name, dirID = _ref9.dirID;
+	
+	            if (!(typeof name !== 'string' || name === '')) {
+	              _context5.next = 6;
+	              break;
+	            }
+	
+	            throw new Error('missing name argument');
+	
+	          case 6:
+	            path = '/files/' + encodeURIComponent(dirID || '');
+	            query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
+	            _context5.next = 10;
+	            return (0, _utils.doFetch)(config, 'POST', '' + path + query);
+	
+	          case 10:
+	            result = _context5.sent;
+	            return _context5.abrupt('return', (0, _jsonapi2.default)(result));
+	
+	          case 12:
+	          case 'end':
+	            return _context5.stop();
+	        }
+	      }
+	    }, _callee5, this);
+	  }));
+	
+	  return function createDirectory(_x12) {
+	    return _ref8.apply(this, arguments);
+	  };
+	}();
+	
+	var trash = exports.trash = function () {
+	  var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(id) {
+	    var config, result;
+	    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+	      while (1) {
+	        switch (_context6.prev = _context6.next) {
+	          case 0:
+	            _context6.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context6.sent;
+	
+	            if (!(typeof id !== 'string' || id === '')) {
+	              _context6.next = 5;
+	              break;
+	            }
+	
+	            throw new Error('missing id argument');
+	
+	          case 5:
+	            _context6.next = 7;
+	            return (0, _utils.doFetch)(config, 'DELETE', '/files/' + encodeURIComponent(id));
+	
+	          case 7:
+	            result = _context6.sent;
+	            return _context6.abrupt('return', (0, _jsonapi2.default)(result));
+	
+	          case 9:
+	          case 'end':
+	            return _context6.stop();
+	        }
+	      }
+	    }, _callee6, this);
+	  }));
+	
+	  return function trash(_x13) {
+	    return _ref10.apply(this, arguments);
+	  };
+	}();
+	
+	var stat = exports.stat = function () {
+	  var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(pathOrID) {
+	    var config, path, response, out, _path, _response, _out;
+	
+	    return regeneratorRuntime.wrap(function _callee7$(_context7) {
+	      while (1) {
+	        switch (_context7.prev = _context7.next) {
+	          case 0:
+	            _context7.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context7.sent;
+	
+	            if (!isID(pathOrID)) {
+	              _context7.next = 13;
+	              break;
+	            }
+	
+	            // GET /files/:id
+	            path = '/files/' + encodeURIComponent(pathOrID);
+	            _context7.next = 7;
+	            return (0, _utils.doFetch)(config, 'GET', path);
+	
+	          case 7:
+	            response = _context7.sent;
+	            out = (0, _jsonapi2.default)(response);
+	
+	            out.isDir = isDir(out);
+	            return _context7.abrupt('return', out);
+	
+	          case 13:
+	            // GET /files/metadata?Path=/Documents/hello.txt
+	            _path = '/files/metadata?Path=' + encodeURIComponent(pathOrID);
+	            _context7.next = 16;
+	            return (0, _utils.doFetch)(config, 'GET', _path);
+	
+	          case 16:
+	            _response = _context7.sent;
+	            _out = (0, _jsonapi2.default)(_response);
+	
+	            _out.isDir = isDir(_out);
+	            return _context7.abrupt('return', _out);
+	
+	          case 20:
+	          case 'end':
+	            return _context7.stop();
+	        }
+	      }
+	    }, _callee7, this);
+	  }));
+	
+	  return function stat(_x14) {
+	    return _ref11.apply(this, arguments);
+	  };
+	}();
+	
+	var _utils = __webpack_require__(5);
+	
+	var _jsonapi = __webpack_require__(8);
+	
+	var _jsonapi2 = _interopRequireDefault(_jsonapi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } /* global fetch Blob File */
+	
+	
+	var contentTypeOctetStream = 'application/octet-stream';
+	
+	function isID(text) {
+	  return text.indexOf('/') !== 0;
+	}
+	
+	function isDir(obj) {
+	  return obj.attributes.type === 'directory';
+	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	function indexKey(doc) {
+	  return doc.type + '/' + doc.id;
+	}
+	
+	function findByRef(resources, ref) {
+	  return resources[indexKey(ref)];
+	}
+	
+	function handleResource(rawResource, resources) {
+	  var resource = {
+	    _id: rawResource.id,
+	    _type: rawResource.type,
+	    _rev: rawResource.meta.rev,
+	    attributes: rawResource.attributes,
+	    relations: function relations(name) {
+	      var rels = rawResource.relationships[name];
+	      if (rels === undefined || rels.data === undefined) return undefined;
+	      if (rels.data === null) return null;
+	      if (!Array.isArray(rels.data)) return findByRef(resources, rels.data);
+	      return rels.data.map(function (ref) {
+	        return findByRef(resources, ref);
+	      });
+	    }
+	  };
+	
+	  resources[indexKey(rawResource)] = resource;
+	
+	  return resource;
+	}
+	
+	function handleTopLevel(doc) {
+	  var resources = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	
+	  // build an index of included resource by Type & ID
+	  (doc.included || []).forEach(function (obj) {
+	    handleResource(obj, resources);
+	  });
+	
+	  if (Array.isArray(doc.data)) {
+	    return doc.data.map(function (r) {
+	      return handleResource(r, resources);
+	    });
+	  } else {
+	    return handleResource(doc.data, resources);
+	  }
+	}
+	
+	exports.default = handleTopLevel;
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
