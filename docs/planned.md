@@ -11,7 +11,7 @@ to comment on them through issues or PR !
 
 // All these functions do not exist in cozy-browser-sdk and can be
 // inefficiently made compatible with stack v2 by manipulating files
-// and folders docTypes.
+// and directories docTypes.
 
 // vfs.ls(path) returns the children of a given directory
 children = await cozy.files.ls("/path/to/dir")
