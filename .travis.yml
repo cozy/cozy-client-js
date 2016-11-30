@@ -26,7 +26,7 @@ before_script:
   - mkdir $GOPATH
   - go get -u github.com/cozy/cozy-stack
   - $GOPATH/bin/cozy-stack instances add dev
-  - $GOPATH/bin/cozy-stack serve &
+  - $GOPATH/bin/cozy-stack serve --assets=$GOPATH/src/github.com/cozy/cozy-stack/assets &
   # start a stack v2 from NPM (listening on 9104 & 9101)
   - npm install -g coffee-script
   - npm install cozy-data-system cozy-proxy
