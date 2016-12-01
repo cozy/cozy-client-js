@@ -236,7 +236,7 @@ It returns a promise for an **indexReference**, which can be passed to `cozy.que
 **Warning**: when used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries. Because of this, more complex queries are not (yet) supported with **v2**.
 
 ```javascript
-booksByYearRef = await cozy.defineIndex(myType, 'year', 'rating')
+booksByYearRef = await cozy.defineIndex(myType, ['year', 'rating'])
 ```
 
 
