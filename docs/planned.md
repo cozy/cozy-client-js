@@ -20,10 +20,6 @@ children = await cozy.files.ls("/path/to/dir")
 // the url can be used in an <image> or <audio> tag
 url = await cozy.files.getURL("/path/to/file.ext")
 
-// vfs.read(path, blob) read a file at the given path
-// it returns a dom.Blob.
-blob = await cozy.files.read("/path/to/file.ext")
-
 // vfs.move(current, next) move the directory or file at the given path then
 // another path
 await cozy.files.move("/path/to/dir_or_file", "/new/path/to/dir_or_file")

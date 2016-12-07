@@ -11,17 +11,29 @@ let filesProto = {
   createDirectory: function (options, optCallback) {
     return promiser(files.createDirectory(options), optCallback)
   },
-  update: function (data, options, optCallback) {
-    return promiser(files.update(data, options), optCallback)
+  updateById: function (id, data, options, optCallback) {
+    return promiser(files.updateById(id, data, options), optCallback)
   },
-  updateAttributes: function (attrs, options, optCallback) {
-    return promiser(files.updateAttributes(attrs, options), optCallback)
+  updateAttributesById: function (id, attrs, optCallback) {
+    return promiser(files.updateAttributesById(id, attrs), optCallback)
   },
-  trash: function (options, optCallback) {
-    return promiser(files.trash(options), optCallback)
+  updateAttributesByPath: function (path, attrs, optCallback) {
+    return promiser(files.updateAttributesByPath(path, attrs), optCallback)
   },
-  stat: function (options, optCallback) {
-    return promiser(files.stat(options), optCallback)
+  trashById: function (id, optCallback) {
+    return promiser(files.trashById(id), optCallback)
+  },
+  statById: function (id, optCallback) {
+    return promiser(files.statById(id), optCallback)
+  },
+  statByPath: function (path, optCallback) {
+    return promiser(files.statByPath(path), optCallback)
+  },
+  downloadById: function (id, optCallback) {
+    return promiser(files.downloadById(id), optCallback)
+  },
+  downloadByPath: function (path, optCallback) {
+    return promiser(files.downloadByPath(path), optCallback)
   }
 }
 

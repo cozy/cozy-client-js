@@ -16,7 +16,6 @@ describe('files API', async function () {
   before(async function () {
     config = await cozy.init({ target: TARGET })
     random = randomGenerator()
-    console.log('random seed = ', random.seed)
   })
 
   beforeEach(function () {
@@ -43,7 +42,7 @@ describe('files API', async function () {
 
     const createdId = created._id
 
-    const updated = await cozy.files.update('datastring2', { fileId: createdId })
+    const updated = await cozy.files.updateById(createdId, 'datastring2')
     updated.should.have.property('attributes')
     updated.attributes.md5sum.should.equal('iWpp8tcTP/DWTJSLf0hoyQ==')
   })
@@ -58,14 +57,14 @@ describe('files API', async function () {
 
     const newname1 = 'newname1_' + random()
     const attrs1 = { tags: ['foo', 'bar'], name: newname1 }
-    const updated1 = await cozy.files.updateAttributes(attrs1, { id: createdId })
+    const updated1 = await cozy.files.updateAttributesById(createdId, attrs1)
     updated1.should.have.property('attributes')
     updated1.attributes.name.should.startWith('newname1_')
     updated1.attributes.tags.should.eql(['foo', 'bar'])
 
     const newname2 = 'newname2_' + random()
     const attrs2 = { tags: ['foo'], name: newname2 }
-    const updated2 = await cozy.files.updateAttributes(attrs2, { path: '/' + newname1 })
+    const updated2 = await cozy.files.updateAttributesByPath('/' + newname1, attrs2)
     updated2.should.have.property('attributes')
     updated2.attributes.name.should.startWith('newname2_')
     updated2.attributes.tags.should.eql(['foo'])
@@ -84,7 +83,7 @@ describe('files API', async function () {
     const created = await cozy.files.createDirectory({ name: dirname })
     let directoryID = created._id
 
-    const stats = await cozy.files.stat(directoryID)
+    const stats = await cozy.files.statById(directoryID)
     stats.should.have.property('attributes')
   })
 
@@ -93,7 +92,7 @@ describe('files API', async function () {
 
     const created = await cozy.files.createDirectory({ name: dirname })
 
-    const stats = await cozy.files.stat('/' + dirname)
+    const stats = await cozy.files.statByPath('/' + dirname)
     stats.should.have.property('attributes')
     stats.should.have.property('_id', created._id)
   })
@@ -104,6 +103,25 @@ describe('files API', async function () {
     const created = await cozy.files.createDirectory({ name: dirname })
     const createdId = created._id
 
-    await cozy.files.trash(createdId)
+    await cozy.files.trashById(createdId)
+  })
+
+  it('downloads a file by path and id', async function () {
+    const filename = 'foo_' + random()
+
+    const created = await cozy.files.create('foo', {
+      name: filename,
+      contentType: 'application/json'
+    })
+
+    const downloaded1 = await cozy.files.downloadById(created._id)
+    const txt1 = await downloaded1.text()
+
+    txt1.should.equal('foo')
+
+    const downloaded2 = await cozy.files.downloadByPath('/' + filename)
+    const txt2 = await downloaded2.text()
+
+    txt2.should.equal('foo')
   })
 })

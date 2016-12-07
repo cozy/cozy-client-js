@@ -76,7 +76,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.update(1, { fileId: '12345' })
+        await cozy.files.updateById('12345', 1)
       } catch (e) {
         err = e
       } finally {
@@ -86,7 +86,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.update({}, { fileId: '12345' })
+        await cozy.files.updateById('12345', {})
       } catch (e) {
         err = e
       } finally {
@@ -96,21 +96,11 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.update('', { fileId: '12345' })
+        await cozy.files.updateById('12345', '')
       } catch (e) {
         err = e
       } finally {
         err.should.eql(new Error('missing data argument'))
-      }
-
-      err = null
-
-      try {
-        await cozy.files.update('somestringdata')
-      } catch (e) {
-        err = e
-      } finally {
-        err.should.eql(new Error('missing fileId argument'))
       }
 
       err = null
@@ -170,7 +160,7 @@ describe('Files', function () {
     before(mock.mockAPI('Trash'))
 
     it('should work', async function () {
-      const res1 = await cozy.files.trash('1234')
+      const res1 = await cozy.files.trashById('1234')
 
       mock.calls('Trash').should.have.length(1)
       mock.lastUrl('Trash').should.equal('/files/1234')
@@ -182,7 +172,7 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.files.trash(null)
+        await cozy.files.trashById(null)
       } catch (e) {
         err = e
       } finally {
@@ -192,7 +182,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.trash({})
+        await cozy.files.trashById({})
       } catch (e) {
         err = e
       } finally {
@@ -202,7 +192,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.trash('')
+        await cozy.files.trashById('')
       } catch (e) {
         err = e
       } finally {
@@ -219,11 +209,11 @@ describe('Files', function () {
     it('should work with good arguments', async function () {
       const attrs = { tags: ['foo', 'bar'] }
 
-      const res1 = await cozy.files.updateAttributes(attrs, { id: '12345' })
+      const res1 = await cozy.files.updateAttributesById('12345', attrs)
       mock.lastUrl('UpdateAttributes').should.equal('/files/12345')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
-      const res2 = await cozy.files.updateAttributes(attrs, { path: '/foo/bar' })
+      const res2 = await cozy.files.updateAttributesByPath('/foo/bar', attrs)
       mock.lastUrl('UpdateAttributes').should.equal('/files/metadata?Path=%2Ffoo%2Fbar')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
@@ -237,19 +227,21 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.files.updateAttributes(null, {})
+        await cozy.files.updateAttributesById('12345', null)
       } catch (e) {
         err = e
       } finally {
         err.should.eql(new Error('missing attrs argument'))
       }
 
+      err = null
+
       try {
-        await cozy.files.updateAttributes({}, {})
+        await cozy.files.updateAttributesByPath('/12345', null)
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing id or path argument'))
+        err.should.eql(new Error('missing attrs argument'))
       }
 
       err = null
@@ -260,7 +252,7 @@ describe('Files', function () {
     before(mock.mockAPI('StatByID'))
 
     it('should work', async function () {
-      const res1 = await cozy.files.stat('id42')
+      const res1 = await cozy.files.statById('id42')
 
       mock.calls('StatByID').should.have.length(1)
       mock.lastUrl('StatByID').should.equal('/files/id42')
@@ -276,7 +268,7 @@ describe('Files', function () {
     before(mock.mockAPI('StatByPath'))
 
     it('should work', async function () {
-      const res1 = await cozy.files.stat('/bills/hôpital.pdf')
+      const res1 = await cozy.files.statByPath('/bills/hôpital.pdf')
 
       mock.calls('StatByPath').should.have.length(1)
       mock.lastUrl('StatByPath').should.equal('/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
@@ -285,6 +277,36 @@ describe('Files', function () {
       res1.should.have.property('isDir', false)
       res1.should.have.property('attributes')
       res1.attributes.should.have.property('name', 'hospi.pdf')
+    })
+  })
+
+  describe('Download file', function () {
+    describe('by ID', function () {
+      before(mock.mockAPI('DownloadByID'))
+
+      it('should work', async function () {
+        const res = await cozy.files.downloadById('id42')
+
+        mock.calls('DownloadByID').should.have.length(1)
+        mock.lastUrl('DownloadByID').should.equal('/files/download/id42')
+
+        const txt = await res.text()
+        txt.should.equal('foo')
+      })
+    })
+
+    describe('by Path', function () {
+      before(mock.mockAPI('DownloadByPath'))
+
+      it('should work', async function () {
+        const res = await cozy.files.downloadByPath('/bills/hôpital.pdf')
+
+        mock.calls('DownloadByPath').should.have.length(1)
+        mock.lastUrl('DownloadByPath').should.equal('/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+
+        const txt = await res.text()
+        txt.should.equal('foo')
+      })
     })
   })
 })

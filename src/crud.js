@@ -1,4 +1,4 @@
-import {waitConfig, createPath, doFetch, normalizeDoctype} from './utils'
+import {waitConfig, createPath, doFetchJSON, normalizeDoctype} from './utils'
 
 const NOREV = 'stack-v2-no-rev'
 
@@ -9,7 +9,7 @@ export async function create (doctype, attributes) {
   if (config.isV2) attributes.docType = doctype
 
   let path = createPath(config, doctype)
-  let response = await doFetch(config, 'POST', path, attributes)
+  let response = await doFetchJSON(config, 'POST', path, attributes)
 
   if (config.isV2) return await find(doctype, response._id)
 
@@ -25,7 +25,7 @@ export async function find (doctype, id) {
   }
 
   let path = createPath(config, doctype, id)
-  let response = await doFetch(config, 'GET', path)
+  let response = await doFetchJSON(config, 'GET', path)
 
   if (config.isV2) Object.assign(response, {_rev: NOREV})
 
@@ -53,7 +53,7 @@ export async function update (doctype, doc, changes) {
   }
 
   let path = createPath(config, doctype, _id)
-  let response = await doFetch(config, 'PUT', path, changes)
+  let response = await doFetchJSON(config, 'PUT', path, changes)
 
   if (config.isV2) return await find(doctype, _id)
 
@@ -89,7 +89,7 @@ export async function _delete (doctype, doc) {
 
   let query = config.isV2 ? null : { rev: _rev }
   let path = createPath(config, doctype, _id, query)
-  let response = await doFetch(config, 'DELETE', path)
+  let response = await doFetchJSON(config, 'DELETE', path)
 
   if (config.isV2) Object.assign(response, {id: _id, rev: NOREV})
 

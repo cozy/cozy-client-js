@@ -1,4 +1,4 @@
-import {warn, waitConfig, createPath, doFetch, normalizeDoctype} from './utils'
+import {warn, waitConfig, createPath, doFetchJSON, normalizeDoctype} from './utils'
 
 export async function defineIndex (doctype, fields) {
   const config = await waitConfig()
@@ -42,7 +42,7 @@ async function defineIndexV2 (config, doctype, fields) {
   let indexName = 'by' + fields.map(capitalize).join('')
   let indexDefinition = { map: makeMapFunction(doctype, fields), reduce: '_count' }
   let path = `/request/${doctype}/${indexName}/`
-  await doFetch(config, 'PUT', path, indexDefinition)
+  await doFetchJSON(config, 'PUT', path, indexDefinition)
   return { doctype: doctype, type: 'mapreduce', name: indexName, fields: fields }
 }
 
@@ -51,7 +51,7 @@ async function defineIndexV2 (config, doctype, fields) {
 async function defineIndexV3 (config, doctype, fields) {
   let path = createPath(config, doctype, '_index')
   let indexDefinition = {'index': {fields}}
-  let response = await doFetch(config, 'POST', path, indexDefinition)
+  let response = await doFetchJSON(config, 'POST', path, indexDefinition)
   return { doctype: doctype, type: 'mango', name: response.id, fields: fields }
 }
 
@@ -67,7 +67,7 @@ async function queryV2 (config, indexRef, options) {
 
   let path = `/request/${indexRef.doctype}/${indexRef.name}/`
   let opts = makeMapReduceQuery(indexRef, options)
-  let response = await doFetch(config, 'POST', path, opts)
+  let response = await doFetchJSON(config, 'POST', path, opts)
   return response.map(r => r.value)
 }
 
@@ -87,7 +87,7 @@ async function queryV3 (config, indexRef, options) {
   }
 
   let path = createPath(config, indexRef.doctype, '_find')
-  let response = await doFetch(config, 'POST', path, opts)
+  let response = await doFetchJSON(config, 'POST', path, opts)
   return response.docs
 }
 

@@ -1185,11 +1185,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var crud = _interopRequireWildcard(_crud);
 	
-	var _mango = __webpack_require__(6);
+	var _mango = __webpack_require__(7);
 	
 	var mango = _interopRequireWildcard(_mango);
 	
-	var _files = __webpack_require__(7);
+	var _files = __webpack_require__(8);
 	
 	var files = _interopRequireWildcard(_files);
 	
@@ -1210,17 +1210,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  createDirectory: function createDirectory(options, optCallback) {
 	    return (0, _utils.promiser)(files.createDirectory(options), optCallback);
 	  },
-	  update: function update(data, options, optCallback) {
-	    return (0, _utils.promiser)(files.update(data, options), optCallback);
+	  updateById: function updateById(id, data, options, optCallback) {
+	    return (0, _utils.promiser)(files.updateById(id, data, options), optCallback);
 	  },
-	  updateAttributes: function updateAttributes(attrs, options, optCallback) {
-	    return (0, _utils.promiser)(files.updateAttributes(attrs, options), optCallback);
+	  updateAttributesById: function updateAttributesById(id, attrs, optCallback) {
+	    return (0, _utils.promiser)(files.updateAttributesById(id, attrs), optCallback);
 	  },
-	  trash: function trash(options, optCallback) {
-	    return (0, _utils.promiser)(files.trash(options), optCallback);
+	  updateAttributesByPath: function updateAttributesByPath(path, attrs, optCallback) {
+	    return (0, _utils.promiser)(files.updateAttributesByPath(path, attrs), optCallback);
 	  },
-	  stat: function stat(options, optCallback) {
-	    return (0, _utils.promiser)(files.stat(options), optCallback);
+	  trashById: function trashById(id, optCallback) {
+	    return (0, _utils.promiser)(files.trashById(id), optCallback);
+	  },
+	  statById: function statById(id, optCallback) {
+	    return (0, _utils.promiser)(files.statById(id), optCallback);
+	  },
+	  statByPath: function statByPath(path, optCallback) {
+	    return (0, _utils.promiser)(files.statByPath(path), optCallback);
+	  },
+	  downloadById: function downloadById(id, optCallback) {
+	    return (0, _utils.promiser)(files.downloadById(id), optCallback);
+	  },
+	  downloadByPath: function downloadByPath(path, optCallback) {
+	    return (0, _utils.promiser)(files.downloadByPath(path), optCallback);
 	  }
 	};
 	
@@ -1295,7 +1307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            path = (0, _utils.createPath)(config, doctype);
 	            _context.next = 8;
-	            return (0, _utils.doFetch)(config, 'POST', path, attributes);
+	            return (0, _utils.doFetchJSON)(config, 'POST', path, attributes);
 	
 	          case 8:
 	            response = _context.sent;
@@ -1352,7 +1364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          case 6:
 	            path = (0, _utils.createPath)(config, doctype, id);
 	            _context2.next = 9;
-	            return (0, _utils.doFetch)(config, 'GET', path);
+	            return (0, _utils.doFetchJSON)(config, 'GET', path);
 	
 	          case 9:
 	            response = _context2.sent;
@@ -1418,7 +1430,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            path = (0, _utils.createPath)(config, doctype, _id);
 	            _context3.next = 13;
-	            return (0, _utils.doFetch)(config, 'PUT', path, changes);
+	            return (0, _utils.doFetchJSON)(config, 'PUT', path, changes);
 	
 	          case 13:
 	            response = _context3.sent;
@@ -1545,7 +1557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            query = config.isV2 ? null : { rev: _rev };
 	            path = (0, _utils.createPath)(config, doctype, _id, query);
 	            _context5.next = 13;
-	            return (0, _utils.doFetch)(config, 'DELETE', path);
+	            return (0, _utils.doFetchJSON)(config, 'DELETE', path);
 	
 	          case 13:
 	            response = _context5.sent;
@@ -1576,13 +1588,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.waitConfig = exports.config = undefined;
 	
 	var waitConfig = exports.waitConfig = function () {
 	  var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(opts) {
@@ -1617,12 +1630,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.promiser = promiser;
 	exports.createPath = createPath;
 	exports.doFetch = doFetch;
+	exports.doFetchJSON = doFetchJSON;
 	exports.normalizeDoctype = normalizeDoctype;
 	exports.warn = warn;
 	
-	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+	var _jsonapi = __webpack_require__(6);
 	
-	/* global fetch, btoa */
+	var _jsonapi2 = _interopRequireDefault(_jsonapi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } /* global fetch, btoa */
+	
 	
 	var config = exports.config = {};
 	
@@ -1681,11 +1700,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var pathprefix = config.isV2 ? '/ds-api' : '';
 	  var fullpath = target + pathprefix + path;
 	  return fetch(fullpath, options).then(function (res) {
-	    var json = res.json();
 	    if (!res.ok) {
-	      return json.then(function (err) {
+	      var contentType = res.headers.get('content-type');
+	      var data = void 0;
+	      if (contentType && contentType.indexOf('json') >= 0) {
+	        data = res.json().then(function (err) {
+	          throw err;
+	        });
+	      } else {
+	        data = res.text();
+	      }
+	      return data.then(function (err) {
 	        throw err;
 	      });
+	    }
+	    return res;
+	  });
+	}
+	
+	function doFetchJSON(config, method, path, body) {
+	  return doFetch(config, method, path, body).then(function (res) {
+	    var contentType = res.headers.get('content-type');
+	    var json = res.json();
+	    if (contentType && contentType.indexOf('application/vnd.api+json') === 0) {
+	      return json.then(_jsonapi2.default);
 	    } else {
 	      return json;
 	    }
@@ -1732,6 +1770,68 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	function indexKey(doc) {
+	  return doc.type + '/' + doc.id;
+	}
+	
+	function findByRef(resources, ref) {
+	  return resources[indexKey(ref)];
+	}
+	
+	function handleResource(rawResource, resources) {
+	  var resource = {
+	    _id: rawResource.id,
+	    _type: rawResource.type,
+	    _rev: rawResource.meta.rev,
+	    attributes: rawResource.attributes,
+	    relations: function relations(name) {
+	      var rels = rawResource.relationships[name];
+	      if (rels === undefined || rels.data === undefined) return undefined;
+	      if (rels.data === null) return null;
+	      if (!Array.isArray(rels.data)) return findByRef(resources, rels.data);
+	      return rels.data.map(function (ref) {
+	        return findByRef(resources, ref);
+	      });
+	    }
+	  };
+	
+	  resources[indexKey(rawResource)] = resource;
+	
+	  return resource;
+	}
+	
+	function handleTopLevel(doc) {
+	  var resources = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	
+	  // build an index of included resource by Type & ID
+	  var included = doc.included;
+	
+	  if (Array.isArray(included)) {
+	    included.forEach(function (r) {
+	      return handleResource(r, resources);
+	    });
+	  }
+	
+	  if (Array.isArray(doc.data)) {
+	    return doc.data.map(function (r) {
+	      return handleResource(r, resources);
+	    });
+	  } else {
+	    return handleResource(doc.data, resources);
+	  }
+	}
+	
+	exports.default = handleTopLevel;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1868,7 +1968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            indexDefinition = { map: makeMapFunction(doctype, fields), reduce: '_count' };
 	            path = '/request/' + doctype + '/' + indexName + '/';
 	            _context3.next = 5;
-	            return (0, _utils.doFetch)(config, 'PUT', path, indexDefinition);
+	            return (0, _utils.doFetchJSON)(config, 'PUT', path, indexDefinition);
 	
 	          case 5:
 	            return _context3.abrupt('return', { doctype: doctype, type: 'mapreduce', name: indexName, fields: fields });
@@ -1900,7 +2000,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            path = (0, _utils.createPath)(config, doctype, '_index');
 	            indexDefinition = { 'index': { fields: fields } };
 	            _context4.next = 4;
-	            return (0, _utils.doFetch)(config, 'POST', path, indexDefinition);
+	            return (0, _utils.doFetchJSON)(config, 'POST', path, indexDefinition);
 	
 	          case 4:
 	            response = _context4.sent;
@@ -1945,7 +2045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            path = '/request/' + indexRef.doctype + '/' + indexRef.name + '/';
 	            opts = makeMapReduceQuery(indexRef, options);
 	            _context5.next = 7;
-	            return (0, _utils.doFetch)(config, 'POST', path, opts);
+	            return (0, _utils.doFetchJSON)(config, 'POST', path, opts);
 	
 	          case 7:
 	            response = _context5.sent;
@@ -1994,7 +2094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            };
 	            path = (0, _utils.createPath)(config, indexRef.doctype, '_find');
 	            _context6.next = 6;
-	            return (0, _utils.doFetch)(config, 'POST', path, opts);
+	            return (0, _utils.doFetchJSON)(config, 'POST', path, opts);
 	
 	          case 6:
 	            response = _context6.sent;
@@ -2176,7 +2276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2184,7 +2284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.stat = exports.trash = exports.createDirectory = exports.updateAttributes = exports.update = exports.create = undefined;
+	exports.downloadByPath = exports.downloadById = exports.statByPath = exports.statById = exports.trashById = exports.updateAttributesByPath = exports.updateAttributesById = exports.updateById = exports.createDirectory = exports.create = undefined;
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
@@ -2247,7 +2347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                  throw err;
 	                });
 	              } else {
-	                return json;
+	                return json.then(_jsonapi2.default);
 	              }
 	            }));
 	
@@ -2266,7 +2366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var create = exports.create = function () {
 	  var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(data, options) {
-	    var config, _ref3, name, dirID, contentType, path, query, result;
+	    var config, _ref3, name, dirID, contentType, path, query;
 	
 	    return regeneratorRuntime.wrap(function _callee2$(_context2) {
 	      while (1) {
@@ -2295,14 +2395,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          case 7:
 	            path = '/files/' + encodeURIComponent(dirID || '');
 	            query = '?Name=' + encodeURIComponent(name) + '&Type=file';
-	            _context2.next = 11;
-	            return doUpload(config, data, contentType, 'POST', '' + path + query);
+	            return _context2.abrupt('return', doUpload(config, data, contentType, 'POST', '' + path + query));
 	
-	          case 11:
-	            result = _context2.sent;
-	            return _context2.abrupt('return', (0, _jsonapi2.default)(result));
-	
-	          case 13:
+	          case 10:
 	          case 'end':
 	            return _context2.stop();
 	        }
@@ -2315,9 +2410,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}();
 	
-	var update = exports.update = function () {
-	  var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(data, options) {
-	    var config, _ref5, fileId, contentType, path, result;
+	var createDirectory = exports.createDirectory = function () {
+	  var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(options) {
+	    var config, _ref5, name, dirID, path, query;
 	
 	    return regeneratorRuntime.wrap(function _callee3$(_context3) {
 	      while (1) {
@@ -2328,25 +2423,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          case 2:
 	            config = _context3.sent;
-	            _ref5 = options || {}, fileId = _ref5.fileId, contentType = _ref5.contentType;
+	            _ref5 = options || {}, name = _ref5.name, dirID = _ref5.dirID;
 	
-	            if (!(typeof fileId !== 'string' || fileId === '')) {
+	            if (!(typeof name !== 'string' || name === '')) {
 	              _context3.next = 6;
 	              break;
 	            }
 	
-	            throw new Error('missing fileId argument');
+	            throw new Error('missing name argument');
 	
 	          case 6:
-	            path = '/files/' + encodeURIComponent(fileId);
-	            _context3.next = 9;
-	            return doUpload(config, data, contentType, 'PUT', path);
+	            path = '/files/' + encodeURIComponent(dirID || '');
+	            query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
+	            return _context3.abrupt('return', (0, _utils.doFetchJSON)(config, 'POST', '' + path + query));
 	
 	          case 9:
-	            result = _context3.sent;
-	            return _context3.abrupt('return', (0, _jsonapi2.default)(result));
-	
-	          case 11:
 	          case 'end':
 	            return _context3.stop();
 	        }
@@ -2354,14 +2445,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, _callee3, this);
 	  }));
 	
-	  return function update(_x8, _x9) {
+	  return function createDirectory(_x8) {
 	    return _ref4.apply(this, arguments);
 	  };
 	}();
 	
-	var updateAttributes = exports.updateAttributes = function () {
-	  var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(attrs, options) {
-	    var config, _ref7, id, filePath, path, query, body, result;
+	var updateById = exports.updateById = function () {
+	  var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(id, data, options) {
+	    var config, _ref7, contentType;
 	
 	    return regeneratorRuntime.wrap(function _callee4$(_context4) {
 	      while (1) {
@@ -2372,52 +2463,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          case 2:
 	            config = _context4.sent;
-	            _ref7 = options || {}, id = _ref7.id, filePath = _ref7.path;
+	            _ref7 = options || {}, contentType = _ref7.contentType;
+	            return _context4.abrupt('return', doUpload(config, data, contentType, 'PUT', '/files/' + encodeURIComponent(id)));
 	
-	            if (!(!attrs || (typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs)) !== 'object')) {
-	              _context4.next = 6;
-	              break;
-	            }
-	
-	            throw new Error('missing attrs argument');
-	
-	          case 6:
-	            path = void 0, query = void 0;
-	
-	            if (!id) {
-	              _context4.next = 12;
-	              break;
-	            }
-	
-	            path = '/files/' + encodeURIComponent(id);
-	            query = '';
-	            _context4.next = 18;
-	            break;
-	
-	          case 12:
-	            if (!filePath) {
-	              _context4.next = 17;
-	              break;
-	            }
-	
-	            path = '/files/metadata';
-	            query = '?Path=' + encodeURIComponent(filePath);
-	            _context4.next = 18;
-	            break;
-	
-	          case 17:
-	            throw new Error('missing id or path argument');
-	
-	          case 18:
-	            body = { data: { attributes: attrs } };
-	            _context4.next = 21;
-	            return (0, _utils.doFetch)(config, 'PATCH', '' + path + query, body);
-	
-	          case 21:
-	            result = _context4.sent;
-	            return _context4.abrupt('return', (0, _jsonapi2.default)(result));
-	
-	          case 23:
+	          case 5:
 	          case 'end':
 	            return _context4.stop();
 	        }
@@ -2425,15 +2474,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, _callee4, this);
 	  }));
 	
-	  return function updateAttributes(_x10, _x11) {
+	  return function updateById(_x9, _x10, _x11) {
 	    return _ref6.apply(this, arguments);
 	  };
 	}();
 	
-	var createDirectory = exports.createDirectory = function () {
-	  var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(options) {
-	    var config, _ref9, name, dirID, path, query, result;
-	
+	var updateAttributesById = exports.updateAttributesById = function () {
+	  var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(id, attrs) {
+	    var config, body;
 	    return regeneratorRuntime.wrap(function _callee5$(_context5) {
 	      while (1) {
 	        switch (_context5.prev = _context5.next) {
@@ -2443,26 +2491,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          case 2:
 	            config = _context5.sent;
-	            _ref9 = options || {}, name = _ref9.name, dirID = _ref9.dirID;
 	
-	            if (!(typeof name !== 'string' || name === '')) {
-	              _context5.next = 6;
+	            if (!(!attrs || (typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs)) !== 'object')) {
+	              _context5.next = 5;
 	              break;
 	            }
 	
-	            throw new Error('missing name argument');
+	            throw new Error('missing attrs argument');
 	
-	          case 6:
-	            path = '/files/' + encodeURIComponent(dirID || '');
-	            query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
-	            _context5.next = 10;
-	            return (0, _utils.doFetch)(config, 'POST', '' + path + query);
+	          case 5:
+	            body = { data: { attributes: attrs } };
+	            return _context5.abrupt('return', (0, _utils.doFetchJSON)(config, 'PATCH', '/files/' + encodeURIComponent(id), body));
 	
-	          case 10:
-	            result = _context5.sent;
-	            return _context5.abrupt('return', (0, _jsonapi2.default)(result));
-	
-	          case 12:
+	          case 7:
 	          case 'end':
 	            return _context5.stop();
 	        }
@@ -2470,14 +2511,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, _callee5, this);
 	  }));
 	
-	  return function createDirectory(_x12) {
+	  return function updateAttributesById(_x12, _x13) {
 	    return _ref8.apply(this, arguments);
 	  };
 	}();
 	
-	var trash = exports.trash = function () {
-	  var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(id) {
-	    var config, result;
+	var updateAttributesByPath = exports.updateAttributesByPath = function () {
+	  var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(path, attrs) {
+	    var config, body;
 	    return regeneratorRuntime.wrap(function _callee6$(_context6) {
 	      while (1) {
 	        switch (_context6.prev = _context6.next) {
@@ -2488,22 +2529,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	          case 2:
 	            config = _context6.sent;
 	
-	            if (!(typeof id !== 'string' || id === '')) {
+	            if (!(!attrs || (typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs)) !== 'object')) {
 	              _context6.next = 5;
 	              break;
 	            }
 	
-	            throw new Error('missing id argument');
+	            throw new Error('missing attrs argument');
 	
 	          case 5:
-	            _context6.next = 7;
-	            return (0, _utils.doFetch)(config, 'DELETE', '/files/' + encodeURIComponent(id));
+	            body = { data: { attributes: attrs } };
+	            return _context6.abrupt('return', (0, _utils.doFetchJSON)(config, 'PATCH', '/files/metadata?Path=' + encodeURIComponent(path), body));
 	
 	          case 7:
-	            result = _context6.sent;
-	            return _context6.abrupt('return', (0, _jsonapi2.default)(result));
-	
-	          case 9:
 	          case 'end':
 	            return _context6.stop();
 	        }
@@ -2511,15 +2548,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, _callee6, this);
 	  }));
 	
-	  return function trash(_x13) {
-	    return _ref10.apply(this, arguments);
+	  return function updateAttributesByPath(_x14, _x15) {
+	    return _ref9.apply(this, arguments);
 	  };
 	}();
 	
-	var stat = exports.stat = function () {
-	  var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(pathOrID) {
-	    var config, path, response, out, _path, _response, _out;
-	
+	var trashById = exports.trashById = function () {
+	  var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(id) {
+	    var config;
 	    return regeneratorRuntime.wrap(function _callee7$(_context7) {
 	      while (1) {
 	        switch (_context7.prev = _context7.next) {
@@ -2530,37 +2566,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          case 2:
 	            config = _context7.sent;
 	
-	            if (!isID(pathOrID)) {
-	              _context7.next = 13;
+	            if (!(typeof id !== 'string' || id === '')) {
+	              _context7.next = 5;
 	              break;
 	            }
 	
-	            // GET /files/:id
-	            path = '/files/' + encodeURIComponent(pathOrID);
-	            _context7.next = 7;
-	            return (0, _utils.doFetch)(config, 'GET', path);
+	            throw new Error('missing id argument');
 	
-	          case 7:
-	            response = _context7.sent;
-	            out = (0, _jsonapi2.default)(response);
+	          case 5:
+	            return _context7.abrupt('return', (0, _utils.doFetchJSON)(config, 'DELETE', '/files/' + encodeURIComponent(id)));
 	
-	            out.isDir = isDir(out);
-	            return _context7.abrupt('return', out);
-	
-	          case 13:
-	            // GET /files/metadata?Path=/Documents/hello.txt
-	            _path = '/files/metadata?Path=' + encodeURIComponent(pathOrID);
-	            _context7.next = 16;
-	            return (0, _utils.doFetch)(config, 'GET', _path);
-	
-	          case 16:
-	            _response = _context7.sent;
-	            _out = (0, _jsonapi2.default)(_response);
-	
-	            _out.isDir = isDir(_out);
-	            return _context7.abrupt('return', _out);
-	
-	          case 20:
+	          case 6:
 	          case 'end':
 	            return _context7.stop();
 	        }
@@ -2568,14 +2584,136 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, _callee7, this);
 	  }));
 	
-	  return function stat(_x14) {
+	  return function trashById(_x16) {
+	    return _ref10.apply(this, arguments);
+	  };
+	}();
+	
+	var statById = exports.statById = function () {
+	  var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(id) {
+	    var config, res;
+	    return regeneratorRuntime.wrap(function _callee8$(_context8) {
+	      while (1) {
+	        switch (_context8.prev = _context8.next) {
+	          case 0:
+	            _context8.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context8.sent;
+	            _context8.next = 5;
+	            return (0, _utils.doFetchJSON)(config, 'GET', '/files/' + encodeURIComponent(id));
+	
+	          case 5:
+	            res = _context8.sent;
+	
+	            res.isDir = isDir(res);
+	            return _context8.abrupt('return', res);
+	
+	          case 8:
+	          case 'end':
+	            return _context8.stop();
+	        }
+	      }
+	    }, _callee8, this);
+	  }));
+	
+	  return function statById(_x17) {
 	    return _ref11.apply(this, arguments);
+	  };
+	}();
+	
+	var statByPath = exports.statByPath = function () {
+	  var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(path) {
+	    var config, res;
+	    return regeneratorRuntime.wrap(function _callee9$(_context9) {
+	      while (1) {
+	        switch (_context9.prev = _context9.next) {
+	          case 0:
+	            _context9.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context9.sent;
+	            _context9.next = 5;
+	            return (0, _utils.doFetchJSON)(config, 'GET', '/files/metadata?Path=' + encodeURIComponent(path));
+	
+	          case 5:
+	            res = _context9.sent;
+	
+	            res.isDir = isDir(res);
+	            return _context9.abrupt('return', res);
+	
+	          case 8:
+	          case 'end':
+	            return _context9.stop();
+	        }
+	      }
+	    }, _callee9, this);
+	  }));
+	
+	  return function statByPath(_x18) {
+	    return _ref12.apply(this, arguments);
+	  };
+	}();
+	
+	var downloadById = exports.downloadById = function () {
+	  var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(id) {
+	    var config;
+	    return regeneratorRuntime.wrap(function _callee10$(_context10) {
+	      while (1) {
+	        switch (_context10.prev = _context10.next) {
+	          case 0:
+	            _context10.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context10.sent;
+	            return _context10.abrupt('return', (0, _utils.doFetch)(config, 'GET', '/files/download/' + encodeURIComponent(id)));
+	
+	          case 4:
+	          case 'end':
+	            return _context10.stop();
+	        }
+	      }
+	    }, _callee10, this);
+	  }));
+	
+	  return function downloadById(_x19) {
+	    return _ref13.apply(this, arguments);
+	  };
+	}();
+	
+	var downloadByPath = exports.downloadByPath = function () {
+	  var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(path) {
+	    var config;
+	    return regeneratorRuntime.wrap(function _callee11$(_context11) {
+	      while (1) {
+	        switch (_context11.prev = _context11.next) {
+	          case 0:
+	            _context11.next = 2;
+	            return (0, _utils.waitConfig)({ nocompat: true });
+	
+	          case 2:
+	            config = _context11.sent;
+	            return _context11.abrupt('return', (0, _utils.doFetch)(config, 'GET', '/files/download?Path=' + encodeURIComponent(path)));
+	
+	          case 4:
+	          case 'end':
+	            return _context11.stop();
+	        }
+	      }
+	    }, _callee11, this);
+	  }));
+	
+	  return function downloadByPath(_x20) {
+	    return _ref14.apply(this, arguments);
 	  };
 	}();
 	
 	var _utils = __webpack_require__(5);
 	
-	var _jsonapi = __webpack_require__(8);
+	var _jsonapi = __webpack_require__(6);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
 	
@@ -2586,71 +2724,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var contentTypeOctetStream = 'application/octet-stream';
 	
-	function isID(text) {
-	  return text.indexOf('/') !== 0;
-	}
-	
 	function isDir(obj) {
 	  return obj.attributes.type === 'directory';
 	}
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	function indexKey(doc) {
-	  return doc.type + '/' + doc.id;
-	}
-	
-	function findByRef(resources, ref) {
-	  return resources[indexKey(ref)];
-	}
-	
-	function handleResource(rawResource, resources) {
-	  var resource = {
-	    _id: rawResource.id,
-	    _type: rawResource.type,
-	    _rev: rawResource.meta.rev,
-	    attributes: rawResource.attributes,
-	    relations: function relations(name) {
-	      var rels = rawResource.relationships[name];
-	      if (rels === undefined || rels.data === undefined) return undefined;
-	      if (rels.data === null) return null;
-	      if (!Array.isArray(rels.data)) return findByRef(resources, rels.data);
-	      return rels.data.map(function (ref) {
-	        return findByRef(resources, ref);
-	      });
-	    }
-	  };
-	
-	  resources[indexKey(rawResource)] = resource;
-	
-	  return resource;
-	}
-	
-	function handleTopLevel(doc) {
-	  var resources = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-	
-	  // build an index of included resource by Type & ID
-	  (doc.included || []).forEach(function (obj) {
-	    handleResource(obj, resources);
-	  });
-	
-	  if (Array.isArray(doc.data)) {
-	    return doc.data.map(function (r) {
-	      return handleResource(r, resources);
-	    });
-	  } else {
-	    return handleResource(doc.data, resources);
-	  }
-	}
-	
-	exports.default = handleTopLevel;
 
 /***/ },
 /* 9 */

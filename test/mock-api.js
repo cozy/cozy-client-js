@@ -80,7 +80,10 @@ const ROUTES = [
     method: 'POST',
     matcher: /^\/files\/.*Type=file.*/,
     response: {
-      data: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
         type: 'io.cozy.files',
         id: 'cb1c159a8db1ee7aeb9441c3ff001753',
         attributes: {
@@ -99,7 +102,7 @@ const ROUTES = [
         meta: {},
         links: {},
         relationships: {}
-      }
+      } }
     }
   },
   {
@@ -107,7 +110,10 @@ const ROUTES = [
     method: 'POST',
     matcher: /^\/files\/.*Type=directory.*/,
     response: {
-      data: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
         type: 'io.cozy.files',
         id: 'cb1c159a8db1ee7aeb9441c3ff001753',
         attributes: {
@@ -121,7 +127,7 @@ const ROUTES = [
         meta: {},
         links: {},
         relationships: {}
-      }
+      } }
     }
   },
   {
@@ -129,7 +135,10 @@ const ROUTES = [
     method: 'DELETE',
     matcher: /^\/files\//,
     response: {
-      data: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
         type: 'io.cozy.files',
         id: 'cb1c159a8db1ee7aeb9441c3ff001753',
         attributes: {
@@ -143,7 +152,7 @@ const ROUTES = [
         meta: {},
         links: {},
         relationships: {}
-      }
+      } }
     }
   },
   {
@@ -151,7 +160,10 @@ const ROUTES = [
     method: 'PATCH',
     matcher: /^\/files\//,
     response: {
-      data: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
         type: 'io.cozy.files',
         id: 'cb1c159a8db1ee7aeb9441c3ff001753',
         attributes: {
@@ -165,7 +177,7 @@ const ROUTES = [
         meta: {},
         links: {},
         relationships: {}
-      }
+      } }
     }
   },
   {
@@ -173,7 +185,10 @@ const ROUTES = [
     method: 'GET',
     matcher: /^\/files\/metadata/,
     response: {
-      data: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
         type: 'io.cozy.files',
         id: 'cb1c159a8db1ee7aeb9441c3ff001753',
         attributes: {
@@ -187,7 +202,7 @@ const ROUTES = [
         meta: {},
         links: {},
         relationships: {}
-      }
+      } }
     }
   },
   {
@@ -195,7 +210,10 @@ const ROUTES = [
     method: 'GET',
     matcher: '/files/id42',
     response: {
-      data: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
         type: 'io.cozy.files',
         id: 'id42',
         attributes: {
@@ -209,8 +227,20 @@ const ROUTES = [
         meta: {},
         links: {},
         relationships: {}
-      }
+      } }
     }
+  },
+  {
+    name: 'DownloadByID',
+    method: 'GET',
+    matcher: '/files/download/id42',
+    response: 'foo'
+  },
+  {
+    name: 'DownloadByPath',
+    method: 'GET',
+    matcher: /^\/files\/download\?Path/,
+    response: 'foo'
   }
 ]
 
