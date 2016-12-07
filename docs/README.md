@@ -308,49 +308,55 @@ const created = await cozy.files.createDirectory({
 ```
 
 
-### `cozy.files.update(data, options)`
+### `cozy.files.updateById(id, data, options)`
 
-`cozy.files.update(data, options)` is used to update the content of an already existing file.
+`cozy.files.updateById(id, data, options)` is used to update the content of an already existing file.
 
 It returns a promise for the document of the file updated.
 
+- `id` is a string specifying the identifier of the file to modify.
 - `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 - `options` is an object with the following fields:
-  * `fileId`: specify the identifier of the file to modify.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
 ```javascript
-const updated = await cozy.files.update(blob, {
-    fileId: "654321",
-    contentType: "text/plain",
-})
+const updated = await cozy.files.updateById("654321", blob, { contentType: "text/plain" })
 ```
 
 
-### `cozy.files.updateAttributes(attrs, options)`
+### `cozy.files.updateAttributesById(id, attrs)`
 
-`cozy.files.updateAttributes(attrs, options)` is used to update the attributes associated to a file or directory.
+`cozy.files.updateAttributesById(id, attrs)` is used to update the attributes associated to a file or directory specified by its id.
 
 It returns a promise for the document of the updated directory or file.
 
+- `id` is a string specifying the identifier of the file or directory to update
 - `attrs` is an object containing the changes
-- `options` is an object with one of the following fields:
-  * `id`: string specifying the identifier of the file or directory to update
-  * `path`: string specifying the path of the file or directory to update
 
 ```javascript
-const updated = await cozy.files.updateAttributes({ tags: ["foo"] }, {
-  id: "12345"
-})
-
-const updated = await cozy.files.updateAttributes({ executable: true }, {
-  path: "/foo/bar"
-})
+const updated = await cozy.files.updateAttributesById("12345", { tags: ["foo"] })
 ```
 
-### `cozy.files.trash(id)`
+  * `path`: string specifying the path of the file or directory to update
 
-`cozy.files.trash(id)` is used to move the file or directory identified by the given id to trash.
+
+### `cozy.files.updateAttributesByPath(path, attrs)`
+
+`cozy.files.updateAttributesByPath(path, attrs)` is used to update the attributes associated to a file or directory specified by its id.
+
+It returns a promise for the document of the updated directory or file.
+
+- `path`: string specifying the path of the file or directory to update
+- `attrs` is an object containing the changes
+
+```javascript
+const updated = await cozy.files.updateAttributes("/foo/bar", { executable: true })
+```
+
+
+### `cozy.files.trashById(id)`
+
+`cozy.files.trashById(id)` is used to move the file or directory identified by the given id to trash.
 
 It returns a promise for the document of the file or directory moved to trash.
 
@@ -358,6 +364,38 @@ It returns a promise for the document of the file or directory moved to trash.
 
 ```javascript
 const trashed = await cozy.files.trash("1234567")
+```
+
+
+### `cozy.files.downloadById(id)`
+
+`cozy.files.downloadById(id)` is used to download a file identified by by the given id.
+
+It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
+
+- `id` is a string specying the identifier of the file
+
+```javascript
+const response = await cozy.files.downloadById("1234567")
+const blob = await response.blob()
+const text = await response.text()
+const buff = await response.arrayBuffer()
+```
+
+
+### `cozy.files.downloadByPath(path)`
+
+`cozy.files.downloadByPath(path)` is used to download a file identified by by the given path.
+
+It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
+
+- `path` is a string specying the path of the file
+
+```javascript
+const response = await cozy.files.downloadByPath("/foo/hello.txt")
+const blob = await response.blob()
+const text = await response.text()
+const buff = await response.arrayBuffer()
 ```
 
 

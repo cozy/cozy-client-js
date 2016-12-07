@@ -28,14 +28,14 @@ function handleResource (rawResource, resources) {
 
 function handleTopLevel (doc, resources = {}) {
   // build an index of included resource by Type & ID
-  (doc.included || []).forEach(function (obj) {
-    handleResource(obj, resources)
-  })
+  const included = doc.included
+
+  if (Array.isArray(included)) {
+    included.forEach((r) => handleResource(r, resources))
+  }
 
   if (Array.isArray(doc.data)) {
-    return doc.data.map(function (r) {
-      return handleResource(r, resources)
-    })
+    return doc.data.map((r) => handleResource(r, resources))
   } else {
     return handleResource(doc.data, resources)
   }

@@ -1,4 +1,5 @@
 /* global fetch, btoa */
+import jsonapi from './jsonapi'
 
 export let config = {}
 
@@ -60,9 +61,26 @@ export function doFetch (config, method, path, body) {
   let pathprefix = config.isV2 ? '/ds-api' : ''
   let fullpath = target + pathprefix + path
   return fetch(fullpath, options).then((res) => {
-    const json = res.json()
     if (!res.ok) {
-      return json.then(err => { throw err })
+      const contentType = res.headers.get('content-type')
+      let data
+      if (contentType && contentType.indexOf('json') >= 0) {
+        data = res.json().then(err => { throw err })
+      } else {
+        data = res.text()
+      }
+      return data.then(err => { throw err })
+    }
+    return res
+  })
+}
+
+export function doFetchJSON (config, method, path, body) {
+  return doFetch(config, method, path, body).then((res) => {
+    const contentType = res.headers.get('content-type')
+    const json = res.json()
+    if (contentType && contentType.indexOf('application/vnd.api+json') === 0) {
+      return json.then(jsonapi)
     } else {
       return json
     }

@@ -1,5 +1,5 @@
 /* global fetch Blob File */
-import {waitConfig, doFetch} from './utils'
+import {waitConfig, doFetch, doFetchJSON} from './utils'
 import jsonapi from './jsonapi'
 
 const contentTypeOctetStream = 'application/octet-stream'
@@ -46,7 +46,7 @@ async function doUpload (config, data, contentType, method, path) {
       if (!res.ok) {
         return json.then(err => { throw err })
       } else {
-        return json
+        return json.then(jsonapi)
       }
     })
 }
@@ -67,46 +67,7 @@ export async function create (data, options) {
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=file`
-  let result = await doUpload(config, data, contentType, 'POST', `${path}${query}`)
-  return jsonapi(result)
-}
-
-export async function update (data, options) {
-  const config = await waitConfig({ nocompat: true })
-
-  let {fileId, contentType} = options || {}
-
-  if (typeof fileId !== 'string' || fileId === '') {
-    throw new Error('missing fileId argument')
-  }
-
-  const path = `/files/${encodeURIComponent(fileId)}`
-  let result = await doUpload(config, data, contentType, 'PUT', path)
-  return jsonapi(result)
-}
-
-export async function updateAttributes (attrs, options) {
-  const config = await waitConfig({ nocompat: true })
-  const {id, path: filePath} = options || {}
-
-  if (!attrs || typeof attrs !== 'object') {
-    throw new Error('missing attrs argument')
-  }
-
-  let path, query
-  if (id) {
-    path = `/files/${encodeURIComponent(id)}`
-    query = ''
-  } else if (filePath) {
-    path = '/files/metadata'
-    query = `?Path=${encodeURIComponent(filePath)}`
-  } else {
-    throw new Error('missing id or path argument')
-  }
-
-  const body = { data: { attributes: attrs } }
-  let result = await doFetch(config, 'PATCH', `${path}${query}`, body)
-  return jsonapi(result)
+  return doUpload(config, data, contentType, 'POST', `${path}${query}`)
 }
 
 export async function createDirectory (options) {
@@ -120,43 +81,73 @@ export async function createDirectory (options) {
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=directory`
-  let result = await doFetch(config, 'POST', `${path}${query}`)
-  return jsonapi(result)
+  return doFetchJSON(config, 'POST', `${path}${query}`)
 }
 
-export async function trash (id) {
+export async function updateById (id, data, options) {
+  const config = await waitConfig({ nocompat: true })
+  const {contentType} = options || {}
+  return doUpload(config, data, contentType, 'PUT', `/files/${encodeURIComponent(id)}`)
+}
+
+export async function updateAttributesById (id, attrs) {
+  const config = await waitConfig({ nocompat: true })
+
+  if (!attrs || typeof attrs !== 'object') {
+    throw new Error('missing attrs argument')
+  }
+
+  const body = { data: { attributes: attrs } }
+  return doFetchJSON(config, 'PATCH',
+    `/files/${encodeURIComponent(id)}`, body)
+}
+
+export async function updateAttributesByPath (path, attrs) {
+  const config = await waitConfig({ nocompat: true })
+
+  if (!attrs || typeof attrs !== 'object') {
+    throw new Error('missing attrs argument')
+  }
+
+  const body = { data: { attributes: attrs } }
+  return doFetchJSON(config, 'PATCH',
+    `/files/metadata?Path=${encodeURIComponent(path)}`, body)
+}
+
+export async function trashById (id) {
   const config = await waitConfig({ nocompat: true })
 
   if (typeof id !== 'string' || id === '') {
     throw new Error('missing id argument')
   }
 
-  let result = await doFetch(config, 'DELETE', `/files/${encodeURIComponent(id)}`)
-  return jsonapi(result)
+  return doFetchJSON(config, 'DELETE', `/files/${encodeURIComponent(id)}`)
 }
 
-export async function stat (pathOrID) {
+export async function statById (id) {
   const config = await waitConfig({ nocompat: true })
-
-  if (isID(pathOrID)) {
-    // GET /files/:id
-    let path = `/files/${encodeURIComponent(pathOrID)}`
-    let response = await doFetch(config, 'GET', path)
-    let out = jsonapi(response)
-    out.isDir = isDir(out)
-    return out
-  } else {
-    // GET /files/metadata?Path=/Documents/hello.txt
-    let path = `/files/metadata?Path=${encodeURIComponent(pathOrID)}`
-    let response = await doFetch(config, 'GET', path)
-    let out = jsonapi(response)
-    out.isDir = isDir(out)
-    return out
-  }
+  const res = await doFetchJSON(config, 'GET',
+    `/files/${encodeURIComponent(id)}`)
+  res.isDir = isDir(res)
+  return res
 }
 
-function isID (text) {
-  return text.indexOf('/') !== 0
+export async function statByPath (path) {
+  const config = await waitConfig({ nocompat: true })
+  const res = await doFetchJSON(config, 'GET',
+    `/files/metadata?Path=${encodeURIComponent(path)}`)
+  res.isDir = isDir(res)
+  return res
+}
+
+export async function downloadById (id) {
+  const config = await waitConfig({ nocompat: true })
+  return doFetch(config, 'GET', `/files/download/${encodeURIComponent(id)}`)
+}
+
+export async function downloadByPath (path) {
+  const config = await waitConfig({ nocompat: true })
+  return doFetch(config, 'GET', `/files/download?Path=${encodeURIComponent(path)}`)
 }
 
 function isDir (obj) {
