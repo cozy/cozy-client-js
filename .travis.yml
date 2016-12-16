@@ -16,20 +16,22 @@ hosts:
     - charlie.cozy.local
 
 before_script:
-  # setup couchdb 2 (docker)
+  # start couchdb 2 (docker)
   - docker run -d -p 5984:5984 --name couch klaemo/couchdb:2.0.0
-  - sleep 10
-  - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   # go 1.7
   - eval "$(gimme 1.7)"
-  # start a stack v3 instance from master (listening on 8080)
   - mkdir $GOPATH
+  # install stack v3
   - go get -u github.com/cozy/cozy-stack
-  - $GOPATH/bin/cozy-stack instances add dev
+  # start a stack v3 instance from master (listening on 8080)
+  - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   - $GOPATH/bin/cozy-stack serve --assets=$GOPATH/src/github.com/cozy/cozy-stack/assets &
-  # start a stack v2 from NPM (listening on 9104 & 9101)
+  - sleep 1
+  - $GOPATH/bin/cozy-stack instances add dev
+  # install stack v2
   - npm install -g coffee-script
   - npm install cozy-data-system cozy-proxy
+  # start a stack v2 from NPM (listening on 9104 & 9101)
   - NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start &
   - sleep 3
   - NODE_ENV=test NAME=proxy TOKEN=token npm explore cozy-proxy npm run start &
