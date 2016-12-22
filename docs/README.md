@@ -484,6 +484,52 @@ const newtoken = cozy.auth.refreshToken(client, oldtoken)
 ```
 
 
+### `cozy.auth.Client`
+
+`cozy.auth.Client` is a class representing an OAuth client. It can be registered, in which case it is known by the server and has a `clientID` and `clientSecret`.
+
+```
+type Client {
+  clientID: string                // informed by server
+  clientSecret: string            // informed by server
+  registrationAccessToken: string // informed by server
+  url: string;         // mandatory
+  redirectURI: string; // mandatory
+  softwareID: string;  // mandatory
+  softwareVersion: string;
+  clientName: string;  // mandatory
+  clientKind: string;
+  clientURI: string;
+  logoURI: string;
+  policyURI: string;
+}
+```
+
+The constructor type is as follow:
+
+- `url` is a string of the url of the cozy
+- `options` is an object with the same fields as a client object, or is an instance of client
+
+```
+new Client(url, options)
+```
+
+
+### `cozy.auth.Token`
+
+`cozy.auth.Token` is a class representing an OAuth token.
+
+```
+type Token {
+  tokenType: string;
+  accessToken: string;
+  refreshToken: string;
+  scope: string
+}
+```
+
+The constructor takes an object with the same fields as a Token object.
+
 Future APIs
 -----------
 
