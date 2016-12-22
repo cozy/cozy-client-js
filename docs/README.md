@@ -369,7 +369,7 @@ const trashed = await cozy.files.trash("1234567")
 
 ### `cozy.files.downloadById(id)`
 
-`cozy.files.downloadById(id)` is used to download a file identified by by the given id.
+`cozy.files.downloadById(id)` is used to download a file identified by the given id.
 
 It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
 
@@ -385,7 +385,7 @@ const buff = await response.arrayBuffer()
 
 ### `cozy.files.downloadByPath(path)`
 
-`cozy.files.downloadByPath(path)` is used to download a file identified by by the given path.
+`cozy.files.downloadByPath(path)` is used to download a file identified by the given path.
 
 It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
 
@@ -396,6 +396,91 @@ const response = await cozy.files.downloadByPath("/foo/hello.txt")
 const blob = await response.blob()
 const text = await response.text()
 const buff = await response.arrayBuffer()
+```
+
+
+### `cozy.auth.registerClient(client)`
+
+`cozy.auth.registerClient` is used to register a new client with the specified informations.
+
+It returns a promise of the newly registered Client, along with a client secret and identifier.
+
+- `client` is a non registered `cozy.auth.Client`
+
+```js
+const client = await cozy.auth.registerClient(new cozy.auth.Client('https://me.cozy.io/', {
+  redirectURI: 'http://localhost:3000/',
+  softwareID: 'mysoftware',
+  clientName: 'Great mobile App'
+}))
+
+const clientID = client.clientID
+const clientSecret = client.clientSecret
+```
+
+
+### `cozy.auth.getClient(client)`
+
+`cozy.auth.getClient` is used to fetch a registered client with the specified clientID and token.
+
+It returns a promise of the client returned by the server.
+
+- `client` is a registered `cozy.auth.Client`
+- `token` is a valid `cozy.auth.Token`
+
+```js
+const token = ...
+const client = await cozy.auth.getClient(new cozy.auth.Client('https://me.cozy.io/', {
+  clientID: '1235'
+}), token)
+```
+
+
+### `cozy.auth.getAuthCodeURL(client, scopes)`
+
+`cozy.auth.getAuthCodeURL` is used to generate the URL on which the user should go to give access to the application with the specified scopes.
+
+It returns an object with the url and a generated random state that should be stored to be matched again for the token exchange phase.
+
+- `client` is a registered `cozy.auth.Client`
+- `scopes` is an array of permission strings formatted as `key:access` (like `files/images:read`)
+
+```js
+const {url, state} = cozy.auth.getAuthCodeURL(client, ['files/images:read'])
+
+// save state and redirect to url
+localStorage.setItem("oauthstate", state)
+document.location.replace(url)
+```
+
+
+### `cozy.auth.getAccessToken(client, state, pageURL)`
+
+`cozy.auth.getAccessToken` is used from the page on which the user should have redirected after authorizing the application.
+
+The method verifies that the specified state and the extracted one match. It then ask the server for a new bearer token and returns it.
+
+- `client` is a registered `cozy.auth.Client`
+- `state` is the previously stored state that is matched against to prevent CSRF attacks
+- `pageURL` is the url of the current page from the which a code and state will be extracted. If empty, `document.location.href` is used
+
+```js
+const client = cozy.auth.getClient(/* ... */)
+const state = localStorage.getItem("oauthstate")
+const pageURL = document.location.href
+const token = cozy.auth.getAccessToken(client, state, pageURL)
+```
+
+
+### `cozy.auth.refreshToken`
+
+`refreshToken` is used to refresh a token that is expired or no more valid.
+
+- `client` is a registered `cozy.auth.Client`
+- `token` is a valid `cozy.auth.Token`
+
+```js
+const newtoken = cozy.auth.refreshToken(client, oldtoken)
 ```
 
 

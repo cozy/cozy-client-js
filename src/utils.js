@@ -34,14 +34,59 @@ export function createPath (config, doctype, id = '', query = null) {
   if (id !== '') {
     route += encodeURIComponent(id)
   }
-  if (query) {
-    const q = []
-    for (const qname in query) {
-      q.push(`${encodeURIComponent(qname)}=${encodeURIComponent(query[qname])}`)
-    }
-    route += `?${q.join('&')}`
+  const q = encodeQuery(query)
+  if (q !== '') {
+    route += '?' + q
   }
   return route
+}
+
+export function encodeQuery (query) {
+  if (!query) {
+    return ''
+  }
+  let q = ''
+  for (const qname in query) {
+    if (q !== '') {
+      q += '&'
+    }
+    q += `${encodeURIComponent(qname)}=${encodeURIComponent(query[qname])}`
+  }
+  return q
+}
+
+export function decodeQuery (url) {
+  let queryIndex = url.indexOf('?')
+  if (queryIndex < 0) {
+    queryIndex = url.length
+  }
+  let fragIndex = url.indexOf('#')
+  if (fragIndex < 0) {
+    fragIndex = url.length
+  }
+  if (fragIndex < queryIndex) {
+    throw new Error('Malformed URL')
+  }
+  const queryStr = url.slice(queryIndex + 1, fragIndex)
+  if (queryStr === '') {
+    throw new Error('Missing query part')
+  }
+  const parts = queryStr.split('&')
+  const queries = {}
+  for (let i = 0; i < parts.length; i++) {
+    let pair = parts[i].split('=')
+    if (pair.length === 0 || pair[0] === '') {
+      continue
+    }
+    if (pair.length === 1) {
+      queries[decodeURIComponent(pair[0])] = true
+    } else if (pair.length === 2) {
+      queries[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1])
+    } else {
+      throw new Error('Malformed URL')
+    }
+  }
+  return queries
 }
 
 export function doFetch (config, method, path, body) {
