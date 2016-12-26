@@ -460,12 +460,12 @@ It returns a promise of an `cozy.auth.AccessToken`. The method verifies that the
 
 - `client` is a registered `cozy.auth.Client`
 - `state` is the previously stored state that is matched against to prevent CSRF attacks
-- `pageURL` is the url of the current page from the which a code and state will be extracted. If empty, `document.location.href` is used
+- `pageURL` is the url of the current page from the which a code and state will be extracted. If empty, `window.location.href` is used
 
 ```js
 const client = cozy.auth.getClient(/* ... */)
 const state = localStorage.getItem("oauthstate")
-const pageURL = document.location.href
+const pageURL = window.location.href
 const token = cozy.auth.getAccessToken(client, state, pageURL)
 ```
 

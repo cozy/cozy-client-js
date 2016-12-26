@@ -146,11 +146,11 @@ export function getAuthCodeURL (client, scopes = []) {
 // registered client.
 //
 // This method extracts the access code and state from the given URL. By
-// default it uses document.location.href. Also, it checks the given state with
+// default it uses window.location.href. Also, it checks the given state with
 // the one specified in the URL query parameter to prevent CSRF attacks.
 export function getAccessToken (client, state, pageURL = '') {
   if (pageURL === '' && typeof document !== 'undefined') {
-    pageURL = document.location.href
+    pageURL = window.location.href
   }
   const queries = decodeQuery(pageURL)
   if (state !== queries['state']) {
