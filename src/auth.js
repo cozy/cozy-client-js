@@ -60,6 +60,10 @@ export class Client {
       policy_uri: this.policyURI
     }
   }
+
+  toAuthHeader () {
+    return 'Bearer ' + this.registrationAccessToken
+  }
 }
 
 export class Token {
@@ -95,7 +99,7 @@ export function registerClient (client) {
 }
 
 // getClient will retrive the registered client informations from the server.
-export function getClient (client, token) {
+export function getClient (client) {
   if (!(client instanceof Client)) {
     client = new Client(client.url, client)
   }
@@ -106,7 +110,7 @@ export function getClient (client, token) {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
-      'Authorization': token.toAuthHeader()
+      'Authorization': client.toAuthHeader()
     }
   })
     .then(handleResponse)

@@ -426,13 +426,11 @@ const clientSecret = client.clientSecret
 It returns a promise of the client returned by the server.
 
 - `client` is a registered `cozy.auth.Client`
-- `token` is a valid `cozy.auth.Token`
 
 ```js
-const token = ...
 const client = await cozy.auth.getClient(new cozy.auth.Client('https://me.cozy.io/', {
   clientID: '1235'
-}), token)
+}))
 ```
 
 
@@ -450,7 +448,7 @@ const {url, state} = cozy.auth.getAuthCodeURL(client, ['files/images:read'])
 
 // save state and redirect to url
 localStorage.setItem("oauthstate", state)
-document.location.replace(url)
+window.location.replace(url)
 ```
 
 
@@ -458,7 +456,7 @@ document.location.replace(url)
 
 `cozy.auth.getAccessToken` is used from the page on which the user should have redirected after authorizing the application.
 
-The method verifies that the specified state and the extracted one match. It then ask the server for a new bearer token and returns it.
+It returns a promise of an `cozy.auth.AccessToken`. The method verifies that the specified state and the extracted one match. It then ask the server for a new access token and returns it.
 
 - `client` is a registered `cozy.auth.Client`
 - `state` is the previously stored state that is matched against to prevent CSRF attacks
@@ -490,9 +488,9 @@ const newtoken = cozy.auth.refreshToken(client, oldtoken)
 
 ```
 type Client {
-  clientID: string                // informed by server
-  clientSecret: string            // informed by server
-  registrationAccessToken: string // informed by server
+  clientID: string;                // informed by server
+  clientSecret: string;            // informed by server
+  registrationAccessToken: string; // informed by server
   url: string;         // mandatory
   redirectURI: string; // mandatory
   softwareID: string;  // mandatory
@@ -515,9 +513,9 @@ new Client(url, options)
 ```
 
 
-### `cozy.auth.Token`
+### `cozy.auth.AccessToken`
 
-`cozy.auth.Token` is a class representing an OAuth token.
+`cozy.auth.AcessToken` is a class representing an OAuth access token.
 
 ```
 type Token {

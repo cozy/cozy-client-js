@@ -89,12 +89,6 @@ describe('Authentication', function () {
     before(mock.mockAPI('AuthGetClient'))
 
     it('works', async function () {
-      const token = new cozy.auth.Token({
-        tokenType: 'Bearer',
-        accessToken: '123',
-        refreshToken: '456',
-        scope: 'a b'
-      })
       const client = await cozy.auth.getClient({
         url: 'http://coucou/',
         clientID: '123',
@@ -102,7 +96,7 @@ describe('Authentication', function () {
         redirectURI: 'http://coucou/',
         softwareID: 'id',
         clientName: 'client'
-      }, token)
+      })
 
       client.clientID.should.equal('123')
       client.clientSecret.should.equal('456')
