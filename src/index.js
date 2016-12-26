@@ -1,3 +1,4 @@
+import * as auth from './auth'
 import * as crud from './crud'
 import * as mango from './mango'
 import * as files from './files'
@@ -37,6 +38,26 @@ let filesProto = {
   }
 }
 
+let authProto = {
+  Client: auth.Client,
+  AccessToken: auth.AccessToken,
+  registerClient: function (client, optCallback) {
+    return promiser(auth.registerClient(client), optCallback)
+  },
+  getClient: function (client, token, optCallback) {
+    return promiser(auth.getClient(client, token), optCallback)
+  },
+  getAuthCodeURL: function (client, scopes = [], optCallback) {
+    return promiser(auth.getAuthCodeURL(client, scopes), optCallback)
+  },
+  getAccessToken: function (client, state, pageURL = '', optCallback) {
+    return promiser(auth.getAccessToken(client, state, pageURL), optCallback)
+  },
+  refreshToken: function (client, token, optCallback) {
+    return promiser(auth.refreshToken(client, token), optCallback)
+  }
+}
+
 let cozy = {
   init: function (opts, optCallback) {
     return promiser(init(opts), optCallback)
@@ -71,6 +92,7 @@ let cozy = {
     return promiser(crud._delete(doctype, doc), optCallback)
   },
 
+  auth: authProto,
   files: filesProto
 }
 

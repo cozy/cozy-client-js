@@ -241,6 +241,44 @@ const ROUTES = [
     method: 'GET',
     matcher: /^\/files\/download\?Path/,
     response: 'foo'
+  },
+  {
+    name: 'AuthRegisterClient',
+    method: 'POST',
+    matcher: /\/auth\/register$/,
+    response: (url, opts) => {
+      return Object.assign(JSON.parse(opts.body), {
+        client_id: '123',
+        client_secret: '456',
+        registration_access_token: '789'
+      })
+    }
+  },
+  {
+    name: 'AuthGetClient',
+    method: 'GET',
+    matcher: /\/auth\/register\/123$/,
+    response: (url, opts) => {
+      return {
+        client_id: '123',
+        client_secret: '456',
+        registration_access_token: '789',
+        redirect_uris: ['http://coucou/'],
+        software_id: 'id',
+        client_name: 'client'
+      }
+    }
+  },
+  {
+    name: 'AccessToken',
+    method: 'POST',
+    matcher: /\/auth\/access_token$/,
+    response: {
+      token_type: 'Bearer',
+      access_token: '123',
+      refresh_token: '456',
+      scope: 'a b'
+    }
   }
 ]
 
