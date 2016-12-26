@@ -66,7 +66,7 @@ export class Client {
   }
 }
 
-export class Token {
+export class AccessToken {
   constructor (opts) {
     this.tokenType = opts.tokenType || opts.token_type
     this.accessToken = opts.accessToken || opts.access_token
@@ -142,8 +142,8 @@ export function getAuthCodeURL (client, scopes = []) {
 }
 
 // getAccessToken perform a request on the access_token entrypoint with the
-// authorization_code grant type in order to generate a new token for a newly
-// registered client.
+// authorization_code grant type in order to generate a new access token for a
+// newly registered client.
 //
 // This method extracts the access code and state from the given URL. By
 // default it uses window.location.href. Also, it checks the given state with
@@ -192,7 +192,7 @@ function retrieveToken (client, query) {
     }))
   })
     .then(handleResponse)
-    .then((data) => new Token(data))
+    .then((data) => new AccessToken(data))
 }
 
 // generateRandomState will try to generate a 128bits random value from a secure

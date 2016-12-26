@@ -40,7 +40,7 @@ let filesProto = {
 
 let authProto = {
   Client: auth.Client,
-  Token: auth.Token,
+  AccessToken: auth.AccessToken,
   registerClient: function (client, optCallback) {
     return promiser(auth.registerClient(client), optCallback)
   },

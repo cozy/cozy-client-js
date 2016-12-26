@@ -158,7 +158,7 @@ describe('Authentication', function () {
       const {url, state} = cozy.auth.getAuthCodeURL(client, ['a', 'b'])
 
       const token = await cozy.auth.getAccessToken(client, state, url)
-      token.should.eql(new cozy.auth.Token({
+      token.should.eql(new cozy.auth.AccessToken({
         tokenType: 'Bearer',
         accessToken: '123',
         refreshToken: '456',
@@ -185,7 +185,7 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      const token1 = new cozy.auth.Token({
+      const token1 = new cozy.auth.AccessToken({
         tokenType: 'Bearer',
         accessToken: '123',
         refreshToken: '456',
@@ -193,7 +193,7 @@ describe('Authentication', function () {
       })
 
       const token2 = await cozy.auth.refreshToken(client, token1)
-      token2.should.eql(new cozy.auth.Token({
+      token2.should.eql(new cozy.auth.AccessToken({
         tokenType: 'Bearer',
         accessToken: '123',
         refreshToken: '456',

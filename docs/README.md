@@ -475,7 +475,7 @@ const token = cozy.auth.getAccessToken(client, state, pageURL)
 `refreshToken` is used to refresh a token that is expired or no more valid.
 
 - `client` is a registered `cozy.auth.Client`
-- `token` is a valid `cozy.auth.Token`
+- `token` is a valid `cozy.auth.AccessToken`
 
 ```js
 const newtoken = cozy.auth.refreshToken(client, oldtoken)
@@ -515,7 +515,7 @@ new Client(url, options)
 
 ### `cozy.auth.AccessToken`
 
-`cozy.auth.AcessToken` is a class representing an OAuth access token.
+`cozy.auth.AccessToken` is a class representing an OAuth access token.
 
 ```
 type Token {
