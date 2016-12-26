@@ -399,21 +399,21 @@ const buff = await response.arrayBuffer()
 ```
 
 
-### `cozy.auth.registerClient(client)`
+### `cozy.auth.registerClient(clientParams)`
 
 `cozy.auth.registerClient` is used to register a new client with the specified informations.
 
 It returns a promise of the newly registered Client, along with a client secret and identifier.
 
-- `client` is a non registered `cozy.auth.Client`
+- `clientParams` are client parameters: a non registered instance of `cozy.auth.Client`
 
 ```js
-const client = await cozy.auth.registerClient(new cozy.auth.Client('https://me.cozy.io/', {
+const clientParams = new cozy.auth.Client('https://me.cozy.io/', {
   redirectURI: 'http://localhost:3000/',
   softwareID: 'mysoftware',
   clientName: 'Great mobile App'
-}))
-
+})
+const client = await cozy.auth.registerClient(clientParams)
 const clientID = client.clientID
 const clientSecret = client.clientSecret
 ```
