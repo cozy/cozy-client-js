@@ -53,11 +53,7 @@ export class MemoryStorage {
   }
 
   load (key) {
-    let value
-    if (this.hash.hasOwnProperty(key)) {
-      value = this.hash[key]
-    }
-    return Promise.resolve(value)
+    return Promise.resolve(this.hash[key])
   }
 
   delete (key) {
