@@ -102,7 +102,7 @@ export function _delete (cozy, doctype, doc) {
   return cozyFetchJSON(cozy, 'DELETE', path)
     .then((resp) => {
       if (cozy.isV2) {
-        return Object.assign(resp, {id: _id, rev: NOREV})
+        return {id: _id, rev: NOREV}
       } else {
         return resp
       }
