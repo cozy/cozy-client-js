@@ -2,7 +2,8 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import {Cozy} from '../../src'
+import {Cozy, MemoryStorage} from '../../src'
+import {oauthFlow, AccessToken} from '../../src/auth_v3'
 import mock from '../mock-api'
 import {decodeQuery} from '../../src/utils'
 import {fakeCredentials} from '../helpers'
@@ -207,6 +208,136 @@ describe('Authentication', function () {
         refreshToken: '456',
         scope: 'a b'
       }))
+    })
+  })
+
+  describe('oauth flow', function () {
+    it('registers a new client with an empty storage', function (done) {
+      const storage = new MemoryStorage()
+      oauthFlow(
+        cozy, storage, 'http://my.cozy.io/',
+        () => ({
+          client: {
+            redirectURI: 'http://babelu/',
+            softwareID: 'id',
+            clientName: 'client'
+          },
+          scopes: ['a', 'b']
+        }),
+        async function (client, url) {
+          client.clientID.should.equal('123')
+          client.clientSecret.should.equal('456')
+          client.registrationAccessToken.should.equal('789')
+          client.redirectURI.should.equal('http://babelu/')
+          url.indexOf('http://foobar/auth/authorize').should.equal(0)
+          const queries = decodeQuery(url)
+          queries.client_id.should.eql('123')
+          queries.redirect_uri.should.eql('http://babelu/')
+          queries.response_type.should.eql('code')
+          queries.scope.should.eql('a b')
+          const creds = await storage.load('state')
+          queries.state.should.eql(creds.state)
+          creds.url.should.be.type('string')
+          done()
+        })
+    })
+
+    it('fails if the stored state is wrong', async function () {
+      const storage = new MemoryStorage()
+      await storage.save('state', {
+        state: '123',
+        client: {}
+      })
+      await storage.save('foo', 'bar')
+      let error
+      try {
+        await oauthFlow(
+          cozy, storage, 'http://my.cozy.io/?state=321',
+          () => {},
+          () => {}
+        )
+      } catch (e) {
+        error = e
+      }
+      if (!error) {
+        throw new Error('should have thrown')
+      }
+    })
+
+    it('should grant access after registration', function (done) {
+      const storage = new MemoryStorage()
+
+      function doRegistration () {
+        return oauthFlow(
+          cozy, storage, 'http://my.cozy.io/',
+          () => ({
+            client: {
+              redirectURI: 'http://fooobar/',
+              softwareID: 'id',
+              clientName: 'client'
+            },
+            scopes: ['a', 'b']
+          }), grantAccess)
+      }
+
+      async function grantAccess (client, pageURL) {
+        const credentials = await oauthFlow(
+          cozy, storage, pageURL,
+          () => {},
+          () => {}
+        )
+
+        credentials.client.clientID.should.equal('123')
+        credentials.client.clientSecret.should.equal('456')
+        credentials.client.registrationAccessToken.should.equal('789')
+        credentials.client.redirectURI.should.equal('http://fooobar/')
+        credentials.client.softwareID.should.equal('id')
+        credentials.client.clientName.should.equal('client')
+        credentials.token.should.be.instanceOf(AccessToken)
+
+        const state = await storage.load('state')
+        const creds = await storage.load('creds')
+
+        if (state !== undefined) {
+          throw new Error('should not have state anymore')
+        }
+
+        creds.client.should.be.instanceOf(cozy.auth.Client)
+        creds.token.should.be.instanceOf(cozy.auth.AccessToken)
+        done()
+      }
+
+      doRegistration()
+    })
+
+    it('should reuse stored credentials', function (done) {
+      const storage = new MemoryStorage()
+
+      function doRegistration () {
+        return oauthFlow(
+          cozy, storage, 'http://my.cozy.io/',
+          () => ({
+            client: {
+              redirectURI: 'http://coucou/',
+              softwareID: 'id',
+              clientName: 'client'
+            },
+            scopes: ['a', 'b']
+          }), grantAccess)
+      }
+
+      async function grantAccess (client, pageURL) {
+        const creds1 = await oauthFlow(
+          cozy, storage, pageURL)
+
+        const creds2 = await oauthFlow(
+          cozy, storage, 'http://my.cozy.io/')
+
+        creds2.should.eql(creds1)
+        done()
+      }
+
+      doRegistration()
     })
   })
 })

@@ -95,7 +95,7 @@ export function getClient (cozy, client) {
   if (!client.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  return cozyFetchJSON(cozy, 'GET', `/auth/register/${client.clientID}`, {
+  return cozyFetchJSON(cozy, 'GET', `/auth/register/${client.clientID}`, null, {
     manualAuthCredentials: {
       client: client,
       token: client
