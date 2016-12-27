@@ -2,19 +2,20 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import cozy from '../../src'
+import {Cozy} from '../../src'
 import mock from '../mock-api'
+import {fakeCredentials} from '../helpers'
 
 describe('Files', function () {
-  afterEach(() => mock.restore())
+  let cozy
 
-  describe('Init', function () {
-    before(mock.mockAPI('Status'))
-
-    it('Does nothing', async function () {
-      await cozy.init()
+  beforeEach(() => {
+    cozy = new Cozy({
+      url: 'http://my.cozy.io///',
+      credentials: fakeCredentials()
     })
   })
+  afterEach(() => mock.restore())
 
   describe('Upload', function () {
     before(mock.mockAPI('UploadFile'))
@@ -25,7 +26,7 @@ describe('Files', function () {
       const res3 = await cozy.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
 
       mock.calls('UploadFile').should.have.length(3)
-      mock.lastUrl('UploadFile').should.equal('/files/12345?Name=foo&Type=file')
+      mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
@@ -115,7 +116,7 @@ describe('Files', function () {
       const res2 = await cozy.files.createDirectory({ name: 'foo', dirID: '12345' })
 
       mock.calls('CreateDirectory').should.have.length(2)
-      mock.lastUrl('CreateDirectory').should.equal('/files/12345?Name=foo&Type=directory')
+      mock.lastUrl('CreateDirectory').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=directory')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
@@ -163,7 +164,7 @@ describe('Files', function () {
       const res1 = await cozy.files.trashById('1234')
 
       mock.calls('Trash').should.have.length(1)
-      mock.lastUrl('Trash').should.equal('/files/1234')
+      mock.lastUrl('Trash').should.equal('http://my.cozy.io/files/1234')
 
       res1.should.have.property('attributes')
     })
@@ -210,11 +211,11 @@ describe('Files', function () {
       const attrs = { tags: ['foo', 'bar'] }
 
       const res1 = await cozy.files.updateAttributesById('12345', attrs)
-      mock.lastUrl('UpdateAttributes').should.equal('/files/12345')
+      mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/12345')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
       const res2 = await cozy.files.updateAttributesByPath('/foo/bar', attrs)
-      mock.lastUrl('UpdateAttributes').should.equal('/files/metadata?Path=%2Ffoo%2Fbar')
+      mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/metadata?Path=%2Ffoo%2Fbar')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
       mock.calls('UpdateAttributes').should.have.length(2)
@@ -255,7 +256,7 @@ describe('Files', function () {
       const res1 = await cozy.files.statById('id42')
 
       mock.calls('StatByID').should.have.length(1)
-      mock.lastUrl('StatByID').should.equal('/files/id42')
+      mock.lastUrl('StatByID').should.equal('http://my.cozy.io/files/id42')
 
       res1.should.have.property('_id', 'id42')
       res1.should.have.property('isDir', true)
@@ -271,7 +272,7 @@ describe('Files', function () {
       const res1 = await cozy.files.statByPath('/bills/hôpital.pdf')
 
       mock.calls('StatByPath').should.have.length(1)
-      mock.lastUrl('StatByPath').should.equal('/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+      mock.lastUrl('StatByPath').should.equal('http://my.cozy.io/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
 
       res1.should.have.property('_id', 'cb1c159a8db1ee7aeb9441c3ff001753')
       res1.should.have.property('isDir', false)
@@ -288,7 +289,7 @@ describe('Files', function () {
         const res = await cozy.files.downloadById('id42')
 
         mock.calls('DownloadByID').should.have.length(1)
-        mock.lastUrl('DownloadByID').should.equal('/files/download/id42')
+        mock.lastUrl('DownloadByID').should.equal('http://my.cozy.io/files/download/id42')
 
         const txt = await res.text()
         txt.should.equal('foo')
@@ -302,7 +303,7 @@ describe('Files', function () {
         const res = await cozy.files.downloadByPath('/bills/hôpital.pdf')
 
         mock.calls('DownloadByPath').should.have.length(1)
-        mock.lastUrl('DownloadByPath').should.equal('/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+        mock.lastUrl('DownloadByPath').should.equal('http://my.cozy.io/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')
 
         const txt = await res.text()
         txt.should.equal('foo')

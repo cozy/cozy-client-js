@@ -1,101 +1,175 @@
-import * as auth from './auth'
+import {unpromiser, warn} from './utils'
+import {cozyFetchJSON} from './fetch'
+import {LocalStorage, MemoryStorage} from './auth_storage'
+import {getAccessToken as getAccessTokenV2} from './auth_v2'
+import * as auth from './auth_v3'
 import * as crud from './crud'
 import * as mango from './mango'
 import * as files from './files'
-import init from './init'
-import {promiser, warn} from './utils'
 
-let filesProto = {
-  create: function (data, options, optCallback) {
-    return promiser(files.create(data, options), optCallback)
-  },
-  createDirectory: function (options, optCallback) {
-    return promiser(files.createDirectory(options), optCallback)
-  },
-  updateById: function (id, data, options, optCallback) {
-    return promiser(files.updateById(id, data, options), optCallback)
-  },
-  updateAttributesById: function (id, attrs, optCallback) {
-    return promiser(files.updateAttributesById(id, attrs), optCallback)
-  },
-  updateAttributesByPath: function (path, attrs, optCallback) {
-    return promiser(files.updateAttributesByPath(path, attrs), optCallback)
-  },
-  trashById: function (id, optCallback) {
-    return promiser(files.trashById(id), optCallback)
-  },
-  statById: function (id, optCallback) {
-    return promiser(files.statById(id), optCallback)
-  },
-  statByPath: function (path, optCallback) {
-    return promiser(files.statByPath(path), optCallback)
-  },
-  downloadById: function (id, optCallback) {
-    return promiser(files.downloadById(id), optCallback)
-  },
-  downloadByPath: function (path, optCallback) {
-    return promiser(files.downloadByPath(path), optCallback)
-  }
-}
+const AuthNone = 0
+const AuthRunning = 1
+const AuthError = 2
+const AuthOK = 3
 
-let authProto = {
-  Client: auth.Client,
-  AccessToken: auth.AccessToken,
-  registerClient: function (client, optCallback) {
-    return promiser(auth.registerClient(client), optCallback)
-  },
-  getClient: function (client, token, optCallback) {
-    return promiser(auth.getClient(client, token), optCallback)
-  },
-  getAuthCodeURL: function (client, scopes = [], optCallback) {
-    return promiser(auth.getAuthCodeURL(client, scopes), optCallback)
-  },
-  getAccessToken: function (client, state, pageURL = '', optCallback) {
-    return promiser(auth.getAccessToken(client, state, pageURL), optCallback)
-  },
-  refreshToken: function (client, token, optCallback) {
-    return promiser(auth.refreshToken(client, token), optCallback)
-  }
-}
-
-let cozy = {
-  init: function (opts, optCallback) {
-    return promiser(init(opts), optCallback)
-  },
-  // create(doctype, attributes) add a document to the database
-  create: function (doctype, attributes, optCallback) {
-    return promiser(crud.create(doctype, attributes), optCallback)
-  },
-  // find(doctype, id) retrieve a document by its doctype & ID.
-  find: function (doctype, id, optCallback) {
-    return promiser(crud.find(doctype, id), optCallback)
-  },
-  update: function (doctype, doc, changes, optCallback) {
-    return promiser(crud.update(doctype, doc, changes), optCallback)
-  },
-  delete: function (doctype, doc, optCallback) {
-    return promiser(crud._delete(doctype, doc), optCallback)
-  },
-  defineIndex: function (doctype, indexDef, optCallback) {
-    return promiser(mango.defineIndex(doctype, indexDef), optCallback)
-  },
-  query: function (indexRef, query, optCallback) {
-    return promiser(mango.query(indexRef, query), optCallback)
-  },
-  // updateAttributes(doctype, id, changes) performs a patch.
-  updateAttribute: function (doctype, id, changes, optCallback) {
-    return promiser(crud.updateAttributes(doctype, id, changes), optCallback)
-  },
-  // aliased delete to destroy fo browser-sdk compatibility
-  destroy: function (doctype, doc, optCallback) {
+const mainProto = {
+  create: crud.create,
+  find: crud.find,
+  update: crud.update,
+  delete: crud._delete,
+  updateAttributes: crud.updateAttributes,
+  defineIndex: mango.defineIndex,
+  query: mango.query,
+  destroy: function (...args) {
     warn('destroy is deprecated, use cozy.delete instead.')
-    return promiser(crud._delete(doctype, doc), optCallback)
-  },
-
-  auth: authProto,
-  files: filesProto
+    return crud._delete(...args)
+  }
 }
 
-if ((typeof window) !== 'undefined') window.cozy = cozy
+const authProto = {
+  registerClient: auth.registerClient,
+  getClient: auth.getClient,
+  getAuthCodeURL: auth.getAuthCodeURL,
+  getAccessToken: auth.getAccessToken,
+  refreshToken: auth.refreshToken
+}
+
+const filesProto = {
+  create: files.create,
+  createDirectory: files.createDirectory,
+  updateById: files.updateById,
+  updateAttributesById: files.updateAttributesById,
+  updateAttributesByPath: files.updateAttributesByPath,
+  trashById: files.trashById,
+  statById: files.statById,
+  statByPath: files.statByPath,
+  downloadById: files.downloadById,
+  downloadByPath: files.downloadByPath
+}
+
+class Cozy {
+  constructor (options) {
+    this.files = {}
+    this.auth = {
+      Client: auth.Client,
+      AccessToken: auth.AccessToken
+    }
+    const disablePromises = !!(options && options.disablePromises)
+    addToProto(this, this, mainProto, disablePromises)
+    addToProto(this, this.auth, authProto, disablePromises)
+    addToProto(this, this.files, filesProto, disablePromises)
+    this.init(options)
+  }
+
+  init (options = {}) {
+    this._authstate = AuthNone
+    this._authcreds = null
+    this.isV2 = (options.isV2 === true)
+    this.storage = null
+
+    const creds = options.credentials
+    if (creds) {
+      if (!(creds.client instanceof auth.Client) ||
+          !(creds.token instanceof auth.AccessToken)) {
+        throw new Error('Bad credentials')
+      }
+      this._authstate = AuthOK
+      this._authcreds = Promise.resolve(creds)
+    }
+
+    if (options.credentialsStorage) {
+      this.storage = options.credentialsStorage
+    }
+
+    this._pageURL = options.pageURL || ''
+    this._createClient = options.createClient || nopCreateClient
+    this._onRegistered = options.onRegistered || nopOnRegistered
+
+    let url = options.url || ''
+    while (url[url.length - 1] === '/') {
+      url = url.slice(0, -1)
+    }
+
+    this.url = url
+  }
+
+  authorize () {
+    const state = this._authstate
+    if (state === AuthOK || state === AuthRunning) {
+      return this._authcreds
+    }
+
+    this._authstate = AuthRunning
+    if (this.isV2) {
+      this._authcreds = getAccessTokenV2()
+    } else if (this.storage) {
+      this._authcreds = auth.oauthFlow(
+        this,
+        this.storage,
+        this._pageURL,
+        this._createClient,
+        this._onRegistered
+      )
+    } else {
+      return Promise.reject(new Error('Missing credentials'))
+    }
+
+    this._authcreds.then(
+      () => { this._authstate = AuthOK },
+      () => { this._authstate = AuthError })
+
+    return this._authcreds
+  }
+
+  saveCredentials (client, token) {
+    const creds = {client, token}
+    if (!this.storage || this._authstate === AuthRunning) {
+      return Promise.resolve(creds)
+    }
+    this.storage.save(auth.CredsKey, creds)
+    this._authcreds = Promise.resolve(creds)
+    return this._authcreds
+  }
+
+  fullpath (path) {
+    const pathprefix = this.isV2 ? '/ds-api' : ''
+    return this.url + pathprefix + path
+  }
+
+  checkIfV2 () {
+    return cozyFetchJSON(cozy, 'GET', '/status/')
+      .then((status) => status.datasystem !== undefined)
+  }
+}
+
+function nopCreateClient () {
+  throw new Error('No "createClient" function given')
+}
+
+function nopOnRegistered () {}
+
+function protoify (context, fn) {
+  return function prototyped (...args) {
+    return fn(context, ...args)
+  }
+}
+
+function addToProto (ctx, obj, proto, disablePromises) {
+  for (const attr in proto) {
+    let fn = protoify(ctx, proto[attr])
+    if (disablePromises) {
+      fn = unpromiser(fn)
+    }
+    obj[attr] = fn
+  }
+}
+
+const cozy = new Cozy()
 
 export default cozy
+export { Cozy, LocalStorage, MemoryStorage }
+
+if ((typeof window) !== 'undefined') {
+  window.cozy = cozy
+  window.Cozy = Cozy
+}

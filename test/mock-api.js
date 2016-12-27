@@ -4,27 +4,25 @@ const ROUTES = [
   {
     name: 'Status',
     method: 'GET',
-    matcher: '/status/',
-    response: { 'couchdb': 'ok' }
+    matcher: /\/status\/$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        'couchdb': 'ok'
+      }
+    }
   },
   {
     name: 'GetDoc',
     method: 'GET',
-    matcher: '/data/io.cozy.testobject/42',
+    matcher: /\/data\/io.cozy.testobject\/42$/,
     response: {
-      '_id': '42',
-      '_rev': '1-5444878785445',
-      'test': 'value'
-    }
-  },
-  {
-    name: 'CreateDoc',
-    method: 'POST',
-    matcher: '/data/io.cozy.testobject/',
-    response: {
-      '_id': '42',
-      '_rev': '1-5444878785445',
-      'data': {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
         '_id': '42',
         '_rev': '1-5444878785445',
         'test': 'value'
@@ -32,53 +30,92 @@ const ROUTES = [
     }
   },
   {
+    name: 'CreateDoc',
+    method: 'POST',
+    matcher: /\/data\/io.cozy.testobject\/$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        '_id': '42',
+        '_rev': '1-5444878785445',
+        'data': {
+          '_id': '42',
+          '_rev': '1-5444878785445',
+          'test': 'value'
+        }
+      }
+    }
+  },
+  {
     name: 'UpdateDoc',
     method: 'PUT',
-    matcher: '/data/io.cozy.testobject/42',
+    matcher: /\/data\/io.cozy.testobject\/42$/,
     response: {
-      '_id': '42',
-      '_rev': '2-5444878785445',
-      'data': {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
         '_id': '42',
         '_rev': '2-5444878785445',
-        'test': 'value2'
+        'data': {
+          '_id': '42',
+          '_rev': '2-5444878785445',
+          'test': 'value2'
+        }
       }
     }
   },
   {
     name: 'DeleteDoc',
     method: 'DELETE',
-    matcher: '/data/io.cozy.testobject/42?rev=1-5444878785445',
+    matcher: /\/data\/io.cozy.testobject\/42\?rev=1-5444878785445$/,
     response: {
-      'id': '42',
-      'rev': '1-5444878785445'
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        'id': '42',
+        'rev': '1-5444878785445'
+      }
     }
   },
   {
     name: 'CreateIndex',
     method: 'POST',
-    matcher: '/data/io.cozy.testobject/_index',
+    matcher: /\/data\/io.cozy.testobject\/_index$/,
     response: {
-      'id': '_design/generatedindexname',
-      'name': 'generatedindexname',
-      'result': 'created'
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        'id': '_design/generatedindexname',
+        'name': 'generatedindexname',
+        'result': 'created'
+      }
     }
   },
   {
     name: 'FindDocuments',
     method: 'POST',
-    matcher: '/data/io.cozy.testobject/_find',
+    matcher: /\/data\/io.cozy.testobject\/_find$/,
     response: {
-      'docs': [
-        {'_id': '42', 'test': 'value'},
-        {'_id': '43', 'test': 'value'}
-      ]
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        'docs': [
+          {'_id': '42', 'test': 'value'},
+          {'_id': '43', 'test': 'value'}
+        ]
+      }
     }
   },
   {
     name: 'UploadFile',
     method: 'POST',
-    matcher: /^\/files\/.*Type=file.*/,
+    matcher: /\/files\/.*Type=file.*$/,
     response: {
       headers: {
         'content-type': 'application/vnd.api+json'
@@ -108,7 +145,7 @@ const ROUTES = [
   {
     name: 'CreateDirectory',
     method: 'POST',
-    matcher: /^\/files\/.*Type=directory.*/,
+    matcher: /\/files\/.*Type=directory.*$/,
     response: {
       headers: {
         'content-type': 'application/vnd.api+json'
@@ -133,7 +170,7 @@ const ROUTES = [
   {
     name: 'Trash',
     method: 'DELETE',
-    matcher: /^\/files\//,
+    matcher: /\/files\/[^/]*$/,
     response: {
       headers: {
         'content-type': 'application/vnd.api+json'
@@ -158,7 +195,7 @@ const ROUTES = [
   {
     name: 'UpdateAttributes',
     method: 'PATCH',
-    matcher: /^\/files\//,
+    matcher: /\/files\/[^/]*$/,
     response: {
       headers: {
         'content-type': 'application/vnd.api+json'
@@ -183,7 +220,7 @@ const ROUTES = [
   {
     name: 'StatByPath',
     method: 'GET',
-    matcher: /^\/files\/metadata/,
+    matcher: /\/files\/metadata[^/]*$/,
     response: {
       headers: {
         'content-type': 'application/vnd.api+json'
@@ -208,7 +245,7 @@ const ROUTES = [
   {
     name: 'StatByID',
     method: 'GET',
-    matcher: '/files/id42',
+    matcher: /\/files\/id42$/,
     response: {
       headers: {
         'content-type': 'application/vnd.api+json'
@@ -233,13 +270,13 @@ const ROUTES = [
   {
     name: 'DownloadByID',
     method: 'GET',
-    matcher: '/files/download/id42',
+    matcher: /\/files\/download\/id42$/,
     response: 'foo'
   },
   {
     name: 'DownloadByPath',
     method: 'GET',
-    matcher: /^\/files\/download\?Path/,
+    matcher: /\/files\/download\?Path=.*$/,
     response: 'foo'
   },
   {
@@ -247,11 +284,17 @@ const ROUTES = [
     method: 'POST',
     matcher: /\/auth\/register$/,
     response: (url, opts) => {
-      return Object.assign(JSON.parse(opts.body), {
+      const body = Object.assign(JSON.parse(opts.body), {
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789'
       })
+      return {
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: body
+      }
     }
   },
   {
@@ -259,13 +302,19 @@ const ROUTES = [
     method: 'GET',
     matcher: /\/auth\/register\/123$/,
     response: (url, opts) => {
-      return {
+      const body = {
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
         redirect_uris: ['http://coucou/'],
         software_id: 'id',
         client_name: 'client'
+      }
+      return {
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: body
       }
     }
   },
@@ -274,10 +323,15 @@ const ROUTES = [
     method: 'POST',
     matcher: /\/auth\/access_token$/,
     response: {
-      token_type: 'Bearer',
-      access_token: '123',
-      refresh_token: '456',
-      scope: 'a b'
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        token_type: 'Bearer',
+        access_token: '123',
+        refresh_token: '456',
+        scope: 'a b'
+      }
     }
   }
 ]
