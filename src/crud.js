@@ -12,8 +12,13 @@ export function create (cozy, doctype, attributes) {
 
   const path = createPath(cozy, doctype)
   return cozyFetchJSON(cozy, 'POST', path, attributes)
-    .then((resp) => cozy.isV2 ? find(cozy, doctype, resp._id) : resp)
-    .then((resp) => resp.data)
+    .then((resp) => {
+      if (cozy.isV2) {
+        return find(cozy, doctype, resp._id)
+      } else {
+        return resp.data
+      }
+    })
 }
 
 export function find (cozy, doctype, id) {
@@ -25,7 +30,13 @@ export function find (cozy, doctype, id) {
 
   const path = createPath(cozy, doctype, id)
   return cozyFetchJSON(cozy, 'GET', path)
-    .then((resp) => cozy.isV2 ? Object.assign(resp, {_rev: NOREV}) : resp)
+    .then((resp) => {
+      if (cozy.isV2) {
+        return Object.assign(resp, {_rev: NOREV})
+      } else {
+        return resp
+      }
+    })
 }
 
 export function update (cozy, doctype, doc, changes) {
@@ -49,19 +60,24 @@ export function update (cozy, doctype, doc, changes) {
 
   const path = createPath(cozy, doctype, _id)
   return cozyFetchJSON(cozy, 'PUT', path, changes)
-    .then((resp) => cozy.isV2 ? find(cozy, doctype, _id) : resp)
-    .then((resp) => resp.data)
+    .then((resp) => {
+      if (cozy.isV2) {
+        return find(cozy, doctype, _id)
+      } else {
+        return resp.data
+      }
+    })
 }
 
 export function updateAttributes (cozy, doctype, _id, changes, tries = 3) {
   doctype = normalizeDoctype(cozy, doctype)
   return find(cozy, doctype, _id)
     .then((doc) => {
-      return update(doctype, doc, Object.assign({ _id }, doc, changes))
+      return update(cozy, doctype, doc, Object.assign({ _id }, doc, changes))
     })
     .catch((err) => {
       if (tries > 0) {
-        return updateAttributes(doctype, _id, changes, tries - 1)
+        return updateAttributes(cozy, doctype, _id, changes, tries - 1)
       } else {
         throw err
       }
