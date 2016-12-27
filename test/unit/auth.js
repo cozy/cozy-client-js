@@ -2,32 +2,38 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import cozy from '../../src'
+import {Cozy} from '../../src'
 import mock from '../mock-api'
 import {decodeQuery} from '../../src/utils'
+import {fakeCredentials} from '../helpers'
 
 describe('Authentication', function () {
+  let cozy
+
+  beforeEach(() => {
+    cozy = new Cozy({ url: 'http://foobar/' })
+  })
+
   describe('Client', function () {
     it('should be defined', function () {
       cozy.auth.Client.should.be.type('function')
     })
 
     it('should create a client', function () {
-      const client = new cozy.auth.Client('http://foobar/', {
+      const client = new cozy.auth.Client({
         redirectURI: 'http://coucou/',
         softwareID: 'id',
         clientName: 'client'
       })
 
       client.should.be.instanceOf(cozy.auth.Client)
-      client.url.should.be.type('string')
       client.redirectURI.should.be.type('string')
       client.softwareID.should.be.type('string')
       client.clientName.should.be.type('string')
     })
 
     it('should create a client from API data', function () {
-      const client = new cozy.auth.Client('http://foobar/', {
+      const client = new cozy.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -41,7 +47,6 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      client.url.should.be.type('string')
       client.clientID.should.be.type('string')
       client.clientSecret.should.be.type('string')
       client.registrationAccessToken.should.be.type('string')
@@ -73,7 +78,6 @@ describe('Authentication', function () {
 
     it('works', async function () {
       const client = await cozy.auth.registerClient({
-        url: 'http://coucou/',
         redirectURI: 'http://coucou/',
         softwareID: 'id',
         clientName: 'client'
@@ -89,8 +93,12 @@ describe('Authentication', function () {
     before(mock.mockAPI('AuthGetClient'))
 
     it('works', async function () {
+      cozy = new Cozy({
+        url: 'http://foobar/',
+        credentials: fakeCredentials()
+      })
+
       const client = await cozy.auth.getClient({
-        url: 'http://coucou/',
         clientID: '123',
         clientSecret: 'blabla',
         redirectURI: 'http://coucou/',
@@ -109,7 +117,7 @@ describe('Authentication', function () {
 
   describe('getAuthCodeURL', function () {
     it('works', function () {
-      const client = new cozy.auth.Client('http://foobar////', {
+      const client = new cozy.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -141,7 +149,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('AccessToken'))
 
     it('works', async function () {
-      const client = new cozy.auth.Client('http://foobar////', {
+      const client = new cozy.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -171,7 +179,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('AccessToken'))
 
     it('works', async function () {
-      const client = new cozy.auth.Client('http://foobar////', {
+      const client = new cozy.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',

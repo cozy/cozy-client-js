@@ -2,21 +2,26 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import cozy from '../../src'
-import fetch from 'isomorphic-fetch'
+import 'isomorphic-fetch'
+import {Cozy} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
-global.fetch = fetch
 
-const TARGET = process.env && process.env.TARGET || ''
+const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
+const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
 
 describe('crud API', function () {
   let docID = null
   let docRev = null
+  let cozy
 
-  describe('Config', function () {
-    if (TARGET === 'http://localhost:9104') before(mockTokenRetrieve)
-    it('When called against a real instance', async function () {
-      await cozy.init({ target: TARGET })
+  if (COZY_STACK_VERSION === '2') {
+    before(mockTokenRetrieve)
+  }
+
+  beforeEach(() => {
+    cozy = new Cozy({
+      url: COZY_STACK_URL,
+      isV2: COZY_STACK_VERSION === '2'
     })
   })
 

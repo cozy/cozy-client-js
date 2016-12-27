@@ -1,12 +1,14 @@
-/* global fetch, btoa */
+/* global btoa */
 import {encodeQuery, decodeQuery} from './utils'
+import {cozyFetchJSON, FetchError} from './fetch'
 
-const stateSize = 16
+const StateSize = 16
+
+export const CredsKey = 'creds'
+export const StateKey = 'state'
 
 export class Client {
-  constructor (url, opts) {
-    this.url = url || ''
-
+  constructor (opts) {
     this.clientID = opts.clientID || opts.client_id || ''
     this.clientSecret = opts.clientSecret || opts.client_secret || ''
     this.registrationAccessToken = opts.registrationAccessToken || opts.registration_access_token || ''
@@ -26,9 +28,6 @@ export class Client {
     this.logoURI = opts.logoURI || opts.logo_uri || ''
     this.policyURI = opts.policyURI || opts.policy_uri || ''
 
-    if (this.url === '') {
-      throw new Error('Missing url attribute')
-    }
     if (this.redirectURI === '') {
       throw new Error('Missing redirectURI field')
     }
@@ -37,10 +36,6 @@ export class Client {
     }
     if (this.clientName === '') {
       throw new Error('Missing clientName field')
-    }
-
-    while (this.url[this.url.length - 1] === '/') {
-      this.url = this.url.slice(0, -1)
     }
   }
 
@@ -79,50 +74,42 @@ export class AccessToken {
   }
 }
 
-export function registerClient (client) {
+export function registerClient (cozy, client) {
   if (!(client instanceof Client)) {
-    client = new Client(client.url, client)
+    client = new Client(client)
   }
   if (client.isRegistered()) {
     return Promise.reject(new Error('Client already registered'))
   }
-  return fetch(`${client.url}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(client.toRegisterJSON())
+  return cozyFetchJSON(cozy, 'POST', '/auth/register', client.toRegisterJSON(), {
+    disableAuth: true
   })
-    .then(handleResponse)
-    .then((data) => new Client(client.url, data))
+    .then((data) => new Client(data))
 }
 
 // getClient will retrive the registered client informations from the server.
-export function getClient (client) {
+export function getClient (cozy, client) {
   if (!(client instanceof Client)) {
-    client = new Client(client.url, client)
+    client = new Client(client)
   }
   if (!client.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  return fetch(`${client.url}/auth/register/${client.clientID}`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Authorization': client.toAuthHeader()
+  return cozyFetchJSON(cozy, 'GET', `/auth/register/${client.clientID}`, {
+    manualAuthCredentials: {
+      client: client,
+      token: client
     }
   })
-    .then(handleResponse)
-    .then((data) => new Client(client.url, data))
+    .then((data) => new Client(data))
 }
 
 // getAuthCodeURL returns a pair {authURL,state} given a registered client. The
 // state should be stored in order to be checked against on the user validation
 // phase.
-export function getAuthCodeURL (client, scopes = []) {
+export function getAuthCodeURL (cozy, client, scopes = []) {
   if (!(client instanceof Client)) {
-    client = new Client(client.url, client)
+    client = new Client(client)
   }
   if (!client.isRegistered()) {
     throw new Error('Client not registered')
@@ -136,7 +123,7 @@ export function getAuthCodeURL (client, scopes = []) {
     'scope': scopes.join(' ')
   }
   return {
-    url: `${client.url}/auth/authorize?${encodeQuery(query)}`,
+    url: `${cozy.url}/auth/authorize?${encodeQuery(query)}`,
     state: state
   }
 }
@@ -148,15 +135,18 @@ export function getAuthCodeURL (client, scopes = []) {
 // This method extracts the access code and state from the given URL. By
 // default it uses window.location.href. Also, it checks the given state with
 // the one specified in the URL query parameter to prevent CSRF attacks.
-export function getAccessToken (client, state, pageURL = '') {
-  if (pageURL === '' && typeof document !== 'undefined') {
-    pageURL = window.location.href
+export function getAccessToken (cozy, client, state, pageURL = '') {
+  if (!state) {
+    return Promise.reject(new Error('Missing state value'))
   }
-  const queries = decodeQuery(pageURL)
+  const queries = getGrantCodeFromPageURL(pageURL)
+  if (queries === null) {
+    return Promise.reject(new Error('Missing states from current URL'))
+  }
   if (state !== queries['state']) {
     return Promise.reject(new Error('Given state does not match url query state'))
   }
-  return retrieveToken(client, {
+  return retrieveToken(cozy, client, null, {
     'grant_type': 'authorization_code',
     'code': queries['access_code']
   })
@@ -164,35 +154,118 @@ export function getAccessToken (client, state, pageURL = '') {
 
 // refreshToken perform a request on the access_token entrypoint with the
 // refresh_token grant type in order to refresh the given token.
-export function refreshToken (client, token) {
-  return retrieveToken(client, {
+export function refreshToken (cozy, client, token) {
+  return retrieveToken(cozy, client, token, {
     'grant_type': 'refresh_token',
     'code': token.refreshToken
   })
 }
 
+// oauthFlow perform the stateful registration and access granting of an OAuth
+// client.
+export function oauthFlow (cozy, storage, pageURL, createClient, onRegistered) {
+  function clearAndRetry () {
+    return storage.clear().then(() =>
+      oauthFlow(cozy, storage, pageURL, createClient, onRegistered))
+  }
+
+  function registerNewClient () {
+    const {client: unregisteredClient, scopes} = createClient()
+
+    return storage.clear()
+      .then(() => registerClient(cozy, unregisteredClient))
+      .then((client) => {
+        const {url, state} = getAuthCodeURL(cozy, client, scopes)
+        return storage.save(StateKey, {client, url, state}).then(() => {
+          onRegistered(client, url)
+          // return a promise that never resolves
+          return new Promise(() => {})
+        })
+      })
+  }
+
+  function saveCreds (creds) {
+    storage.delete(StateKey)
+    return storage.save(CredsKey, creds).then(() => creds)
+  }
+
+  return Promise.all([
+    storage.load(CredsKey),
+    storage.load(StateKey)
+  ]).then(([creds, state]) => {
+    // The cache is empty, we initiate the client registration.
+    if (!creds && !state) {
+      return registerNewClient()
+    }
+
+    let authFlow
+    if (creds) {
+      // If a credentials are cached we re-fetch the registered client with the
+      // said token. Fetching the client, if the token is outdated we should
+      // try the token is refreshed.
+      const {client, token} = creds
+      authFlow = getClient(cozy, client)
+        .then((client) => ({client, token}))
+    } else {
+      // Try to get granted of a token if the state is already filled.
+      const {client, state: value, url} = state
+      if (!getGrantCodeFromPageURL(pageURL)) {
+        onRegistered(client, url)
+        // return a promise that never resolves
+        return new Promise(() => {})
+      }
+
+      authFlow = getAccessToken(cozy, client, value, pageURL)
+        .then((token) => ({client, token}))
+    }
+
+    // If the auth flow is rejected with a 401 error, we clear the cache and
+    // restart the entire registration flow.
+    return authFlow.then(saveCreds, (err) => {
+      if ((err instanceof FetchError) && err.isUnauthorised()) {
+        return clearAndRetry()
+      } else {
+        throw err
+      }
+    })
+  })
+}
+
 // retrieveToken perform a request on the access_token entrypoint in order to
 // fetch a token.
-function retrieveToken (client, query) {
+function retrieveToken (cozy, client, token, query) {
   if (!(client instanceof Client)) {
-    client = new Client(client.url, client)
+    client = new Client(client)
   }
   if (!client.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  return fetch(`${client.url}/auth/access_token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Accept': 'application/json'
-    },
-    body: encodeQuery(Object.assign({}, query, {
-      'client_id': client.clientID,
-      'client_secret': client.clientSecret
-    }))
+  const body = encodeQuery(Object.assign({}, query, {
+    'client_id': client.clientID,
+    'client_secret': client.clientSecret
+  }))
+  return cozyFetchJSON(cozy, 'POST', '/auth/access_token', body, {
+    disableAuth: (token === null),
+    manualAuthCredentials: { client, token },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   })
-    .then(handleResponse)
     .then((data) => new AccessToken(data))
+}
+
+// getGrantCodeFromPageURL extract the state and access_code query parameters
+// from the given url
+function getGrantCodeFromPageURL (pageURL = '') {
+  if (pageURL === '' && typeof window !== 'undefined') {
+    pageURL = window.location.href
+  }
+  const queries = decodeQuery(pageURL)
+  if (!queries.hasOwnProperty('state')) {
+    return null
+  }
+  return {
+    state: queries['state'],
+    code: queries['access_code']
+  }
 }
 
 // generateRandomState will try to generate a 128bits random value from a secure
@@ -203,12 +276,15 @@ function generateRandomState () {
   if (typeof window !== 'undefined' &&
       typeof window.crypto !== 'undefined' &&
       typeof window.crypto.getRandomValues === 'function') {
-    buffer = new Uint8Array(stateSize)
+    buffer = new Uint8Array(StateSize)
     window.crypto.getRandomValues(buffer)
-  } else if (typeof require === 'function') {
-    buffer = require('crypto').randomBytes(stateSize)
   } else {
-    buffer = new Array(stateSize)
+    try {
+      buffer = require('crypto').randomBytes(StateSize)
+    } catch (e) {}
+  }
+  if (!buffer) {
+    buffer = new Array(StateSize)
     for (let i = 0; i < buffer.length; i++) {
       buffer[i] = Math.floor((Math.random() * 255))
     }
@@ -217,11 +293,4 @@ function generateRandomState () {
     .replace(/=+$/, '')
     .replace(/\//g, '_')
     .replace(/\+/g, '-')
-}
-
-function handleResponse (res) {
-  if (!res.ok) {
-    return res.text().then(txt => { throw txt })
-  }
-  return res.json()
 }

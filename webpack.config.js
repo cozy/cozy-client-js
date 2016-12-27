@@ -4,11 +4,13 @@ var nodeExternals = require('webpack-node-externals')
 var path = require('path')
 var webpack = require('webpack')
 
+var NODE_ENV = process.env.NODE_ENV
+var NODE_TARGET = process.env.NODE_TARGET || 'web'
+
 var config = {
-  entry: ['whatwg-fetch', 'regenerator-runtime/runtime', path.join(__dirname, 'src', 'index.js')],
+  entry: ['isomorphic-fetch', path.join(__dirname, 'src', 'index.js')],
   devtool: 'source-map',
-  target: 'node',
-  bail: true,
+  target: NODE_TARGET,
   output: {
     path: path.join(__dirname, '/dist'),
     filename: 'cozy-client.js',
@@ -30,13 +32,16 @@ var config = {
       }
     ]
   },
+  node: {
+    "crypto": false
+  },
   resolve: {
     root: path.resolve('./src'),
     extensions: ['', '.js']
-  }
+  },
 }
 
-if (process.env.NODE_ENV === 'test') {
+if (NODE_TARGET === 'node') {
   config.externals = [nodeExternals()]
   config.plugins = [
     new webpack.ProvidePlugin({ 'btoa': 'btoa' }),

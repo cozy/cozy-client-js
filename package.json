@@ -4,12 +4,13 @@
   "description": "Javascript library to interact with a cozy",
   "main": "src/index.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production NODE_TARGET=web webpack",
+    "watch": "NODE_ENV=production NODE_TARGET=web webpack --watch",
     "lint": "standard './src/**/*.js' './test/**/*.js' webpack.config.js",
     "test": "npm run test:unit && npm run test:v2 && npm run test:v3",
-    "test:unit": "NODE_ENV=test mocha-webpack 'test/unit/**.js'",
-    "test:v2": "NODE_ENV=test TARGET=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
-    "test:v3": "NODE_ENV=test TARGET=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
+    "test:unit": "NODE_ENV=test NODE_TARGET=node mocha-webpack 'test/unit/**.js'",
+    "test:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
+    "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
     "clean": "rm -r dist && rm -r .tmp"
   },
   "repository": {
@@ -48,8 +49,7 @@
     "standard": "8.6.0",
     "standard-loader": "5.0.0",
     "webpack": "1.13.3",
-    "webpack-node-externals": "1.5.4",
-    "whatwg-fetch": "1.0.0"
+    "webpack-node-externals": "1.5.4"
   },
   "/#######################################################": "",
   "# this repo works as a cozy v2 client-side application #": "",

@@ -1,10 +1,10 @@
-/* global fetch Blob File */
-import {waitConfig, doFetch, doFetchJSON} from './utils'
+/* global Blob, File */
+import {cozyFetch, cozyFetchJSON} from './fetch'
 import jsonapi from './jsonapi'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
-async function doUpload (config, data, contentType, method, path) {
+function doUpload (cozy, data, contentType, method, path) {
   if (!data) {
     throw new Error('missing data argument')
   }
@@ -35,8 +35,7 @@ async function doUpload (config, data, contentType, method, path) {
     }
   }
 
-  const target = config.target || ''
-  return fetch(`${target}${path}`, {
+  return cozyFetch(cozy, path, {
     method: method,
     headers: { 'Content-Type': contentType },
     body: data
@@ -51,9 +50,7 @@ async function doUpload (config, data, contentType, method, path) {
     })
 }
 
-export async function create (data, options) {
-  const config = await waitConfig({ nocompat: true })
-
+export function create (cozy, data, options) {
   let {name, dirID, contentType} = options || {}
 
   // handle case where data is a file and contains the name
@@ -67,13 +64,11 @@ export async function create (data, options) {
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=file`
-  return doUpload(config, data, contentType, 'POST', `${path}${query}`)
+  return doUpload(cozy, data, contentType, 'POST', `${path}${query}`)
 }
 
-export async function createDirectory (options) {
-  const config = await waitConfig({ nocompat: true })
-
-  let {name, dirID} = options || {}
+export function createDirectory (cozy, options) {
+  const {name, dirID} = options || {}
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
@@ -81,75 +76,60 @@ export async function createDirectory (options) {
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=directory`
-  return doFetchJSON(config, 'POST', `${path}${query}`)
+  return cozyFetchJSON(cozy, 'POST', `${path}${query}`)
 }
 
-export async function updateById (id, data, options) {
-  const config = await waitConfig({ nocompat: true })
+export function updateById (cozy, id, data, options) {
   const {contentType} = options || {}
-  return doUpload(config, data, contentType, 'PUT', `/files/${encodeURIComponent(id)}`)
+  return doUpload(cozy, data, contentType, 'PUT', `/files/${encodeURIComponent(id)}`)
 }
 
-export async function updateAttributesById (id, attrs) {
-  const config = await waitConfig({ nocompat: true })
-
+export function updateAttributesById (cozy, id, attrs) {
   if (!attrs || typeof attrs !== 'object') {
     throw new Error('missing attrs argument')
   }
 
   const body = { data: { attributes: attrs } }
-  return doFetchJSON(config, 'PATCH',
+  return cozyFetchJSON(cozy, 'PATCH',
     `/files/${encodeURIComponent(id)}`, body)
 }
 
-export async function updateAttributesByPath (path, attrs) {
-  const config = await waitConfig({ nocompat: true })
-
+export function updateAttributesByPath (cozy, path, attrs) {
   if (!attrs || typeof attrs !== 'object') {
     throw new Error('missing attrs argument')
   }
 
   const body = { data: { attributes: attrs } }
-  return doFetchJSON(config, 'PATCH',
+  return cozyFetchJSON(cozy, 'PATCH',
     `/files/metadata?Path=${encodeURIComponent(path)}`, body)
 }
 
-export async function trashById (id) {
-  const config = await waitConfig({ nocompat: true })
-
+export function trashById (cozy, id) {
   if (typeof id !== 'string' || id === '') {
     throw new Error('missing id argument')
   }
-
-  return doFetchJSON(config, 'DELETE', `/files/${encodeURIComponent(id)}`)
+  return cozyFetchJSON(cozy, 'DELETE', `/files/${encodeURIComponent(id)}`)
 }
 
-export async function statById (id) {
-  const config = await waitConfig({ nocompat: true })
-  const res = await doFetchJSON(config, 'GET',
-    `/files/${encodeURIComponent(id)}`)
-  res.isDir = isDir(res)
-  return res
+export function statById (cozy, id) {
+  return cozyFetchJSON(cozy, 'GET', `/files/${encodeURIComponent(id)}`)
+    .then(addIsDir)
 }
 
-export async function statByPath (path) {
-  const config = await waitConfig({ nocompat: true })
-  const res = await doFetchJSON(config, 'GET',
-    `/files/metadata?Path=${encodeURIComponent(path)}`)
-  res.isDir = isDir(res)
-  return res
+export function statByPath (cozy, path) {
+  return cozyFetchJSON(cozy, 'GET', `/files/metadata?Path=${encodeURIComponent(path)}`)
+    .then(addIsDir)
 }
 
-export async function downloadById (id) {
-  const config = await waitConfig({ nocompat: true })
-  return doFetch(config, 'GET', `/files/download/${encodeURIComponent(id)}`)
+export function downloadById (cozy, id) {
+  return cozyFetch(cozy, `/files/download/${encodeURIComponent(id)}`)
 }
 
-export async function downloadByPath (path) {
-  const config = await waitConfig({ nocompat: true })
-  return doFetch(config, 'GET', `/files/download?Path=${encodeURIComponent(path)}`)
+export function downloadByPath (cozy, path) {
+  return cozyFetch(cozy, `/files/download?Path=${encodeURIComponent(path)}`)
 }
 
-function isDir (obj) {
-  return obj.attributes.type === 'directory'
+function addIsDir (obj) {
+  obj.isDir = obj.attributes.type === 'directory'
+  return obj
 }

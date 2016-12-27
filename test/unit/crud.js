@@ -2,19 +2,20 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import cozy from '../../src'
+import {Cozy} from '../../src'
 import mock from '../mock-api'
+import {fakeCredentials} from '../helpers'
 
 describe('crud API', function () {
-  afterEach(() => mock.restore())
+  let cozy
 
-  describe('Init', function () {
-    before(mock.mockAPI('Status'))
-
-    it('Does nothing', async function () {
-      await cozy.init()
+  beforeEach(() => {
+    cozy = new Cozy({
+      url: 'http://my.cozy.io///',
+      credentials: fakeCredentials()
     })
   })
+  afterEach(() => mock.restore())
 
   describe('Create document', function () {
     before(mock.mockAPI('CreateDoc'))
@@ -24,7 +25,7 @@ describe('crud API', function () {
       const created = await cozy.create('io.cozy.testobject', testDoc)
 
       mock.calls('CreateDoc').should.have.length(1)
-      mock.lastUrl('CreateDoc').should.equal('/data/io.cozy.testobject/')
+      mock.lastUrl('CreateDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/')
       mock.lastOptions('CreateDoc').should.have.property('body',
         '{"test":"value"}'
       )
@@ -42,7 +43,7 @@ describe('crud API', function () {
       let fetched = await cozy.find('io.cozy.testobject', '42')
 
       mock.calls('GetDoc').should.have.length(1)
-      mock.lastUrl('GetDoc').should.equal('/data/io.cozy.testobject/42')
+      mock.lastUrl('GetDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/42')
       mock.lastOptions('GetDoc').should.not.have.property('body')
 
       fetched.should.have.property('_id', '42')
@@ -59,7 +60,7 @@ describe('crud API', function () {
       const updated = await cozy.update('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' }, changes)
 
       mock.calls('UpdateDoc').should.have.length(1)
-      mock.lastUrl('UpdateDoc').should.equal('/data/io.cozy.testobject/42')
+      mock.lastUrl('UpdateDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/42')
       mock.lastOptions('UpdateDoc').should.have.property('body',
         '{"_id":"42","_rev":"1-5444878785445","test":"value2"}'
       )
@@ -101,7 +102,7 @@ describe('crud API', function () {
       const deleted = await cozy.delete('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' })
 
       mock.calls('DeleteDoc').should.have.length(1)
-      mock.lastUrl('DeleteDoc').should.equal('/data/io.cozy.testobject/42?rev=1-5444878785445')
+      mock.lastUrl('DeleteDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/42?rev=1-5444878785445')
       mock.lastOptions('DeleteDoc').should.not.have.property('body')
 
       deleted.should.have.property('id', '42')

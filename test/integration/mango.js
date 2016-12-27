@@ -2,12 +2,12 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import cozy from '../../src'
-import fetch from 'isomorphic-fetch'
+import 'isomorphic-fetch'
+import {Cozy} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
-global.fetch = fetch
 
-const TARGET = process.env && process.env.TARGET || ''
+const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
+const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
 const DOCTYPE = 'io.cozy.testobject2'
 
 let docs = [
@@ -21,11 +21,17 @@ let docs = [
 describe('mango API', function () {
   let indexOnGroup = null
   let indexOnGroupAndYear = null
+  let cozy
 
-  if (TARGET === 'http://localhost:9104') before(mockTokenRetrieve)
+  if (COZY_STACK_VERSION === '2') {
+    before(mockTokenRetrieve)
+  }
 
   before(async function () {
-    await cozy.init({ target: TARGET })
+    cozy = new Cozy({
+      url: COZY_STACK_URL,
+      isV2: COZY_STACK_VERSION === '2'
+    })
     for (var i = 0, l = docs.length; i < l; i++) {
       docs[i] = await cozy.create(DOCTYPE, docs[i])
     }
