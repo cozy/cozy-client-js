@@ -5,6 +5,7 @@ import should from 'should'
 import 'isomorphic-fetch'
 import {Cozy} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
+import {fakeCredentials} from '../helpers'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
@@ -25,13 +26,22 @@ describe('mango API', function () {
 
   if (COZY_STACK_VERSION === '2') {
     before(mockTokenRetrieve)
+    before(function () {
+      cozy = new Cozy({
+        url: COZY_STACK_URL,
+        isV2: true
+      })
+    })
+  } else {
+    before(function () {
+      cozy = new Cozy({
+        url: COZY_STACK_URL,
+        credentials: fakeCredentials()
+      })
+    })
   }
 
   before(async function () {
-    cozy = new Cozy({
-      url: COZY_STACK_URL,
-      isV2: COZY_STACK_VERSION === '2'
-    })
     for (var i = 0, l = docs.length; i < l; i++) {
       docs[i] = await cozy.create(DOCTYPE, docs[i])
     }

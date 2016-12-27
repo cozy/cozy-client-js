@@ -5,6 +5,7 @@ import should from 'should'
 import 'isomorphic-fetch'
 import {Cozy} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
+import {fakeCredentials} from '../helpers'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
@@ -16,14 +17,20 @@ describe('crud API', function () {
 
   if (COZY_STACK_VERSION === '2') {
     before(mockTokenRetrieve)
-  }
-
-  beforeEach(() => {
-    cozy = new Cozy({
-      url: COZY_STACK_URL,
-      isV2: COZY_STACK_VERSION === '2'
+    beforeEach(() => {
+      cozy = new Cozy({
+        url: COZY_STACK_URL,
+        isV2: true
+      })
     })
-  })
+  } else {
+    beforeEach(() => {
+      cozy = new Cozy({
+        url: COZY_STACK_URL,
+        credentials: fakeCredentials()
+      })
+    })
+  }
 
   describe('Create document', function () {
     it('Works', async function () {

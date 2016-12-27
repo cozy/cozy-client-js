@@ -4,7 +4,7 @@
 import should from 'should'
 import 'isomorphic-fetch'
 import {Cozy} from '../../src'
-import {randomGenerator} from '../helpers'
+import {randomGenerator, fakeCredentials} from '../helpers'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
@@ -17,7 +17,10 @@ describe('files API', async function () {
     if (COZY_STACK_VERSION === '2') {
       this.skip()
     }
-    cozy = new Cozy({ url: COZY_STACK_URL })
+    cozy = new Cozy({
+      url: COZY_STACK_URL,
+      credentials: fakeCredentials()
+    })
     random = randomGenerator()
   })
 
