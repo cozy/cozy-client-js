@@ -189,35 +189,38 @@ export function oauthFlow (cozy, storage, pageURL, createClient, onRegistered) {
     return storage.save(CredsKey, creds).then(() => creds)
   }
 
-  return Promise.all([
-    storage.load(CredsKey),
-    storage.load(StateKey)
-  ]).then(([creds, state]) => {
-    // The cache is empty, we initiate the client registration.
-    if (!creds && !state) {
-      return registerNewClient()
-    }
-
-    let authFlow
-    if (creds) {
-      // If a credentials are cached we re-fetch the registered client with the
-      // said token. Fetching the client, if the token is outdated we should
-      // try the token is refreshed.
-      const {client, token} = creds
-      authFlow = getClient(cozy, client)
-        .then((client) => ({client, token}))
-    } else {
+  function doFlow (credentials, state) {
+    if (!credentials) {
       // Try to get granted of a token if the state is already filled.
-      const {client, state: value, url} = state
       if (!getGrantCodeFromPageURL(pageURL)) {
         onRegistered(client, url)
         // return a promise that never resolves
         return new Promise(() => {})
       }
 
-      authFlow = getAccessToken(cozy, client, value, pageURL)
+      const {client, state: value, url} = state
+      return getAccessToken(cozy, client, value, pageURL)
         .then((token) => ({client, token}))
     }
+
+    // If credentials are cached we re-fetch the registered client with the
+    // said token. Fetching the client, if the token is outdated we should try
+    // the token is refreshed.
+    const {client, token} = credentials
+    return getClient(cozy, client)
+      .then((client) => ({client, token}))
+  }
+
+  return Promise.all([
+    storage.load(CredsKey),
+    storage.load(StateKey)
+  ]).then(([credentials, state]) => {
+    // The cache is empty, we initiate the client registration.
+    if (!credentials && !state) {
+      return registerNewClient()
+    }
+
+    const authFlow = doFlow(credentials, state)
 
     // If the auth flow is rejected with a 401 error, we clear the cache and
     // restart the entire registration flow.

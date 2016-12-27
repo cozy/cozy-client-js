@@ -1,16 +1,7 @@
 export class LocalStorage {
-  constructor (prefix = 'cozy:oauth:', getLocalStorage = () => window.localStorage) {
-    // We try to deref the localstorage, and if it fails (because the user has
-    // deactivated its localstorage for instance) we fallback on a memory
-    // storage.
-    let storage
-    try {
-      storage = getLocalStorage()
-    } catch (e) {
-      storage = memStorage
-    }
-    this.storage = storage
-    this.prefix = prefix
+  constructor (storage, prefix) {
+    this.storage = storage || window.localStorage
+    this.prefix = prefix || 'cozy:oauth:'
   }
 
   save (key, value) {
@@ -50,49 +41,29 @@ export class LocalStorage {
 
 export class MemoryStorage {
   constructor () {
-    this.hash = {}
+    this.hash = Object.create(null)
   }
 
   save (key, value) {
-    return Promise.resolve(this.hash[key] = value)
+    this.hash[key] = value
+    return Promise.resolve(value)
   }
 
   load (key) {
-    return Promise.resolve(this.hash[key])
+    let value
+    if (this.hash.hasOwnProperty(key)) {
+      value = this.hash[key]
+    }
+    return Promise.resolve(value)
   }
 
   delete (key) {
-    return Promise.resolve(delete this.hash[key])
+    delete this.hash[key]
+    return Promise.resolve()
   }
 
   clear () {
-    return Promise.resolve(this.hash = {})
-  }
-}
-
-const memStorage = {
-  _h: {},
-  _k: [],
-  length: 0,
-  setItem (key, value) {
-    if (!this._h.hasOwnProperty(key)) {
-      this._k.push(key)
-      this.length++
-    }
-    this._h[key] = value
-  },
-  getItem (key) {
-    return this._h[key]
-  },
-  removeItem (key) {
-    if (delete this._h[key]) {
-      this._k.splice(this._k.indexOf(key), 1)
-      this.length--
-      return true
-    }
-    return false
-  },
-  key (index) {
-    return this._k[index]
+    this.hash = Object.create(null)
+    return Promise.resolve()
   }
 }
