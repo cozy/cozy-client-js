@@ -1,6 +1,9 @@
 export class LocalStorage {
   constructor (storage, prefix) {
-    this.storage = storage || window.localStorage
+    if (!storage && typeof window !== 'undefined') {
+      storage = window.localStorage
+    }
+    this.storage = storage
     this.prefix = prefix || 'cozy:oauth:'
   }
 

@@ -29,7 +29,7 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
 
     return retry(() => refreshToken(cozy, client, token), 3)()
       .then((newToken) => cozy.saveCredentials(client, newToken))
-      .then((newToken) => cozyFetchWithAuth(fullpath, options, newToken))
+      .then((credentials) => cozyFetchWithAuth(cozy, fullpath, options, credentials))
   })
 }
 

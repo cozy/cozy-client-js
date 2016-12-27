@@ -64,7 +64,7 @@ class Cozy {
   init (options = {}) {
     this._authstate = AuthNone
     this._authcreds = null
-    this.isV2 = false
+    this.isV2 = (options.isV2 === true)
     this.storage = null
 
     const creds = options.credentials
@@ -79,12 +79,6 @@ class Cozy {
 
     if (options.credentialsStorage) {
       this.storage = options.credentialsStorage
-    } else {
-      this.storage = new LocalStorage()
-    }
-
-    if (options.isV2) {
-      this.isV2 = true
     }
 
     this._pageURL = options.pageURL || ''
@@ -101,7 +95,6 @@ class Cozy {
 
   authorize () {
     const state = this._authstate
-
     if (state === AuthOK || state === AuthRunning) {
       return this._authcreds
     }
@@ -109,7 +102,7 @@ class Cozy {
     this._authstate = AuthRunning
     if (this.isV2) {
       this._authcreds = getAccessTokenV2()
-    } else {
+    } else if (this.storage) {
       this._authcreds = auth.oauthFlow(
         this,
         this.storage,
@@ -117,6 +110,8 @@ class Cozy {
         this._createClient,
         this._onRegistered
       )
+    } else {
+      return Promise.reject(new Error('Missing credentials'))
     }
 
     this._authcreds.then(
@@ -127,12 +122,12 @@ class Cozy {
   }
 
   saveCredentials (client, token) {
-    if (this.storage === null || this._authstate === AuthRunning) {
-      return this._authcreds
+    const creds = {client, token}
+    if (!this.storage || this._authstate === AuthRunning) {
+      return Promise.resolve(creds)
     }
-    const data = {client, token}
-    this.storage.save(auth.CredsKey, data)
-    this._authcreds = Promise.resolve(data)
+    this.storage.save(auth.CredsKey, creds)
+    this._authcreds = Promise.resolve(creds)
     return this._authcreds
   }
 
