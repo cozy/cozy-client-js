@@ -30,15 +30,15 @@ export function retry (fn, count, delay = 300) {
         throw err
       }
       return sleep(getBackedoffDelay(delay, count))
-        .then(doTry)
+        .then(() => doTry(...args))
     })
   }
 }
 
-var FUZZ_FACTOR = 0.3
+const FUZZ_FACTOR = 0.3
 
 export function getFuzzedDelay (retryDelay) {
-  var fuzzingFactor = ((Math.random() * 2) - 1) * FUZZ_FACTOR
+  const fuzzingFactor = ((Math.random() * 2) - 1) * FUZZ_FACTOR
   return retryDelay * (1.0 + fuzzingFactor)
 }
 

@@ -9,8 +9,8 @@ export default function mockTokenRetrieve () {
     if (payload.action === 'getToken' && origin === 'fakecozy.local') {
       listener({
         data: {
-          appName: process.env.NAME || 'fakeapp',
-          token: process.env.TOKEN || 'faketoken'
+          appName: process.env.NAME,
+          token: process.env.TOKEN
         }
       })
     }

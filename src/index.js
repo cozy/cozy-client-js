@@ -132,7 +132,7 @@ class Cozy {
   }
 
   fullpath (path) {
-    const pathprefix = cozy.isV2 ? '/ds-api' : ''
+    const pathprefix = this.isV2 ? '/ds-api' : ''
     return this.url + pathprefix + path
   }
 
