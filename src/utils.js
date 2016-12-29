@@ -1,20 +1,26 @@
+const FuzzFactor = 0.3
+
 export function unpromiser (fn) {
   return function (...args) {
-    const promise = fn.apply(this, args)
-    if (!promise || typeof promise.then !== 'function') {
-      return promise
+    const value = fn.apply(this, args)
+    if (!isPromise(value)) {
+      return value
     }
     const l = args.length
     if (l === 0 || typeof args[l - 1] !== 'function') {
-      return null
+      return
     }
     const cb = args[l - 1]
-    promise.then(
+    value.then(
       (res) => cb(null, res),
       (err) => cb(err, null)
     )
-    return null
+    return
   }
+}
+
+export function isPromise (value) {
+  return !!value && typeof value.then === 'function'
 }
 
 export function sleep (time, args) {
@@ -35,10 +41,8 @@ export function retry (fn, count, delay = 300) {
   }
 }
 
-const FUZZ_FACTOR = 0.3
-
 export function getFuzzedDelay (retryDelay) {
-  const fuzzingFactor = ((Math.random() * 2) - 1) * FUZZ_FACTOR
+  const fuzzingFactor = ((Math.random() * 2) - 1) * FuzzFactor
   return retryDelay * (1.0 + fuzzingFactor)
 }
 
@@ -111,39 +115,6 @@ export function decodeQuery (url) {
     }
   }
   return queries
-}
-
-const KNOWN_DOCTYPES = {
-  'files': 'io.cozy.files',
-  'folder': 'io.cozy.files',
-  'contact': 'io.cozy.contacts',
-  'event': 'io.cozy.events',
-  'track': 'io.cozy.labs.music.track',
-  'playlist': 'io.cozy.labs.music.playlist'
-}
-
-const REVERSE_KNOWN = {}
-
-Object.keys(KNOWN_DOCTYPES).forEach(k => {
-  REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k
-})
-
-export function normalizeDoctype (cozy, doctype) {
-  let isQualified = doctype.indexOf('.') !== -1
-  if (cozy.isV2 && isQualified) {
-    let known = REVERSE_KNOWN[doctype]
-    if (known) return known
-    return doctype.replace(/\./g, '-')
-  }
-  if (!cozy.isV2 && !isQualified) {
-    let known = KNOWN_DOCTYPES[doctype]
-    if (known) {
-      warn('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + known)
-      return known
-    }
-    throw new Error('Doctype ' + doctype + ' should be qualified.')
-  }
-  return doctype
 }
 
 const warned = []

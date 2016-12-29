@@ -538,17 +538,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var crud = _interopRequireWildcard(_crud);
 	
-	var _mango = __webpack_require__(11);
+	var _mango = __webpack_require__(12);
 	
 	var mango = _interopRequireWildcard(_mango);
 	
-	var _files = __webpack_require__(12);
+	var _files = __webpack_require__(13);
 	
 	var files = _interopRequireWildcard(_files);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var AccessTokenV3 = auth.AccessToken,
+	    ClientV3 = auth.Client;
+	
 	
 	var AuthNone = 0;
 	var AuthRunning = 1;
@@ -596,8 +600,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this.files = {};
 	    this.auth = {
-	      Client: auth.Client,
-	      AccessToken: auth.AccessToken
+	      Client: ClientV3,
+	      AccessToken: AccessTokenV3,
+	      AccessTokenV2: _auth_v.AccessToken,
+	      LocalStorage: _auth_storage.LocalStorage,
+	      MemoryStorage: _auth_storage.MemoryStorage
 	    };
 	    var disablePromises = !!(options && options.disablePromises);
 	    addToProto(this, this, mainProto, disablePromises);
@@ -618,9 +625,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var creds = options.credentials;
 	      if (creds) {
-	        if (!(creds.client instanceof auth.Client) || !(creds.token instanceof auth.AccessToken)) {
+	        var client = creds.client,
+	            token = creds.token;
+	
+	        var isV3Credentials = client instanceof ClientV3 && token instanceof AccessTokenV3;
+	
+	        var isV2Credentials = token instanceof _auth_v.AccessToken;
+	
+	        if (this.isV2 && !isV2Credentials) {
 	          throw new Error('Bad credentials');
 	        }
+	        if (!this.isV2 && !isV3Credentials) {
+	          throw new Error('Bad credentials');
+	        }
+	
 	        this._authstate = AuthOK;
 	        this._authcreds = Promise.resolve(creds);
 	      }
@@ -745,6 +763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.unpromiser = unpromiser;
+	exports.isPromise = isPromise;
 	exports.sleep = sleep;
 	exports.retry = retry;
 	exports.getFuzzedDelay = getFuzzedDelay;
@@ -752,30 +771,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.createPath = createPath;
 	exports.encodeQuery = encodeQuery;
 	exports.decodeQuery = decodeQuery;
-	exports.normalizeDoctype = normalizeDoctype;
 	exports.warn = warn;
+	var FuzzFactor = 0.3;
+	
 	function unpromiser(fn) {
 	  return function () {
 	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	      args[_key] = arguments[_key];
 	    }
 	
-	    var promise = fn.apply(this, args);
-	    if (!promise || typeof promise.then !== 'function') {
-	      return promise;
+	    var value = fn.apply(this, args);
+	    if (!isPromise(value)) {
+	      return value;
 	    }
 	    var l = args.length;
 	    if (l === 0 || typeof args[l - 1] !== 'function') {
-	      return null;
+	      return;
 	    }
 	    var cb = args[l - 1];
-	    promise.then(function (res) {
+	    value.then(function (res) {
 	      return cb(null, res);
 	    }, function (err) {
 	      return cb(err, null);
 	    });
-	    return null;
+	    return;
 	  };
+	}
+	
+	function isPromise(value) {
+	  return !!value && typeof value.then === 'function';
 	}
 	
 	function sleep(time, args) {
@@ -803,10 +827,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 	
-	var FUZZ_FACTOR = 0.3;
-	
 	function getFuzzedDelay(retryDelay) {
-	  var fuzzingFactor = (Math.random() * 2 - 1) * FUZZ_FACTOR;
+	  var fuzzingFactor = (Math.random() * 2 - 1) * FuzzFactor;
 	  return retryDelay * (1.0 + fuzzingFactor);
 	}
 	
@@ -884,39 +906,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	  return queries;
-	}
-	
-	var KNOWN_DOCTYPES = {
-	  'files': 'io.cozy.files',
-	  'folder': 'io.cozy.files',
-	  'contact': 'io.cozy.contacts',
-	  'event': 'io.cozy.events',
-	  'track': 'io.cozy.labs.music.track',
-	  'playlist': 'io.cozy.labs.music.playlist'
-	};
-	
-	var REVERSE_KNOWN = {};
-	
-	Object.keys(KNOWN_DOCTYPES).forEach(function (k) {
-	  REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k;
-	});
-	
-	function normalizeDoctype(cozy, doctype) {
-	  var isQualified = doctype.indexOf('.') !== -1;
-	  if (cozy.isV2 && isQualified) {
-	    var known = REVERSE_KNOWN[doctype];
-	    if (known) return known;
-	    return doctype.replace(/\./g, '-');
-	  }
-	  if (!cozy.isV2 && !isQualified) {
-	    var _known = KNOWN_DOCTYPES[doctype];
-	    if (_known) {
-	      warn('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + _known);
-	      return _known;
-	    }
-	    throw new Error('Doctype ' + doctype + ' should be qualified.');
-	  }
-	  return doctype;
 	}
 	
 	var warned = [];
@@ -1600,8 +1589,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'delete',
 	    value: function _delete(key) {
-	      delete this.hash[key];
-	      return Promise.resolve();
+	      var deleted = delete this.hash[key];
+	      return Promise.resolve(deleted);
 	    }
 	  }, {
 	    key: 'clear',
@@ -1709,12 +1698,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(4);
 	
+	var _doctypes = __webpack_require__(11);
+	
 	var _fetch = __webpack_require__(5);
 	
 	var NOREV = 'stack-v2-no-rev';
 	
 	function create(cozy, doctype, attributes) {
-	  doctype = (0, _utils.normalizeDoctype)(cozy, doctype);
+	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
 	
 	  if (cozy.isV2) {
 	    attributes.docType = doctype;
@@ -1731,7 +1722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function find(cozy, doctype, id) {
-	  doctype = (0, _utils.normalizeDoctype)(cozy, doctype);
+	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
 	
 	  if (!id) {
 	    return Promise.reject(new Error('Missing id parameter'));
@@ -1748,7 +1739,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function update(cozy, doctype, doc, changes) {
-	  doctype = (0, _utils.normalizeDoctype)(cozy, doctype);
+	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
 	
 	  var _id = doc._id,
 	      _rev = doc._rev;
@@ -1781,7 +1772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function updateAttributes(cozy, doctype, _id, changes) {
 	  var tries = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 3;
 	
-	  doctype = (0, _utils.normalizeDoctype)(cozy, doctype);
+	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
 	  return find(cozy, doctype, _id).then(function (doc) {
 	    return update(cozy, doctype, doc, Object.assign({ _id: _id }, doc, changes));
 	  }).catch(function (err) {
@@ -1794,7 +1785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function _delete(cozy, doctype, doc) {
-	  doctype = (0, _utils.normalizeDoctype)(cozy, doctype);
+	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
 	
 	  var _id = doc._id,
 	      _rev = doc._rev;
@@ -1828,6 +1819,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.normalizeDoctype = normalizeDoctype;
+	
+	var _utils = __webpack_require__(4);
+	
+	var KNOWN_DOCTYPES = {
+	  'files': 'io.cozy.files',
+	  'folder': 'io.cozy.files',
+	  'contact': 'io.cozy.contacts',
+	  'event': 'io.cozy.events',
+	  'track': 'io.cozy.labs.music.track',
+	  'playlist': 'io.cozy.labs.music.playlist'
+	};
+	
+	var REVERSE_KNOWN = {};
+	Object.keys(KNOWN_DOCTYPES).forEach(function (k) {
+	  REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k;
+	});
+	
+	function normalizeDoctype(cozy, doctype) {
+	  var isQualified = doctype.indexOf('.') !== -1;
+	  if (cozy.isV2 && isQualified) {
+	    var known = REVERSE_KNOWN[doctype];
+	    if (known) return known;
+	    return doctype.replace(/\./g, '-');
+	  }
+	  if (!cozy.isV2 && !isQualified) {
+	    var _known = KNOWN_DOCTYPES[doctype];
+	    if (_known) {
+	      (0, _utils.warn)('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + _known);
+	      return _known;
+	    }
+	    throw new Error('Doctype ' + doctype + ' should be qualified.');
+	  }
+	  return doctype;
+	}
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -1841,10 +1877,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(4);
 	
+	var _doctypes = __webpack_require__(11);
+	
 	var _fetch = __webpack_require__(5);
 	
 	function defineIndex(cozy, doctype, fields) {
-	  doctype = (0, _utils.normalizeDoctype)(cozy, doctype);
+	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
 	  if (!Array.isArray(fields) || fields.length === 0) {
 	    throw new Error('defineIndex fields should be a non-empty array');
 	  }
@@ -2085,7 +2123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

@@ -1,4 +1,5 @@
-import {createPath, normalizeDoctype} from './utils'
+import {createPath} from './utils'
+import {normalizeDoctype} from './doctypes'
 import {cozyFetchJSON} from './fetch'
 
 const NOREV = 'stack-v2-no-rev'

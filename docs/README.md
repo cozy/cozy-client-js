@@ -8,8 +8,7 @@ cozy-client-js is compatible with both cozy architectures.
 **Cozy-client-js is still a work-in-progress. There may be some bugs, if you find any, please open an issue.**
 
 
-Reminder about cozy architectures
----------------------------------
+## Reminder about cozy architectures
 
 There is two actives cozy architectures:
 
@@ -26,8 +25,8 @@ The former javascript library for making client-side application was `cozy-brows
 
 If you already have an application using `cozy-browser-sdk`, you can see what will change in the [transition document](./browser-sdk-transition.md). If you have any doubt, please open an issue!
 
-Include the library in your application
-----------------------
+
+## Include the library in your application
 
 You can `import`/`require` cozy-client-js using npm & webpack
 **TODO** test if `cozy-client-js` compatible with browserify, rollup, ect.
@@ -35,8 +34,7 @@ You can `import`/`require` cozy-client-js using npm & webpack
 You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
 
 
-Doctypes & Permissions
-----------------------
+## Doctypes & Permissions
 
 A doctype is a simple javascript string identifying a type of document.
 Some basic doctypes are provided by cozy, but you can pick your own.
@@ -63,8 +61,7 @@ When you use a doctype, even one created by your application, you need to ask fo
 **TODO** Have some docs about **v2** package.json vs **v3** manifest.webapp
 
 
-Promises & Callbacks
---------------------
+## Promises & Callbacks
 
 All cozy-client-js functions support callback or promise.
 
@@ -85,10 +82,11 @@ try {
 }
 ```
 
-If a callback is provided, NO promise is returned.
-**DO NOT** mix promises and callback in a codebase.
+If for some reason you do not want to use promises, you can pass the `disablePromises` flag to the init function. This way, you will be able to use the functions with a classic callback.
+
 ```javascript
-cozy.create(myBooksDoctype, doc, function(err, result){
+cozy.init({ disablePromises: true })
+cozy.create(myBooksDoctype, doc, function(err, result) {
     if (err) {
       console.log('fail', err);
     } else {
@@ -99,20 +97,45 @@ cozy.create(myBooksDoctype, doc, function(err, result){
 ```
 
 
-Implemented API
----------------
+## Implemented API
+
+
+### `new Cozy(options)`
+
+`new Cozy(options)` returns a new cozy client.
+
+It does return a Cozy instance.
+
+It takes the same options object as the `cozy.init(options)` function.
 
 
 ### `cozy.init(options)`
 
-`cozy.init(options)` setup cozy-client-js and perform the necessary steps to retrieve the application token. Our goal is for you developer to not worry about how the token is retrieved, as it will depend on cozy version and context.
+`cozy.init(options)` setups initialize the global cozy instance.
+
+It does not return a value.
 
 - `options` is an object with the following fields:
-  * `target`: if the cozy you want to speak to is not on the same origin than the app. Useful for test, should not used for app installed inside Cozy.
+  * `url`: absolute url of the cozy stack
+  * `isV2`: boolean indicating if the client is used on a v2 stack
+  * `disablePromises`: boolean to make function that returns promise used with a classical "callback as last argument"
+  * `credentials`: a `{token, client}` object with token instance of `cozy.auth.AccessToken` or `cozy.auth.AccessToken` and client instance of `cozy.auth.Client` or null for v2
+  * `pageURL`: a string of the current page URL or request
+  * `createClient`: a function that return a new client instance used for OAuth client registration (see [OAuth](./oauth.md))
+  * `onRegistered`: a function called after client registration called with client and redirect url used by the user to authorize the client (see [OAuth](./oauth.md))
+  * `credentialsStorage`: a storage instance respecting the Storage interface (see [OAuth](./oauth.md))
 
 ```javascript
-await cozy.init()
-// let's do something
+cozy.init({
+  url: 'http://my.cozy.local',
+  isV2: false,
+  disablePromises: false,
+  credentials: null,
+  pageURL: window.location.href,
+  createClient: () => return new cozy.auth.Client({/*...*/}),
+  onRegistered: (client, url) => window.location.replace(url),
+  credentialsStorage: new cozy.auth.LocalStorage(window.localStorage)
+})
 ```
 
 
@@ -131,9 +154,8 @@ If you use an existing doctype, you should follow its expected format. **v2** do
 
 ```javascript
 // simple object
-var book = { title: "Moby Dick", author:"Herman Melville", isbn: "42" }
-
-created = await cozy.create(myBooksDoctype, book)
+const book = { title: "Moby Dick", author:"Herman Melville", isbn: "42" }
+const created = await cozy.create(myBooksDoctype, book)
 // same fields
 console.log(created.title, created.author, created.isbn)
 // _id, _rev are added
@@ -155,7 +177,7 @@ If the document does not exist, the promise will reject or the callback will be 
 - `id` is a string specifying the identifier of the document you search for
 
 ```javascript
-doc = await cozy.find(myBooksDoctype, createdBookId)
+const doc = await cozy.find(myBooksDoctype, createdBookId)
 console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
@@ -175,8 +197,8 @@ If the document current `_rev` does not match the passed one, it means there is 
 - `newdoc` is an object, specifying the new content of the document
 
 ```javascript
-var updates = { title: "Moby Dick !", author:"THE Herman Melville"}
-updated = await cozy.update(myBooksDoctype, doc, updates)
+const updates = { title: "Moby Dick !", author:"THE Herman Melville"}
+const updated = await cozy.update(myBooksDoctype, doc, updates)
 console.log(updated._id === doc._id) // _id does not change
 console.log(updated._rev) // 2-xxxxxx
 console.log(updated.title, updated.year) // fields are changed
@@ -199,8 +221,8 @@ This function gives 3 attempts not to conflict.
 - `changes` is an object
 
 ```javascript
-var updates = { year: 1852}
-updated = await cozy.updateAttributes(myBooksDoctype, id, updates)
+const updates = { year: 1852}
+const updated = await cozy.updateAttributes(myBooksDoctype, id, updates)
 console.log(updated._id === doc._id) // _id does not change
 console.log(updated._rev) // 3-xxxxxx
 console.log(updated.year) // fields are changed
@@ -236,7 +258,7 @@ It returns a promise for an **indexReference**, which can be passed to `cozy.que
 **Warning**: when used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries. Because of this, more complex queries are not (yet) supported with **v2**.
 
 ```javascript
-booksByYearRef = await cozy.defineIndex(myType, ['year', 'rating'])
+const booksByYearRef = await cozy.defineIndex(myType, ['year', 'rating'])
 ```
 
 
@@ -254,7 +276,7 @@ It returns a promise with a list of documents matching the query. Results will b
 **Warning**: complex mango queries are not, and may never be compatible with **v2**
 
 ```javascript
-results = await cozy.query(booksByYearRef, {
+const results = await cozy.query(booksByYearRef, {
   "selector": {year: 1851},
   "limit": 3,
   "skip": 1
@@ -279,7 +301,7 @@ It returns a promise for the document of the file created.
   * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
 
-**Warning**: this API is not V2 compatible.
+**Warning**: this API is not v2 compatible.
 
 ```javascript
 const created = await cozy.files.create(blob, {

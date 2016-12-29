@@ -1,11 +1,13 @@
 import {unpromiser, warn} from './utils'
 import {cozyFetchJSON} from './fetch'
 import {LocalStorage, MemoryStorage} from './auth_storage'
-import {getAccessToken as getAccessTokenV2} from './auth_v2'
+import {AccessToken as AccessTokenV2, getAccessToken as getAccessTokenV2} from './auth_v2'
 import * as auth from './auth_v3'
 import * as crud from './crud'
 import * as mango from './mango'
 import * as files from './files'
+
+const {AccessToken: AccessTokenV3, Client: ClientV3} = auth
 
 const AuthNone = 0
 const AuthRunning = 1
@@ -51,8 +53,11 @@ class Cozy {
   constructor (options) {
     this.files = {}
     this.auth = {
-      Client: auth.Client,
-      AccessToken: auth.AccessToken
+      Client: ClientV3,
+      AccessToken: AccessTokenV3,
+      AccessTokenV2: AccessTokenV2,
+      LocalStorage: LocalStorage,
+      MemoryStorage: MemoryStorage
     }
     const disablePromises = !!(options && options.disablePromises)
     addToProto(this, this, mainProto, disablePromises)
@@ -69,10 +74,21 @@ class Cozy {
 
     const creds = options.credentials
     if (creds) {
-      if (!(creds.client instanceof auth.Client) ||
-          !(creds.token instanceof auth.AccessToken)) {
+      const {client, token} = creds
+      const isV3Credentials = (
+        (client instanceof ClientV3) &&
+        (token instanceof AccessTokenV3))
+
+      const isV2Credentials = (
+        (token instanceof AccessTokenV2))
+
+      if (this.isV2 && !isV2Credentials) {
         throw new Error('Bad credentials')
       }
+      if (!this.isV2 && !isV3Credentials) {
+        throw new Error('Bad credentials')
+      }
+
       this._authstate = AuthOK
       this._authcreds = Promise.resolve(creds)
     }
