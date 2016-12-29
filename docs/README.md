@@ -82,7 +82,7 @@ try {
 }
 ```
 
-If for some reason you do not want to use promises, you can pass the `disablePromises` flag to the init function. This way, you will be able to use the function with a classic callback.
+If for some reason you do not want to use promises, you can pass the `disablePromises` flag to the init function. This way, you will be able to use the functions with a classic callback.
 
 ```javascript
 cozy.init({ disablePromises: true })
@@ -111,7 +111,7 @@ It takes the same options object as the `cozy.init(options)` function.
 
 ### `cozy.init(options)`
 
-`cozy.init(options)` setups initialize the globla cozy instance.
+`cozy.init(options)` setups initialize the global cozy instance.
 
 It does not return a value.
 

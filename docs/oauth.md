@@ -1,6 +1,6 @@
 This document describes in more details how to use this library along with OAuth.
 
-The library proposes to ways to perform OAuth: one manual and requires you to handle state the way you see fit using the cozy.auth.* methods, the other is automated and stateful and implements many details of the OAuth registration and authorization flow for you.
+The library proposes two ways to perform OAuth: one manual that requires you to handle state the way you see fit using the cozy.auth.* methods, the other is automated and stateful and implements many details of the OAuth registration and authorization flow for you.
 
 Here we describe the automated and stateful method.
 
@@ -34,7 +34,7 @@ cozy.init({ credentialsStorage: new cozy.auth.LocalStorage() })
 
 ### Registration callbacks
 
-In order to handle the registration of the client, two callbacks should be provided the cozy-client-js instance.
+In order to handle the registration of the client, two callbacks should be provided to the cozy-client-js instance.
 
   - `createClient()` which should return an object `{client, scopes}` where client is a valid instance or object of `cozy.auth.Client` and scopes is an array containing the wanted scopes of the application.
   - `onRegistered(client, url)` which should provide the wanted "side effect" after the client registration.
