@@ -1,4 +1,5 @@
-import {warn, createPath, normalizeDoctype} from './utils'
+import {warn, createPath} from './utils'
+import {normalizeDoctype} from './doctypes'
 import {cozyFetchJSON} from './fetch'
 
 export function defineIndex (cozy, doctype, fields) {

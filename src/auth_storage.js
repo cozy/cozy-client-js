@@ -57,8 +57,8 @@ export class MemoryStorage {
   }
 
   delete (key) {
-    delete this.hash[key]
-    return Promise.resolve()
+    const deleted = delete this.hash[key]
+    return Promise.resolve(deleted)
   }
 
   clear () {
