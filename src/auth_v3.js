@@ -139,16 +139,16 @@ export function getAccessToken (cozy, client, state, pageURL = '') {
   if (!state) {
     return Promise.reject(new Error('Missing state value'))
   }
-  const queries = getGrantCodeFromPageURL(pageURL)
-  if (queries === null) {
+  const grantQueries = getGrantCodeFromPageURL(pageURL)
+  if (grantQueries === null) {
     return Promise.reject(new Error('Missing states from current URL'))
   }
-  if (state !== queries['state']) {
+  if (state !== grantQueries.state) {
     return Promise.reject(new Error('Given state does not match url query state'))
   }
   return retrieveToken(cozy, client, null, {
     'grant_type': 'authorization_code',
-    'code': queries['access_code']
+    'code': grantQueries.code
   })
 }
 
