@@ -70,7 +70,6 @@ class Cozy {
     this._authstate = AuthNone
     this._authcreds = null
     this.isV2 = (options.isV2 === true)
-    this.storage = null
 
     const creds = options.credentials
     if (creds) {
@@ -93,20 +92,17 @@ class Cozy {
       this._authcreds = Promise.resolve(creds)
     }
 
-    if (options.credentialsStorage) {
-      this.storage = options.credentialsStorage
-    }
-
-    this._pageURL = options.pageURL || ''
-    this._createClient = options.createClient || nopCreateClient
-    this._onRegistered = options.onRegistered || nopOnRegistered
+    const oauth = options.oauth || {}
+    this._storage = oauth.storage || null
+    this._createClient = oauth.createClient || nopCreateClient
+    this._onRegistered = oauth.onRegistered || nopOnRegistered
 
     let url = options.url || ''
     while (url[url.length - 1] === '/') {
       url = url.slice(0, -1)
     }
 
-    this.url = url
+    this._url = url
   }
 
   authorize () {
@@ -118,16 +114,15 @@ class Cozy {
     this._authstate = AuthRunning
     if (this.isV2) {
       this._authcreds = getAccessTokenV2()
-    } else if (this.storage) {
+    } else if (this._storage) {
       this._authcreds = auth.oauthFlow(
         this,
-        this.storage,
-        this._pageURL,
+        this._storage,
         this._createClient,
         this._onRegistered
       )
     } else {
-      return Promise.reject(new Error('Missing credentials'))
+      return Promise.reject(new Error('No credentials'))
     }
 
     this._authcreds.then(
@@ -139,17 +134,17 @@ class Cozy {
 
   saveCredentials (client, token) {
     const creds = {client, token}
-    if (!this.storage || this._authstate === AuthRunning) {
+    if (!this._storage || this._authstate === AuthRunning) {
       return Promise.resolve(creds)
     }
-    this.storage.save(auth.CredsKey, creds)
+    this._storage.save(auth.CredsKey, creds)
     this._authcreds = Promise.resolve(creds)
     return this._authcreds
   }
 
   fullpath (path) {
     const pathprefix = this.isV2 ? '/ds-api' : ''
-    return this.url + pathprefix + path
+    return this._url + pathprefix + path
   }
 
   checkIfV2 () {

@@ -7,17 +7,25 @@ var webpack = require('webpack')
 var NODE_ENV = process.env.NODE_ENV
 var NODE_TARGET = process.env.NODE_TARGET || 'web'
 
+var output = {
+  path: path.join(__dirname, '/dist'),
+}
+
+if (NODE_TARGET === "web") {
+  output.filename = 'cozy-client.js'
+  output.library = 'cozy-client-js'
+  output.libraryTarget = 'umd'
+  output.umdNamedDefine = true
+} else {
+  output.filename = 'cozy-client.node.js'
+  output.libraryTarget = 'commonjs'
+}
+
 var config = {
   entry: ['isomorphic-fetch', path.join(__dirname, 'src', 'index.js')],
   devtool: 'source-map',
   target: NODE_TARGET,
-  output: {
-    path: path.join(__dirname, '/dist'),
-    filename: 'cozy-client.js',
-    library: 'cozy-client-js',
-    libraryTarget: 'umd',
-    umdNamedDefine: true
-  },
+  output: output,
   module: {
     loaders: [
       {
