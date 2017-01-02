@@ -59,14 +59,16 @@ class Cozy {
       LocalStorage: LocalStorage,
       MemoryStorage: MemoryStorage
     }
-    const disablePromises = !!(options && options.disablePromises)
-    addToProto(this, this, mainProto, disablePromises)
-    addToProto(this, this.auth, authProto, disablePromises)
-    addToProto(this, this.files, filesProto, disablePromises)
+    this._inited = false
     this.init(options)
   }
 
   init (options = {}) {
+    if (this._inited) {
+      throw new Error('Already inited instance')
+    }
+
+    this._inited = true
     this._authstate = AuthNone
     this._authcreds = null
     this.isV2 = (options.isV2 === true)
@@ -103,6 +105,11 @@ class Cozy {
     }
 
     this._url = url
+
+    const disablePromises = !!options.disablePromises
+    addToProto(this, this, mainProto, disablePromises)
+    addToProto(this, this.auth, authProto, disablePromises)
+    addToProto(this, this.files, filesProto, disablePromises)
   }
 
   authorize () {
