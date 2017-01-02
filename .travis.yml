@@ -27,7 +27,7 @@ before_script:
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   - $GOPATH/bin/cozy-stack serve --assets=$GOPATH/src/github.com/cozy/cozy-stack/assets &
   - sleep 1
-  - $GOPATH/bin/cozy-stack instances add dev
+  - $GOPATH/bin/cozy-stack instances add --dev "localhost:8080"
   # install stack v2
   - npm install -g coffee-script
   - npm install cozy-data-system cozy-proxy
