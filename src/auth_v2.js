@@ -40,12 +40,6 @@ export class AccessToken {
   constructor (opts) {
     this.appName = opts.appName || ''
     this.token = opts.token || ''
-    if (this.appName === '') {
-      throw new Error('Missing appName parameter')
-    }
-    if (this.token === '') {
-      throw new Error('Missing token parameter')
-    }
   }
 
   toAuthHeader () {
