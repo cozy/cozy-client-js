@@ -32,14 +32,15 @@ The library constructor (on `init` method) should be passed the storage in the `
 In order to handle the registration of the client, two callbacks should be provided to the cozy-client-js instance.
 
   - `clientParams` an object with the following parameters:
-    + `redirectURI`: string; // mandatory
-    + `softwareID`: string;  // mandatory
-    + `softwareVersion`: string;
-    + `clientName`: string;  // mandatory
-    + `clientKind`: string;
-    + `clientURI`: string;
-    + `logoURI`: string;
-    + `policyURI`: string;
+    + `redirectURI`: the URI on which the user is redirected after accepting the client (mandatory)
+    + `softwareID`: identifier of the software (by default `github.com/cozy/cozy-client-js`)
+    + `softwareVersion`: version of the software (optinal)
+    + `clientName`: string (optional)
+    + `clientKind`: string (optional)
+    + `clientURI`: string (optional)
+    + `logoURI`: string (optional)
+    + `policyURI`: string (optional)
+    + `scopes`: array of `key:value` elements representing the permission scopes required by the application that the user should accept (mandatory)
   - `onRegistered(client, url)` which should provide the wanted "side effect" after the client registration and return a promise containing the request URL provided by the user containing the access code and state.
 
 The `onRegistered` callback is called with the registered client and the URL on which the user should go to give access to the application.
