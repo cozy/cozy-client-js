@@ -520,17 +520,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.MemoryStorage = exports.LocalStorage = exports.Cozy = undefined;
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch */
+	
 	
 	var _utils = __webpack_require__(4);
 	
-	var _fetch = __webpack_require__(5);
+	var _auth_storage = __webpack_require__(5);
 	
-	var _auth_storage = __webpack_require__(8);
+	var _auth_v = __webpack_require__(6);
 	
-	var _auth_v = __webpack_require__(9);
-	
-	var _auth_v2 = __webpack_require__(6);
+	var _auth_v2 = __webpack_require__(7);
 	
 	var auth = _interopRequireWildcard(_auth_v2);
 	
@@ -558,6 +557,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var AuthRunning = 1;
 	var AuthError = 2;
 	var AuthOK = 3;
+	
+	var defaultClientParams = {
+	  softwareID: 'github.com/cozy/cozy-client-js'
+	};
 	
 	var mainProto = {
 	  create: crud.create,
@@ -622,7 +625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._inited = true;
 	      this._authstate = AuthNone;
 	      this._authcreds = null;
-	      this.isV2 = options.isV2 === true;
+	      this._version = null;
 	
 	      var creds = options.credentials;
 	      if (creds) {
@@ -633,10 +636,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var isV2Credentials = token instanceof _auth_v.AccessToken;
 	
-	        if (this.isV2 && !isV2Credentials) {
-	          throw new Error('Bad credentials');
-	        }
-	        if (!this.isV2 && !isV3Credentials) {
+	        if (!isV2Credentials && !isV3Credentials) {
 	          throw new Error('Bad credentials');
 	        }
 	
@@ -646,10 +646,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var oauth = options.oauth || {};
 	      this._storage = oauth.storage || null;
-	      this._createClient = oauth.createClient || nopCreateClient;
+	      this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams);
 	      this._onRegistered = oauth.onRegistered || nopOnRegistered;
 	
-	      var url = options.url || '';
+	      var url = options.cozyURL || '';
 	      while (url[url.length - 1] === '/') {
 	        url = url.slice(0, -1);
 	      }
@@ -672,21 +672,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      this._authstate = AuthRunning;
-	      if (this.isV2) {
-	        this._authcreds = (0, _auth_v.getAccessToken)();
-	      } else if (this._storage) {
-	        this._authcreds = auth.oauthFlow(this, this._storage, this._createClient, this._onRegistered);
-	      } else {
-	        return Promise.reject(new Error('No credentials'));
-	      }
+	      return this.isV2().then(function (isV2) {
+	        if (isV2) {
+	          _this._authcreds = (0, _auth_v.getAccessToken)();
+	        } else if (_this._storage) {
+	          _this._authcreds = auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered);
+	        } else {
+	          return Promise.reject(new Error('No credentials'));
+	        }
 	
-	      this._authcreds.then(function () {
-	        _this._authstate = AuthOK;
-	      }, function () {
-	        _this._authstate = AuthError;
+	        _this._authcreds.then(function () {
+	          _this._authstate = AuthOK;
+	        }, function () {
+	          _this._authstate = AuthError;
+	        });
+	
+	        return _this._authcreds;
 	      });
-	
-	      return this._authcreds;
 	    }
 	  }, {
 	    key: 'saveCredentials',
@@ -702,26 +704,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'fullpath',
 	    value: function fullpath(path) {
-	      var pathprefix = this.isV2 ? '/ds-api' : '';
-	      return this._url + pathprefix + path;
+	      var _this2 = this;
+	
+	      return this.isV2().then(function (isV2) {
+	        var pathprefix = isV2 ? '/ds-api' : '';
+	        return _this2._url + pathprefix + path;
+	      });
 	    }
 	  }, {
-	    key: 'checkIfV2',
-	    value: function checkIfV2() {
-	      return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/status/').then(function (status) {
-	        return status.datasystem !== undefined;
-	      });
+	    key: 'isV2',
+	    value: function isV2() {
+	      var _this3 = this;
+	
+	      if (!this._version) {
+	        this._version = (0, _utils.retry)(function () {
+	          return fetch(_this3._url + '/status/');
+	        }, 3)().then(function (res) {
+	          if (!res.ok) {
+	            throw new Error('Could not fetch cozy status');
+	          } else {
+	            return res.json();
+	          }
+	        }).then(function (status) {
+	          return status.datasystem !== undefined;
+	        });
+	      }
+	      return this._version;
 	    }
 	  }]);
 	
 	  return Cozy;
 	}();
 	
-	function nopCreateClient() {
-	  throw new Error('No "createClient" function given');
+	function nopOnRegistered() {
+	  throw new Error('Missing onRegistered callback');
 	}
-	
-	function nopOnRegistered() {}
 	
 	function protoify(context, fn) {
 	  return function prototyped() {
@@ -841,12 +858,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return getFuzzedDelay(retryDelay * Math.pow(2, retryCount - 1));
 	}
 	
-	function createPath(cozy, doctype) {
-	  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-	  var query = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+	function createPath(cozy, isV2, doctype) {
+	  var id = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+	  var query = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 	
 	  var route = '/data/';
-	  if (!cozy.isV2) {
+	  if (!isV2) {
 	    route += encodeURIComponent(doctype) + '/';
 	  }
 	  if (id !== '') {
@@ -921,147 +938,192 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.FetchError = undefined;
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch */
-	
-	
-	exports.cozyFetch = cozyFetch;
-	exports.cozyFetchJSON = cozyFetchJSON;
-	
-	var _auth_v = __webpack_require__(6);
-	
-	var _utils = __webpack_require__(4);
-	
-	var _jsonapi = __webpack_require__(7);
-	
-	var _jsonapi2 = _interopRequireDefault(_jsonapi);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function cozyFetch(cozy, path) {
-	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	var LocalStorage = exports.LocalStorage = function () {
+	  function LocalStorage(storage, prefix) {
+	    _classCallCheck(this, LocalStorage);
 	
-	  var fullpath = cozy.fullpath(path);
-	  var resp = void 0;
-	  if (options.disableAuth) {
-	    resp = fetch(fullpath, options);
-	  } else if (options.manualAuthCredentials) {
-	    resp = cozyFetchWithAuth(cozy, fullpath, options, options.manualAuthCredentials);
-	  } else {
-	    resp = cozy.authorize().then(function (credentials) {
-	      return cozyFetchWithAuth(cozy, fullpath, options, credentials);
-	    });
-	  }
-	  return resp.then(handleResponse);
-	}
-	
-	function cozyFetchWithAuth(cozy, fullpath, options, credentials) {
-	  var client = credentials.client,
-	      token = credentials.token;
-	
-	  options.headers = options.headers || {};
-	  options.headers['Authorization'] = token.toAuthHeader();
-	
-	  return fetch(fullpath, options).then(function (res) {
-	    if (res.status !== 401 || cozy.isV2) {
-	      return res;
+	    if (!storage && typeof window !== 'undefined') {
+	      storage = window.localStorage;
 	    }
+	    this.storage = storage;
+	    this.prefix = prefix || 'cozy:oauth:';
+	  }
 	
-	    return (0, _utils.retry)(function () {
-	      return (0, _auth_v.refreshToken)(cozy, client, token);
-	    }, 3)().then(function (newToken) {
-	      return cozy.saveCredentials(client, newToken);
-	    }).then(function (credentials) {
-	      return cozyFetchWithAuth(cozy, fullpath, options, credentials);
-	    });
-	  });
-	}
+	  _createClass(LocalStorage, [{
+	    key: 'save',
+	    value: function save(key, value) {
+	      var _this = this;
 	
-	function cozyFetchJSON(cozy, method, path, body) {
-	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
-	
-	  options.method = method;
-	
-	  var headers = options.headers = options.headers || {};
-	
-	  headers['Accept'] = 'application/json';
-	
-	  if (body !== undefined) {
-	    if (headers['Content-Type']) {
-	      options.body = body;
-	    } else {
-	      headers['Content-Type'] = 'application/json';
-	      options.body = JSON.stringify(body);
+	      return new Promise(function (resolve) {
+	        _this.storage.setItem(_this.prefix + key, JSON.stringify(value));
+	        resolve(value);
+	      });
 	    }
+	  }, {
+	    key: 'load',
+	    value: function load(key) {
+	      var _this2 = this;
+	
+	      return new Promise(function (resolve) {
+	        var item = _this2.storage.getItem(_this2.prefix + key);
+	        if (!item) {
+	          resolve();
+	        } else {
+	          resolve(JSON.parse(item));
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'delete',
+	    value: function _delete(key) {
+	      var _this3 = this;
+	
+	      return new Promise(function (resolve) {
+	        return resolve(_this3.storage.removeItem(_this3.prefix + key));
+	      });
+	    }
+	  }, {
+	    key: 'clear',
+	    value: function clear() {
+	      var _this4 = this;
+	
+	      return new Promise(function (resolve) {
+	        var storage = _this4.storage;
+	        for (var i = 0; i < storage.length; i++) {
+	          var key = storage.key(i);
+	          if (key.indexOf(_this4.prefix) === 0) {
+	            storage.removeItem(key);
+	          }
+	        }
+	        resolve();
+	      });
+	    }
+	  }]);
+	
+	  return LocalStorage;
+	}();
+	
+	var MemoryStorage = exports.MemoryStorage = function () {
+	  function MemoryStorage() {
+	    _classCallCheck(this, MemoryStorage);
+	
+	    this.hash = Object.create(null);
 	  }
 	
-	  return cozyFetch(cozy, path, options).then(handleJSONResponse);
-	}
-	
-	function handleResponse(res) {
-	  if (res.ok) {
-	    return res;
-	  }
-	  var data = void 0;
-	  var contentType = res.headers.get('content-type');
-	  if (contentType && contentType.indexOf('json') >= 0) {
-	    data = res.json();
-	  } else {
-	    data = res.text();
-	  }
-	  return data.then(function (err) {
-	    throw new FetchError(res, err);
-	  });
-	}
-	
-	function handleJSONResponse(res) {
-	  var contentType = res.headers.get('content-type');
-	  if (!contentType || contentType.indexOf('json') < 0) {
-	    return res.text(function (data) {
-	      throw new FetchError(res, new Error('Response is not JSON: ' + data));
-	    });
-	  }
-	
-	  var json = res.json();
-	  if (contentType.indexOf('application/vnd.api+json') === 0) {
-	    return json.then(_jsonapi2.default);
-	  } else {
-	    return json;
-	  }
-	}
-	
-	var FetchError = exports.FetchError = function () {
-	  function FetchError(res, reason) {
-	    _classCallCheck(this, FetchError);
-	
-	    this.response = res;
-	    this.url = res.url;
-	    this.status = res.status;
-	    this.reason = reason;
-	  }
-	
-	  _createClass(FetchError, [{
-	    key: 'isUnauthorised',
-	    value: function isUnauthorised() {
-	      return this.status === 401;
+	  _createClass(MemoryStorage, [{
+	    key: 'save',
+	    value: function save(key, value) {
+	      this.hash[key] = value;
+	      return Promise.resolve(value);
+	    }
+	  }, {
+	    key: 'load',
+	    value: function load(key) {
+	      return Promise.resolve(this.hash[key]);
+	    }
+	  }, {
+	    key: 'delete',
+	    value: function _delete(key) {
+	      var deleted = delete this.hash[key];
+	      return Promise.resolve(deleted);
+	    }
+	  }, {
+	    key: 'clear',
+	    value: function clear() {
+	      this.hash = Object.create(null);
+	      return Promise.resolve();
 	    }
 	  }]);
 
-	  return FetchError;
+	  return MemoryStorage;
 	}();
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.getAccessToken = getAccessToken;
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	/* global btoa */
+	var V2TOKEN_ABORT_TIMEOUT = 3000;
+	
+	function getAccessToken() {
+	  return new Promise(function (resolve, reject) {
+	    if (typeof window === 'undefined') {
+	      return reject(new Error('getV2Token should be used in browser'));
+	    } else if (!window.parent) {
+	      return reject(new Error('getV2Token should be used in iframe'));
+	    } else if (!window.parent.postMessage) {
+	      return reject(new Error('getV2Token should be used in modern browser'));
+	    }
+	    var origin = window.location.origin;
+	    var intent = { action: 'getToken' };
+	    var timeout = null;
+	    var receiver = function receiver(event) {
+	      var token = void 0;
+	      try {
+	        token = new AccessToken({
+	          appName: event.data.appName,
+	          token: event.data.token
+	        });
+	      } catch (e) {
+	        reject(e);
+	        return;
+	      }
+	      window.removeEventListener('message', receiver);
+	      clearTimeout(timeout);
+	      resolve({ client: null, token: token });
+	    };
+	    window.addEventListener('message', receiver, false);
+	    window.parent.postMessage(intent, origin);
+	    timeout = setTimeout(function () {
+	      reject(new Error('No response from parent iframe after 3s'));
+	    }, V2TOKEN_ABORT_TIMEOUT);
+	  });
+	}
+	
+	var AccessToken = exports.AccessToken = function () {
+	  function AccessToken(opts) {
+	    _classCallCheck(this, AccessToken);
+	
+	    this.appName = opts.appName || '';
+	    this.token = opts.token || '';
+	  }
+	
+	  _createClass(AccessToken, [{
+	    key: 'toAuthHeader',
+	    value: function toAuthHeader() {
+	      return 'Basic ' + btoa(this.appName + ':' + this.token);
+	    }
+	  }]);
+
+	  return AccessToken;
+	}();
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1087,7 +1149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(4);
 	
-	var _fetch = __webpack_require__(5);
+	var _fetch = __webpack_require__(8);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -1232,7 +1294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    'scope': scopes.join(' ')
 	  };
 	  return {
-	    url: cozy.fullpath('/auth/authorize?' + (0, _utils.encodeQuery)(query)),
+	    url: cozy._url + ('/auth/authorize?' + (0, _utils.encodeQuery)(query)),
 	    state: state
 	  };
 	}
@@ -1274,7 +1336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// oauthFlow performs the stateful registration and access granting of an OAuth
 	// client.
-	function oauthFlow(cozy, storage, createClient, onRegistered) {
+	function oauthFlow(cozy, storage, clientParams, onRegistered) {
 	  var tryCount = 0;
 	
 	  function clearAndRetry(err) {
@@ -1282,19 +1344,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw err;
 	    }
 	    return storage.clear().then(function () {
-	      return oauthFlow(cozy, storage, createClient, onRegistered);
+	      return oauthFlow(cozy, storage, clientParams, onRegistered);
 	    });
 	  }
 	
 	  function registerNewClient() {
-	    var _createClient = createClient(),
-	        unregisteredClient = _createClient.client,
-	        scopes = _createClient.scopes;
-	
 	    return storage.clear().then(function () {
-	      return registerClient(cozy, unregisteredClient);
+	      return registerClient(cozy, clientParams);
 	    }).then(function (client) {
-	      var _getAuthCodeURL = getAuthCodeURL(cozy, client, scopes),
+	      var _getAuthCodeURL = getAuthCodeURL(cozy, client, clientParams.scopes),
 	          url = _getAuthCodeURL.url,
 	          state = _getAuthCodeURL.state;
 	
@@ -1425,7 +1483,155 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 7 */
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.FetchError = undefined;
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); /* global fetch */
+	
+	
+	exports.cozyFetch = cozyFetch;
+	exports.cozyFetchJSON = cozyFetchJSON;
+	
+	var _auth_v = __webpack_require__(7);
+	
+	var _utils = __webpack_require__(4);
+	
+	var _jsonapi = __webpack_require__(9);
+	
+	var _jsonapi2 = _interopRequireDefault(_jsonapi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function cozyFetch(cozy, path) {
+	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	
+	  return cozy.fullpath(path).then(function (fullpath) {
+	    var resp = void 0;
+	    if (options.disableAuth) {
+	      resp = fetch(fullpath, options);
+	    } else if (options.manualAuthCredentials) {
+	      resp = cozyFetchWithAuth(cozy, fullpath, options, options.manualAuthCredentials);
+	    } else {
+	      resp = cozy.authorize().then(function (credentials) {
+	        return cozyFetchWithAuth(cozy, fullpath, options, credentials);
+	      });
+	    }
+	    return resp.then(handleResponse);
+	  });
+	}
+	
+	function cozyFetchWithAuth(cozy, fullpath, options, credentials) {
+	  var client = credentials.client,
+	      token = credentials.token;
+	
+	  options.headers = options.headers || {};
+	  options.headers['Authorization'] = token.toAuthHeader();
+	
+	  return Promise.all([cozy.isV2(), fetch(fullpath, options)]).then(function (_ref) {
+	    var _ref2 = _slicedToArray(_ref, 2),
+	        isV2 = _ref2[0],
+	        res = _ref2[1];
+	
+	    if (res.status !== 401 || isV2) {
+	      return res;
+	    }
+	
+	    return (0, _utils.retry)(function () {
+	      return (0, _auth_v.refreshToken)(cozy, client, token);
+	    }, 3)().then(function (newToken) {
+	      return cozy.saveCredentials(client, newToken);
+	    }).then(function (credentials) {
+	      return cozyFetchWithAuth(cozy, fullpath, options, credentials);
+	    });
+	  });
+	}
+	
+	function cozyFetchJSON(cozy, method, path, body) {
+	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+	
+	  options.method = method;
+	
+	  var headers = options.headers = options.headers || {};
+	
+	  headers['Accept'] = 'application/json';
+	
+	  if (body !== undefined) {
+	    if (headers['Content-Type']) {
+	      options.body = body;
+	    } else {
+	      headers['Content-Type'] = 'application/json';
+	      options.body = JSON.stringify(body);
+	    }
+	  }
+	
+	  return cozyFetch(cozy, path, options).then(handleJSONResponse);
+	}
+	
+	function handleResponse(res) {
+	  if (res.ok) {
+	    return res;
+	  }
+	  var data = void 0;
+	  var contentType = res.headers.get('content-type');
+	  if (contentType && contentType.indexOf('json') >= 0) {
+	    data = res.json();
+	  } else {
+	    data = res.text();
+	  }
+	  return data.then(function (err) {
+	    throw new FetchError(res, err);
+	  });
+	}
+	
+	function handleJSONResponse(res) {
+	  var contentType = res.headers.get('content-type');
+	  if (!contentType || contentType.indexOf('json') < 0) {
+	    return res.text(function (data) {
+	      throw new FetchError(res, new Error('Response is not JSON: ' + data));
+	    });
+	  }
+	
+	  var json = res.json();
+	  if (contentType.indexOf('application/vnd.api+json') === 0) {
+	    return json.then(_jsonapi2.default);
+	  } else {
+	    return json;
+	  }
+	}
+	
+	var FetchError = exports.FetchError = function () {
+	  function FetchError(res, reason) {
+	    _classCallCheck(this, FetchError);
+	
+	    this.response = res;
+	    this.url = res.url;
+	    this.status = res.status;
+	    this.reason = reason;
+	  }
+	
+	  _createClass(FetchError, [{
+	    key: 'isUnauthorised',
+	    value: function isUnauthorised() {
+	      return this.status === 401;
+	    }
+	  }]);
+
+	  return FetchError;
+	}();
+
+/***/ },
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1487,192 +1693,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = handleTopLevel;
 
 /***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var LocalStorage = exports.LocalStorage = function () {
-	  function LocalStorage(storage, prefix) {
-	    _classCallCheck(this, LocalStorage);
-	
-	    if (!storage && typeof window !== 'undefined') {
-	      storage = window.localStorage;
-	    }
-	    this.storage = storage;
-	    this.prefix = prefix || 'cozy:oauth:';
-	  }
-	
-	  _createClass(LocalStorage, [{
-	    key: 'save',
-	    value: function save(key, value) {
-	      var _this = this;
-	
-	      return new Promise(function (resolve) {
-	        _this.storage.setItem(_this.prefix + key, JSON.stringify(value));
-	        resolve(value);
-	      });
-	    }
-	  }, {
-	    key: 'load',
-	    value: function load(key) {
-	      var _this2 = this;
-	
-	      return new Promise(function (resolve) {
-	        var item = _this2.storage.getItem(_this2.prefix + key);
-	        if (!item) {
-	          resolve();
-	        } else {
-	          resolve(JSON.parse(item));
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'delete',
-	    value: function _delete(key) {
-	      var _this3 = this;
-	
-	      return new Promise(function (resolve) {
-	        return resolve(_this3.storage.removeItem(_this3.prefix + key));
-	      });
-	    }
-	  }, {
-	    key: 'clear',
-	    value: function clear() {
-	      var _this4 = this;
-	
-	      return new Promise(function (resolve) {
-	        var storage = _this4.storage;
-	        for (var i = 0; i < storage.length; i++) {
-	          var key = storage.key(i);
-	          if (key.indexOf(_this4.prefix) === 0) {
-	            storage.removeItem(key);
-	          }
-	        }
-	        resolve();
-	      });
-	    }
-	  }]);
-	
-	  return LocalStorage;
-	}();
-	
-	var MemoryStorage = exports.MemoryStorage = function () {
-	  function MemoryStorage() {
-	    _classCallCheck(this, MemoryStorage);
-	
-	    this.hash = Object.create(null);
-	  }
-	
-	  _createClass(MemoryStorage, [{
-	    key: 'save',
-	    value: function save(key, value) {
-	      this.hash[key] = value;
-	      return Promise.resolve(value);
-	    }
-	  }, {
-	    key: 'load',
-	    value: function load(key) {
-	      return Promise.resolve(this.hash[key]);
-	    }
-	  }, {
-	    key: 'delete',
-	    value: function _delete(key) {
-	      var deleted = delete this.hash[key];
-	      return Promise.resolve(deleted);
-	    }
-	  }, {
-	    key: 'clear',
-	    value: function clear() {
-	      this.hash = Object.create(null);
-	      return Promise.resolve();
-	    }
-	  }]);
-
-	  return MemoryStorage;
-	}();
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	exports.getAccessToken = getAccessToken;
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	/* global btoa */
-	var V2TOKEN_ABORT_TIMEOUT = 3000;
-	
-	function getAccessToken() {
-	  return new Promise(function (resolve, reject) {
-	    if (typeof window === 'undefined') {
-	      return reject(new Error('getV2Token should be used in browser'));
-	    } else if (!window.parent) {
-	      return reject(new Error('getV2Token should be used in iframe'));
-	    } else if (!window.parent.postMessage) {
-	      return reject(new Error('getV2Token should be used in modern browser'));
-	    }
-	    var origin = window.location.origin;
-	    var intent = { action: 'getToken' };
-	    var timeout = null;
-	    var receiver = function receiver(event) {
-	      var token = void 0;
-	      try {
-	        token = new AccessToken({
-	          appName: event.data.appName,
-	          token: event.data.token
-	        });
-	      } catch (e) {
-	        reject(e);
-	        return;
-	      }
-	      window.removeEventListener('message', receiver);
-	      clearTimeout(timeout);
-	      resolve({ client: null, token: token });
-	    };
-	    window.addEventListener('message', receiver, false);
-	    window.parent.postMessage(intent, origin);
-	    timeout = setTimeout(function () {
-	      reject(new Error('No response from parent iframe after 3s'));
-	    }, V2TOKEN_ABORT_TIMEOUT);
-	  });
-	}
-	
-	var AccessToken = exports.AccessToken = function () {
-	  function AccessToken(opts) {
-	    _classCallCheck(this, AccessToken);
-	
-	    this.appName = opts.appName || '';
-	    this.token = opts.token || '';
-	  }
-	
-	  _createClass(AccessToken, [{
-	    key: 'toAuthHeader',
-	    value: function toAuthHeader() {
-	      return 'Basic ' + btoa(this.appName + ':' + this.token);
-	    }
-	  }]);
-
-	  return AccessToken;
-	}();
-
-/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1691,113 +1711,119 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _doctypes = __webpack_require__(11);
 	
-	var _fetch = __webpack_require__(5);
+	var _fetch = __webpack_require__(8);
 	
 	var NOREV = 'stack-v2-no-rev';
 	
 	function create(cozy, doctype, attributes) {
-	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
-	
-	  if (cozy.isV2) {
-	    attributes.docType = doctype;
-	  }
-	
-	  var path = (0, _utils.createPath)(cozy, doctype);
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, attributes).then(function (resp) {
-	    if (cozy.isV2) {
-	      return find(cozy, doctype, resp._id);
-	    } else {
-	      return resp.data;
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    if (isV2) {
+	      attributes.docType = doctype;
 	    }
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, attributes).then(function (resp) {
+	      if (isV2) {
+	        return find(cozy, doctype, resp._id);
+	      } else {
+	        return resp.data;
+	      }
+	    });
 	  });
 	}
 	
 	function find(cozy, doctype, id) {
-	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
 	
-	  if (!id) {
-	    return Promise.reject(new Error('Missing id parameter'));
-	  }
-	
-	  var path = (0, _utils.createPath)(cozy, doctype, id);
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path).then(function (resp) {
-	    if (cozy.isV2) {
-	      return Object.assign(resp, { _rev: NOREV });
-	    } else {
-	      return resp;
+	    if (!id) {
+	      return Promise.reject(new Error('Missing id parameter'));
 	    }
+	
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, id);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path).then(function (resp) {
+	      if (isV2) {
+	        return Object.assign(resp, { _rev: NOREV });
+	      } else {
+	        return resp;
+	      }
+	    });
 	  });
 	}
 	
 	function update(cozy, doctype, doc, changes) {
-	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    var _id = doc._id,
+	        _rev = doc._rev;
 	
-	  var _id = doc._id,
-	      _rev = doc._rev;
 	
-	
-	  if (!_id) {
-	    return Promise.reject(new Error('Missing _id field in passed document'));
-	  }
-	
-	  if (!cozy.isV2 && !_rev) {
-	    return Promise.reject(new Error('Missing _rev field in passed document'));
-	  }
-	
-	  if (cozy.isV2) {
-	    changes = Object.assign({ _id: _id }, changes);
-	  } else {
-	    changes = Object.assign({ _id: _id, _rev: _rev }, changes);
-	  }
-	
-	  var path = (0, _utils.createPath)(cozy, doctype, _id);
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', path, changes).then(function (resp) {
-	    if (cozy.isV2) {
-	      return find(cozy, doctype, _id);
-	    } else {
-	      return resp.data;
+	    if (!_id) {
+	      return Promise.reject(new Error('Missing _id field in passed document'));
 	    }
+	
+	    if (!isV2 && !_rev) {
+	      return Promise.reject(new Error('Missing _rev field in passed document'));
+	    }
+	
+	    if (isV2) {
+	      changes = Object.assign({ _id: _id }, changes);
+	    } else {
+	      changes = Object.assign({ _id: _id, _rev: _rev }, changes);
+	    }
+	
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, _id);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', path, changes).then(function (resp) {
+	      if (isV2) {
+	        return find(cozy, doctype, _id);
+	      } else {
+	        return resp.data;
+	      }
+	    });
 	  });
 	}
 	
 	function updateAttributes(cozy, doctype, _id, changes) {
 	  var tries = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 3;
 	
-	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
-	  return find(cozy, doctype, _id).then(function (doc) {
-	    return update(cozy, doctype, doc, Object.assign({ _id: _id }, doc, changes));
-	  }).catch(function (err) {
-	    if (tries > 0) {
-	      return updateAttributes(cozy, doctype, _id, changes, tries - 1);
-	    } else {
-	      throw err;
-	    }
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    return find(cozy, doctype, _id).then(function (doc) {
+	      return update(cozy, doctype, doc, Object.assign({ _id: _id }, doc, changes));
+	    }).catch(function (err) {
+	      if (tries > 0) {
+	        return updateAttributes(cozy, doctype, _id, changes, tries - 1);
+	      } else {
+	        throw err;
+	      }
+	    });
 	  });
 	}
 	
 	function _delete(cozy, doctype, doc) {
-	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    var _id = doc._id,
+	        _rev = doc._rev;
 	
-	  var _id = doc._id,
-	      _rev = doc._rev;
 	
-	
-	  if (!_id) {
-	    return Promise.reject(new Error('Missing _id field in passed document'));
-	  }
-	
-	  if (!cozy.isV2 && !_rev) {
-	    return Promise.reject(new Error('Missing _rev field in passed document'));
-	  }
-	
-	  var query = cozy.isV2 ? null : { rev: _rev };
-	  var path = (0, _utils.createPath)(cozy, doctype, _id, query);
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', path).then(function (resp) {
-	    if (cozy.isV2) {
-	      return { id: _id, rev: NOREV };
-	    } else {
-	      return resp;
+	    if (!_id) {
+	      return Promise.reject(new Error('Missing _id field in passed document'));
 	    }
+	
+	    if (!isV2 && !_rev) {
+	      return Promise.reject(new Error('Missing _rev field in passed document'));
+	    }
+	
+	    var query = isV2 ? null : { rev: _rev };
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, _id, query);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', path).then(function (resp) {
+	      if (isV2) {
+	        return { id: _id, rev: NOREV };
+	      } else {
+	        return resp;
+	      }
+	    });
 	  });
 	}
 
@@ -1828,14 +1854,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k;
 	});
 	
-	function normalizeDoctype(cozy, doctype) {
+	function normalizeDoctype(cozy, isV2, doctype) {
 	  var isQualified = doctype.indexOf('.') !== -1;
-	  if (cozy.isV2 && isQualified) {
+	  if (isV2 && isQualified) {
 	    var known = REVERSE_KNOWN[doctype];
 	    if (known) return known;
 	    return doctype.replace(/\./g, '-');
 	  }
-	  if (!cozy.isV2 && !isQualified) {
+	  if (!isV2 && !isQualified) {
 	    var _known = KNOWN_DOCTYPES[doctype];
 	    if (_known) {
 	      (0, _utils.warn)('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + _known);
@@ -1870,29 +1896,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _doctypes = __webpack_require__(11);
 	
-	var _fetch = __webpack_require__(5);
+	var _fetch = __webpack_require__(8);
 	
 	function defineIndex(cozy, doctype, fields) {
-	  doctype = (0, _doctypes.normalizeDoctype)(cozy, doctype);
-	  if (!Array.isArray(fields) || fields.length === 0) {
-	    throw new Error('defineIndex fields should be a non-empty array');
-	  }
-	  if (cozy.isV2) {
-	    return defineIndexV2(cozy, doctype, fields);
-	  } else {
-	    return defineIndexV3(cozy, doctype, fields);
-	  }
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    if (!Array.isArray(fields) || fields.length === 0) {
+	      throw new Error('defineIndex fields should be a non-empty array');
+	    }
+	    if (isV2) {
+	      return defineIndexV2(cozy, doctype, fields);
+	    } else {
+	      return defineIndexV3(cozy, doctype, fields);
+	    }
+	  });
 	}
 	
 	function query(cozy, indexRef, options) {
-	  if (!indexRef) {
-	    throw new Error('query should be passed the indexRef');
-	  }
-	  if (cozy.isV2) {
-	    return queryV2(cozy, indexRef, options);
-	  } else {
-	    return queryV3(cozy, indexRef, options);
-	  }
+	  return cozy.isV2().then(function (isV2) {
+	    if (!indexRef) {
+	      throw new Error('query should be passed the indexRef');
+	    }
+	    if (isV2) {
+	      return queryV2(cozy, indexRef, options);
+	    } else {
+	      return queryV3(cozy, indexRef, options);
+	    }
+	  });
 	}
 	
 	// Internals
@@ -1924,7 +1954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// defineIndexV2 is equivalent to defineIndex but only works for V2.
 	// It transforms the index fields into a map reduce view.
 	function defineIndexV3(cozy, doctype, fields) {
-	  var path = (0, _utils.createPath)(cozy, doctype, '_index');
+	  var path = (0, _utils.createPath)(cozy, false, doctype, '_index');
 	  var indexDefinition = { 'index': { fields: fields } };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, indexDefinition).then(function (response) {
 	    return { doctype: doctype, type: 'mango', name: response.id, fields: fields };
@@ -1965,7 +1995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    sort: indexRef.fields // sort is useless with mango
 	  };
 	
-	  var path = (0, _utils.createPath)(cozy, indexRef.doctype, '_find');
+	  var path = (0, _utils.createPath)(cozy, false, indexRef.doctype, '_find');
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function (response) {
 	    return response.docs;
 	  });
@@ -2137,9 +2167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.downloadById = downloadById;
 	exports.downloadByPath = downloadByPath;
 	
-	var _fetch = __webpack_require__(5);
+	var _fetch = __webpack_require__(8);
 	
-	var _jsonapi = __webpack_require__(7);
+	var _jsonapi = __webpack_require__(9);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
 	
