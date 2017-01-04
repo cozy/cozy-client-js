@@ -217,14 +217,12 @@ describe('Authentication', function () {
       const err = new Error()
       oauthFlow(
         cozy, storage,
-        () => ({
-          client: {
-            redirectURI: 'http://babelu/',
-            softwareID: 'id',
-            clientName: 'client'
-          },
+        {
+          redirectURI: 'http://babelu/',
+          softwareID: 'id',
+          clientName: 'client',
           scopes: ['a', 'b']
-        }),
+        },
         async function (client, url) {
           client.clientID.should.equal('123')
           client.clientSecret.should.equal('456')
@@ -272,14 +270,12 @@ describe('Authentication', function () {
       function doRegistration () {
         return oauthFlow(
           cozy, storage,
-          () => ({
-            client: {
-              redirectURI: 'http://coucou/',
-              softwareID: 'id',
-              clientName: 'client'
-            },
+          {
+            redirectURI: 'http://coucou/',
+            softwareID: 'id',
+            clientName: 'client',
             scopes: ['a', 'b']
-          }),
+          },
           async function () {
             const data = await storage.load('state')
             return 'http://blabla/?state=' + data.state
@@ -323,14 +319,12 @@ describe('Authentication', function () {
       function doRegistration () {
         return oauthFlow(
           cozy, storage,
-          () => ({
-            client: {
-              redirectURI: 'http://coucou/',
-              softwareID: 'id',
-              clientName: 'client'
-            },
+          {
+            redirectURI: 'http://coucou/',
+            softwareID: 'id',
+            clientName: 'client',
             scopes: ['a', 'b']
-          }),
+          },
           async function () {
             const data = await storage.load('state')
             return 'http://blabla/?state=' + data.state
