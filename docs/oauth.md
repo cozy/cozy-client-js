@@ -27,11 +27,19 @@ The library provides two implementation of such storage:
 
 The library constructor (on `init` method) should be passed the storage in the `storage` field of the `oauth` options.
 
-### Registration callbacks
+### Registration parameters
 
 In order to handle the registration of the client, two callbacks should be provided to the cozy-client-js instance.
 
-  - `createClient()` which should return an object `{client, scopes}` where client is a valid instance or object of `cozy.auth.Client` and scopes is an array containing the wanted scopes of the application.
+  - `clientParams` an object with the following parameters:
+    + `redirectURI`: string; // mandatory
+    + `softwareID`: string;  // mandatory
+    + `softwareVersion`: string;
+    + `clientName`: string;  // mandatory
+    + `clientKind`: string;
+    + `clientURI`: string;
+    + `logoURI`: string;
+    + `policyURI`: string;
   - `onRegistered(client, url)` which should provide the wanted "side effect" after the client registration and return a promise containing the request URL provided by the user containing the access code and state.
 
 The `onRegistered` callback is called with the registered client and the URL on which the user should go to give access to the application.
@@ -43,19 +51,6 @@ Here is a complete example running on Node.JS with a local http server receiving
 ```js
 const http = require('http');
 const {Cozy,MemoryStorage} = require('./dist/cozy-client.node.js')
-
-function createClient() {
-  const client = {
-    redirectURI: 'http://localhost:3333/do_access',
-    softwareID: 'foobar',
-    clientName: 'client'
-  }
-  const scopes = ['files/images:read']
-  return {
-    client: client,
-    scopes: scopes,
-  }
-}
 
 function onRegistered(client, url) {
   let server
@@ -81,7 +76,12 @@ const cozy = new Cozy({
   cozyURL: 'http://cozy.local:8080',
   oauth: {
     storage: new MemoryStorage(),
-    createClient: createClient,
+    clientParams: {
+      redirectURI: 'http://localhost:3333/do_access',
+      softwareID: 'foobar',
+      clientName: 'client',
+      scopes: ['files/images:read']
+    },
     onRegistered: onRegistered,
   }
 })

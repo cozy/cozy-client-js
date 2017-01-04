@@ -14,6 +14,10 @@ const AuthRunning = 1
 const AuthError = 2
 const AuthOK = 3
 
+const defaultClientParams = {
+  softwareID: 'github.com/cozy/cozy-client-js'
+}
+
 const mainProto = {
   create: crud.create,
   find: crud.find,
@@ -93,7 +97,7 @@ class Cozy {
 
     const oauth = options.oauth || {}
     this._storage = oauth.storage || null
-    this._createClient = oauth.createClient || nopCreateClient
+    this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
     this._onRegistered = oauth.onRegistered || nopOnRegistered
 
     let url = options.cozyURL || ''
@@ -123,7 +127,7 @@ class Cozy {
         this._authcreds = auth.oauthFlow(
           this,
           this._storage,
-          this._createClient,
+          this._clientParams,
           this._onRegistered
         )
       } else {
@@ -171,11 +175,9 @@ class Cozy {
   }
 }
 
-function nopCreateClient () {
-  throw new Error('No "createClient" function given')
+function nopOnRegistered () {
+  throw new Error('Missing onRegistered callback')
 }
-
-function nopOnRegistered () {}
 
 function protoify (context, fn) {
   return function prototyped (...args) {

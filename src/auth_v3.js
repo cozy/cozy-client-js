@@ -163,7 +163,7 @@ export function refreshToken (cozy, client, token) {
 
 // oauthFlow performs the stateful registration and access granting of an OAuth
 // client.
-export function oauthFlow (cozy, storage, createClient, onRegistered) {
+export function oauthFlow (cozy, storage, clientParams, onRegistered) {
   let tryCount = 0
 
   function clearAndRetry (err) {
@@ -171,15 +171,14 @@ export function oauthFlow (cozy, storage, createClient, onRegistered) {
       throw err
     }
     return storage.clear().then(() =>
-      oauthFlow(cozy, storage, createClient, onRegistered))
+      oauthFlow(cozy, storage, clientParams, onRegistered))
   }
 
   function registerNewClient () {
-    const {client: unregisteredClient, scopes} = createClient()
     return storage.clear()
-      .then(() => registerClient(cozy, unregisteredClient))
+      .then(() => registerClient(cozy, clientParams))
       .then((client) => {
-        const {url, state} = getAuthCodeURL(cozy, client, scopes)
+        const {url, state} = getAuthCodeURL(cozy, client, clientParams.scopes)
         return storage.save(StateKey, {client, url, state})
       })
   }
