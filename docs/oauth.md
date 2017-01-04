@@ -78,7 +78,7 @@ function onRegistered(client, url) {
 }
 
 const cozy = new Cozy({
-  url: 'http://cozy.local:8080',
+  cozyURL: 'http://cozy.local:8080',
   oauth: {
     storage: new MemoryStorage(),
     createClient: createClient,

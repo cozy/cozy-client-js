@@ -3,26 +3,30 @@ import {normalizeDoctype} from './doctypes'
 import {cozyFetchJSON} from './fetch'
 
 export function defineIndex (cozy, doctype, fields) {
-  doctype = normalizeDoctype(cozy, doctype)
-  if (!Array.isArray(fields) || fields.length === 0) {
-    throw new Error('defineIndex fields should be a non-empty array')
-  }
-  if (cozy.isV2) {
-    return defineIndexV2(cozy, doctype, fields)
-  } else {
-    return defineIndexV3(cozy, doctype, fields)
-  }
+  return cozy.isV2().then((isV2) => {
+    doctype = normalizeDoctype(cozy, isV2, doctype)
+    if (!Array.isArray(fields) || fields.length === 0) {
+      throw new Error('defineIndex fields should be a non-empty array')
+    }
+    if (isV2) {
+      return defineIndexV2(cozy, doctype, fields)
+    } else {
+      return defineIndexV3(cozy, doctype, fields)
+    }
+  })
 }
 
 export function query (cozy, indexRef, options) {
-  if (!indexRef) {
-    throw new Error('query should be passed the indexRef')
-  }
-  if (cozy.isV2) {
-    return queryV2(cozy, indexRef, options)
-  } else {
-    return queryV3(cozy, indexRef, options)
-  }
+  return cozy.isV2().then((isV2) => {
+    if (!indexRef) {
+      throw new Error('query should be passed the indexRef')
+    }
+    if (isV2) {
+      return queryV2(cozy, indexRef, options)
+    } else {
+      return queryV3(cozy, indexRef, options)
+    }
+  })
 }
 
 // Internals
@@ -53,7 +57,7 @@ function defineIndexV2 (cozy, doctype, fields) {
 // defineIndexV2 is equivalent to defineIndex but only works for V2.
 // It transforms the index fields into a map reduce view.
 function defineIndexV3 (cozy, doctype, fields) {
-  let path = createPath(cozy, doctype, '_index')
+  let path = createPath(cozy, false, doctype, '_index')
   let indexDefinition = {'index': {fields}}
   return cozyFetchJSON(cozy, 'POST', path, indexDefinition)
     .then((response) => ({ doctype: doctype, type: 'mango', name: response.id, fields: fields }))
@@ -90,7 +94,7 @@ function queryV3 (cozy, indexRef, options) {
     sort: indexRef.fields // sort is useless with mango
   }
 
-  let path = createPath(cozy, indexRef.doctype, '_find')
+  let path = createPath(cozy, false, indexRef.doctype, '_find')
   return cozyFetchJSON(cozy, 'POST', path, opts)
     .then((response) => response.docs)
 }

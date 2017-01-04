@@ -1,19 +1,20 @@
 import fetchMock from 'fetch-mock'
 
-const ROUTES = [
-  {
-    name: 'Status',
-    method: 'GET',
-    matcher: /\/status\/$/,
-    response: {
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: {
-        'couchdb': 'ok'
-      }
+const statusRoute = {
+  name: 'Status',
+  method: 'GET',
+  matcher: /\/status\/$/,
+  response: {
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: {
+      'couchdb': 'ok'
     }
-  },
+  }
+}
+
+const ROUTES = [
   {
     name: 'GetDoc',
     method: 'GET',
@@ -337,6 +338,7 @@ const ROUTES = [
 ]
 
 fetchMock.mockAPI = (name) => function () {
+  fetchMock.mock(statusRoute)
   ROUTES.filter(route => route.name === name)
         .forEach(route => fetchMock.mock(route))
 }

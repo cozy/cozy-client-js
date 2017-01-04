@@ -50,9 +50,9 @@ export function getBackedoffDelay (retryDelay, retryCount = 1) {
   return getFuzzedDelay(retryDelay * Math.pow(2, retryCount - 1))
 }
 
-export function createPath (cozy, doctype, id = '', query = null) {
+export function createPath (cozy, isV2, doctype, id = '', query = null) {
   let route = '/data/'
-  if (!cozy.isV2) {
+  if (!isV2) {
     route += `${encodeURIComponent(doctype)}/`
   }
   if (id !== '') {

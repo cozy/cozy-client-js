@@ -116,25 +116,21 @@ It takes the same options object as the `cozy.init(options)` function.
 It does not return a value.
 
 - `options` is an object with the following fields:
-  * `url`: absolute url of the cozy stack
-  * `isV2`: boolean indicating if the client is used on a v2 stack
+  * `cozyURL`: absolute url of the cozy stack
   * `disablePromises`: boolean to make function that returns promise used with a classical "callback as last argument"
   * `credentials`: a `{token, client}` object with token instance of `cozy.auth.AccessToken` or `cozy.auth.AccessToken` and client instance of `cozy.auth.Client` or null for v2
-  * `pageURL`: a string of the current page URL or request
-  * `createClient`: a function that return a new client instance used for OAuth client registration (see [OAuth](./oauth.md))
-  * `onRegistered`: a function called after client registration called with client and redirect url used by the user to authorize the client (see [OAuth](./oauth.md))
-  * `credentialsStorage`: a storage instance respecting the Storage interface (see [OAuth](./oauth.md))
+  * `oauth`: an object with the OAuth parameters, see [OAuth](./oauth.md) for details
 
 ```javascript
 cozy.init({
-  url: 'http://my.cozy.local',
-  isV2: false,
+  cozyURL: 'http://my.cozy.local',
   disablePromises: false,
-  credentials: null,
-  pageURL: window.location.href,
-  createClient: () => return new cozy.auth.Client({/*...*/}),
-  onRegistered: (client, url) => window.location.replace(url),
-  credentialsStorage: new cozy.auth.LocalStorage(window.localStorage)
+  oauth: {
+    client: {/*...*/},
+    scopes: ["files:read"],
+    onRegistered: (client, url) => { /* */ },
+    credentialsStorage: new cozy.auth.LocalStorage(window.localStorage)
+  }
 })
 ```
 

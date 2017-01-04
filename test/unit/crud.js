@@ -11,7 +11,7 @@ describe('crud API', function () {
 
   beforeEach(() => {
     cozy = new Cozy({
-      url: 'http://my.cozy.io///',
+      cozyURL: 'http://my.cozy.io///',
       credentials: fakeCredentials()
     })
   })
@@ -53,7 +53,7 @@ describe('crud API', function () {
   })
 
   describe('Update document', function () {
-    before(mock.mockAPI('UpdateDoc'))
+    beforeEach(mock.mockAPI('UpdateDoc'))
 
     it('Call the proper route', async function () {
       const changes = { 'test': 'value2' }

@@ -123,7 +123,7 @@ export function getAuthCodeURL (cozy, client, scopes = []) {
     'scope': scopes.join(' ')
   }
   return {
-    url: cozy.fullpath(`/auth/authorize?${encodeQuery(query)}`),
+    url: cozy._url + `/auth/authorize?${encodeQuery(query)}`,
     state: state
   }
 }

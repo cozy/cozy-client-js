@@ -12,7 +12,7 @@ describe('Authentication', function () {
   let cozy
 
   beforeEach(() => {
-    cozy = new Cozy({ url: 'http://foobar/' })
+    cozy = new Cozy({ cozyURL: 'http://foobar/' })
   })
 
   describe('Client', function () {
@@ -95,7 +95,7 @@ describe('Authentication', function () {
 
     it('works', async function () {
       cozy = new Cozy({
-        url: 'http://foobar/',
+        cozyURL: 'http://foobar/',
         credentials: fakeCredentials()
       })
 

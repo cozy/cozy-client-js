@@ -4,17 +4,18 @@ import {retry} from './utils'
 import jsonapi from './jsonapi'
 
 export function cozyFetch (cozy, path, options = {}) {
-  const fullpath = cozy.fullpath(path)
-  let resp
-  if (options.disableAuth) {
-    resp = fetch(fullpath, options)
-  } else if (options.manualAuthCredentials) {
-    resp = cozyFetchWithAuth(cozy, fullpath, options, options.manualAuthCredentials)
-  } else {
-    resp = cozy.authorize().then((credentials) =>
-      cozyFetchWithAuth(cozy, fullpath, options, credentials))
-  }
-  return resp.then(handleResponse)
+  return cozy.fullpath(path).then((fullpath) => {
+    let resp
+    if (options.disableAuth) {
+      resp = fetch(fullpath, options)
+    } else if (options.manualAuthCredentials) {
+      resp = cozyFetchWithAuth(cozy, fullpath, options, options.manualAuthCredentials)
+    } else {
+      resp = cozy.authorize().then((credentials) =>
+        cozyFetchWithAuth(cozy, fullpath, options, credentials))
+    }
+    return resp.then(handleResponse)
+  })
 }
 
 function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
@@ -22,8 +23,11 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
   options.headers = options.headers || {}
   options.headers['Authorization'] = token.toAuthHeader()
 
-  return fetch(fullpath, options).then((res) => {
-    if (res.status !== 401 || cozy.isV2) {
+  return Promise.all([
+    cozy.isV2(),
+    fetch(fullpath, options)
+  ]).then(([isV2, res]) => {
+    if (res.status !== 401 || isV2) {
       return res
     }
 

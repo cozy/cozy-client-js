@@ -1,5 +1,5 @@
-import {unpromiser, warn} from './utils'
-import {cozyFetchJSON} from './fetch'
+/* global fetch */
+import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AccessToken as AccessTokenV2, getAccessToken as getAccessTokenV2} from './auth_v2'
 import * as auth from './auth_v3'
@@ -71,7 +71,7 @@ class Cozy {
     this._inited = true
     this._authstate = AuthNone
     this._authcreds = null
-    this.isV2 = (options.isV2 === true)
+    this._version = null
 
     const creds = options.credentials
     if (creds) {
@@ -83,10 +83,7 @@ class Cozy {
       const isV2Credentials = (
         (token instanceof AccessTokenV2))
 
-      if (this.isV2 && !isV2Credentials) {
-        throw new Error('Bad credentials')
-      }
-      if (!this.isV2 && !isV3Credentials) {
+      if (!isV2Credentials && !isV3Credentials) {
         throw new Error('Bad credentials')
       }
 
@@ -99,7 +96,7 @@ class Cozy {
     this._createClient = oauth.createClient || nopCreateClient
     this._onRegistered = oauth.onRegistered || nopOnRegistered
 
-    let url = options.url || ''
+    let url = options.cozyURL || ''
     while (url[url.length - 1] === '/') {
       url = url.slice(0, -1)
     }
@@ -119,24 +116,26 @@ class Cozy {
     }
 
     this._authstate = AuthRunning
-    if (this.isV2) {
-      this._authcreds = getAccessTokenV2()
-    } else if (this._storage) {
-      this._authcreds = auth.oauthFlow(
-        this,
-        this._storage,
-        this._createClient,
-        this._onRegistered
-      )
-    } else {
-      return Promise.reject(new Error('No credentials'))
-    }
+    return this.isV2().then((isV2) => {
+      if (isV2) {
+        this._authcreds = getAccessTokenV2()
+      } else if (this._storage) {
+        this._authcreds = auth.oauthFlow(
+          this,
+          this._storage,
+          this._createClient,
+          this._onRegistered
+        )
+      } else {
+        return Promise.reject(new Error('No credentials'))
+      }
 
-    this._authcreds.then(
-      () => { this._authstate = AuthOK },
-      () => { this._authstate = AuthError })
+      this._authcreds.then(
+        () => { this._authstate = AuthOK },
+        () => { this._authstate = AuthError })
 
-    return this._authcreds
+      return this._authcreds
+    })
   }
 
   saveCredentials (client, token) {
@@ -150,13 +149,25 @@ class Cozy {
   }
 
   fullpath (path) {
-    const pathprefix = this.isV2 ? '/ds-api' : ''
-    return this._url + pathprefix + path
+    return this.isV2().then((isV2) => {
+      const pathprefix = isV2 ? '/ds-api' : ''
+      return this._url + pathprefix + path
+    })
   }
 
-  checkIfV2 () {
-    return cozyFetchJSON(cozy, 'GET', '/status/')
-      .then((status) => status.datasystem !== undefined)
+  isV2 () {
+    if (!this._version) {
+      this._version = retry(() => fetch(`${this._url}/status/`), 3)()
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Could not fetch cozy status')
+          } else {
+            return res.json()
+          }
+        })
+        .then((status) => status.datasystem !== undefined)
+    }
+    return this._version
   }
 }
 
