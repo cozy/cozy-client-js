@@ -8,8 +8,10 @@ export class LocalStorage {
   }
 
   save (key, value) {
-    return new Promise(resolve => resolve(
-      this.storage.setItem(this.prefix + key, JSON.stringify(value))))
+    return new Promise(resolve => {
+      this.storage.setItem(this.prefix + key, JSON.stringify(value))
+      resolve(value)
+    })
   }
 
   load (key) {

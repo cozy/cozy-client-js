@@ -28,14 +28,13 @@ describe('mango API', function () {
     before(mockTokenRetrieve)
     before(function () {
       cozy = new Cozy({
-        url: COZY_STACK_URL,
-        isV2: true
+        cozyURL: COZY_STACK_URL,
       })
     })
   } else {
     before(function () {
       cozy = new Cozy({
-        url: COZY_STACK_URL,
+        cozyURL: COZY_STACK_URL,
         credentials: fakeCredentials()
       })
     })

@@ -19,14 +19,13 @@ describe('crud API', function () {
     before(mockTokenRetrieve)
     beforeEach(() => {
       cozy = new Cozy({
-        url: COZY_STACK_URL,
-        isV2: true
+        cozyURL: COZY_STACK_URL
       })
     })
   } else {
     beforeEach(() => {
       cozy = new Cozy({
-        url: COZY_STACK_URL,
+        cozyURL: COZY_STACK_URL,
         credentials: fakeCredentials()
       })
     })

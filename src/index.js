@@ -1,5 +1,5 @@
-import {unpromiser, warn} from './utils'
-import {cozyFetchJSON} from './fetch'
+/* global fetch */
+import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AccessToken as AccessTokenV2, getAccessToken as getAccessTokenV2} from './auth_v2'
 import * as auth from './auth_v3'
@@ -13,6 +13,10 @@ const AuthNone = 0
 const AuthRunning = 1
 const AuthError = 2
 const AuthOK = 3
+
+const defaultClientParams = {
+  softwareID: 'github.com/cozy/cozy-client-js'
+}
 
 const mainProto = {
   create: crud.create,
@@ -59,18 +63,19 @@ class Cozy {
       LocalStorage: LocalStorage,
       MemoryStorage: MemoryStorage
     }
-    const disablePromises = !!(options && options.disablePromises)
-    addToProto(this, this, mainProto, disablePromises)
-    addToProto(this, this.auth, authProto, disablePromises)
-    addToProto(this, this.files, filesProto, disablePromises)
+    this._inited = false
     this.init(options)
   }
 
   init (options = {}) {
+    if (this._inited) {
+      throw new Error('Already inited instance')
+    }
+
+    this._inited = true
     this._authstate = AuthNone
     this._authcreds = null
-    this.isV2 = (options.isV2 === true)
-    this.storage = null
+    this._version = null
 
     const creds = options.credentials
     if (creds) {
@@ -82,10 +87,7 @@ class Cozy {
       const isV2Credentials = (
         (token instanceof AccessTokenV2))
 
-      if (this.isV2 && !isV2Credentials) {
-        throw new Error('Bad credentials')
-      }
-      if (!this.isV2 && !isV3Credentials) {
+      if (!isV2Credentials && !isV3Credentials) {
         throw new Error('Bad credentials')
       }
 
@@ -93,20 +95,22 @@ class Cozy {
       this._authcreds = Promise.resolve(creds)
     }
 
-    if (options.credentialsStorage) {
-      this.storage = options.credentialsStorage
-    }
+    const oauth = options.oauth || {}
+    this._storage = oauth.storage || null
+    this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
+    this._onRegistered = oauth.onRegistered || nopOnRegistered
 
-    this._pageURL = options.pageURL || ''
-    this._createClient = options.createClient || nopCreateClient
-    this._onRegistered = options.onRegistered || nopOnRegistered
-
-    let url = options.url || ''
+    let url = options.cozyURL || ''
     while (url[url.length - 1] === '/') {
       url = url.slice(0, -1)
     }
 
-    this.url = url
+    this._url = url
+
+    const disablePromises = !!options.disablePromises
+    addToProto(this, this, mainProto, disablePromises)
+    addToProto(this, this.auth, authProto, disablePromises)
+    addToProto(this, this.files, filesProto, disablePromises)
   }
 
   authorize () {
@@ -116,53 +120,64 @@ class Cozy {
     }
 
     this._authstate = AuthRunning
-    if (this.isV2) {
-      this._authcreds = getAccessTokenV2()
-    } else if (this.storage) {
-      this._authcreds = auth.oauthFlow(
-        this,
-        this.storage,
-        this._pageURL,
-        this._createClient,
-        this._onRegistered
-      )
-    } else {
-      return Promise.reject(new Error('Missing credentials'))
-    }
+    return this.isV2().then((isV2) => {
+      if (isV2) {
+        this._authcreds = getAccessTokenV2()
+      } else if (this._storage) {
+        this._authcreds = auth.oauthFlow(
+          this,
+          this._storage,
+          this._clientParams,
+          this._onRegistered
+        )
+      } else {
+        return Promise.reject(new Error('No credentials'))
+      }
 
-    this._authcreds.then(
-      () => { this._authstate = AuthOK },
-      () => { this._authstate = AuthError })
+      this._authcreds.then(
+        () => { this._authstate = AuthOK },
+        () => { this._authstate = AuthError })
 
-    return this._authcreds
+      return this._authcreds
+    })
   }
 
   saveCredentials (client, token) {
     const creds = {client, token}
-    if (!this.storage || this._authstate === AuthRunning) {
+    if (!this._storage || this._authstate === AuthRunning) {
       return Promise.resolve(creds)
     }
-    this.storage.save(auth.CredsKey, creds)
+    this._storage.save(auth.CredsKey, creds)
     this._authcreds = Promise.resolve(creds)
     return this._authcreds
   }
 
   fullpath (path) {
-    const pathprefix = this.isV2 ? '/ds-api' : ''
-    return this.url + pathprefix + path
+    return this.isV2().then((isV2) => {
+      const pathprefix = isV2 ? '/ds-api' : ''
+      return this._url + pathprefix + path
+    })
   }
 
-  checkIfV2 () {
-    return cozyFetchJSON(cozy, 'GET', '/status/')
-      .then((status) => status.datasystem !== undefined)
+  isV2 () {
+    if (!this._version) {
+      this._version = retry(() => fetch(`${this._url}/status/`), 3)()
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Could not fetch cozy status')
+          } else {
+            return res.json()
+          }
+        })
+        .then((status) => status.datasystem !== undefined)
+    }
+    return this._version
   }
 }
 
-function nopCreateClient () {
-  throw new Error('No "createClient" function given')
+function nopOnRegistered () {
+  throw new Error('Missing onRegistered callback')
 }
-
-function nopOnRegistered () {}
 
 function protoify (context, fn) {
   return function prototyped (...args) {

@@ -1,6 +1,8 @@
 This document describes in more details how to use this library along with OAuth.
 
-The library proposes two ways to perform OAuth: one manual that requires you to handle state the way you see fit using the cozy.auth.* methods, the other is automated and stateful and implements many details of the OAuth registration and authorization flow for you.
+Before reading this document, to better understand how authentication and OAuth work on the cozy-stack, you should read [this document](https://cozy.github.io/cozy-stack/auth.html).
+
+The library exposes internal methods to access the OAuth endpoints of the cozy-stack. See [cozy.auth.* methods](./README.md#cozyauthregisterclientclientparams). However, the library also provides a more automated way to perform de OAuth flow by implementing many details of the OAuth registration and authorization flow for you.
 
 Here we describe the automated and stateful method.
 
@@ -23,55 +25,67 @@ The library provides two implementation of such storage:
   - `cozy.auth.MemoryStorage` storing data in-memory
   - `cozy.auth.LocalStorage` storage data in a html5 [`localStorage`](https://developer.mozilla.org/en/docs/Web/API/Window/localStorage)
 
-The library constructor (on `init` method) should be passed the storage in the `credentialsStorage` field:
+The library constructor (on `init` method) should be passed the storage in the `storage` field of the `oauth` options.
 
-```js
-new Cozy({ credentialsStorage: new cozy.auth.LocalStorage() })
-// or if using the global instance
-cozy.init({ credentialsStorage: new cozy.auth.LocalStorage() })
-```
-
-
-### Registration callbacks
+### Registration parameters
 
 In order to handle the registration of the client, two callbacks should be provided to the cozy-client-js instance.
 
-  - `createClient()` which should return an object `{client, scopes}` where client is a valid instance or object of `cozy.auth.Client` and scopes is an array containing the wanted scopes of the application.
-  - `onRegistered(client, url)` which should provide the wanted "side effect" after the client registration.
+  - `clientParams` an object with the following parameters:
+    + `redirectURI`: the URI on which the user is redirected after accepting the client (mandatory)
+    + `softwareID`: identifier of the software (by default `github.com/cozy/cozy-client-js`)
+    + `softwareVersion`: version of the software (optinal)
+    + `clientName`: string (optional)
+    + `clientKind`: string (optional)
+    + `clientURI`: string (optional)
+    + `logoURI`: string (optional)
+    + `policyURI`: string (optional)
+    + `scopes`: array of `key:value` elements representing the permission scopes required by the application that the user should accept (mandatory)
+  - `onRegistered(client, url)` which should provide the wanted "side effect" after the client registration and return a promise containing the request URL provided by the user containing the access code and state.
 
 The `onRegistered` callback is called with the registered client and the URL on which the user should go to give access to the application.
 
-### Complete example
+### Complete example for Node.JS
 
-Here is a complete example
+Here is a complete example running on Node.JS with a local http server receiving as redirect URI receiving the call of the user to complete the authorization of the client.
 
 ```js
-const cozy = new Cozy({
-  credentialsStorage: new cozy.auth.LocalStorage(),
-  createClient: createClient,
-  onRegistered: onRegistered,
-})
-// or if using the global instance
-cozy.init({
-  credentialsStorage: new cozy.auth.LocalStorage(),
-  createClient: createClient,
-  onRegistered: onRegistered,
-})
-
-function createClient() {
-  const client = {
-    redirectURI: 'http://babelu/',
-    softwareID: 'id',
-    clientName: 'client'
-  }
-  const scopes = ['files/images:read']
-  return {
-    client: client,
-    scopes: scopes,
-  }
-}
+const http = require('http');
+const {Cozy,MemoryStorage} = require('./dist/cozy-client.node.js')
 
 function onRegistered(client, url) {
-  alert("Please visit the following url to authorize the application: ": url)
+  let server
+  return new Promise((resolve) => {
+    server = http.createServer((request, response) => {
+      if (request.url.indexOf('/do_access') === 0) {
+        console.log('Received access from user with url', request.url)
+        resolve(request.url)
+        response.end();
+      }
+    })
+    server.listen(3333, () => {
+      console.log('Please visit the following url to authorize the application: ', url)
+    })
+  })
+    .then(
+      (url) => { server.close(); return url; },
+      (err) => { server.close(); throw err; }
+    )
 }
+
+const cozy = new Cozy({
+  cozyURL: 'http://cozy.local:8080',
+  oauth: {
+    storage: new MemoryStorage(),
+    clientParams: {
+      redirectURI: 'http://localhost:3333/do_access',
+      softwareID: 'foobar',
+      clientName: 'client',
+      scopes: ['files/images:read']
+    },
+    onRegistered: onRegistered,
+  }
+})
+
+cozy.authorize().then((creds) => console.log(creds))
 ```

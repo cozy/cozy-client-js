@@ -14,14 +14,14 @@ Object.keys(KNOWN_DOCTYPES).forEach(k => {
   REVERSE_KNOWN[KNOWN_DOCTYPES[k]] = k
 })
 
-export function normalizeDoctype (cozy, doctype) {
+export function normalizeDoctype (cozy, isV2, doctype) {
   let isQualified = doctype.indexOf('.') !== -1
-  if (cozy.isV2 && isQualified) {
+  if (isV2 && isQualified) {
     let known = REVERSE_KNOWN[doctype]
     if (known) return known
     return doctype.replace(/\./g, '-')
   }
-  if (!cozy.isV2 && !isQualified) {
+  if (!isV2 && !isQualified) {
     let known = KNOWN_DOCTYPES[doctype]
     if (known) {
       warn('you are using a non-qualified doctype ' + doctype + ' assumed to be ' + known)

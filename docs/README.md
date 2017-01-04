@@ -116,25 +116,20 @@ It takes the same options object as the `cozy.init(options)` function.
 It does not return a value.
 
 - `options` is an object with the following fields:
-  * `url`: absolute url of the cozy stack
-  * `isV2`: boolean indicating if the client is used on a v2 stack
+  * `cozyURL`: absolute url of the cozy stack
   * `disablePromises`: boolean to make function that returns promise used with a classical "callback as last argument"
-  * `credentials`: a `{token, client}` object with token instance of `cozy.auth.AccessToken` or `cozy.auth.AccessToken` and client instance of `cozy.auth.Client` or null for v2
-  * `pageURL`: a string of the current page URL or request
-  * `createClient`: a function that return a new client instance used for OAuth client registration (see [OAuth](./oauth.md))
-  * `onRegistered`: a function called after client registration called with client and redirect url used by the user to authorize the client (see [OAuth](./oauth.md))
-  * `credentialsStorage`: a storage instance respecting the Storage interface (see [OAuth](./oauth.md))
+  * `oauth`: an object with the OAuth parameters, see [OAuth](./oauth.md) for details
 
 ```javascript
 cozy.init({
-  url: 'http://my.cozy.local',
-  isV2: false,
+  cozyURL: 'http://my.cozy.local',
   disablePromises: false,
-  credentials: null,
-  pageURL: window.location.href,
-  createClient: () => return new cozy.auth.Client({/*...*/}),
-  onRegistered: (client, url) => window.location.replace(url),
-  credentialsStorage: new cozy.auth.LocalStorage(window.localStorage)
+  oauth: {
+    client: {/*...*/},
+    scopes: ["files:read"],
+    onRegistered: (client, url) => { /* */ },
+    credentialsStorage: new cozy.auth.LocalStorage(window.localStorage)
+  }
 })
 ```
 
@@ -423,6 +418,8 @@ const buff = await response.arrayBuffer()
 
 ### `cozy.auth.registerClient(clientParams)`
 
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
 `cozy.auth.registerClient` is used to register a new client with the specified informations.
 
 It returns a promise of the newly registered Client, along with a client secret and identifier.
@@ -443,6 +440,8 @@ const clientSecret = client.clientSecret
 
 ### `cozy.auth.getClient(client)`
 
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
 `cozy.auth.getClient` is used to fetch a registered client with the specified clientID and token.
 
 It returns a promise of the client returned by the server.
@@ -457,6 +456,8 @@ const client = await cozy.auth.getClient(new cozy.auth.Client('https://me.cozy.i
 
 
 ### `cozy.auth.getAuthCodeURL(client, scopes)`
+
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
 
 `cozy.auth.getAuthCodeURL` is used to generate the URL on which the user should go to give access to the application with the specified scopes.
 
@@ -476,6 +477,8 @@ window.location.replace(url)
 
 ### `cozy.auth.getAccessToken(client, state, pageURL)`
 
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
 `cozy.auth.getAccessToken` is used from the page on which the user should have redirected after authorizing the application.
 
 It returns a promise of an `cozy.auth.AccessToken`. The method verifies that the specified state and the extracted one match. It then ask the server for a new access token and returns it.
@@ -494,6 +497,8 @@ const token = cozy.auth.getAccessToken(client, state, pageURL)
 
 ### `cozy.auth.refreshToken`
 
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
 `refreshToken` is used to refresh a token that is expired or no more valid.
 
 - `client` is a registered `cozy.auth.Client`
@@ -506,6 +511,8 @@ const newtoken = cozy.auth.refreshToken(client, oldtoken)
 
 ### `cozy.auth.Client`
 
+**This class is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
 `cozy.auth.Client` is a class representing an OAuth client. It can be registered, in which case it is known by the server and has a `clientID` and `clientSecret`.
 
 ```
@@ -513,7 +520,6 @@ type Client {
   clientID: string;                // informed by server
   clientSecret: string;            // informed by server
   registrationAccessToken: string; // informed by server
-  url: string;         // mandatory
   redirectURI: string; // mandatory
   softwareID: string;  // mandatory
   softwareVersion: string;
@@ -536,6 +542,8 @@ new Client(url, options)
 
 
 ### `cozy.auth.AccessToken`
+
+**This class is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
 
 `cozy.auth.AccessToken` is a class representing an OAuth access token.
 

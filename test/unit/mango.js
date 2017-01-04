@@ -12,7 +12,7 @@ describe('mango API', function () {
 
   beforeEach(() => {
     cozy = new Cozy({
-      url: 'http://my.cozy.io///',
+      cozyURL: 'http://my.cozy.io///',
       credentials: fakeCredentials()
     })
   })

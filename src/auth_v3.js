@@ -123,7 +123,7 @@ export function getAuthCodeURL (cozy, client, scopes = []) {
     'scope': scopes.join(' ')
   }
   return {
-    url: `${cozy.url}/auth/authorize?${encodeQuery(query)}`,
+    url: cozy._url + `/auth/authorize?${encodeQuery(query)}`,
     state: state
   }
 }
@@ -161,77 +161,72 @@ export function refreshToken (cozy, client, token) {
   })
 }
 
-// oauthFlow perform the stateful registration and access granting of an OAuth
+// oauthFlow performs the stateful registration and access granting of an OAuth
 // client.
-export function oauthFlow (cozy, storage, pageURL, createClient, onRegistered) {
-  function clearAndRetry () {
+export function oauthFlow (cozy, storage, clientParams, onRegistered) {
+  let tryCount = 0
+
+  function clearAndRetry (err) {
+    if (tryCount++ > 0) {
+      throw err
+    }
     return storage.clear().then(() =>
-      oauthFlow(cozy, storage, pageURL, createClient, onRegistered))
+      oauthFlow(cozy, storage, clientParams, onRegistered))
   }
 
   function registerNewClient () {
-    const {client: unregisteredClient, scopes} = createClient()
-
     return storage.clear()
-      .then(() => registerClient(cozy, unregisteredClient))
+      .then(() => registerClient(cozy, clientParams))
       .then((client) => {
-        const {url, state} = getAuthCodeURL(cozy, client, scopes)
-        return storage.save(StateKey, {client, url, state}).then(() => {
-          onRegistered(client, url)
-          // return a promise that never resolves
-          return new Promise(() => {})
-        })
+        const {url, state} = getAuthCodeURL(cozy, client, clientParams.scopes)
+        return storage.save(StateKey, {client, url, state})
       })
-  }
-
-  function saveCreds (creds) {
-    storage.delete(StateKey)
-    return storage.save(CredsKey, creds).then(() => creds)
-  }
-
-  function doFlow (credentials, state) {
-    if (!credentials) {
-      // Try to get granted of a token if the state is already filled.
-      if (!getGrantCodeFromPageURL(pageURL)) {
-        onRegistered(client, url)
-        // return a promise that never resolves
-        return new Promise(() => {})
-      }
-
-      const {client, state: value, url} = state
-      return getAccessToken(cozy, client, value, pageURL)
-        .then((token) => ({client, token}))
-    }
-
-    // If credentials are cached we re-fetch the registered client with the
-    // said token. Fetching the client, if the token is outdated we should try
-    // the token is refreshed.
-    const {client, token} = credentials
-    return getClient(cozy, client)
-      .then((client) => ({client, token}))
   }
 
   return Promise.all([
     storage.load(CredsKey),
     storage.load(StateKey)
-  ]).then(([credentials, state]) => {
-    // The cache is empty, we initiate the client registration.
-    if (!credentials && !state) {
-      return registerNewClient()
+  ])
+  .then(([credentials, storedState]) => {
+    // If credentials are cached we re-fetch the registered client with the
+    // said token. Fetching the client, if the token is outdated we should try
+    // the token is refreshed.
+    if (credentials) {
+      const {client, token} = credentials
+      return getClient(cozy, client).then((client) => ({client, token}))
     }
 
-    const authFlow = doFlow(credentials, state)
+    // Otherwise register a new client if necessary (ie. no client is stored)
+    // and call the onRegistered callback to wait for the user to grant the
+    // access. Finally fetches to access token on success.
+    let statePromise
+    if (!storedState) {
+      statePromise = registerNewClient()
+    } else {
+      statePromise = Promise.resolve(storedState)
+    }
 
-    // If the auth flow is rejected with a 401 error, we clear the cache and
-    // restart the entire registration flow.
-    return authFlow.then(saveCreds, (err) => {
+    let client, state, token
+    return statePromise
+      .then((data) => {
+        client = data.client
+        state = data.state
+        return Promise.resolve(onRegistered(client, data.url))
+      })
+      .then((pageURL) => getAccessToken(cozy, client, state, pageURL))
+      .then((t) => { token = t })
+      .then(() => storage.delete(StateKey))
+      .then(() => ({client, token}))
+  })
+  .then(
+    (creds) => storage.save(CredsKey, creds),
+    (err) => {
       if ((err instanceof FetchError) && err.isUnauthorised()) {
-        return clearAndRetry()
+        return clearAndRetry(err)
       } else {
         throw err
       }
     })
-  })
 }
 
 // retrieveToken perform a request on the access_token entrypoint in order to

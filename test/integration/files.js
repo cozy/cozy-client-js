@@ -18,7 +18,7 @@ describe('files API', async function () {
       this.skip()
     }
     cozy = new Cozy({
-      url: COZY_STACK_URL,
+      cozyURL: COZY_STACK_URL,
       credentials: fakeCredentials()
     })
     random = randomGenerator()

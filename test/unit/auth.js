@@ -12,7 +12,7 @@ describe('Authentication', function () {
   let cozy
 
   beforeEach(() => {
-    cozy = new Cozy({ url: 'http://foobar/' })
+    cozy = new Cozy({ cozyURL: 'http://foobar/' })
   })
 
   describe('Client', function () {
@@ -95,7 +95,7 @@ describe('Authentication', function () {
 
     it('works', async function () {
       cozy = new Cozy({
-        url: 'http://foobar/',
+        cozyURL: 'http://foobar/',
         credentials: fakeCredentials()
       })
 
@@ -214,16 +214,15 @@ describe('Authentication', function () {
   describe('oauth flow', function () {
     it('registers a new client with an empty storage', function (done) {
       const storage = new MemoryStorage()
+      const err = new Error()
       oauthFlow(
-        cozy, storage, 'http://my.cozy.io/',
-        () => ({
-          client: {
-            redirectURI: 'http://babelu/',
-            softwareID: 'id',
-            clientName: 'client'
-          },
+        cozy, storage,
+        {
+          redirectURI: 'http://babelu/',
+          softwareID: 'id',
+          clientName: 'client',
           scopes: ['a', 'b']
-        }),
+        },
         async function (client, url) {
           client.clientID.should.equal('123')
           client.clientSecret.should.equal('456')
@@ -238,8 +237,9 @@ describe('Authentication', function () {
           const creds = await storage.load('state')
           queries.state.should.eql(creds.state)
           creds.url.should.be.type('string')
-          done()
+          throw err
         })
+        .catch((e) => err === e ? done() : done(e))
     })
 
     it('fails if the stored state is wrong', async function () {
@@ -252,9 +252,9 @@ describe('Authentication', function () {
       let error
       try {
         await oauthFlow(
-          cozy, storage, 'http://my.cozy.io/?state=321',
+          cozy, storage,
           () => {},
-          () => {}
+          () => 'http://coucou/?state=123'
         )
       } catch (e) {
         error = e
@@ -269,28 +269,31 @@ describe('Authentication', function () {
 
       function doRegistration () {
         return oauthFlow(
-          cozy, storage, 'http://my.cozy.io/',
-          () => ({
-            client: {
-              redirectURI: 'http://fooobar/',
-              softwareID: 'id',
-              clientName: 'client'
-            },
+          cozy, storage,
+          {
+            redirectURI: 'http://coucou/',
+            softwareID: 'id',
+            clientName: 'client',
             scopes: ['a', 'b']
-          }), grantAccess)
+          },
+          async function () {
+            const data = await storage.load('state')
+            return 'http://blabla/?state=' + data.state
+          })
+          .then(doThen)
       }
 
-      async function grantAccess (client, pageURL) {
+      async function doThen () {
         const credentials = await oauthFlow(
-          cozy, storage, pageURL,
+          cozy, storage,
           () => {},
-          () => {}
+          () => ''
         )
 
         credentials.client.clientID.should.equal('123')
         credentials.client.clientSecret.should.equal('456')
         credentials.client.registrationAccessToken.should.equal('789')
-        credentials.client.redirectURI.should.equal('http://fooobar/')
+        credentials.client.redirectURI.should.equal('http://coucou/')
         credentials.client.softwareID.should.equal('id')
         credentials.client.clientName.should.equal('client')
         credentials.token.should.be.instanceOf(AccessToken)
@@ -315,26 +318,30 @@ describe('Authentication', function () {
 
       function doRegistration () {
         return oauthFlow(
-          cozy, storage, 'http://my.cozy.io/',
-          () => ({
-            client: {
-              redirectURI: 'http://coucou/',
-              softwareID: 'id',
-              clientName: 'client'
-            },
+          cozy, storage,
+          {
+            redirectURI: 'http://coucou/',
+            softwareID: 'id',
+            clientName: 'client',
             scopes: ['a', 'b']
-          }), grantAccess)
+          },
+          async function () {
+            const data = await storage.load('state')
+            return 'http://blabla/?state=' + data.state
+          })
+          .then(doThen)
       }
 
-      async function grantAccess (client, pageURL) {
+      async function doThen () {
         const creds1 = await oauthFlow(
-          cozy, storage, pageURL)
+          cozy, storage)
 
         const creds2 = await oauthFlow(
-          cozy, storage, 'http://my.cozy.io/')
+          cozy, storage)
 
         creds2.should.eql(creds1)
         done()
+        return 'http://coucou/?state=123'
       }
 
       doRegistration()
