@@ -650,29 +650,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._inited = true;
 	      this._authstate = AuthNone;
 	      this._authcreds = null;
+	      this._storage = null;
 	      this._version = null;
 	
-	      var creds = options.credentials;
-	      if (creds) {
-	        var client = creds.client,
-	            token = creds.token;
-	
-	        var isV3Credentials = client instanceof ClientV3 && token instanceof AccessTokenV3;
-	
-	        var isV2Credentials = token instanceof _auth_v.AccessToken;
-	
-	        if (!isV2Credentials && !isV3Credentials) {
-	          throw new Error('Bad credentials');
-	        }
-	
+	      var oauth = options.oauth;
+	      if (oauth) {
+	        this._storage = oauth.storage;
+	        this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams);
+	        this._onRegistered = oauth.onRegistered || nopOnRegistered;
+	      } else {
+	        // if no oauth options are given, we expect to be on a client side
+	        // application running in a browser with cookie-based authentication.
 	        this._authstate = AuthOK;
-	        this._authcreds = Promise.resolve(creds);
+	        this._authcreds = Promise.resolve(null);
 	      }
-	
-	      var oauth = options.oauth || {};
-	      this._storage = oauth.storage || null;
-	      this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams);
-	      this._onRegistered = oauth.onRegistered || nopOnRegistered;
 	
 	      var url = options.cozyURL || '';
 	      while (url[url.length - 1] === '/') {
@@ -1557,20 +1548,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function cozyFetchWithAuth(cozy, fullpath, options, credentials) {
-	  var client = credentials.client,
-	      token = credentials.token;
-	
-	  options.headers = options.headers || {};
-	  options.headers['Authorization'] = token.toAuthHeader();
-	
+	  if (credentials) {
+	    options.headers = options.headers || {};
+	    options.headers['Authorization'] = credentials.token.toAuthHeader();
+	  }
 	  return Promise.all([cozy.isV2(), fetch(fullpath, options)]).then(function (_ref) {
 	    var _ref2 = _slicedToArray(_ref, 2),
 	        isV2 = _ref2[0],
 	        res = _ref2[1];
 	
-	    if (res.status !== 401 || isV2) {
+	    if (res.status !== 401 || isV2 || !credentials) {
 	      return res;
 	    }
+	    var client = credentials.client,
+	        token = credentials.token;
 	
 	    return (0, _utils.retry)(function () {
 	      return (0, _auth_v.refreshToken)(cozy, client, token);
