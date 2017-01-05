@@ -23,6 +23,11 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
     options.headers = options.headers || {}
     options.headers['Authorization'] = credentials.token.toAuthHeader()
   }
+
+  // the option credentials:include tells fetch to include the cookies in the
+  // request even for cross-origin requests
+  options.credentials = 'include'
+
   return Promise.all([
     cozy.isV2(),
     fetch(fullpath, options)

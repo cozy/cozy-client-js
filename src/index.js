@@ -73,6 +73,7 @@ class Cozy {
     }
 
     this._inited = true
+    this._oauth = false
     this._authstate = AuthNone
     this._authcreds = null
     this._storage = null
@@ -80,14 +81,10 @@ class Cozy {
 
     const oauth = options.oauth
     if (oauth) {
+      this._oauth = true
       this._storage = oauth.storage
       this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
       this._onRegistered = oauth.onRegistered || nopOnRegistered
-    } else {
-      // if no oauth options are given, we expect to be on a client side
-      // application running in a browser with cookie-based authentication.
-      this._authstate = AuthOK
-      this._authcreds = Promise.resolve(null)
     }
 
     let url = options.cozyURL || ''
@@ -111,9 +108,10 @@ class Cozy {
 
     this._authstate = AuthRunning
     return this.isV2().then((isV2) => {
-      if (isV2) {
-        this._authcreds = getAccessTokenV2()
-      } else if (this._storage) {
+      if (isV2 && this._oauth) {
+        throw new Error("OAuth is not supported on the V2 stack")
+      }
+      if (this._oauth) {
         this._authcreds = auth.oauthFlow(
           this,
           this._storage,
@@ -121,7 +119,13 @@ class Cozy {
           this._onRegistered
         )
       } else {
-        return Promise.reject(new Error('No credentials'))
+        // we expect to be on a client side application running in a browser
+        // with cookie-based authentication.
+        if (isV2) {
+          this._authcreds = getAccessTokenV2()
+        } else {
+          this._authcreds = Promise.resolve(null)
+        }
       }
 
       this._authcreds.then(
