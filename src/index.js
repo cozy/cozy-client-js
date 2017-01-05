@@ -73,32 +73,19 @@ class Cozy {
     }
 
     this._inited = true
+    this._oauth = false
     this._authstate = AuthNone
     this._authcreds = null
+    this._storage = null
     this._version = null
 
-    const creds = options.credentials
-    if (creds) {
-      const {client, token} = creds
-      const isV3Credentials = (
-        (client instanceof ClientV3) &&
-        (token instanceof AccessTokenV3))
-
-      const isV2Credentials = (
-        (token instanceof AccessTokenV2))
-
-      if (!isV2Credentials && !isV3Credentials) {
-        throw new Error('Bad credentials')
-      }
-
-      this._authstate = AuthOK
-      this._authcreds = Promise.resolve(creds)
+    const oauth = options.oauth
+    if (oauth) {
+      this._oauth = true
+      this._storage = oauth.storage
+      this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
+      this._onRegistered = oauth.onRegistered || nopOnRegistered
     }
-
-    const oauth = options.oauth || {}
-    this._storage = oauth.storage || null
-    this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
-    this._onRegistered = oauth.onRegistered || nopOnRegistered
 
     let url = options.cozyURL || ''
     while (url[url.length - 1] === '/') {
@@ -120,26 +107,32 @@ class Cozy {
     }
 
     this._authstate = AuthRunning
-    return this.isV2().then((isV2) => {
-      if (isV2) {
-        this._authcreds = getAccessTokenV2()
-      } else if (this._storage) {
-        this._authcreds = auth.oauthFlow(
+    this._authcreds = this.isV2().then((isV2) => {
+      if (isV2 && this._oauth) {
+        throw new Error('OAuth is not supported on the V2 stack')
+      }
+      if (this._oauth) {
+        return auth.oauthFlow(
           this,
           this._storage,
           this._clientParams,
           this._onRegistered
         )
-      } else {
-        return Promise.reject(new Error('No credentials'))
       }
-
-      this._authcreds.then(
-        () => { this._authstate = AuthOK },
-        () => { this._authstate = AuthError })
-
-      return this._authcreds
+      // we expect to be on a client side application running in a browser
+      // with cookie-based authentication.
+      if (isV2) {
+        return getAccessTokenV2()
+      } else {
+        return Promise.resolve(null)
+      }
     })
+
+    this._authcreds.then(
+      () => { this._authstate = AuthOK },
+      () => { this._authstate = AuthError })
+
+    return this._authcreds
   }
 
   saveCredentials (client, token) {

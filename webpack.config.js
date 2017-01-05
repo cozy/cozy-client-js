@@ -4,14 +4,13 @@ var nodeExternals = require('webpack-node-externals')
 var path = require('path')
 var webpack = require('webpack')
 
-var NODE_ENV = process.env.NODE_ENV
-var NODE_TARGET = process.env.NODE_TARGET || 'web'
+var NODE_TARGET = process.env.NODE_TARGET || 'web'
 
 var output = {
-  path: path.join(__dirname, '/dist'),
+  path: path.join(__dirname, '/dist')
 }
 
-if (NODE_TARGET === "web") {
+if (NODE_TARGET === 'web') {
   output.filename = 'cozy-client.js'
   output.library = 'cozy-client-js'
   output.libraryTarget = 'umd'
@@ -41,12 +40,12 @@ var config = {
     ]
   },
   node: {
-    "crypto": false
+    'crypto': false
   },
   resolve: {
     root: path.resolve('./src'),
     extensions: ['', '.js']
-  },
+  }
 }
 
 if (NODE_TARGET === 'node') {

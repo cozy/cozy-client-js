@@ -4,7 +4,6 @@
 import should from 'should'
 import {Cozy} from '../../src'
 import mock from '../mock-api'
-import {fakeCredentials} from '../helpers'
 
 describe('mango API', function () {
   let indexRef
@@ -12,8 +11,7 @@ describe('mango API', function () {
 
   beforeEach(() => {
     cozy = new Cozy({
-      cozyURL: 'http://my.cozy.io///',
-      credentials: fakeCredentials()
+      cozyURL: 'http://my.cozy.io///'
     })
   })
 
