@@ -4,15 +4,13 @@
 import should from 'should'
 import {Cozy} from '../../src'
 import mock from '../mock-api'
-import {fakeCredentials} from '../helpers'
 
 describe('crud API', function () {
   let cozy
 
   beforeEach(() => {
     cozy = new Cozy({
-      cozyURL: 'http://my.cozy.io///',
-      credentials: fakeCredentials()
+      cozyURL: 'http://my.cozy.io///'
     })
   })
   afterEach(() => mock.restore())

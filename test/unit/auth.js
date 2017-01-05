@@ -6,7 +6,6 @@ import {Cozy, MemoryStorage} from '../../src'
 import {oauthFlow, AccessToken} from '../../src/auth_v3'
 import mock from '../mock-api'
 import {decodeQuery} from '../../src/utils'
-import {fakeCredentials} from '../helpers'
 
 describe('Authentication', function () {
   let cozy
@@ -95,8 +94,7 @@ describe('Authentication', function () {
 
     it('works', async function () {
       cozy = new Cozy({
-        cozyURL: 'http://foobar/',
-        credentials: fakeCredentials()
+        cozyURL: 'http://foobar/'
       })
 
       const client = await cozy.auth.getClient({

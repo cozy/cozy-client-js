@@ -75,30 +75,20 @@ class Cozy {
     this._inited = true
     this._authstate = AuthNone
     this._authcreds = null
+    this._storage = null
     this._version = null
 
-    const creds = options.credentials
-    if (creds) {
-      const {client, token} = creds
-      const isV3Credentials = (
-        (client instanceof ClientV3) &&
-        (token instanceof AccessTokenV3))
-
-      const isV2Credentials = (
-        (token instanceof AccessTokenV2))
-
-      if (!isV2Credentials && !isV3Credentials) {
-        throw new Error('Bad credentials')
-      }
-
+    const oauth = options.oauth
+    if (oauth) {
+      this._storage = oauth.storage
+      this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
+      this._onRegistered = oauth.onRegistered || nopOnRegistered
+    } else {
+      // if no oauth options are given, we expect to be on a client side
+      // application running in a browser with cookie-based authentication.
       this._authstate = AuthOK
-      this._authcreds = Promise.resolve(creds)
+      this._authcreds = Promise.resolve(null)
     }
-
-    const oauth = options.oauth || {}
-    this._storage = oauth.storage || null
-    this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
-    this._onRegistered = oauth.onRegistered || nopOnRegistered
 
     let url = options.cozyURL || ''
     while (url[url.length - 1] === '/') {

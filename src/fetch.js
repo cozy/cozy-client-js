@@ -19,18 +19,18 @@ export function cozyFetch (cozy, path, options = {}) {
 }
 
 function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
-  const { client, token } = credentials
-  options.headers = options.headers || {}
-  options.headers['Authorization'] = token.toAuthHeader()
-
+  if (credentials) {
+    options.headers = options.headers || {}
+    options.headers['Authorization'] = credentials.token.toAuthHeader()
+  }
   return Promise.all([
     cozy.isV2(),
     fetch(fullpath, options)
   ]).then(([isV2, res]) => {
-    if (res.status !== 401 || isV2) {
+    if (res.status !== 401 || isV2 || !credentials) {
       return res
     }
-
+    const { client, token } = credentials
     return retry(() => refreshToken(cozy, client, token), 3)()
       .then((newToken) => cozy.saveCredentials(client, newToken))
       .then((credentials) => cozyFetchWithAuth(cozy, fullpath, options, credentials))
