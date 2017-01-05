@@ -107,33 +107,32 @@ class Cozy {
     }
 
     this._authstate = AuthRunning
-    return this.isV2().then((isV2) => {
+    this._authcreds = this.isV2().then((isV2) => {
       if (isV2 && this._oauth) {
-        throw new Error("OAuth is not supported on the V2 stack")
+        throw new Error('OAuth is not supported on the V2 stack')
       }
       if (this._oauth) {
-        this._authcreds = auth.oauthFlow(
+        return auth.oauthFlow(
           this,
           this._storage,
           this._clientParams,
           this._onRegistered
         )
-      } else {
-        // we expect to be on a client side application running in a browser
-        // with cookie-based authentication.
-        if (isV2) {
-          this._authcreds = getAccessTokenV2()
-        } else {
-          this._authcreds = Promise.resolve(null)
-        }
       }
-
-      this._authcreds.then(
-        () => { this._authstate = AuthOK },
-        () => { this._authstate = AuthError })
-
-      return this._authcreds
+      // we expect to be on a client side application running in a browser
+      // with cookie-based authentication.
+      if (isV2) {
+        return getAccessTokenV2()
+      } else {
+        return Promise.resolve(null)
+      }
     })
+
+    this._authcreds.then(
+      () => { this._authstate = AuthOK },
+      () => { this._authstate = AuthError })
+
+    return this._authcreds
   }
 
   saveCredentials (client, token) {
