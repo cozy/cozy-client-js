@@ -635,7 +635,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      MemoryStorage: _auth_storage.MemoryStorage
 	    };
 	    this._inited = false;
-	    this.init(options);
+	    if (options) {
+	      this.init(options);
+	    }
 	  }
 	
 	  _createClass(Cozy, [{
@@ -648,6 +650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      this._inited = true;
+	      this._oauth = false;
 	      this._authstate = AuthNone;
 	      this._authcreds = null;
 	      this._storage = null;
@@ -655,14 +658,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var oauth = options.oauth;
 	      if (oauth) {
+	        this._oauth = true;
 	        this._storage = oauth.storage;
 	        this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams);
 	        this._onRegistered = oauth.onRegistered || nopOnRegistered;
-	      } else {
-	        // if no oauth options are given, we expect to be on a client side
-	        // application running in a browser with cookie-based authentication.
-	        this._authstate = AuthOK;
-	        this._authcreds = Promise.resolve(null);
 	      }
 	
 	      var url = options.cozyURL || '';
@@ -688,23 +687,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      this._authstate = AuthRunning;
-	      return this.isV2().then(function (isV2) {
-	        if (isV2) {
-	          _this._authcreds = (0, _auth_v.getAccessToken)();
-	        } else if (_this._storage) {
-	          _this._authcreds = auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered);
-	        } else {
-	          return Promise.reject(new Error('No credentials'));
+	      this._authcreds = this.isV2().then(function (isV2) {
+	        if (isV2 && _this._oauth) {
+	          throw new Error('OAuth is not supported on the V2 stack');
 	        }
-	
-	        _this._authcreds.then(function () {
-	          _this._authstate = AuthOK;
-	        }, function () {
-	          _this._authstate = AuthError;
-	        });
-	
-	        return _this._authcreds;
+	        if (_this._oauth) {
+	          return auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered);
+	        }
+	        // we expect to be on a client side application running in a browser
+	        // with cookie-based authentication.
+	        if (isV2) {
+	          return (0, _auth_v.getAccessToken)();
+	        } else {
+	          return Promise.resolve(null);
+	        }
 	      });
+	
+	      this._authcreds.then(function () {
+	        _this._authstate = AuthOK;
+	      }, function () {
+	        _this._authstate = AuthError;
+	      });
+	
+	      return this._authcreds;
 	    }
 	  }, {
 	    key: 'saveCredentials',
@@ -1552,6 +1557,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    options.headers = options.headers || {};
 	    options.headers['Authorization'] = credentials.token.toAuthHeader();
 	  }
+	
+	  // the option credentials:include tells fetch to include the cookies in the
+	  // request even for cross-origin requests
+	  options.credentials = 'include';
+	
 	  return Promise.all([cozy.isV2(), fetch(fullpath, options)]).then(function (_ref) {
 	    var _ref2 = _slicedToArray(_ref, 2),
 	        isV2 = _ref2[0],
