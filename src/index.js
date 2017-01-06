@@ -64,7 +64,9 @@ class Cozy {
       MemoryStorage: MemoryStorage
     }
     this._inited = false
-    this.init(options)
+    if (options) {
+      this.init(options)
+    }
   }
 
   init (options = {}) {
