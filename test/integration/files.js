@@ -125,4 +125,53 @@ describe('files API', async function () {
 
     txt2.should.equal('foo')
   })
+
+  it('destroy all trashed files and directories', async function () {
+    await createTrashedDirectory(cozy, 'foo_' + random())
+    await createTrashedDirectory(cozy, 'foo_' + random())
+    await cozy.files.clearTrash()
+
+    let trashed = await cozy.files.listTrash()
+    trashed.should.be.an.Array()
+    trashed.should.have.length(0)
+  })
+
+  it('list trashed files and directories', async function () {
+    await cozy.files.clearTrash()
+    const created1 = await createTrashedDirectory(cozy, 'foo_' + random())
+    const created2 = await createTrashedDirectory(cozy, 'foo_' + random())
+    let trashed = await cozy.files.listTrash()
+    trashed.should.be.an.Array()
+    trashed.should.have.length(2)
+    let found1 = false
+    let found2 = false
+    trashed.forEach((file) => {
+      if (file._id === created1._id) found1 = true
+      else if (file._id === created2._id) found2 = true
+      else throw new Error('found unexpected file' + file._id)
+    })
+    found1.should.be.true
+    found2.should.be.true
+  })
+
+  it('restore a trashed file or directory', async function () {
+    await cozy.files.clearTrash()
+    const created = await createTrashedDirectory(cozy, 'foo_' + random())
+    await cozy.files.restoreById(created._id)
+  })
+
+  it('destroy a trashed file or directory', async function () {
+    await cozy.files.clearTrash()
+    const created = await createTrashedDirectory(cozy, 'foo_' + random())
+    await cozy.files.destroyById(created._id)
+    let trashed = await cozy.files.listTrash()
+    trashed.should.be.an.Array()
+    trashed.should.have.length(0)
+  })
 })
+
+async function createTrashedDirectory (cozy, dirname) {
+  const created = await cozy.files.createDirectory({ name: dirname })
+  await cozy.files.trashById(created._id)
+  return created
+}
