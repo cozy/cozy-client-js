@@ -129,6 +129,22 @@ export function downloadByPath (cozy, path) {
   return cozyFetch(cozy, `/files/download?Path=${encodeURIComponent(path)}`)
 }
 
+export function listTrash (cozy) {
+  return cozyFetchJSON(cozy, 'GET', `/files/trash`)
+}
+
+export function clearTrash (cozy) {
+  return cozyFetchJSON(cozy, 'DELETE', `/files/trash`)
+}
+
+export function restoreById (cozy, id) {
+  return cozyFetchJSON(cozy, 'POST', `/files/trash/${encodeURIComponent(id)}`)
+}
+
+export function destroyById (cozy, id) {
+  return cozyFetchJSON(cozy, 'DELETE', `/files/trash/${encodeURIComponent(id)}`)
+}
+
 function addIsDir (obj) {
   obj.isDir = obj.attributes.type === 'directory'
   return obj

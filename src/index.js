@@ -50,7 +50,11 @@ const filesProto = {
   statById: files.statById,
   statByPath: files.statByPath,
   downloadById: files.downloadById,
-  downloadByPath: files.downloadByPath
+  downloadByPath: files.downloadByPath,
+  listTrash: files.listTrash,
+  clearTrash: files.clearTrash,
+  restoreById: files.restoreById,
+  destroyById: files.destroyById
 }
 
 class Cozy {
