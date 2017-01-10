@@ -437,6 +437,42 @@ const clientID = client.clientID
 const clientSecret = client.clientSecret
 ```
 
+### `cozy.auth.updateClient(client, resetSecret = false)`
+
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
+`cozy.auth.updateClient` is used to update informations about the oauth client.
+
+It returns a promise for the updated Client.
+
+- `client` a registered instance of `cozy.auth.Client`
+- `resetSecret` by setting `resetSecret` to `true`, a new Secret is generated.
+
+```js
+const client = await cozy.auth.registerClient(clientParams)
+
+// change the client's version
+client.softwareVersion = "newlogo.jpg"
+const client = await cozy.auth.updateClient(client)
+
+
+// change the client secret
+const client = await cozy.auth.updateClient(client, true)
+```
+
+### `cozy.auth.unregisterClient(client)`
+
+**This method is for internal or advanced usages. Please see [OAuth document](./oauth.md) to see how to use OAuth with this library**
+
+`cozy.auth.unregisterClient` is used to unregister a client.
+
+It returns a promise for completion
+
+- `client` a registered instance of `cozy.auth.Client`
+
+```js
+const client = await cozy.auth.registerClient(clientParams)
+await cozy.auth.unregisterClient(client)
 
 ### `cozy.auth.getClient(client)`
 
