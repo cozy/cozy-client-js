@@ -619,7 +619,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  statById: files.statById,
 	  statByPath: files.statByPath,
 	  downloadById: files.downloadById,
-	  downloadByPath: files.downloadByPath
+	  downloadByPath: files.downloadByPath,
+	  listTrash: files.listTrash,
+	  clearTrash: files.clearTrash,
+	  restoreById: files.restoreById,
+	  destroyById: files.destroyById
 	};
 	
 	var Cozy = function () {
@@ -2192,6 +2196,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.statByPath = statByPath;
 	exports.downloadById = downloadById;
 	exports.downloadByPath = downloadByPath;
+	exports.listTrash = listTrash;
+	exports.clearTrash = clearTrash;
+	exports.restoreById = restoreById;
+	exports.destroyById = destroyById;
 	
 	var _fetch = __webpack_require__(8);
 	
@@ -2332,6 +2340,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function downloadByPath(cozy, path) {
 	  return (0, _fetch.cozyFetch)(cozy, '/files/download?Path=' + encodeURIComponent(path));
+	}
+	
+	function listTrash(cozy) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/files/trash');
+	}
+	
+	function clearTrash(cozy) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/trash');
+	}
+	
+	function restoreById(cozy, id) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/trash/' + encodeURIComponent(id));
+	}
+	
+	function destroyById(cozy, id) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/trash/' + encodeURIComponent(id));
 	}
 	
 	function addIsDir(obj) {
