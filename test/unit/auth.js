@@ -290,6 +290,12 @@ describe('Authentication', function () {
   })
 
   describe('oauth flow', function () {
+    beforeEach(() => mock.restore())
+    beforeEach(mock.mockAPI('Status'))
+    beforeEach(mock.mockAPI('AuthRegisterClient'))
+    beforeEach(mock.mockAPI('AuthGetClient'))
+    beforeEach(mock.mockAPI('AccessToken'))
+
     it('registers a new client with an empty storage', function (done) {
       const storage = new MemoryStorage()
       const err = new Error()
