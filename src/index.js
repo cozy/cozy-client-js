@@ -34,6 +34,8 @@ const mainProto = {
 
 const authProto = {
   registerClient: auth.registerClient,
+  updateClient: auth.updateClient,
+  unregisterClient: auth.unregisterClient,
   getClient: auth.getClient,
   getAuthCodeURL: auth.getAuthCodeURL,
   getAccessToken: auth.getAccessToken,

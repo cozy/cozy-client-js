@@ -87,6 +87,25 @@ export function registerClient (cozy, client) {
     .then((data) => new Client(data))
 }
 
+export function updateClient (cozy, client, resetSecret = false) {
+  if (!(client instanceof Client)) {
+    client = new Client(client)
+  }
+  if (!client.isRegistered()) {
+    return Promise.reject(new Error('Client not registered'))
+  }
+  let data = client.toRegisterJSON()
+  data.client_id = client.clientID
+  if (resetSecret) data.client_secret = client.clientSecret
+
+  return cozyFetchJSON(cozy, 'PUT', `/auth/register/${client.clientID}`, data)
+  .then((data) => new Client(data))
+}
+
+export function unregisterClient (cozy, client) {
+  return cozyFetchJSON(cozy, 'DELETE', `/auth/register/${client.clientID}`)
+}
+
 // getClient will retrive the registered client informations from the server.
 export function getClient (cozy, client) {
   if (!(client instanceof Client)) {
