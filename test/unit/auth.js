@@ -13,6 +13,7 @@ describe('Authentication', function () {
   beforeEach(() => {
     cozy = new Cozy({ cozyURL: 'http://foobar/' })
   })
+  afterEach(() => mock.restore())
 
   describe('Client', function () {
     it('should be defined', function () {
@@ -206,6 +207,85 @@ describe('Authentication', function () {
         refreshToken: '456',
         scope: 'a b'
       }))
+    })
+  })
+
+  describe('update of client', function () {
+    before(mock.mockAPI('UpdateClient'))
+
+    it('can update client data', async function () {
+      const client = new cozy.auth.Client({
+        client_id: '123',
+        client_secret: '456',
+        registration_access_token: '789',
+        redirect_uris: ['http://coucou/'],
+        software_id: 'id',
+        software_version: '1',
+        client_name: 'client',
+        client_kind: 'desktop',
+        client_uri: 'http://foobar',
+        logo_uri: '123',
+        policy_uri: '123'
+      })
+
+      client.logoURI = '321'
+
+      let client2 = await cozy.auth.updateClient(client)
+      client2.clientID.should.eql('123')
+      client2.logoURI.should.eql('321')
+
+      let opts = JSON.parse(mock.lastCall('UpdateClient')[1].body)
+      should(opts.client_secret).be.undefined()
+    })
+  })
+
+  describe('update of client (reset token)', function () {
+    before(mock.mockAPI('ResetClientToken'))
+
+    it('can reset client token', async function () {
+      const client = new cozy.auth.Client({
+        client_id: '123',
+        client_secret: '456',
+        registration_access_token: '789',
+        redirect_uris: ['http://coucou/'],
+        software_id: 'id',
+        software_version: '1',
+        client_name: 'client',
+        client_kind: 'desktop',
+        client_uri: 'http://foobar',
+        logo_uri: '123',
+        policy_uri: '123'
+      })
+
+      let client2 = await cozy.auth.updateClient(client, true)
+      client2.clientID.should.eql('123')
+
+      let opts = JSON.parse(mock.lastCall('ResetClientToken')[1].body)
+      opts.client_secret.should.eql('456')
+
+      client2.clientSecret.should.eql('654')
+    })
+  })
+
+  describe('unregister client', function () {
+    before(mock.mockAPI('UnregisterClient'))
+
+    it('works', async function () {
+      const client = new cozy.auth.Client({
+        client_id: '123',
+        client_secret: '456',
+        registration_access_token: '789',
+        redirect_uris: ['http://coucou/'],
+        software_id: 'id',
+        software_version: '1',
+        client_name: 'client',
+        client_kind: 'desktop',
+        client_uri: 'http://foobar',
+        logo_uri: '123',
+        policy_uri: '123'
+      })
+
+      await cozy.auth.unregisterClient(client)
     })
   })
 

@@ -334,6 +334,50 @@ const ROUTES = [
         scope: 'a b'
       }
     }
+  },
+  {
+    name: 'UpdateClient',
+    method: 'PUT',
+    matcher: /auth\/register\/123$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        client_id: '123',
+        client_secret: '456',
+        registration_access_token: '789',
+        redirect_uris: ['http://coucou/'],
+        software_id: 'id',
+        client_name: 'client',
+        logo_uri: '321'
+      }
+    }
+  },
+  {
+    name: 'ResetClientToken',
+    method: 'PUT',
+    matcher: /auth\/register\/123$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        client_id: '123',
+        client_secret: '654',
+        registration_access_token: '789',
+        redirect_uris: ['http://coucou/'],
+        software_id: 'id',
+        client_name: 'client',
+        logo_uri: '321'
+      }
+    }
+  },
+  {
+    name: 'UnregisterClient',
+    method: 'DELETE',
+    matcher: /auth\/register\/123$/,
+    response: { body: '' }
   }
 ]
 
