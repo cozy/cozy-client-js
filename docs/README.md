@@ -452,7 +452,7 @@ It returns a promise for the updated Client.
 const client = await cozy.auth.registerClient(clientParams)
 
 // change the client's version
-client.softwareVersion = "newlogo.jpg"
+client.softwareVersion = "v1.2.3"
 const client = await cozy.auth.updateClient(client)
 
 
