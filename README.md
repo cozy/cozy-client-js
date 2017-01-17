@@ -1,4 +1,4 @@
-[![Travis build status shield](https://img.shields.io/travis/cozy/cozy-client-js.svg?branch=master)](https://travis-ci.org/cozy/cozy-client-js)
+[![Travis build status shield](https://img.shields.io/travis/cozy/cozy-client-js/master.svg)](https://travis-ci.org/cozy/cozy-client-js)
 [![NPM release version shield](https://img.shields.io/npm/v/cozy-client-js.svg)](https://www.npmjs.com/package/cozy-client-js)
 [![NPM Licence shield](https://img.shields.io/npm/l/cozy-client-js.svg)](https://github.com/cozy/cozy-client-js/blob/master/LICENSE)
 
