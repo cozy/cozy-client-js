@@ -45,6 +45,9 @@ var config = {
   resolve: {
     root: path.resolve('./src'),
     extensions: ['', '.js']
+  },
+  externals: {
+    pouchdb: 'PouchDB'
   }
 }
 
