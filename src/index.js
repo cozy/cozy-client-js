@@ -6,6 +6,7 @@ import * as auth from './auth_v3'
 import * as crud from './crud'
 import * as mango from './mango'
 import * as files from './files'
+import * as offline from './offline'
 
 const {AccessToken: AccessTokenV3, Client: ClientV3} = auth
 
@@ -59,9 +60,15 @@ const filesProto = {
   destroyById: files.destroyById
 }
 
+const offlineProto = {
+  addDocType: offline.addDocType,
+  init: offline.init
+}
+
 class Cozy {
   constructor (options) {
     this.files = {}
+    this.offline = {}
     this.auth = {
       Client: ClientV3,
       AccessToken: AccessTokenV3,
@@ -86,6 +93,7 @@ class Cozy {
     this._authcreds = null
     this._storage = null
     this._version = null
+    this._offline_databases = false
 
     const oauth = options.oauth
     if (oauth) {
@@ -106,6 +114,11 @@ class Cozy {
     addToProto(this, this, mainProto, disablePromises)
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
+    addToProto(this, this.offline, offlineProto, disablePromises)
+
+    if (options.offline) {
+      this.offline.init(options.offline)
+    }
   }
 
   authorize () {

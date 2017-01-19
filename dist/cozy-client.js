@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
+		module.exports = factory(require("PouchDB"));
 	else if(typeof define === 'function' && define.amd)
-		define("cozy-client-js", [], factory);
+		define("cozy-client-js", ["PouchDB"], factory);
 	else if(typeof exports === 'object')
-		exports["cozy-client-js"] = factory();
+		exports["cozy-client-js"] = factory(require("PouchDB"));
 	else
-		root["cozy-client-js"] = factory();
-})(this, function() {
+		root["cozy-client-js"] = factory(root["PouchDB"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -570,6 +570,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var files = _interopRequireWildcard(_files);
 	
+	var _offline = __webpack_require__(14);
+	
+	var offline = _interopRequireWildcard(_offline);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -603,6 +607,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var authProto = {
 	  registerClient: auth.registerClient,
+	  updateClient: auth.updateClient,
+	  unregisterClient: auth.unregisterClient,
 	  getClient: auth.getClient,
 	  getAuthCodeURL: auth.getAuthCodeURL,
 	  getAccessToken: auth.getAccessToken,
@@ -626,11 +632,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  destroyById: files.destroyById
 	};
 	
+	var offlineProto = {
+	  addDocType: offline.addDocType,
+	  init: offline.init
+	};
+	
 	var Cozy = function () {
 	  function Cozy(options) {
 	    _classCallCheck(this, Cozy);
 	
 	    this.files = {};
+	    this.offline = {};
 	    this.auth = {
 	      Client: ClientV3,
 	      AccessToken: AccessTokenV3,
@@ -659,6 +671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._authcreds = null;
 	      this._storage = null;
 	      this._version = null;
+	      this._offline_databases = false;
 	
 	      var oauth = options.oauth;
 	      if (oauth) {
@@ -679,6 +692,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      addToProto(this, this, mainProto, disablePromises);
 	      addToProto(this, this.auth, authProto, disablePromises);
 	      addToProto(this, this.files, filesProto, disablePromises);
+	      addToProto(this, this.offline, offlineProto, disablePromises);
+	
+	      if (options.offline) {
+	        this.offline.init(options.offline);
+	      }
 	    }
 	  }, {
 	    key: 'authorize',
@@ -1166,6 +1184,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	exports.registerClient = registerClient;
+	exports.updateClient = updateClient;
+	exports.unregisterClient = unregisterClient;
 	exports.getClient = getClient;
 	exports.getAuthCodeURL = getAuthCodeURL;
 	exports.getAccessToken = getAccessToken;
@@ -1278,6 +1298,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }).then(function (data) {
 	    return new Client(data);
 	  });
+	}
+	
+	function updateClient(cozy, client) {
+	  var resetSecret = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+	
+	  if (!(client instanceof Client)) {
+	    client = new Client(client);
+	  }
+	  if (!client.isRegistered()) {
+	    return Promise.reject(new Error('Client not registered'));
+	  }
+	  var data = client.toRegisterJSON();
+	  data.client_id = client.clientID;
+	  if (resetSecret) data.client_secret = client.clientSecret;
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', '/auth/register/' + client.clientID, data).then(function (data) {
+	    return new Client(data);
+	  });
+	}
+	
+	function unregisterClient(cozy, client) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/auth/register/' + client.clientID);
 	}
 	
 	// getClient will retrive the registered client informations from the server.
@@ -2362,6 +2404,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	  obj.isDir = obj.attributes.type === 'directory';
 	  return obj;
 	}
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.init = init;
+	exports.addDocType = addDocType;
+	var PouchDB = __webpack_require__(15);
+	
+	function init(cozy, _ref) {
+	  var _ref$options = _ref.options,
+	      options = _ref$options === undefined ? {} : _ref$options,
+	      _ref$docTypes = _ref.docTypes,
+	      docTypes = _ref$docTypes === undefined ? [] : _ref$docTypes;
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
+	
+	  try {
+	    for (var _iterator = docTypes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var docType = _step.value;
+	
+	      addDocType(cozy, docType, options);
+	    }
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator.return) {
+	        _iterator.return();
+	      }
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
+	      }
+	    }
+	  }
+	}
+	
+	function addDocType(cozy, docType, options) {
+	  cozy._offline_databases = cozy._offline_databases || [];
+	  cozy._offline_databases[docType] = new PouchDB(docType, options);
+	}
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_15__;
 
 /***/ }
 /******/ ])
