@@ -233,5 +233,15 @@ export function makeMapReduceQuery (indexRef, query) {
     }
   })
 
+  if (query.descending) {
+    mrquery = {
+      descending: true,
+      reduce: false,
+      startkey: mrquery.endkey,
+      endkey: mrquery.startkey,
+      inclusive_end: mrquery.inclusive_end
+    }
+  }
+
   return mrquery
 }
