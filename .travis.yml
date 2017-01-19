@@ -15,6 +15,11 @@ hosts:
     - bob.cozy.local
     - charlie.cozy.local
 
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
 before_script:
   # start couchdb 2 (docker)
   - docker run -d -p 5984:5984 --name couch klaemo/couchdb:2.0.0
@@ -30,7 +35,6 @@ before_script:
   - $GOPATH/bin/cozy-stack instances add --dev "localhost:8080"
   # install stack v2
   - npm install -g coffee-script
-  - npm install cozy-data-system cozy-proxy
   # start a stack v2 from NPM (listening on 9104 & 9101)
   - NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start &
   - sleep 3
