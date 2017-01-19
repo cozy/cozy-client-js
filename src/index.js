@@ -62,7 +62,8 @@ const filesProto = {
 
 const offlineProto = {
   addDocType: offline.addDocType,
-  init: offline.init
+  init: offline.init,
+  replicateFromCozy: offline.replicateFromCozy
 }
 
 class Cozy {
