@@ -7,7 +7,7 @@ import PouchDB from 'pouchdb'
 PouchDB.plugin(require('pouchdb-adapter-memory'))
 
 describe('offline', function () {
-  const fileDocType = 'io.cozy.files'
+  const fileDoctype = 'io.cozy.files'
   let cozy
 
   describe('Initialise offline', function () {
@@ -16,21 +16,21 @@ describe('offline', function () {
       cozy._offline_databases.should.be.false
     })
 
-    it('create couchdb database for each docType', function () {
+    it('create couchdb database for each doctype', function () {
       cozy = new Cozy({
         cozyURL: 'http://cozy.local:8080/',
-        offline: {docTypes: [fileDocType], options: {adapter: 'memory'}}
+        offline: {doctypes: [fileDoctype], options: {adapter: 'memory'}}
       })
       cozy._offline_databases.should.be.an.Array()
-      cozy._offline_databases.should.have.property(fileDocType)
+      cozy._offline_databases.should.have.property(fileDoctype)
     })
 
     it('is possible to enable after cozy init', function () {
       cozy = new Cozy({cozyURL: 'http://cozy.local:8080/'})
       cozy._offline_databases.should.be.false
-      cozy.offline.addDocType(fileDocType, {adapter: 'memory'})
+      cozy.offline.addDoctype(fileDoctype, {adapter: 'memory'})
       cozy._offline_databases.should.be.an.Array()
-      cozy._offline_databases.should.have.property(fileDocType)
+      cozy._offline_databases.should.have.property(fileDoctype)
     })
   })
 })
