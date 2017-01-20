@@ -43,7 +43,7 @@ describe('offline', function () {
   })
 
   it('can replicate database from cozy', async function () {
-    cozy.offline.addDoctype(DOCTYPE, {adapter: 'memory'})
+    cozy.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
     let complete = await cozy.offline.replicateFromCozy(DOCTYPE)
     complete.docs_written.should.not.equal(0)
     complete = await cozy.offline.replicateFromCozy(DOCTYPE)
@@ -54,7 +54,7 @@ describe('offline', function () {
     let err = null
 
     try {
-      cozy.offline.addDoctype(DOCTYPE, {adapter: 'memory'})
+      cozy.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
       await cozy.offline.replicateFromCozy(DOCTYPE, {live: true})
     } catch (e) {
       err = e
