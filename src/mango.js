@@ -90,8 +90,11 @@ function queryV3 (cozy, indexRef, options) {
     fields: options.fields,
     selector: options.selector,
     limit: options.limit,
-    since: options.since,
-    sort: indexRef.fields // sort is useless with mango
+    since: options.since
+  }
+
+  if (options.descending) {
+    opts.sort = indexRef.fields.map(f => ({ [f]: 'desc' }))
   }
 
   let path = createPath(cozy, false, indexRef.doctype, '_find')
@@ -229,6 +232,16 @@ export function makeMapReduceQuery (indexRef, query) {
       throw new Error('Cant apply selector on ' + field + ', it is not in index')
     }
   })
+
+  if (query.descending) {
+    mrquery = {
+      descending: true,
+      reduce: false,
+      startkey: mrquery.endkey,
+      endkey: mrquery.startkey,
+      inclusive_end: mrquery.inclusive_end
+    }
+  }
 
   return mrquery
 }

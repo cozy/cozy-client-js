@@ -49,7 +49,7 @@ describe('mango API', function () {
       mock.calls('FindDocuments').should.have.length(1)
       mock.lastUrl('FindDocuments').should.equal('http://my.cozy.io/data/io.cozy.testobject/_find')
       mock.lastOptions('FindDocuments').should.have.property('body',
-        '{"use_index":"_design/generatedindexname","selector":{"field1":"value"},"sort":["field1","field2"]}'
+        '{"use_index":"_design/generatedindexname","selector":{"field1":"value"}}'
       )
 
       fetched.should.be.an.Array()

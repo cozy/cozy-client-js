@@ -84,4 +84,18 @@ describe('mango API', function () {
     results.should.be.an.Array()
     results.should.have.length(2)
   })
+
+  it('Query indexOnGroupAndYear with 2 fields and sorted', async function () {
+    let sortedResults = await cozy.query(indexOnGroupAndYear, {
+      selector: {group: 'A', year: {$gte: 1900, $lt: 2200}},
+      descending: true
+    })
+    let nonSortedresults = await cozy.query(indexOnGroupAndYear, {
+      selector: {group: 'A', year: {$gte: 1900, $lt: 2200}}
+    })
+
+    sortedResults.should.be.an.Array()
+    sortedResults.should.have.length(2)
+    sortedResults[0].should.deepEqual(nonSortedresults[1])
+  })
 })
