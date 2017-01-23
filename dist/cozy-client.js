@@ -633,8 +633,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var offlineProto = {
-	  addDocType: offline.addDocType,
-	  init: offline.init
+	  init: offline.init,
+	  createDatabase: offline.createDatabase,
+	  hasDatabase: offline.hasDatabase,
+	  getDatabase: offline.getDatabase,
+	  destroyDatabase: offline.destroyDatabase,
+	  replicateFromCozy: offline.replicateFromCozy
 	};
 	
 	var Cozy = function () {
@@ -2432,23 +2436,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.init = init;
-	exports.addDocType = addDocType;
+	exports.createDatabase = createDatabase;
+	exports.hasDatabase = hasDatabase;
+	exports.getDatabase = getDatabase;
+	exports.destroyDatabase = destroyDatabase;
+	exports.replicateFromCozy = replicateFromCozy;
 	var PouchDB = __webpack_require__(15);
 	
 	function init(cozy, _ref) {
 	  var _ref$options = _ref.options,
 	      options = _ref$options === undefined ? {} : _ref$options,
-	      _ref$docTypes = _ref.docTypes,
-	      docTypes = _ref$docTypes === undefined ? [] : _ref$docTypes;
+	      _ref$doctypes = _ref.doctypes,
+	      doctypes = _ref$doctypes === undefined ? [] : _ref$doctypes;
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
 	
 	  try {
-	    for (var _iterator = docTypes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	      var docType = _step.value;
+	    for (var _iterator = doctypes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var doctype = _step.value;
 	
-	      addDocType(cozy, docType, options);
+	      createDatabase(cozy, doctype, options);
 	    }
 	  } catch (err) {
 	    _didIteratorError = true;
@@ -2466,9 +2474,75 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 	
-	function addDocType(cozy, docType, options) {
+	function createDatabase(cozy, doctype) {
+	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	
 	  cozy._offline_databases = cozy._offline_databases || [];
-	  cozy._offline_databases[docType] = new PouchDB(docType, options);
+	  cozy._offline_databases[doctype] = new PouchDB(doctype, options);
+	  return cozy._offline_databases[doctype];
+	}
+	
+	function hasDatabase(cozy, doctype) {
+	  return cozy._offline_databases && doctype in cozy._offline_databases;
+	}
+	
+	function getDatabase(cozy, doctype) {
+	  if (hasDatabase(cozy, doctype)) {
+	    return cozy._offline_databases[doctype];
+	  }
+	  return;
+	}
+	
+	function destroyDatabase(cozy, doctype) {
+	  if (hasDatabase(cozy, doctype)) {
+	    getDatabase(cozy, doctype).destroy();
+	    delete getDatabase(cozy, doctype);
+	  }
+	}
+	
+	function replicateFromCozy(cozy, doctype) {
+	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	  var events = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+	
+	  if (hasDatabase(cozy, doctype)) {
+	    if (options.live === true) {
+	      throw new Error('You can\'t use `live` option with Cozy couchdb.');
+	    }
+	    var url = cozy._url + '/data/' + doctype;
+	    var db = getDatabase(cozy, doctype);
+	    var replication = db.replicate.from(url, options);
+	    var eventNames = ['change', 'paused', 'active', 'denied', 'complete', 'error'];
+	    var _iteratorNormalCompletion2 = true;
+	    var _didIteratorError2 = false;
+	    var _iteratorError2 = undefined;
+	
+	    try {
+	      for (var _iterator2 = eventNames[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	        var eventName = _step2.value;
+	
+	        if (typeof events[eventName] === 'function') {
+	          replication.on(eventName, events[eventName]);
+	        }
+	      }
+	    } catch (err) {
+	      _didIteratorError2 = true;
+	      _iteratorError2 = err;
+	    } finally {
+	      try {
+	        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	          _iterator2.return();
+	        }
+	      } finally {
+	        if (_didIteratorError2) {
+	          throw _iteratorError2;
+	        }
+	      }
+	    }
+	
+	    return replication;
+	  } else {
+	    throw new Error('You should add this doctype: ' + doctype + ' to offline.');
+	  }
 	}
 
 /***/ },
