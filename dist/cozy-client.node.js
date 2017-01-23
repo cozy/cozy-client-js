@@ -1504,6 +1504,8 @@
 	
 	var _fetch = __webpack_require__(8);
 	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
 	function defineIndex(cozy, doctype, fields) {
 	  return cozy.isV2().then(function (isV2) {
 	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
@@ -1597,9 +1599,14 @@
 	    fields: options.fields,
 	    selector: options.selector,
 	    limit: options.limit,
-	    since: options.since,
-	    sort: indexRef.fields // sort is useless with mango
+	    since: options.since
 	  };
+	
+	  if (options.descending) {
+	    opts.sort = indexRef.fields.map(function (f) {
+	      return _defineProperty({}, f, 'desc');
+	    });
+	  }
 	
 	  var path = (0, _utils.createPath)(cozy, false, indexRef.doctype, '_find');
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function (response) {
@@ -1745,6 +1752,16 @@
 	      throw new Error('Cant apply selector on ' + field + ', it is not in index');
 	    }
 	  });
+	
+	  if (query.descending) {
+	    mrquery = {
+	      descending: true,
+	      reduce: false,
+	      startkey: mrquery.endkey,
+	      endkey: mrquery.startkey,
+	      inclusive_end: mrquery.inclusive_end
+	    };
+	  }
 	
 	  return mrquery;
 	}
