@@ -473,6 +473,7 @@ It returns a promise for completion
 ```js
 const client = await cozy.auth.registerClient(clientParams)
 await cozy.auth.unregisterClient(client)
+```
 
 ### `cozy.auth.getClient(client)`
 
@@ -485,7 +486,7 @@ It returns a promise of the client returned by the server.
 - `client` is a registered `cozy.auth.Client`
 
 ```js
-const client = await cozy.auth.getClient(new cozy.auth.Client('https://me.cozy.io/', {
+const client = await cozy.auth.getClient(new cozy.auth.Client({
   clientID: '1235'
 }))
 ```
