@@ -427,7 +427,7 @@ It returns a promise of the newly registered Client, along with a client secret 
 - `clientParams` are client parameters: a non registered instance of `cozy.auth.Client`
 
 ```js
-const clientParams = new cozy.auth.Client('https://me.cozy.io/', {
+const clientParams = new cozy.auth.Client({
   redirectURI: 'http://localhost:3000/',
   softwareID: 'mysoftware',
   clientName: 'Great mobile App'
