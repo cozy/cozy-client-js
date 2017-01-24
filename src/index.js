@@ -61,8 +61,12 @@ const filesProto = {
 }
 
 const offlineProto = {
-  addDocType: offline.addDocType,
-  init: offline.init
+  init: offline.init,
+  createDatabase: offline.createDatabase,
+  hasDatabase: offline.hasDatabase,
+  getDatabase: offline.getDatabase,
+  destroyDatabase: offline.destroyDatabase,
+  replicateFromCozy: offline.replicateFromCozy
 }
 
 class Cozy {
