@@ -99,7 +99,7 @@ export function updateClient (cozy, client, resetSecret = false) {
   if (resetSecret) data.client_secret = client.clientSecret
 
   return cozyFetchJSON(cozy, 'PUT', `/auth/register/${client.clientID}`, data)
-  .then((data) => createClient(data, client))
+    .then((data) => createClient(data, client))
 }
 
 export function unregisterClient (cozy, client) {
@@ -229,8 +229,15 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered) {
     // said token. Fetching the client, if the token is outdated we should try
     // the token is refreshed.
     if (credentials) {
-      const {client, token} = credentials
-      return getClient(cozy, client).then((client) => ({client, token}))
+      let oldClient, token
+      try {
+        oldClient = new Client(credentials.client)
+        token = new AccessToken(credentials.token)
+      } catch (err) {
+        // bad cache, we should clear and retry the process
+        return clearAndRetry(err)
+      }
+      return getClient(cozy, oldClient).then((client) => ({client, token}))
     }
 
     // Otherwise register a new client if necessary (ie. no client is stored)
