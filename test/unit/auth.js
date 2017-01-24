@@ -103,7 +103,8 @@ describe('Authentication', function () {
         clientSecret: 'blabla',
         redirectURI: 'http://coucou/',
         softwareID: 'id',
-        clientName: 'client'
+        clientName: 'client',
+        registrationAccessToken: '789'
       })
 
       client.clientID.should.equal('123')
@@ -233,6 +234,7 @@ describe('Authentication', function () {
       let client2 = await cozy.auth.updateClient(client)
       client2.clientID.should.eql('123')
       client2.logoURI.should.eql('321')
+      client2.registrationAccessToken.should.eql('789')
 
       let opts = JSON.parse(mock.lastCall('UpdateClient')[1].body)
       should(opts.client_secret).be.undefined()
@@ -259,6 +261,7 @@ describe('Authentication', function () {
 
       let client2 = await cozy.auth.updateClient(client, true)
       client2.clientID.should.eql('123')
+      client2.registrationAccessToken.should.eql('789')
 
       let opts = JSON.parse(mock.lastCall('ResetClientToken')[1].body)
       opts.client_secret.should.eql('456')
