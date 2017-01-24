@@ -49,7 +49,7 @@ export function cozyFetchJSON (cozy, method, path, body, options = {}) {
 
   headers['Accept'] = 'application/json'
 
-  if (body !== undefined) {
+  if (method !== 'GET' && method !== 'HEAD' && body !== undefined) {
     if (headers['Content-Type']) {
       options.body = body
     } else {
