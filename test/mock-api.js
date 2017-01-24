@@ -306,7 +306,6 @@ const ROUTES = [
       const body = {
         client_id: '123',
         client_secret: '456',
-        registration_access_token: '789',
         redirect_uris: ['http://coucou/'],
         software_id: 'id',
         client_name: 'client'
@@ -346,7 +345,6 @@ const ROUTES = [
       body: {
         client_id: '123',
         client_secret: '456',
-        registration_access_token: '789',
         redirect_uris: ['http://coucou/'],
         software_id: 'id',
         client_name: 'client',
@@ -365,7 +363,6 @@ const ROUTES = [
       body: {
         client_id: '123',
         client_secret: '654',
-        registration_access_token: '789',
         redirect_uris: ['http://coucou/'],
         software_id: 'id',
         client_name: 'client',

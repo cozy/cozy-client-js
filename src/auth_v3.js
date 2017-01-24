@@ -99,7 +99,7 @@ export function updateClient (cozy, client, resetSecret = false) {
   if (resetSecret) data.client_secret = client.clientSecret
 
   return cozyFetchJSON(cozy, 'PUT', `/auth/register/${client.clientID}`, data)
-  .then((data) => new Client(data))
+  .then((data) => createClient(data, client))
 }
 
 export function unregisterClient (cozy, client) {
@@ -120,7 +120,25 @@ export function getClient (cozy, client) {
       token: client
     }
   })
-    .then((data) => new Client(data))
+    .then((data) => createClient(data, client))
+}
+
+// createClient returns a new Client instance given on object containing the
+// data of the client, from the API, and an old instance of the client.
+function createClient (data, oldClient) {
+  const newClient = new Client(data)
+  // we need to keep track of the registrationAccessToken since it is send
+  // only on registration. The GET /auth/register/:client-id endpoint does
+  // not return this token.
+  const shouldPassRegistration = (
+    !!oldClient &&
+    oldClient.registrationAccessToken !== '' &&
+    newClient.registrationAccessToken === ''
+  )
+  if (shouldPassRegistration) {
+    newClient.registrationAccessToken = oldClient.registrationAccessToken
+  }
+  return newClient
 }
 
 // getAuthCodeURL returns a pair {authURL,state} given a registered client. The
