@@ -1455,11 +1455,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // the token is refreshed.
 	    if (credentials) {
 	      var _ret = function () {
-	        var client = credentials.client,
-	            token = credentials.token;
-	
+	        var oldClient = void 0,
+	            token = void 0;
+	        try {
+	          oldClient = new Client(credentials.client);
+	          token = new AccessToken(credentials.token);
+	        } catch (err) {
+	          // bad cache, we should clear and retry the process
+	          return {
+	            v: clearAndRetry(err)
+	          };
+	        }
 	        return {
-	          v: getClient(cozy, client).then(function (client) {
+	          v: getClient(cozy, oldClient).then(function (client) {
 	            return { client: client, token: token };
 	          })
 	        };
@@ -1656,7 +1664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  headers['Accept'] = 'application/json';
 	
-	  if (body !== undefined) {
+	  if (method !== 'GET' && method !== 'HEAD' && body !== undefined) {
 	    if (headers['Content-Type']) {
 	      options.body = body;
 	    } else {
