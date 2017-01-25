@@ -97,7 +97,7 @@ cozy.create(myBooksDoctype, doc, function(err, result) {
 ```
 
 
-## Implemented API
+## Constructor
 
 
 ### `new Cozy(options)`
@@ -133,6 +133,8 @@ cozy.init({
 })
 ```
 
+
+## Data API
 
 ### `cozy.create(doctype, attributes)`
 
@@ -284,6 +286,8 @@ resuts[0].rating < 2 // lowest rating first
 ```
 
 
+## Files API
+
 ### `cozy.files.create(data, options)`
 
 `cozy.files.create(data, options)` is used to upload a new file onto your cozy
@@ -415,6 +419,24 @@ const text = await response.text()
 const buff = await response.arrayBuffer()
 ```
 
+
+## Settings
+
+### `cozy.settings.diskUsage()`
+
+`cozy.settings.diskUsage` is used to known informations about the total used space on the cozy disk.
+
+It returns a promise of the document of the disk-usage of id `io.cozy.settings.disk-usage`, with attributes containing a `used` field a string of how many *bytes* are used on the disk.
+
+The `used` field is a string since the underlying data is an `int64` which may not be properly represented in javascript.
+
+```javascript
+const usage = await cozy.settings.diskUsage()
+console.log(usage.attributes.used)
+```
+
+
+## Authentication and OAuth (internal)
 
 ### `cozy.auth.registerClient(clientParams)`
 
