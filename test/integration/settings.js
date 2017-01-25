@@ -21,7 +21,7 @@ describe('settings api', async function () {
   })
 
   it('gets the disk usage', async function () {
-    const usage = cozy.settings.diskUsage()
+    const usage = await cozy.settings.diskUsage()
     usage.should.have.property('attributes')
     usage.attributes.used.should.be.type('string')
   })
