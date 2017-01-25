@@ -1469,6 +1469,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return {
 	          v: getClient(cozy, oldClient).then(function (client) {
 	            return { client: client, token: token };
+	          }).catch(function (err) {
+	            // If we fall into an error while fetching the client (because of a
+	            // bad connectivity for instance), we do not bail the whole process
+	            // since the client should be able to continue with the persisted
+	            // client and token.
+	            //
+	            // If it is an explicit Unauthorized error though, we bail, clear th
+	            // cache and retry.
+	            if (_fetch.FetchError.isUnauthorized(err)) {
+	              throw err;
+	            }
+	            return { client: oldClient, token: token };
 	          })
 	        };
 	      }();
@@ -1505,7 +1517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }).then(function (creds) {
 	    return storage.save(CredsKey, creds);
 	  }, function (err) {
-	    if (err instanceof _fetch.FetchError && err.isUnauthorised()) {
+	    if (_fetch.FetchError.isUnauthorized(err)) {
 	      return clearAndRetry(err);
 	    } else {
 	      throw err;
@@ -1719,14 +1731,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  _createClass(FetchError, [{
-	    key: 'isUnauthorised',
-	    value: function isUnauthorised() {
+	    key: 'isUnauthorized',
+	    value: function isUnauthorized() {
 	      return this.status === 401;
 	    }
 	  }]);
-
+	
 	  return FetchError;
 	}();
+	
+	FetchError.isUnauthorized = function (err) {
+	  return err instanceof FetchError && err.isUnauthorized();
+	};
 
 /***/ },
 /* 9 */
