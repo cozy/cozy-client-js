@@ -375,6 +375,27 @@ const ROUTES = [
     method: 'DELETE',
     matcher: /auth\/register\/123$/,
     response: { body: '' }
+  },
+  {
+    name: 'DiskUsage',
+    method: 'GET',
+    matcher: /settings\/disk-usage$/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
+        type: 'io.cozy.settings',
+        id: 'io.cozy.settings.disk-usage',
+        attributes: {
+          used: '123'
+        },
+        meta: {},
+        links: {
+          self: '/settings/disk-usage'
+        }
+      } }
+    }
   }
 ]
 
