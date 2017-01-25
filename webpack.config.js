@@ -47,7 +47,7 @@ var config = {
     extensions: ['', '.js']
   },
   externals: {
-    pouchdb: 'PouchDB'
+    pouchdb: 'pouchdb'
   }
 }
 
