@@ -102,7 +102,11 @@ export class FetchError {
     this.reason = reason
   }
 
-  isUnauthorised () {
+  isUnauthorized () {
     return this.status === 401
   }
+}
+
+FetchError.isUnauthorized = function (err) {
+  return (err instanceof FetchError && err.isUnauthorized())
 }

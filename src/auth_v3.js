@@ -237,7 +237,21 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered) {
         // bad cache, we should clear and retry the process
         return clearAndRetry(err)
       }
-      return getClient(cozy, oldClient).then((client) => ({client, token}))
+      return getClient(cozy, oldClient)
+        .then((client) => ({client, token}))
+        .catch((err) => {
+          // If we fall into an error while fetching the client (because of a
+          // bad connectivity for instance), we do not bail the whole process
+          // since the client should be able to continue with the persisted
+          // client and token.
+          //
+          // If it is an explicit Unauthorized error though, we bail, clear th
+          // cache and retry.
+          if (FetchError.isUnauthorized(err)) {
+            throw err
+          }
+          return { client: oldClient, token }
+        })
     }
 
     // Otherwise register a new client if necessary (ie. no client is stored)
@@ -265,7 +279,7 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered) {
   .then(
     (creds) => storage.save(CredsKey, creds),
     (err) => {
-      if ((err instanceof FetchError) && err.isUnauthorised()) {
+      if (FetchError.isUnauthorized(err)) {
         return clearAndRetry(err)
       } else {
         throw err
