@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("PouchDB"));
+		module.exports = factory(require("pouchdb"));
 	else if(typeof define === 'function' && define.amd)
-		define("cozy-client-js", ["PouchDB"], factory);
+		define("cozy-client-js", ["pouchdb"], factory);
 	else if(typeof exports === 'object')
-		exports["cozy-client-js"] = factory(require("PouchDB"));
+		exports["cozy-client-js"] = factory(require("pouchdb"));
 	else
-		root["cozy-client-js"] = factory(root["PouchDB"]);
+		root["cozy-client-js"] = factory(root["pouchdb"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
