@@ -62,11 +62,19 @@ const filesProto = {
 
 const offlineProto = {
   init: offline.init,
+  getDoctypes: offline.getDoctypes,
+  // database
   createDatabase: offline.createDatabase,
   hasDatabase: offline.hasDatabase,
   getDatabase: offline.getDatabase,
   destroyDatabase: offline.destroyDatabase,
-  replicateFromCozy: offline.replicateFromCozy
+  // replication
+  replicateFromCozy: offline.replicateFromCozy,
+  hasSync: offline.hasSync,
+  startAllSync: offline.startAllSync,
+  startSync: offline.startSync,
+  stopAllSync: offline.stopAllSync,
+  stopSync: offline.stopSync
 }
 
 class Cozy {
@@ -97,7 +105,7 @@ class Cozy {
     this._authcreds = null
     this._storage = null
     this._version = null
-    this._offline_databases = false
+    this._offline = null
 
     const oauth = options.oauth
     if (oauth) {
