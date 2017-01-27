@@ -43,3 +43,12 @@ before_script:
   - npm explore cozy-data-system coffee commands.coffee test-install client-js ../../test/package.json
   - export NAME=client-js
   - export TOKEN=apptoken
+
+deploy:
+  provider: npm
+  email: npm@cozycloud.cc
+  api_key:
+    secure: IY7qwu9LGdCKJTWDtsFPtaB2WhJ3vXUXTCeYEss0kM9Q98RuTSQA7ibu4c2kCRMhI7A7WAmHnkR7kDciyJGltcWEhn8yaXiJMfYqzCbyyfC4xfP4GsvKTlEyg3gjTREaJRibPJsQDBwo0d6zSaB85D0ovml0DT3PZCcMxUDw94yq/ej6qK3OAKY1QEQTEwNEQUL6Rr2ryi3zQHj8bP8cpq5tAFPvgsngLbGZsG8r2Rj6aHYjw2uHH1ummdcfJ0PdoHKaik1V5JazqPRs+KpQRpgByJ/sC3lVB9JMkxTzZ8n2iDOaIFgmAs4XIn1K6aUWQGkUsDi2vBoq3nHWCuLGOkeKWaktUtkQkzaG/6pm7UCZOxRQrJbldLZZQqxTpAEIZ31nybSM7kqT86NXIZm55hstn5cqlQoC/Y0T/NorkTAF5OAhD+dX35iw4C+Wglj9YdDABEXbpXGfl4dlKehxj4BfliGuelVR26XU/xocJCjq8/MA6Y5bcu2mZHHI7VtmeGHAya54JbQaqYMWpttIwp8al/RZ2/oLtpq+HNvwNWf583z7fezzP8EUYbAUzG6LleybDpoDfJ/CbI3LqWcopnS8HspL10TnPqaqA9pjvbrZPSJlydUfgEHmiWneha4FKbgpPfefG4PHiieFVEMA4lmUxFWWL91fruHg56cDmbk=
+  on:
+    tags: true
+    repo: cozy/cozy-client-js
