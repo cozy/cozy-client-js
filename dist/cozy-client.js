@@ -634,11 +634,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var offlineProto = {
 	  init: offline.init,
+	  getDoctypes: offline.getDoctypes,
+	  // database
 	  createDatabase: offline.createDatabase,
 	  hasDatabase: offline.hasDatabase,
 	  getDatabase: offline.getDatabase,
 	  destroyDatabase: offline.destroyDatabase,
-	  replicateFromCozy: offline.replicateFromCozy
+	  // replication
+	  replicateFromCozy: offline.replicateFromCozy,
+	  hasSync: offline.hasSync,
+	  startAllSync: offline.startAllSync,
+	  startSync: offline.startSync,
+	  stopAllSync: offline.stopAllSync,
+	  stopSync: offline.stopSync
 	};
 	
 	var Cozy = function () {
@@ -675,7 +683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._authcreds = null;
 	      this._storage = null;
 	      this._version = null;
-	      this._offline_databases = false;
+	      this._offline = null;
 	
 	      var oauth = options.oauth;
 	      if (oauth) {
@@ -2473,11 +2481,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
 	exports.init = init;
 	exports.createDatabase = createDatabase;
 	exports.hasDatabase = hasDatabase;
 	exports.getDatabase = getDatabase;
 	exports.destroyDatabase = destroyDatabase;
+	exports.getDoctypes = getDoctypes;
+	exports.startAllSync = startAllSync;
+	exports.stopAllSync = stopAllSync;
+	exports.startSync = startSync;
+	exports.hasSync = hasSync;
+	exports.stopSync = stopSync;
 	exports.replicateFromCozy = replicateFromCozy;
 	var PouchDB = __webpack_require__(15);
 	
@@ -2485,7 +2502,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var _ref$options = _ref.options,
 	      options = _ref$options === undefined ? {} : _ref$options,
 	      _ref$doctypes = _ref.doctypes,
-	      doctypes = _ref$doctypes === undefined ? [] : _ref$doctypes;
+	      doctypes = _ref$doctypes === undefined ? [] : _ref$doctypes,
+	      _ref$timer = _ref.timer,
+	      timer = _ref$timer === undefined ? false : _ref$timer;
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
@@ -2510,31 +2529,117 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }
+	
+	  if (timer) {
+	    startAllSync(cozy, timer);
+	  }
 	}
 	
 	function createDatabase(cozy, doctype) {
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	  var timer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 	
-	  cozy._offline_databases = cozy._offline_databases || [];
-	  cozy._offline_databases[doctype] = new PouchDB(doctype, options);
-	  return cozy._offline_databases[doctype];
+	  cozy._offline = cozy._offline || [];
+	  cozy._offline[doctype] = cozy._offline[doctype] || {};
+	  var offline = cozy._offline[doctype];
+	  if (offline && offline.database) {
+	    return offline.database;
+	  }
+	  offline.database = new PouchDB(doctype, options);
+	  offline.timer = timer;
+	  offline.autoSync = null;
+	  if (timer) {
+	    startSync(cozy, doctype, timer);
+	  }
+	  return offline.database;
 	}
 	
 	function hasDatabase(cozy, doctype) {
-	  return cozy._offline_databases && doctype in cozy._offline_databases;
+	  return cozy._offline !== null && doctype in cozy._offline && cozy._offline[doctype].database !== undefined;
 	}
 	
 	function getDatabase(cozy, doctype) {
 	  if (hasDatabase(cozy, doctype)) {
-	    return cozy._offline_databases[doctype];
+	    return cozy._offline[doctype].database;
 	  }
 	  return;
 	}
 	
 	function destroyDatabase(cozy, doctype) {
 	  if (hasDatabase(cozy, doctype)) {
+	    stopSync(cozy, doctype);
 	    getDatabase(cozy, doctype).destroy();
 	    delete getDatabase(cozy, doctype);
+	  }
+	}
+	
+	function getDoctypes(cozy) {
+	  if (cozy._offline === null) {
+	    return [];
+	  }
+	  return Object.keys(cozy._offline);
+	}
+	
+	//
+	// SYNC
+	//
+	
+	function startAllSync(cozy, timer) {
+	  if (timer) {
+	    var doctypes = getDoctypes(cozy);
+	    doctypes.forEach(function (doctype) {
+	      startSync(cozy, doctype, timer);
+	    });
+	  }
+	}
+	
+	function stopAllSync(cozy) {
+	  var doctypes = getDoctypes(cozy);
+	  doctypes.forEach(function (doctype) {
+	    stopSync(cozy, doctype);
+	  });
+	}
+	
+	function startSync(cozy, doctype, timer) {
+	  // TODO: add timer limitation for not flooding Gozy
+	  if (hasDatabase(cozy, doctype)) {
+	    var _ret = function () {
+	      if (hasSync(cozy, doctype)) {
+	        if (timer === cozy._offline[doctype].timer) {
+	          return {
+	            v: void 0
+	          };
+	        }
+	        stopSync(cozy, doctype);
+	      }
+	      var offline = cozy._offline[doctype];
+	      offline.timer = timer;
+	      offline.autoSync = setInterval(function () {
+	        if (offline.replicate === undefined) {
+	          offline.replicate = replicateFromCozy(cozy, doctype).on('complete', function (info) {
+	            delete offline.replicate;
+	          });
+	          // TODO: add replicationToCozy
+	        }
+	      }, timer * 1000);
+	    }();
+	
+	    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	  }
+	}
+	
+	function hasSync(cozy, doctype) {
+	  return cozy._offline !== null && doctype in cozy._offline && cozy._offline[doctype].autoSync !== null;
+	}
+	
+	function stopSync(cozy, doctype) {
+	  if (hasSync(cozy, doctype)) {
+	    var offline = cozy._offline[doctype];
+	    if (offline.replication) {
+	      offline.replication.cancel();
+	    }
+	    clearInterval(offline.autoSync);
+	    delete offline.autoSync;
 	  }
 	}
 	

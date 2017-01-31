@@ -39,6 +39,7 @@ describe('offline', function () {
       for (var i = 0, l = docs.length; i < l; i++) {
         await cozy.delete(DOCTYPE, docs[i])
       }
+      cozy.offline.stopAllSync()
     }
   })
 
@@ -62,4 +63,54 @@ describe('offline', function () {
       err.should.eql(new Error('You can\'t use `live` option with Cozy couchdb.'))
     }
   })
+
+  it('can auto replicate database', async function () {
+    let db = cozy.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
+    const lastSeq = await new Promise((resolve) => {
+      cozy.offline.replicateFromCozy(DOCTYPE, {}, {complete: (info) => {
+        db.changes().on('complete', (info) => {
+          resolve(info.last_seq)
+        })
+      }})
+    })
+
+    let count = 0
+    db.changes({live: true, include_docs: true, since: lastSeq})
+      .on('change', (change) => { count++ })
+
+    const smallDoc = {test: 187}
+    cozy.offline.startSync(DOCTYPE, 3)
+    await new Promise(resolve => setTimeout(resolve, 1 * 1000))
+    let doc = await cozy.create(DOCTYPE, smallDoc)
+    const docId = doc._id
+
+    let err = null
+    doc = null
+
+    try {
+      doc = await db.get(docId)
+    } catch (e) {
+      err = e
+      err.status.should.be.exactly(404)
+    } finally {
+      (doc === null).should.be.true
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 5 * 1000))
+
+    doc = null
+    err = null
+
+    try {
+      doc = await db.get(docId)
+    } catch (e) {
+      err = e
+    } finally {
+      (err === null).should.be.true
+      doc.should.be.type('object')
+      doc._id.should.equal(docId)
+      doc.test.should.equal(smallDoc.test)
+    }
+    count.should.be.exactly(1)
+  }).timeout(7 * 1000)
 })

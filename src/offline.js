@@ -1,32 +1,103 @@
 const PouchDB = require('pouchdb')
 
-export function init (cozy, { options = {}, doctypes = [] }) {
+export function init (cozy, { options = {}, doctypes = [], timer = false }) {
   for (let doctype of doctypes) {
     createDatabase(cozy, doctype, options)
   }
+  if (timer) { startAllSync(cozy, timer) }
 }
 
-export function createDatabase (cozy, doctype, options = {}) {
-  cozy._offline_databases = cozy._offline_databases || []
-  cozy._offline_databases[doctype] = new PouchDB(doctype, options)
-  return cozy._offline_databases[doctype]
+export function createDatabase (cozy, doctype, options = {}, timer = false) {
+  cozy._offline = cozy._offline || []
+  cozy._offline[doctype] = cozy._offline[doctype] || {}
+  let offline = cozy._offline[doctype]
+  if (offline && offline.database) { return offline.database }
+  offline.database = new PouchDB(doctype, options)
+  offline.timer = timer
+  offline.autoSync = null
+  if (timer) { startSync(cozy, doctype, timer) }
+  return offline.database
 }
 
 export function hasDatabase (cozy, doctype) {
-  return cozy._offline_databases && doctype in cozy._offline_databases
+  return cozy._offline !== null &&
+    doctype in cozy._offline &&
+    cozy._offline[doctype].database !== undefined
 }
 
 export function getDatabase (cozy, doctype) {
   if (hasDatabase(cozy, doctype)) {
-    return cozy._offline_databases[doctype]
+    return cozy._offline[doctype].database
   }
   return
 }
 
 export function destroyDatabase (cozy, doctype) {
   if (hasDatabase(cozy, doctype)) {
+    stopSync(cozy, doctype)
     getDatabase(cozy, doctype).destroy()
     delete getDatabase(cozy, doctype)
+  }
+}
+
+export function getDoctypes (cozy) {
+  if (cozy._offline === null) { return [] }
+  return Object.keys(cozy._offline)
+}
+
+//
+// SYNC
+//
+
+export function startAllSync (cozy, timer) {
+  if (timer) {
+    const doctypes = getDoctypes(cozy)
+    doctypes.forEach((doctype) => {
+      startSync(cozy, doctype, timer)
+    })
+  }
+}
+
+export function stopAllSync (cozy) {
+  const doctypes = getDoctypes(cozy)
+  doctypes.forEach((doctype) => {
+    stopSync(cozy, doctype)
+  })
+}
+
+export function startSync (cozy, doctype, timer) {
+  // TODO: add timer limitation for not flooding Gozy
+  if (hasDatabase(cozy, doctype)) {
+    if (hasSync(cozy, doctype)) {
+      if (timer === cozy._offline[doctype].timer) { return }
+      stopSync(cozy, doctype)
+    }
+    let offline = cozy._offline[doctype]
+    offline.timer = timer
+    offline.autoSync = setInterval(() => {
+      if (offline.replicate === undefined) {
+        offline.replicate = replicateFromCozy(cozy, doctype)
+          .on('complete', (info) => {
+            delete offline.replicate
+          })
+        // TODO: add replicationToCozy
+      }
+    }, timer * 1000)
+  }
+}
+
+export function hasSync (cozy, doctype) {
+  return cozy._offline !== null &&
+    doctype in cozy._offline &&
+    cozy._offline[doctype].autoSync !== null
+}
+
+export function stopSync (cozy, doctype) {
+  if (hasSync(cozy, doctype)) {
+    let offline = cozy._offline[doctype]
+    if (offline.replication) { offline.replication.cancel() }
+    clearInterval(offline.autoSync)
+    delete offline.autoSync
   }
 }
 
