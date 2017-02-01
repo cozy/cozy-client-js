@@ -175,6 +175,7 @@ describe('files API', async function () {
     beforeEach(() => {
       cozy = new Cozy({
         cozyURL: COZY_STACK_URL,
+        token: COZY_STACK_TOKEN,
         offline: {doctypes: ['io.cozy.files'], options: {adapter: 'memory'}}
       })
     })
