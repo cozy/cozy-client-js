@@ -8,6 +8,7 @@ import {randomGenerator} from '../helpers'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
+const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 
 describe('files API', async function () {
   let random
@@ -18,7 +19,8 @@ describe('files API', async function () {
       this.skip()
     }
     cozy = new Cozy({
-      cozyURL: COZY_STACK_URL
+      cozyURL: COZY_STACK_URL,
+      token: COZY_STACK_TOKEN
     })
     random = randomGenerator()
   })
