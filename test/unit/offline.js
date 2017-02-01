@@ -15,13 +15,20 @@ describe('offline', () => {
 
   describe('Initialise offline', () => {
     it('is disable by default', () => {
-      cozy = new Cozy({cozyURL: cozyUrl})
+      cozy = new Cozy({
+        cozyURL: cozyUrl,
+        token: 'apptoken'
+      })
       const isNotDefined = cozy._offline === null
       isNotDefined.should.be.true
     })
 
     it('create couchdb database for each doctype', () => {
-      cozy = new Cozy({cozyURL: cozyUrl, offline: offlineParameter})
+      cozy = new Cozy({
+        cozyURL: cozyUrl,
+        offline: offlineParameter,
+        token: 'apptoken'
+      })
       cozy._offline.should.be.an.Array()
       cozy._offline.should.have.property(fileDoctype)
       cozy._offline.should.have.property(otherDoctype)
@@ -30,7 +37,10 @@ describe('offline', () => {
     })
 
     it('is possible to enable after cozy init', () => {
-      cozy = new Cozy({cozyURL: cozyUrl})
+      cozy = new Cozy({
+        cozyURL: cozyUrl,
+        token: 'apptoken'
+      })
       cozy.offline.createDatabase(fileDoctype, {adapter: 'memory'})
       cozy._offline.should.be.an.Array()
       cozy._offline.should.have.property(fileDoctype)
@@ -39,7 +49,10 @@ describe('offline', () => {
 
   describe('doctype database', () => {
     beforeEach(() => {
-      cozy = new Cozy({cozyURL: cozyUrl})
+      cozy = new Cozy({
+        cozyURL: cozyUrl,
+        token: 'apptoken'
+      })
     })
 
     it('should create database', () => {
@@ -82,7 +95,11 @@ describe('offline', () => {
 
   describe('sync database', () => {
     beforeEach(() => {
-      cozy = new Cozy({cozyURL: cozyUrl, offline: offlineParameter})
+      cozy = new Cozy({
+        cozyURL: cozyUrl,
+        offline: offlineParameter,
+        token: 'apptoken'
+      })
     })
 
     it('is disable by default', () => {
@@ -94,7 +111,11 @@ describe('offline', () => {
       cozy.offline.hasSync(otherDoctype).should.be.false
       let copy = JSON.parse(JSON.stringify(offlineParameter))
       copy.timer = 10
-      cozy = new Cozy({cozyURL: cozyUrl, offline: copy})
+      cozy = new Cozy({
+        cozyURL: cozyUrl,
+        offline: copy,
+        token: 'apptoken'
+      })
       cozy.offline.hasSync(fileDoctype).should.be.true
       cozy.offline.hasSync(otherDoctype).should.be.true
       cozy.offline.stopAllSync()

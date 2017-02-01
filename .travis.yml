@@ -43,6 +43,11 @@ before_script:
   - npm explore cozy-data-system coffee commands.coffee test-install client-js ../../test/package.json
   - export NAME=client-js
   - export TOKEN=apptoken
+  # install an application and generate the associated token
+  # TODO: should use a CLI to install this application when permissions on /apps/ are added
+  - "curl -X POST -H 'Accept: application/vnd.api+json' 'http://localhost:8080/apps/mini?Source=git://github.com/jinroh/cozy-mini.git'"
+  - sleep 10
+  - export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "localhost:8080" "mini")
 
 deploy:
   provider: npm

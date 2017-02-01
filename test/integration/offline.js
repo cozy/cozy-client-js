@@ -9,6 +9,7 @@ PouchDB.plugin(require('pouchdb-adapter-memory'))
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
+const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 const DOCTYPE = 'io.cozy.testobject2'
 
 let docs = [
@@ -27,7 +28,8 @@ describe('offline', function () {
       return this.skip()
     }
     cozy = new Cozy({
-      cozyURL: COZY_STACK_URL
+      cozyURL: COZY_STACK_URL,
+      token: COZY_STACK_TOKEN
     })
     for (var i = 0, l = docs.length; i < l; i++) {
       docs[i] = await cozy.create(DOCTYPE, docs[i])

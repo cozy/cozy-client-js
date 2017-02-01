@@ -11,7 +11,10 @@ describe('Authentication', function () {
   let cozy
 
   beforeEach(() => {
-    cozy = new Cozy({ cozyURL: 'http://foobar/' })
+    cozy = new Cozy({
+      cozyURL: 'http://foobar/',
+      token: 'apptoken'
+    })
   })
   afterEach(() => mock.restore())
 
@@ -95,7 +98,8 @@ describe('Authentication', function () {
 
     it('works', async function () {
       cozy = new Cozy({
-        cozyURL: 'http://foobar/'
+        cozyURL: 'http://foobar/',
+        token: 'apptoken'
       })
 
       const client = await cozy.auth.getClient({

@@ -74,6 +74,16 @@ export class AccessToken {
   }
 }
 
+export class AppToken {
+  constructor (opts) {
+    this.token = opts.token || ''
+  }
+
+  toAuthHeader () {
+    return 'Bearer ' + this.token
+  }
+}
+
 export function registerClient (cozy, client) {
   if (!(client instanceof Client)) {
     client = new Client(client)

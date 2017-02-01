@@ -1,7 +1,7 @@
 /* global btoa */
 const V2TOKEN_ABORT_TIMEOUT = 3000
 
-export function getAccessToken () {
+export function getAppToken () {
   return new Promise(function (resolve, reject) {
     if (typeof window === 'undefined') {
       return reject(new Error('getV2Token should be used in browser'))
@@ -16,7 +16,7 @@ export function getAccessToken () {
     const receiver = function (event) {
       let token
       try {
-        token = new AccessToken({
+        token = new AppToken({
           appName: event.data.appName,
           token: event.data.token
         })
@@ -36,7 +36,7 @@ export function getAccessToken () {
   })
 }
 
-export class AccessToken {
+export class AppToken {
   constructor (opts) {
     this.appName = opts.appName || ''
     this.token = opts.token || ''

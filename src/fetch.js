@@ -1,5 +1,5 @@
 /* global fetch */
-import {refreshToken} from './auth_v3'
+import {refreshToken, AccessToken} from './auth_v3'
 import {retry} from './utils'
 import jsonapi from './jsonapi'
 
@@ -35,7 +35,12 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
     if (res.status !== 401 || isV2 || !credentials) {
       return res
     }
+    // we try to refresh the token only for OAuth, ie, the client defined
+    // and the token is an instance of AccessToken.
     const { client, token } = credentials
+    if (!client || !(token instanceof AccessToken)) {
+      return res
+    }
     return retry(() => refreshToken(cozy, client, token), 3)()
       .then((newToken) => cozy.saveCredentials(client, newToken))
       .then((credentials) => cozyFetchWithAuth(cozy, fullpath, options, credentials))

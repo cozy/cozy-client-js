@@ -8,6 +8,7 @@ import mockTokenRetrieve from '../mock-iframe-token'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
+const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 const DOCTYPE = 'io.cozy.testobject2'
 
 let docs = [
@@ -29,7 +30,8 @@ describe('mango API', function () {
 
   before(function () {
     cozy = new Cozy({
-      cozyURL: COZY_STACK_URL
+      cozyURL: COZY_STACK_URL,
+      token: COZY_STACK_TOKEN
     })
   })
 

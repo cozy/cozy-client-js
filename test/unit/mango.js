@@ -11,7 +11,8 @@ describe('mango API', function () {
 
   beforeEach(() => {
     cozy = new Cozy({
-      cozyURL: 'http://my.cozy.io///'
+      cozyURL: 'http://my.cozy.io///',
+      token: 'apptoken'
     })
   })
 

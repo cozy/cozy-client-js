@@ -1,7 +1,7 @@
 /* global fetch */
 import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
-import {AccessToken as AccessTokenV2, getAccessToken as getAccessTokenV2} from './auth_v2'
+import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
 import * as auth from './auth_v3'
 import * as crud from './crud'
 import * as mango from './mango'
@@ -9,7 +9,11 @@ import * as files from './files'
 import * as offline from './offline'
 import * as settings from './settings'
 
-const {AccessToken: AccessTokenV3, Client: ClientV3} = auth
+const {
+  AppToken: AppTokenV3,
+  AccessToken: AccessTokenV3,
+  Client: ClientV3
+} = auth
 
 const AuthNone = 0
 const AuthRunning = 1
@@ -90,7 +94,8 @@ class Cozy {
     this.auth = {
       Client: ClientV3,
       AccessToken: AccessTokenV3,
-      AccessTokenV2: AccessTokenV2,
+      AppToken: AppTokenV3,
+      AppTokenV2: AppTokenV2,
       LocalStorage: LocalStorage,
       MemoryStorage: MemoryStorage
     }
@@ -106,15 +111,23 @@ class Cozy {
     }
 
     this._inited = true
-    this._oauth = false
+    this._oauth = false // is oauth activated or not
+    this._token = null  // application token
     this._authstate = AuthNone
     this._authcreds = null
     this._storage = null
     this._version = null
     this._offline = null
 
+    const token = options.token
     const oauth = options.oauth
-    if (oauth) {
+    if (token && oauth) {
+      throw new Error('Cannot specify an application token with a oauth activated')
+    }
+
+    if (token) {
+      this._token = new AppTokenV3({ token })
+    } else if (oauth) {
       this._oauth = true
       this._storage = oauth.storage
       this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
@@ -162,9 +175,11 @@ class Cozy {
       // we expect to be on a client side application running in a browser
       // with cookie-based authentication.
       if (isV2) {
-        return getAccessTokenV2()
+        return getAppTokenV2()
+      } else if (this._token) {
+        return Promise.resolve({client: null, token: this._token})
       } else {
-        return Promise.resolve(null)
+        throw new Error('Missing application token')
       }
     })
 

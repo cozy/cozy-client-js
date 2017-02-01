@@ -8,6 +8,7 @@ import mockTokenRetrieve from '../mock-iframe-token'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
+const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 
 describe('crud API', function () {
   let docID = null
@@ -20,7 +21,8 @@ describe('crud API', function () {
 
   beforeEach(() => {
     cozy = new Cozy({
-      cozyURL: COZY_STACK_URL
+      cozyURL: COZY_STACK_URL,
+      token: COZY_STACK_TOKEN
     })
   })
 
