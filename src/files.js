@@ -1,6 +1,7 @@
 /* global Blob, File */
 import {cozyFetch, cozyFetchJSON} from './fetch'
 import jsonapi from './jsonapi'
+import { DOCTYPE_FILES } from './doctypes'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
@@ -111,7 +112,19 @@ export function trashById (cozy, id) {
   return cozyFetchJSON(cozy, 'DELETE', `/files/${encodeURIComponent(id)}`)
 }
 
-export function statById (cozy, id) {
+export function statById (cozy, id, offline = true) {
+  if (offline && cozy.offline.hasDatabase(DOCTYPE_FILES)) {
+    let db = cozy.offline.getDatabase(DOCTYPE_FILES)
+    return Promise.all([
+      db.get(id),
+      db.find({selector: {'dir_id': id}})
+    ]).then(([doc, children]) => {
+      children = children.docs.map(doc => {
+        return addIsDir(toJsonApi(cozy, doc))
+      })
+      return addIsDir(toJsonApi(cozy, doc, children))
+    })
+  }
   return cozyFetchJSON(cozy, 'GET', `/files/${encodeURIComponent(id)}`)
     .then(addIsDir)
 }
@@ -148,4 +161,21 @@ export function destroyById (cozy, id) {
 function addIsDir (obj) {
   obj.isDir = obj.attributes.type === 'directory'
   return obj
+}
+
+function toJsonApi (cozy, doc, contents = []) {
+  let clone = JSON.parse(JSON.stringify(doc))
+  delete clone._id
+  delete clone._rev
+  return {
+    _id: doc._id,
+    _rev: doc._rev,
+    _type: DOCTYPE_FILES,
+    attributes: clone,
+    relations: (name) => {
+      if (name === 'contents') {
+        return contents
+      }
+    }
+  }
 }

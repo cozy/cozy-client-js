@@ -1,4 +1,7 @@
-const PouchDB = require('pouchdb')
+import PouchDB from 'pouchdb'
+import pouchdbFind from 'pouchdb-find'
+PouchDB.plugin(pouchdbFind)
+import { DOCTYPE_FILES } from './doctypes'
 
 export function init (cozy, { options = {}, doctypes = [], timer = false }) {
   for (let doctype of doctypes) {
@@ -16,6 +19,7 @@ export function createDatabase (cozy, doctype, options = {}, timer = false) {
   offline.timer = timer
   offline.autoSync = null
   if (timer) { startSync(cozy, doctype, timer) }
+  createIndexes(cozy, offline.database, doctype)
   return offline.database
 }
 
@@ -120,5 +124,11 @@ export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
     return replication
   } else {
     throw new Error(`You should add this doctype: ${doctype} to offline.`)
+  }
+}
+
+function createIndexes (cozy, db, doctype) {
+  if (doctype === DOCTYPE_FILES) {
+    db.createIndex({index: {fields: ['dir_id']}})
   }
 }

@@ -1492,13 +1492,16 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.DOCTYPE_FILES = undefined;
 	exports.normalizeDoctype = normalizeDoctype;
 	
 	var _utils = __webpack_require__(3);
 	
+	var DOCTYPE_FILES = exports.DOCTYPE_FILES = 'io.cozy.files';
+	
 	var KNOWN_DOCTYPES = {
-	  'files': 'io.cozy.files',
-	  'folder': 'io.cozy.files',
+	  'files': DOCTYPE_FILES,
+	  'folder': DOCTYPE_FILES,
 	  'contact': 'io.cozy.contacts',
 	  'event': 'io.cozy.events',
 	  'track': 'io.cozy.labs.music.track',
@@ -1826,6 +1829,8 @@
 	  value: true
 	});
 	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global Blob, File */
 	
 	
@@ -1849,6 +1854,8 @@
 	var _jsonapi = __webpack_require__(9);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
+	
+	var _doctypes = __webpack_require__(12);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1970,6 +1977,21 @@
 	}
 	
 	function statById(cozy, id) {
+	  var offline = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+	
+	  if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
+	    var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
+	    return Promise.all([db.get(id), db.find({ selector: { 'dir_id': id } })]).then(function (_ref4) {
+	      var _ref5 = _slicedToArray(_ref4, 2),
+	          doc = _ref5[0],
+	          children = _ref5[1];
+	
+	      children = children.docs.map(function (doc) {
+	        return addIsDir(toJsonApi(cozy, doc));
+	      });
+	      return addIsDir(toJsonApi(cozy, doc, children));
+	    });
+	  }
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/files/' + encodeURIComponent(id)).then(addIsDir);
 	}
 	
@@ -2005,6 +2027,25 @@
 	  obj.isDir = obj.attributes.type === 'directory';
 	  return obj;
 	}
+	
+	function toJsonApi(cozy, doc) {
+	  var contents = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+	
+	  var clone = JSON.parse(JSON.stringify(doc));
+	  delete clone._id;
+	  delete clone._rev;
+	  return {
+	    _id: doc._id,
+	    _rev: doc._rev,
+	    _type: _doctypes.DOCTYPE_FILES,
+	    attributes: clone,
+	    relations: function relations(name) {
+	      if (name === 'contents') {
+	        return contents;
+	      }
+	    }
+	  };
+	}
 
 /***/ },
 /* 15 */
@@ -2030,8 +2071,20 @@
 	exports.hasSync = hasSync;
 	exports.stopSync = stopSync;
 	exports.replicateFromCozy = replicateFromCozy;
-	var PouchDB = __webpack_require__(16);
 	
+	var _pouchdb = __webpack_require__(16);
+	
+	var _pouchdb2 = _interopRequireDefault(_pouchdb);
+	
+	var _pouchdbFind = __webpack_require__(17);
+	
+	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
+	
+	var _doctypes = __webpack_require__(12);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	_pouchdb2.default.plugin(_pouchdbFind2.default);
 	function init(cozy, _ref) {
 	  var _ref$options = _ref.options,
 	      options = _ref$options === undefined ? {} : _ref$options,
@@ -2079,12 +2132,13 @@
 	  if (offline && offline.database) {
 	    return offline.database;
 	  }
-	  offline.database = new PouchDB(doctype, options);
+	  offline.database = new _pouchdb2.default(doctype, options);
 	  offline.timer = timer;
 	  offline.autoSync = null;
 	  if (timer) {
 	    startSync(cozy, doctype, timer);
 	  }
+	  createIndexes(cozy, offline.database, doctype);
 	  return offline.database;
 	}
 	
@@ -2221,12 +2275,24 @@
 	    throw new Error('You should add this doctype: ' + doctype + ' to offline.');
 	  }
 	}
+	
+	function createIndexes(cozy, db, doctype) {
+	  if (doctype === _doctypes.DOCTYPE_FILES) {
+	    db.createIndex({ index: { fields: ['dir_id'] } });
+	  }
+	}
 
 /***/ },
 /* 16 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb");
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	module.exports = require("pouchdb-find");
 
 /***/ }
 /******/ ])));
