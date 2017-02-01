@@ -4,7 +4,7 @@ import jsonapi from './jsonapi'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
-function doUpload (cozy, data, contentType, method, path) {
+function doUpload (cozy, data, method, path, options) {
   if (!data) {
     throw new Error('missing data argument')
   }
@@ -23,11 +23,15 @@ function doUpload (cozy, data, contentType, method, path) {
     throw new Error('invalid data type')
   }
 
+  let {contentType, lastModifiedDate} = options || {}
   if (!contentType) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
     } else if (isFile) {
       contentType = data.type || contentTypeOctetStream
+      if (!lastModifiedDate) {
+        lastModifiedDate = data.lastModifiedDate
+      }
     } else if (isBlob) {
       contentType = contentTypeOctetStream
     } else if (typeof data === 'string') {
@@ -35,9 +39,16 @@ function doUpload (cozy, data, contentType, method, path) {
     }
   }
 
+  if (lastModifiedDate && typeof lastModifiedDate === 'string') {
+    lastModifiedDate = new Date(lastModifiedDate)
+  }
+
   return cozyFetch(cozy, path, {
     method: method,
-    headers: { 'Content-Type': contentType },
+    headers: {
+      'Content-Type': contentType,
+      'Date': lastModifiedDate ? lastModifiedDate.toISOString() : ''
+    },
     body: data
   })
     .then((res) => {
@@ -51,7 +62,7 @@ function doUpload (cozy, data, contentType, method, path) {
 }
 
 export function create (cozy, data, options) {
-  let {name, dirID, contentType} = options || {}
+  let {name, dirID} = options || {}
 
   // handle case where data is a file and contains the name
   if (!name && typeof data.name === 'string') {
@@ -64,7 +75,7 @@ export function create (cozy, data, options) {
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=file`
-  return doUpload(cozy, data, contentType, 'POST', `${path}${query}`)
+  return doUpload(cozy, data, 'POST', `${path}${query}`, options)
 }
 
 export function createDirectory (cozy, options) {
@@ -80,8 +91,7 @@ export function createDirectory (cozy, options) {
 }
 
 export function updateById (cozy, id, data, options) {
-  const {contentType} = options || {}
-  return doUpload(cozy, data, contentType, 'PUT', `/files/${encodeURIComponent(id)}`)
+  return doUpload(cozy, data, 'PUT', `/files/${encodeURIComponent(id)}`, options)
 }
 
 export function updateAttributesById (cozy, id, attrs) {

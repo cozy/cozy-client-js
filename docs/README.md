@@ -295,6 +295,7 @@ It returns a promise for the document of the file created.
   * `name`: specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
   * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+  * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
 
 **Warning**: this API is not v2 compatible.
 
@@ -303,7 +304,10 @@ const created = await cozy.files.create(blob, {
     name: "filename",
     dirID: "123456",
 })
-const fileCreated = await cozy.files.create(fileInput.files[0], { dirID: "" })
+const fileCreated = await cozy.files.create(fileInput.files[0], {
+  dirID: "",
+  lastModifiedDate: new Date()
+})
 ```
 
 
