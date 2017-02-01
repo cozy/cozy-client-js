@@ -38,6 +38,7 @@ before_script:
   # start a stack v2 from NPM (listening on 9104 & 9101)
   - NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start &
   - sleep 3
+  - npm explore cozy-proxy npm run postinstall
   - NODE_ENV=test NAME=proxy TOKEN=token npm explore cozy-proxy npm run start &
   - sleep 3
   - npm explore cozy-data-system coffee commands.coffee test-install client-js ../../test/package.json
