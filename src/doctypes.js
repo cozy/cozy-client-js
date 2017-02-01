@@ -1,8 +1,10 @@
 import {warn} from './utils'
 
+export const DOCTYPE_FILES = 'io.cozy.files'
+
 const KNOWN_DOCTYPES = {
-  'files': 'io.cozy.files',
-  'folder': 'io.cozy.files',
+  'files': DOCTYPE_FILES,
+  'folder': DOCTYPE_FILES,
   'contact': 'io.cozy.contacts',
   'event': 'io.cozy.events',
   'track': 'io.cozy.labs.music.track',

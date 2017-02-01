@@ -62,10 +62,10 @@ describe('offline', () => {
       db.should.be.an.instanceof(PouchDB)
     })
 
-    it('should destroy database', () => {
-      cozy.offline.createDatabase(fileDoctype, {adapter: 'memory'})
+    it('should destroy database', async () => {
+      await cozy.offline.createDatabase(fileDoctype, {adapter: 'memory'})
       cozy.offline.hasDatabase(fileDoctype).should.be.true
-      cozy.offline.destroyDatabase(fileDoctype)
+      await cozy.offline.destroyDatabase(fileDoctype)
       cozy.offline.hasDatabase(fileDoctype).should.be.false
     })
 
@@ -77,6 +77,13 @@ describe('offline', () => {
       cozy.offline.getDoctypes().should.be.eql([fileDoctype])
       cozy.offline.createDatabase(otherDoctype, {adapter: 'memory'})
       cozy.offline.getDoctypes().should.be.eql([fileDoctype, otherDoctype])
+    })
+
+    it('should create mongo index when create database', async () => {
+      let db = cozy.offline.createDatabase(fileDoctype, {adapter: 'memory'})
+      await db.getIndexes().then(result => {
+        result.indexes.length.should.exactly(1)
+      })
     })
   })
 

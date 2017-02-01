@@ -168,10 +168,39 @@ describe('files API', async function () {
     trashed.should.be.an.Array()
     trashed.should.have.length(0)
   })
+
+  describe('offline', async () => {
+    beforeEach(() => {
+      cozy = new Cozy({
+        cozyURL: COZY_STACK_URL,
+        offline: {doctypes: ['io.cozy.files'], options: {adapter: 'memory'}}
+      })
+    })
+    afterEach(() => {
+      cozy.offline.destroyDatabase('io.cozy.files')
+    })
+
+    it('should be same document offline/online', async () => {
+      const folder = await createRandomDirectory(cozy)
+      await cozy.offline.replicateFromCozy('io.cozy.files')
+      const offline = await cozy.files.statById(folder._id)
+      const online = await cozy.files.statById(folder._id, false)
+      Object.keys(online).forEach(key => { offline.should.have.keys(key) })
+      Object.keys(offline).forEach(key => { online.should.have.keys(key) })
+      Object.keys(online.attributes).forEach(key => { offline.attributes.should.have.keys(key) })
+      Object.keys(offline.attributes).forEach(key => { online.attributes.should.have.keys(key) })
+    }).timeout(4 * 1000)
+  })
 })
 
 async function createTrashedDirectory (cozy, dirname) {
   const created = await cozy.files.createDirectory({ name: dirname })
   await cozy.files.trashById(created._id)
+  return created
+}
+
+async function createRandomDirectory (cozy) {
+  const dirname = 'foo_' + randomGenerator()()
+  const created = await cozy.files.createDirectory({ name: dirname })
   return created
 }

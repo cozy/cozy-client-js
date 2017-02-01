@@ -49,7 +49,7 @@ describe('offline', function () {
     complete.docs_written.should.not.equal(0)
     complete = await cozy.offline.replicateFromCozy(DOCTYPE)
     complete.docs_written.should.equal(0)
-  })
+  }).timeout(3 * 1000)
 
   it('can\'t replication with live option.', async function () {
     let err = null
