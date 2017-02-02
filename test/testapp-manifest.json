@@ -1,0 +1,18 @@
+{
+  "description": "A mini app to test cozy-stack-v2",
+  "developer": {
+    "name": "Foo Bar",
+    "url": "foobar.io"
+  },
+  "license": "MIT",
+  "name": "testapp",
+  "slug": "testapp",
+  "version": "0.1.0",
+  "permissions": {
+    "settings": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.settings",
+      "verbs": ["GET", "POST", "PUT"]
+    }
+  }
+}
