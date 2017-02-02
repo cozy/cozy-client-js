@@ -94,11 +94,16 @@
 	
 	var offline = _interopRequireWildcard(_offline);
 	
+	var _settings = __webpack_require__(18);
+	
+	var settings = _interopRequireWildcard(_settings);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var AccessTokenV3 = auth.AccessToken,
+	var AppTokenV3 = auth.AppToken,
+	    AccessTokenV3 = auth.AccessToken,
 	    ClientV3 = auth.Client;
 	
 	
@@ -169,16 +174,22 @@
 	  stopSync: offline.stopSync
 	};
 	
+	var settingsProto = {
+	  diskUsage: settings.diskUsage
+	};
+	
 	var Cozy = function () {
 	  function Cozy(options) {
 	    _classCallCheck(this, Cozy);
 	
 	    this.files = {};
 	    this.offline = {};
+	    this.settings = {};
 	    this.auth = {
 	      Client: ClientV3,
 	      AccessToken: AccessTokenV3,
-	      AccessTokenV2: _auth_v.AccessToken,
+	      AppToken: AppTokenV3,
+	      AppTokenV2: _auth_v.AppToken,
 	      LocalStorage: _auth_storage.LocalStorage,
 	      MemoryStorage: _auth_storage.MemoryStorage
 	    };
@@ -198,15 +209,23 @@
 	      }
 	
 	      this._inited = true;
-	      this._oauth = false;
+	      this._oauth = false; // is oauth activated or not
+	      this._token = null; // application token
 	      this._authstate = AuthNone;
 	      this._authcreds = null;
 	      this._storage = null;
 	      this._version = null;
 	      this._offline = null;
 	
+	      var token = options.token;
 	      var oauth = options.oauth;
-	      if (oauth) {
+	      if (token && oauth) {
+	        throw new Error('Cannot specify an application token with a oauth activated');
+	      }
+	
+	      if (token) {
+	        this._token = new AppTokenV3({ token: token });
+	      } else if (oauth) {
 	        this._oauth = true;
 	        this._storage = oauth.storage;
 	        this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams);
@@ -225,6 +244,7 @@
 	      addToProto(this, this.auth, authProto, disablePromises);
 	      addToProto(this, this.files, filesProto, disablePromises);
 	      addToProto(this, this.offline, offlineProto, disablePromises);
+	      addToProto(this, this.settings, settingsProto, disablePromises);
 	
 	      if (options.offline) {
 	        this.offline.init(options.offline);
@@ -251,9 +271,11 @@
 	        // we expect to be on a client side application running in a browser
 	        // with cookie-based authentication.
 	        if (isV2) {
-	          return (0, _auth_v.getAccessToken)();
+	          return (0, _auth_v.getAppToken)();
+	        } else if (_this._token) {
+	          return Promise.resolve({ client: null, token: _this._token });
 	        } else {
-	          return Promise.resolve(null);
+	          throw new Error('Missing application token');
 	        }
 	      });
 	
@@ -637,14 +659,14 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	exports.getAccessToken = getAccessToken;
+	exports.getAppToken = getAppToken;
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	/* global btoa */
 	var V2TOKEN_ABORT_TIMEOUT = 3000;
 	
-	function getAccessToken() {
+	function getAppToken() {
 	  return new Promise(function (resolve, reject) {
 	    if (typeof window === 'undefined') {
 	      return reject(new Error('getV2Token should be used in browser'));
@@ -659,7 +681,7 @@
 	    var receiver = function receiver(event) {
 	      var token = void 0;
 	      try {
-	        token = new AccessToken({
+	        token = new AppToken({
 	          appName: event.data.appName,
 	          token: event.data.token
 	        });
@@ -679,22 +701,22 @@
 	  });
 	}
 	
-	var AccessToken = exports.AccessToken = function () {
-	  function AccessToken(opts) {
-	    _classCallCheck(this, AccessToken);
+	var AppToken = exports.AppToken = function () {
+	  function AppToken(opts) {
+	    _classCallCheck(this, AppToken);
 	
 	    this.appName = opts.appName || '';
 	    this.token = opts.token || '';
 	  }
 	
-	  _createClass(AccessToken, [{
+	  _createClass(AppToken, [{
 	    key: 'toAuthHeader',
 	    value: function toAuthHeader() {
 	      return 'Basic ' + btoa(this.appName + ':' + this.token);
 	    }
 	  }]);
 
-	  return AccessToken;
+	  return AppToken;
 	}();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
@@ -713,7 +735,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.AccessToken = exports.Client = exports.StateKey = exports.CredsKey = undefined;
+	exports.AppToken = exports.AccessToken = exports.Client = exports.StateKey = exports.CredsKey = undefined;
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
@@ -823,6 +845,23 @@
 	  }]);
 	
 	  return AccessToken;
+	}();
+	
+	var AppToken = exports.AppToken = function () {
+	  function AppToken(opts) {
+	    _classCallCheck(this, AppToken);
+	
+	    this.token = opts.token || '';
+	  }
+	
+	  _createClass(AppToken, [{
+	    key: 'toAuthHeader',
+	    value: function toAuthHeader() {
+	      return 'Bearer ' + this.token;
+	    }
+	  }]);
+	
+	  return AppToken;
 	}();
 	
 	function registerClient(cozy, client) {
@@ -1190,9 +1229,14 @@
 	    if (res.status !== 401 || isV2 || !credentials) {
 	      return res;
 	    }
+	    // we try to refresh the token only for OAuth, ie, the client defined
+	    // and the token is an instance of AccessToken.
 	    var client = credentials.client,
 	        token = credentials.token;
 	
+	    if (!client || !(token instanceof _auth_v.AccessToken)) {
+	      return res;
+	    }
 	    return (0, _utils.retry)(function () {
 	      return (0, _auth_v.refreshToken)(cozy, client, token);
 	    }, 3)().then(function (newToken) {
@@ -1861,7 +1905,7 @@
 	
 	var contentTypeOctetStream = 'application/octet-stream';
 	
-	function doUpload(cozy, data, contentType, method, path) {
+	function doUpload(cozy, data, method, path, options) {
 	  if (!data) {
 	    throw new Error('missing data argument');
 	  }
@@ -1880,11 +1924,18 @@
 	    throw new Error('invalid data type');
 	  }
 	
+	  var _ref = options || {},
+	      contentType = _ref.contentType,
+	      lastModifiedDate = _ref.lastModifiedDate;
+	
 	  if (!contentType) {
 	    if (isBuffer) {
 	      contentType = contentTypeOctetStream;
 	    } else if (isFile) {
 	      contentType = data.type || contentTypeOctetStream;
+	      if (!lastModifiedDate) {
+	        lastModifiedDate = data.lastModifiedDate;
+	      }
 	    } else if (isBlob) {
 	      contentType = contentTypeOctetStream;
 	    } else if (typeof data === 'string') {
@@ -1892,9 +1943,16 @@
 	    }
 	  }
 	
+	  if (lastModifiedDate && typeof lastModifiedDate === 'string') {
+	    lastModifiedDate = new Date(lastModifiedDate);
+	  }
+	
 	  return (0, _fetch.cozyFetch)(cozy, path, {
 	    method: method,
-	    headers: { 'Content-Type': contentType },
+	    headers: {
+	      'Content-Type': contentType,
+	      'Date': lastModifiedDate ? lastModifiedDate.toISOString() : ''
+	    },
 	    body: data
 	  }).then(function (res) {
 	    var json = res.json();
@@ -1909,10 +1967,9 @@
 	}
 	
 	function create(cozy, data, options) {
-	  var _ref = options || {},
-	      name = _ref.name,
-	      dirID = _ref.dirID,
-	      contentType = _ref.contentType;
+	  var _ref2 = options || {},
+	      name = _ref2.name,
+	      dirID = _ref2.dirID;
 	
 	  // handle case where data is a file and contains the name
 	
@@ -1927,13 +1984,13 @@
 	
 	  var path = '/files/' + encodeURIComponent(dirID || '');
 	  var query = '?Name=' + encodeURIComponent(name) + '&Type=file';
-	  return doUpload(cozy, data, contentType, 'POST', '' + path + query);
+	  return doUpload(cozy, data, 'POST', '' + path + query, options);
 	}
 	
 	function createDirectory(cozy, options) {
-	  var _ref2 = options || {},
-	      name = _ref2.name,
-	      dirID = _ref2.dirID;
+	  var _ref3 = options || {},
+	      name = _ref3.name,
+	      dirID = _ref3.dirID;
 	
 	  if (typeof name !== 'string' || name === '') {
 	    throw new Error('missing name argument');
@@ -1945,10 +2002,7 @@
 	}
 	
 	function updateById(cozy, id, data, options) {
-	  var _ref3 = options || {},
-	      contentType = _ref3.contentType;
-	
-	  return doUpload(cozy, data, contentType, 'PUT', '/files/' + encodeURIComponent(id));
+	  return doUpload(cozy, data, 'PUT', '/files/' + encodeURIComponent(id), options);
 	}
 	
 	function updateAttributesById(cozy, id, attrs) {
@@ -2293,6 +2347,23 @@
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb-find");
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.diskUsage = diskUsage;
+	
+	var _fetch = __webpack_require__(8);
+	
+	function diskUsage(cozy) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/disk-usage');
+	}
 
 /***/ }
 /******/ ])));
