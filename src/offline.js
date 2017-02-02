@@ -1,7 +1,8 @@
 import PouchDB from 'pouchdb'
 import pouchdbFind from 'pouchdb-find'
-PouchDB.plugin(pouchdbFind)
 import { DOCTYPE_FILES } from './doctypes'
+
+let pluginLoaded = false
 
 export function init (cozy, { options = {}, doctypes = [], timer = false }) {
   for (let doctype of doctypes) {
@@ -11,6 +12,10 @@ export function init (cozy, { options = {}, doctypes = [], timer = false }) {
 }
 
 export function createDatabase (cozy, doctype, options = {}, timer = false) {
+  if (!pluginLoaded) {
+    PouchDB.plugin(pouchdbFind)
+    pluginLoaded = true
+  }
   cozy._offline = cozy._offline || []
   cozy._offline[doctype] = cozy._offline[doctype] || {}
   let offline = cozy._offline[doctype]
