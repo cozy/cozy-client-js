@@ -152,6 +152,29 @@ export function downloadByPath (cozy, path) {
   return cozyFetch(cozy, `/files/download?Path=${encodeURIComponent(path)}`)
 }
 
+function extractResponseLinkRelated (res) {
+  let href = res.links && res.links.related
+  if (!href) throw new Error('No related link in server response')
+  return href
+}
+
+export function getDowloadLink (cozy, path) {
+  return cozyFetchJSON(cozy, 'POST', `/files/downloads?Path=${encodeURIComponent(path)}`)
+    .then(extractResponseLinkRelated)
+}
+
+export function getArchiveLink (cozy, paths, name = 'files') {
+  const archive = {
+    type: 'io.cozy.archives',
+    attributes: {
+      name: name,
+      files: paths
+    }
+  }
+  return cozyFetchJSON(cozy, 'POST', `/files/archive`, {data: archive})
+  .then(extractResponseLinkRelated)
+}
+
 export function listTrash (cozy) {
   return cozyFetchJSON(cozy, 'GET', `/files/trash`)
 }

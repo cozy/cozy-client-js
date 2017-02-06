@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+/* global fetch */
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
@@ -171,6 +172,45 @@ describe('files API', async function () {
     trashed.should.have.length(0)
   })
 
+  it('creates download link for 1 file', async function () {
+    const filename = 'foo_' + random()
+    const created = await cozy.files.create('foo', {
+      name: filename,
+      contentType: 'application/json'
+    })
+    const path = '/' + created.attributes.name
+    console.log(path)
+    let link = await cozy.files.getDowloadLink(path)
+    let downloaded = await fetch(COZY_STACK_URL + link)
+    const txt1 = await downloaded.text()
+    txt1.should.equal('foo')
+  })
+
+  it('creates download link for archive', async function () {
+    const filename = 'foo_' + random()
+    const created = await cozy.files.create('foo', {
+      name: filename,
+      contentType: 'application/json'
+    })
+
+    const filename2 = 'bar_' + random()
+    const created2 = await cozy.files.create('bar', {
+      name: filename2,
+      contentType: 'application/json'
+    })
+    const toDownload = [
+      '/' + created.attributes.name,
+      '/' + created2.attributes.name
+    ]
+    console.log(toDownload)
+    let link = await cozy.files.getArchiveLink(toDownload, 'foobar')
+    let downloaded = await fetch(COZY_STACK_URL + link)
+    downloaded.ok.should.be.true
+    downloaded.headers.get('Content-Type').should.equal('application/zip')
+    const disp = downloaded.headers.get('Content-Disposition')
+    disp.indexOf('foobar').should.not.equal(-1)
+  })
+
   describe('offline', async () => {
     beforeEach(() => {
       cozy = new Cozy({
@@ -188,7 +228,7 @@ describe('files API', async function () {
       await cozy.offline.replicateFromCozy('io.cozy.files')
       const offline = await cozy.files.statById(folder._id)
       const online = await cozy.files.statById(folder._id, false)
-      Object.keys(online).forEach(key => { offline.should.have.keys(key) })
+      Object.keys(online).forEach(key => { key === 'links' || offline.should.have.keys(key) })
       Object.keys(offline).forEach(key => { online.should.have.keys(key) })
       Object.keys(online.attributes).forEach(key => { offline.attributes.should.have.keys(key) })
       Object.keys(offline.attributes).forEach(key => { online.attributes.should.have.keys(key) })

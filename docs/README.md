@@ -394,7 +394,7 @@ const trashed = await cozy.files.trash("1234567")
 
 ### `cozy.files.downloadById(id)`
 
-`cozy.files.downloadById(id)` is used to download a file identified by the given id.
+`cozy.files.downloadById(id)` is used to download a file identified by the given id. The file is downloaded through the browser fetch method, use this if you plan to use the file in javascript after.
 
 It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
 
@@ -410,7 +410,7 @@ const buff = await response.arrayBuffer()
 
 ### `cozy.files.downloadByPath(path)`
 
-`cozy.files.downloadByPath(path)` is used to download a file identified by the given path.
+`cozy.files.downloadByPath(path)` is used to download a file identified by the given path. The file is downloaded through the browser fetch method, use this if you plan to use the file in javascript after.
 
 It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
 
@@ -423,6 +423,41 @@ const text = await response.text()
 const buff = await response.arrayBuffer()
 ```
 
+### `cozy.files.getDowloadLink(path)`
+
+`cozy.files.getDowloadLink(path)` is used to get a download link for the file  identified by the given path.
+
+It returns a promise for the download link.
+Download link are only valid for a short while (default 1 hour)
+You can use this link to start a browser download like this:
+
+```javascript
+const href = await cozy.files.getDowloadLink("/foo/hello.txt")
+const link = document.createElement('a')
+link.href = href
+link.download = fileName
+document.body.appendChild(link) && link.click()
+```
+
+- `path` is a string specying the path of the file
+
+
+### `cozy.files.getArchiveLink(paths)`
+
+`cozy.files.getArchiveLink(paths)` is used to get a download link for a zip file containing all the files identified by the given paths.
+
+It returns a promise for the download link.
+Download link are only valid for a short while (default 1 hour)
+You can use this link to start a browser download (see code in getDowloadLink)
+
+```javascript
+const href = await cozy.files.getArchiveLink("/foo/hello.txt")
+```
+
+- `path` is a string specying the path of the file
+
+
+- `ids` is an array of file ids.
 
 ## Settings
 

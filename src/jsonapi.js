@@ -6,11 +6,12 @@ function findByRef (resources, ref) {
   return resources[indexKey(ref)]
 }
 
-function handleResource (rawResource, resources) {
+function handleResource (rawResource, resources, links) {
   let resource = {
     _id: rawResource.id,
     _type: rawResource.type,
     _rev: rawResource.meta.rev,
+    links: Object.assign({}, rawResource.links, links),
     attributes: rawResource.attributes,
     relations: (name) => {
       let rels = rawResource.relationships[name]
@@ -31,13 +32,13 @@ function handleTopLevel (doc, resources = {}) {
   const included = doc.included
 
   if (Array.isArray(included)) {
-    included.forEach((r) => handleResource(r, resources))
+    included.forEach((r) => handleResource(r, resources, doc.links))
   }
 
   if (Array.isArray(doc.data)) {
-    return doc.data.map((r) => handleResource(r, resources))
+    return doc.data.map((r) => handleResource(r, resources, doc.links))
   } else {
-    return handleResource(doc.data, resources)
+    return handleResource(doc.data, resources, doc.links)
   }
 }
 
