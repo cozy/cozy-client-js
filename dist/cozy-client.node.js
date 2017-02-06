@@ -204,10 +204,6 @@
 	    value: function init() {
 	      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
-	      if (this._inited) {
-	        throw new Error('Already inited instance');
-	      }
-	
 	      this._inited = true;
 	      this._oauth = false; // is oauth activated or not
 	      this._token = null; // application token
@@ -2138,7 +2134,8 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	_pouchdb2.default.plugin(_pouchdbFind2.default);
+	var pluginLoaded = false;
+	
 	function init(cozy, _ref) {
 	  var _ref$options = _ref.options,
 	      options = _ref$options === undefined ? {} : _ref$options,
@@ -2180,6 +2177,10 @@
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	  var timer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 	
+	  if (!pluginLoaded) {
+	    _pouchdb2.default.plugin(_pouchdbFind2.default);
+	    pluginLoaded = true;
+	  }
 	  cozy._offline = cozy._offline || [];
 	  cozy._offline[doctype] = cozy._offline[doctype] || {};
 	  var offline = cozy._offline[doctype];
