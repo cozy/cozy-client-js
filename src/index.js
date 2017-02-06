@@ -106,10 +106,6 @@ class Cozy {
   }
 
   init (options = {}) {
-    if (this._inited) {
-      throw new Error('Already inited instance')
-    }
-
     this._inited = true
     this._oauth = false // is oauth activated or not
     this._token = null  // application token
