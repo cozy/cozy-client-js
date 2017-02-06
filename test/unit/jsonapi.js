@@ -7,15 +7,15 @@ import jsonapiUnpack from '../../src/jsonapi'
 describe('unpacking', function () {
   it('simple data', function () {
     let result = jsonapiUnpack({
+      'links': {
+        'self': '/io.cozy.testobject/42'
+      },
       'data': {
         'attributes': {
           'test': 'value'
         },
         'type': 'io.cozy.testobject',
         'id': '42',
-        'links': {
-          'self': '/io.cozy.testobject/42'
-        },
         'meta': {
           'rev': '1-24'
         }
