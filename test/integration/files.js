@@ -179,7 +179,6 @@ describe('files API', async function () {
       contentType: 'application/json'
     })
     const path = '/' + created.attributes.name
-    console.log(path)
     let link = await cozy.files.getDowloadLink(path)
     let downloaded = await fetch(COZY_STACK_URL + link)
     const txt1 = await downloaded.text()
@@ -202,7 +201,6 @@ describe('files API', async function () {
       '/' + created.attributes.name,
       '/' + created2.attributes.name
     ]
-    console.log(toDownload)
     let link = await cozy.files.getArchiveLink(toDownload, 'foobar')
     let downloaded = await fetch(COZY_STACK_URL + link)
     downloaded.ok.should.be.true
