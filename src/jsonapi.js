@@ -10,7 +10,7 @@ function handleResource (rawResource, resources, links) {
   let resource = {
     _id: rawResource.id,
     _type: rawResource.type,
-    _rev: rawResource.meta.rev,
+    _rev: (rawResource.meta && rawResource.meta.rev),
     links: Object.assign({}, rawResource.links, links),
     attributes: rawResource.attributes,
     relations: (name) => {

@@ -385,10 +385,55 @@ const updated = await cozy.files.updateAttributes("/foo/bar", { executable: true
 
 It returns a promise for the document of the file or directory moved to trash.
 
-- `id` is a string specying the identifier of the file or directory
+- `id` is a string specifying the identifier of the file or directory
 
 ```javascript
 const trashed = await cozy.files.trash("1234567")
+```
+
+## `cozy.files.destroyById(id)`
+
+`cozy.files.destroyById(id)` is used to shred (destroy definitively) a file or directory identified by the given id.
+
+The file must be in the trash folder first.
+
+It returns a promise for completion
+
+- `id` is a string specifying the identifier of the file or directory
+
+```javascript
+const trashed = await cozy.files.trash("1234567")
+await cozy.files.destroyById("1234567")
+```
+
+## `cozy.files.restoreById(id)`
+
+`cozy.files.restoreById(id)` is used to restore a file or directory identified by the given id. The file must be in the trash folder.
+
+It returns a promise for the restored doc. (with updated parent)
+
+- `id` is a string specifying the identifier of the file or directory
+
+```javascript
+const trashed = await cozy.files.trash("1234567")
+const restored = await cozy.files.restore("1234567")
+```
+
+## `cozy.files.listTrash()`
+
+`cozy.files.listTrash()` returns a promise for the list of all files in the trash.
+
+```javascript
+const trashedFilesAndFolders = await cozy.files.listTrash()
+```
+
+
+## `cozy.files.clearTrash()`
+
+`cozy.files.clearTrash()` destroys definitively all trash content.
+
+```javascript
+await cozy.files.clearTrash()
 ```
 
 
@@ -442,22 +487,43 @@ document.body.appendChild(link) && link.click()
 - `path` is a string specying the path of the file
 
 
-### `cozy.files.getArchiveLink(paths)`
+### `cozy.files.getArchiveLink(paths, name)`
 
-`cozy.files.getArchiveLink(paths)` is used to get a download link for a zip file containing all the files identified by the given paths.
+`cozy.files.getArchiveLink(paths, name)` is used to get a download link for a zip file containing all the files identified by the given paths.
 
 It returns a promise for the download link.
 Download link are only valid for a short while (default 1 hour)
 You can use this link to start a browser download (see code in getDowloadLink)
 
 ```javascript
-const href = await cozy.files.getArchiveLink("/foo/hello.txt")
+const href = await cozy.files.getArchiveLink([
+  "/foo/hello.txt",
+  "/bar/test.txt"
+])
+// href === "/files/archive/b1c127c25d99f0b37ac2c2a907f36069/files.zip"
+
+const href = await cozy.files.getArchiveLink(["/foo/hello.txt"], "secretproject")
+// href === "/files/archive/bc2a901c127c25d99f0b37a36069c27f/secretproject.zip"
 ```
 
-- `path` is a string specying the path of the file
+- `paths` is an array of paths
+- `name` is the optional name for the generated archive file (default "files").
 
 
-- `ids` is an array of file ids.
+### `cozy.addReferencedFiles(doc, fileIds)`
+
+`cozy.addReferencedFiles(doc, fileIds)` binds the files to the document.
+(see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details)
+
+
+### `cozy.listReferencedFiles(doc)`
+
+`cozy.listReferencedFiles(doc)` list the files bound to the document.
+(see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details).
+
+It returns a promise for a list of filesIds. Files must then be fetched separately.
+
+
 
 ## Settings
 

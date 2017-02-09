@@ -8,6 +8,7 @@ import * as mango from './mango'
 import * as files from './files'
 import * as offline from './offline'
 import * as settings from './settings'
+import * as relations from './relations'
 
 const {
   AppToken: AppTokenV3,
@@ -32,6 +33,8 @@ const mainProto = {
   updateAttributes: crud.updateAttributes,
   defineIndex: mango.defineIndex,
   query: mango.query,
+  addReferencedFiles: relations.addReferencedFiles,
+  listReferencedFiles: relations.listReferencedFiles,
   destroy: function (...args) {
     warn('destroy is deprecated, use cozy.delete instead.')
     return crud._delete(...args)
