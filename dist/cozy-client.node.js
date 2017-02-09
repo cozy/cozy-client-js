@@ -98,6 +98,10 @@
 	
 	var settings = _interopRequireWildcard(_settings);
 	
+	var _relations = __webpack_require__(19);
+	
+	var relations = _interopRequireWildcard(_relations);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -124,6 +128,8 @@
 	  updateAttributes: crud.updateAttributes,
 	  defineIndex: mango.defineIndex,
 	  query: mango.query,
+	  addReferencedFiles: relations.addReferencedFiles,
+	  listReferencedFiles: relations.listReferencedFiles,
 	  destroy: function destroy() {
 	    (0, _utils.warn)('destroy is deprecated, use cozy.delete instead.');
 	    return crud._delete.apply(crud, arguments);
@@ -151,6 +157,8 @@
 	  statByPath: files.statByPath,
 	  downloadById: files.downloadById,
 	  downloadByPath: files.downloadByPath,
+	  getDowloadLink: files.getDowloadLink,
+	  getArchiveLink: files.getArchiveLink,
 	  listTrash: files.listTrash,
 	  clearTrash: files.clearTrash,
 	  restoreById: files.restoreById,
@@ -1337,11 +1345,12 @@
 	  return resources[indexKey(ref)];
 	}
 	
-	function handleResource(rawResource, resources) {
+	function handleResource(rawResource, resources, links) {
 	  var resource = {
 	    _id: rawResource.id,
 	    _type: rawResource.type,
-	    _rev: rawResource.meta.rev,
+	    _rev: rawResource.meta && rawResource.meta.rev,
+	    links: Object.assign({}, rawResource.links, links),
 	    attributes: rawResource.attributes,
 	    relations: function relations(name) {
 	      var rels = rawResource.relationships[name];
@@ -1367,16 +1376,16 @@
 	
 	  if (Array.isArray(included)) {
 	    included.forEach(function (r) {
-	      return handleResource(r, resources);
+	      return handleResource(r, resources, doc.links);
 	    });
 	  }
 	
 	  if (Array.isArray(doc.data)) {
 	    return doc.data.map(function (r) {
-	      return handleResource(r, resources);
+	      return handleResource(r, resources, doc.links);
 	    });
 	  } else {
-	    return handleResource(doc.data, resources);
+	    return handleResource(doc.data, resources, doc.links);
 	  }
 	}
 	
@@ -1884,6 +1893,8 @@
 	exports.statByPath = statByPath;
 	exports.downloadById = downloadById;
 	exports.downloadByPath = downloadByPath;
+	exports.getDowloadLink = getDowloadLink;
+	exports.getArchiveLink = getArchiveLink;
 	exports.listTrash = listTrash;
 	exports.clearTrash = clearTrash;
 	exports.restoreById = restoreById;
@@ -2055,6 +2066,29 @@
 	
 	function downloadByPath(cozy, path) {
 	  return (0, _fetch.cozyFetch)(cozy, '/files/download?Path=' + encodeURIComponent(path));
+	}
+	
+	function extractResponseLinkRelated(res) {
+	  var href = res.links && res.links.related;
+	  if (!href) throw new Error('No related link in server response');
+	  return href;
+	}
+	
+	function getDowloadLink(cozy, path) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/downloads?Path=' + encodeURIComponent(path)).then(extractResponseLinkRelated);
+	}
+	
+	function getArchiveLink(cozy, paths) {
+	  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'files';
+	
+	  var archive = {
+	    type: 'io.cozy.archives',
+	    attributes: {
+	      name: name,
+	      files: paths
+	    }
+	  };
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/archive', { data: archive }).then(extractResponseLinkRelated);
 	}
 	
 	function listTrash(cozy) {
@@ -2364,6 +2398,48 @@
 	
 	function diskUsage(cozy) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/disk-usage');
+	}
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.addReferencedFiles = addReferencedFiles;
+	exports.listReferencedFiles = listReferencedFiles;
+	
+	var _fetch = __webpack_require__(8);
+	
+	var _doctypes = __webpack_require__(12);
+	
+	function addReferencedFiles(cozy, doc, ids) {
+	  if (!doc) throw new Error('missing doc argument');
+	  if (!Array.isArray(ids)) ids = [ids];
+	
+	  var refs = ids.map(function (id) {
+	    return { type: _doctypes.DOCTYPE_FILES, id: id };
+	  });
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', makeReferencesPath(doc), { data: refs });
+	}
+	
+	function listReferencedFiles(cozy, doc) {
+	  if (!doc) throw new Error('missing doc argument');
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', makeReferencesPath(doc)).then(function (files) {
+	    return files.map(function (file) {
+	      return file._id;
+	    });
+	  });
+	}
+	
+	function makeReferencesPath(doc) {
+	  var type = encodeURIComponent(doc._type);
+	  var id = encodeURIComponent(doc._id);
+	  return '/data/' + type + '/' + id + '/relationships/references';
 	}
 
 /***/ }
