@@ -403,7 +403,6 @@ It returns a promise for completion
 
 ```javascript
 const trashed = await cozy.files.trash("1234567")
-// defini
 await cozy.files.destroyById("1234567")
 ```
 
@@ -417,8 +416,7 @@ It returns a promise for the restored doc. (with updated parent)
 
 ```javascript
 const trashed = await cozy.files.trash("1234567")
-// defini
-const restored = await cozy.files.trash("1234567")
+const restored = await cozy.files.restore("1234567")
 ```
 
 ## `cozy.files.listTrash()`
@@ -518,10 +516,14 @@ const href = await cozy.files.getArchiveLink(["/foo/hello.txt"], "secretproject"
 (see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details)
 
 
-### `cozy.listReferencedFiles(doc, file)`
+### `cozy.listReferencedFiles(doc)`
 
-`cozy.listReferencedFiles(doc, fileIds)` list the files bound to the document.
-(see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details)
+`cozy.listReferencedFiles(doc)` list the files bound to the document.
+(see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details).
+
+It returns a promise for a list of filesIds. Files must then be fetched separately.
+
+
 
 ## Settings
 
