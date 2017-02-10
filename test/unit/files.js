@@ -115,14 +115,23 @@ describe('Files', function () {
     before(mock.mockAPI('CreateDirectory'))
 
     it('should work', async function () {
+      const dateString = 'Wed, 01 Feb 2017 10:24:42 GMT'
+      const date = new Date(dateString)
       const res1 = await cozy.files.createDirectory({ name: 'foo' })
-      const res2 = await cozy.files.createDirectory({ name: 'foo', dirID: '12345' })
+      const res2 = await cozy.files.createDirectory({ name: 'foo', lastModifiedDate: date })
+      const res3 = await cozy.files.createDirectory({ name: 'foo', lastModifiedDate: dateString })
+      const res4 = await cozy.files.createDirectory({ name: 'foo', dirID: '12345' })
 
-      mock.calls('CreateDirectory').should.have.length(2)
+      const calls = mock.calls('CreateDirectory')
+      calls.should.have.length(4)
+      calls[1][1].headers['Date'].should.equal(dateString)
+      calls[2][1].headers['Date'].should.equal(dateString)
       mock.lastUrl('CreateDirectory').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=directory')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
+      res3.should.have.property('attributes')
+      res4.should.have.property('attributes')
     })
 
     it('should fail with wrong arguments', async function () {
