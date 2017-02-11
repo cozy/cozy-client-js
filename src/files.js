@@ -48,7 +48,7 @@ function doUpload (cozy, data, method, path, options) {
     method: method,
     headers: {
       'Content-Type': contentType,
-      'Date': lastModifiedDate ? lastModifiedDate.toISOString() : ''
+      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
     },
     body: data
   })
