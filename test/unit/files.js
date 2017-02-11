@@ -21,7 +21,7 @@ describe('Files', function () {
     before(mock.mockAPI('UploadFile'))
 
     it('should work for supported data types', async function () {
-      const date = new Date('2017-02-01T10:24:42.116Z')
+      const date = new Date('Wed, 01 Feb 2017 10:24:42 GMT')
       const stream = new Readable()
 
       stream.push('somestreamdata')
@@ -35,7 +35,7 @@ describe('Files', function () {
       const calls = mock.calls('UploadFile')
       calls.should.have.length(4)
       calls[0][1].headers['Content-Type'].should.equal('text/html')
-      calls[1][1].headers['Date'].should.equal(date.toISOString())
+      calls[1][1].headers['Date'].should.equal(date.toGMTString())
       mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file')
 
       res1.should.have.property('attributes')
