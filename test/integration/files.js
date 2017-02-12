@@ -4,6 +4,7 @@
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
 import 'isomorphic-fetch'
+import { Readable } from 'stream'
 import {Cozy} from '../../src'
 import {randomGenerator} from '../helpers'
 
@@ -30,6 +31,22 @@ describe('files API', async function () {
     const filename = 'foo_' + random()
 
     const created = await cozy.files.create('datastring1', {
+      name: filename,
+      contentType: 'application/json'
+    })
+
+    created.should.have.property('attributes')
+    created.attributes.md5sum.should.equal('7Zfd8PaeeXsm5WJesf/KJw==')
+  })
+
+  it('creates a file from a stream', async function () {
+    const filename = 'foo_' + random()
+    const stream = new Readable()
+
+    stream.push('datastring1')
+    stream.push(null)
+
+    const created = await cozy.files.create(stream, {
       name: filename,
       contentType: 'application/json'
     })
