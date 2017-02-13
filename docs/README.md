@@ -294,7 +294,7 @@ resuts[0].rating < 2 // lowest rating first
 
 It returns a promise for the document of the file created.
 
-- `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
+- `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView`, `stream.Readable` (node) or `string`.
 - `options` is an object with the following fields:
   * `name`: specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
   * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.

@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
+import { Readable } from 'stream'
 import {Cozy} from '../../src'
 import mock from '../mock-api'
 
@@ -21,12 +22,18 @@ describe('Files', function () {
 
     it('should work for supported data types', async function () {
       const date = new Date('2017-02-01T10:24:42.116Z')
+      const stream = new Readable()
+
+      stream.push('somestreamdata')
+      stream.push(null)
+
       const res1 = await cozy.files.create('somestringdata', { name: 'foo', dirID: '12345', contentType: 'text/html' })
       const res2 = await cozy.files.create(new Uint8Array(10), { name: 'foo', dirID: '12345', lastModifiedDate: date })
-      const res3 = await cozy.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
+      const res3 = await cozy.files.create(stream, { name: 'foo', dirID: '12345', contentType: 'text/plain' })
+      const res4 = await cozy.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
 
       const calls = mock.calls('UploadFile')
-      calls.should.have.length(3)
+      calls.should.have.length(4)
       calls[0][1].headers['Content-Type'].should.equal('text/html')
       calls[1][1].headers['Date'].should.equal(date.toISOString())
       mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file')
@@ -34,6 +41,7 @@ describe('Files', function () {
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
       res3.should.have.property('attributes')
+      res4.should.have.property('attributes')
     })
 
     it('should fail for unsupported data types', async function () {
