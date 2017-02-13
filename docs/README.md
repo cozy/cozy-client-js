@@ -324,11 +324,13 @@ It returns a promise for the document of the directory created.
 - `options` is an object with the following fields:
   * `name`: specify the name of the directory
   * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
+  * `lastModifiedDate`: a date to specify the last modification time to use for the directory.
 
 ```javascript
 const created = await cozy.files.createDirectory({
   name: "mydir",
-  dirID: "123456"
+  dirID: "123456",
+  lastModifiedDate: new Date()
 })
 ```
 

@@ -80,15 +80,23 @@ export function create (cozy, data, options) {
 }
 
 export function createDirectory (cozy, options) {
-  const {name, dirID} = options || {}
+  let {name, dirID, lastModifiedDate} = options || {}
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
   }
 
+  if (lastModifiedDate && typeof lastModifiedDate === 'string') {
+    lastModifiedDate = new Date(lastModifiedDate)
+  }
+
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=directory`
-  return cozyFetchJSON(cozy, 'POST', `${path}${query}`)
+  return cozyFetchJSON(cozy, 'POST', `${path}${query}`, undefined, {
+    headers: {
+      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+    }
+  })
 }
 
 export function updateById (cozy, id, data, options) {

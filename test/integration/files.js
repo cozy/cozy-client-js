@@ -76,9 +76,12 @@ describe('files API', async function () {
 
   it('creates directory', async function () {
     const dirname = 'foo_' + random()
+    const date = new Date('Wed, 01 Feb 2017 10:24:42 GMT')
 
-    const created = await cozy.files.createDirectory({ name: dirname })
+    const created = await cozy.files.createDirectory({ name: dirname, lastModifiedDate: date })
     created.should.have.property('attributes')
+    new Date(created.attributes.created_at).should.eql(date)
+    new Date(created.attributes.updated_at).should.eql(date)
   })
 
   it('gets directory info by ID', async function () {
