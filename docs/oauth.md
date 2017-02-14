@@ -34,7 +34,7 @@ In order to handle the registration of the client, two callbacks should be provi
   - `clientParams` an object with the following parameters:
     + `redirectURI`: the URI on which the user is redirected after accepting the client (mandatory)
     + `softwareID`: identifier of the software (by default `github.com/cozy/cozy-client-js`)
-    + `softwareVersion`: version of the software (optinal)
+    + `softwareVersion`: version of the software (optional)
     + `clientName`: string (optional)
     + `clientKind`: string (optional)
     + `clientURI`: string (optional)
