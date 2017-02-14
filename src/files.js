@@ -3,11 +3,6 @@ import {cozyFetch, cozyFetchJSON} from './fetch'
 import jsonapi from './jsonapi'
 import { DOCTYPE_FILES } from './doctypes'
 
-let Readable
-try {
-  Readable = require('stream').Readable
-} catch (_) {}
-
 const contentTypeOctetStream = 'application/octet-stream'
 
 function doUpload (cozy, data, method, path, options) {
@@ -23,7 +18,7 @@ function doUpload (cozy, data, method, path, options) {
   const isBuffer = (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer)
   const isFile = (typeof File !== 'undefined' && data instanceof File)
   const isBlob = (typeof Blob !== 'undefined' && data instanceof Blob)
-  const isStream = (typeof Readable !== 'undefined' && data instanceof Readable)
+  const isStream = (data.readable === true && typeof data.pipe === 'function')
   const isString = (typeof data === 'string')
 
   if (!isBuffer && !isFile && !isBlob && !isStream && !isString) {
