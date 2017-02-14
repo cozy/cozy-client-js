@@ -90,15 +90,15 @@
 	
 	var files = _interopRequireWildcard(_files);
 	
-	var _offline = __webpack_require__(15);
+	var _offline = __webpack_require__(16);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(18);
+	var _settings = __webpack_require__(17);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(19);
+	var _relations = __webpack_require__(18);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -1910,6 +1910,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var Readable = void 0;
+	try {
+	  Readable = __webpack_require__(15).Readable;
+	} catch (_) {}
+	
 	var contentTypeOctetStream = 'application/octet-stream';
 	
 	function doUpload(cozy, data, method, path, options) {
@@ -1925,9 +1930,10 @@
 	  var isBuffer = typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer;
 	  var isFile = typeof File !== 'undefined' && data instanceof File;
 	  var isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
+	  var isStream = typeof Readable !== 'undefined' && data instanceof Readable;
 	  var isString = typeof data === 'string';
 	
-	  if (!isBuffer && !isFile && !isBlob && !isString) {
+	  if (!isBuffer && !isFile && !isBlob && !isStream && !isString) {
 	    throw new Error('invalid data type');
 	  }
 	
@@ -1945,6 +1951,8 @@
 	      }
 	    } else if (isBlob) {
 	      contentType = contentTypeOctetStream;
+	    } else if (isStream) {
+	      contentType = contentTypeOctetStream;
 	    } else if (typeof data === 'string') {
 	      contentType = 'text/plain';
 	    }
@@ -1958,7 +1966,7 @@
 	    method: method,
 	    headers: {
 	      'Content-Type': contentType,
-	      'Date': lastModifiedDate ? lastModifiedDate.toISOString() : ''
+	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
 	    },
 	    body: data
 	  }).then(function (res) {
@@ -1997,15 +2005,24 @@
 	function createDirectory(cozy, options) {
 	  var _ref3 = options || {},
 	      name = _ref3.name,
-	      dirID = _ref3.dirID;
+	      dirID = _ref3.dirID,
+	      lastModifiedDate = _ref3.lastModifiedDate;
 	
 	  if (typeof name !== 'string' || name === '') {
 	    throw new Error('missing name argument');
 	  }
 	
+	  if (lastModifiedDate && typeof lastModifiedDate === 'string') {
+	    lastModifiedDate = new Date(lastModifiedDate);
+	  }
+	
 	  var path = '/files/' + encodeURIComponent(dirID || '');
 	  var query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '' + path + query);
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '' + path + query, undefined, {
+	    headers: {
+	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+	    }
+	  });
 	}
 	
 	function updateById(cozy, id, data, options) {
@@ -2133,6 +2150,12 @@
 
 /***/ },
 /* 15 */
+/***/ function(module, exports) {
+
+	module.exports = require("stream");
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2156,11 +2179,11 @@
 	exports.stopSync = stopSync;
 	exports.replicateFromCozy = replicateFromCozy;
 	
-	var _pouchdb = __webpack_require__(16);
+	var _pouchdb = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pouchdb\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(17);
+	var _pouchdbFind = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pouchdb-find\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -2372,19 +2395,7 @@
 	}
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	module.exports = require("pouchdb");
-
-/***/ },
 /* 17 */
-/***/ function(module, exports) {
-
-	module.exports = require("pouchdb-find");
-
-/***/ },
-/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2401,7 +2412,7 @@
 	}
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
