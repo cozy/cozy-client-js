@@ -29,14 +29,18 @@ describe('files API', async function () {
 
   it('creates a file', async function () {
     const filename = 'foo_' + random()
+    const date = new Date('Wed, 01 Feb 2017 10:24:42 GMT')
 
     const created = await cozy.files.create('datastring1', {
       name: filename,
-      contentType: 'application/json'
+      contentType: 'application/json',
+      lastModifiedDate: date
     })
 
     created.should.have.property('attributes')
     created.attributes.md5sum.should.equal('7Zfd8PaeeXsm5WJesf/KJw==')
+    new Date(created.attributes.created_at).should.eql(date)
+    new Date(created.attributes.updated_at).should.eql(date)
   })
 
   it('creates a file from a stream', async function () {
