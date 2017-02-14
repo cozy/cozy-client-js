@@ -310,6 +310,7 @@ describe('Files', function () {
 
         mock.calls('DownloadByID').should.have.length(1)
         mock.lastUrl('DownloadByID').should.equal('http://my.cozy.io/files/download/id42')
+        res.body.should.be.instanceOf(Readable)
 
         const txt = await res.text()
         txt.should.equal('foo')
@@ -324,6 +325,7 @@ describe('Files', function () {
 
         mock.calls('DownloadByPath').should.have.length(1)
         mock.lastUrl('DownloadByPath').should.equal('http://my.cozy.io/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+        res.body.should.be.instanceOf(Readable)
 
         const txt = await res.text()
         txt.should.equal('foo')

@@ -452,6 +452,7 @@ const response = await cozy.files.downloadById("1234567")
 const blob = await response.blob()
 const text = await response.text()
 const buff = await response.arrayBuffer()
+response.pipe(fs.createWriteStream('/some/file'))
 ```
 
 
@@ -468,6 +469,7 @@ const response = await cozy.files.downloadByPath("/foo/hello.txt")
 const blob = await response.blob()
 const text = await response.text()
 const buff = await response.arrayBuffer()
+response.pipe(fs.createWriteStream('/some/file'))
 ```
 
 ### `cozy.files.getDowloadLink(path)`
