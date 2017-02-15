@@ -86,9 +86,11 @@ export function startSync (cozy, doctype, timer) {
     offline.autoSync = setInterval(() => {
       if (offline.replicate === undefined) {
         offline.replicate = replicateFromCozy(cozy, doctype)
-          .on('complete', (info) => {
+        offline.replicate.then((db) => {
+          db.on('complete', (info) => {
             delete offline.replicate
           })
+        })
         // TODO: add replicationToCozy
       }
     }, timer * 1000)
@@ -115,21 +117,32 @@ export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
     if (options.live === true) {
       throw new Error('You can\'t use `live` option with Cozy couchdb.')
     }
-    const url = cozy._url + '/data/' + doctype
-    let db = getDatabase(cozy, doctype)
-    let replication = db.replicate.from(url, options)
-    const eventNames = [
-      'change', 'paused', 'active', 'denied', 'complete', 'error'
-    ]
-    for (let eventName of eventNames) {
-      if (typeof events[eventName] === 'function') {
-        replication.on(eventName, events[eventName])
-      }
+    if (options.manualAuthCredentials) {
+      return replicateFromCozyWithAuth(cozy, doctype, options, events, options.manualAuthCredentials)
+    } else {
+      return cozy.authorize().then((credentials) => {
+        return replicateFromCozyWithAuth(cozy, doctype, options, events, credentials)
+      })
     }
-    return replication
   } else {
     throw new Error(`You should add this doctype: ${doctype} to offline.`)
   }
+}
+
+export function replicateFromCozyWithAuth (cozy, doctype, options, events, credentials) {
+  let basic = credentials.token.toBasicAuth()
+  let url = (cozy._url + '/data/' + doctype).replace('//', `//${basic}`)
+  let db = getDatabase(cozy, doctype)
+  let replication = db.replicate.from(url, options)
+  const eventNames = [
+    'change', 'paused', 'active', 'denied', 'complete', 'error'
+  ]
+  for (let eventName of eventNames) {
+    if (typeof events[eventName] === 'function') {
+      replication.on(eventName, events[eventName])
+    }
+  }
+  return replication
 }
 
 function createIndexes (cozy, db, doctype) {

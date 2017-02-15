@@ -72,6 +72,10 @@ export class AccessToken {
   toAuthHeader () {
     return 'Bearer ' + this.accessToken
   }
+
+  toBasicAuth () {
+    return `user:${this.accessToken}@`
+  }
 }
 
 export class AppToken {
@@ -81,6 +85,10 @@ export class AppToken {
 
   toAuthHeader () {
     return 'Bearer ' + this.token
+  }
+
+  toBasicAuth () {
+    return `user:${this.token}@`
   }
 }
 
