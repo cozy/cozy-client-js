@@ -179,6 +179,21 @@ console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
 
+### `cozy.data.changesFeed(doctype, options)`
+
+`cozy.data.changesFeed(doctype, options)` returns the last changes from CouchDB for the given doctype
+
+It returns a promise for the changes.
+
+- `doctype` is a string specifying the [doctype](#doctypes--permissions)
+- `options` is an object, only its `since` parameter is supported currently
+
+```javascript
+const changes = await.cozy.data.changesFeed(myBooksDoctype, { since: 0 })
+console.log(changes.last_seq, changes.results)
+```
+
+
 ### `cozy.data.update(doctype, doc, newdoc)`
 
 `cozy.data.update(doctype, doc, newdoc)` replaces the document by a new version.
