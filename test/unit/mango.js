@@ -23,7 +23,7 @@ describe('mango API', function () {
 
     it('Call the proper route', async function () {
       const testIndex = ['field1', 'field2']
-      indexRef = await cozy.defineIndex('io.cozy.testobject', testIndex)
+      indexRef = await cozy.data.defineIndex('io.cozy.testobject', testIndex)
 
       mock.calls('CreateIndex').should.have.length(1)
       mock.lastUrl('CreateIndex').should.equal('http://my.cozy.io/data/io.cozy.testobject/_index')
@@ -43,7 +43,7 @@ describe('mango API', function () {
     before(mock.mockAPI('FindDocuments'))
 
     it('Call the proper route', async function () {
-      let fetched = await cozy.query(indexRef, {
+      let fetched = await cozy.data.query(indexRef, {
         selector: {field1: 'value'}
       })
 

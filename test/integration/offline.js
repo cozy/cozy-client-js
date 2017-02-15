@@ -32,14 +32,14 @@ describe('offline', function () {
       token: COZY_STACK_TOKEN
     })
     for (var i = 0, l = docs.length; i < l; i++) {
-      docs[i] = await cozy.create(DOCTYPE, docs[i])
+      docs[i] = await cozy.data.create(DOCTYPE, docs[i])
     }
   })
 
   after(async function () {
     if (COZY_STACK_VERSION === '3') {
       for (var i = 0, l = docs.length; i < l; i++) {
-        await cozy.delete(DOCTYPE, docs[i])
+        await cozy.data.delete(DOCTYPE, docs[i])
       }
       cozy.offline.stopAllSync()
     }
@@ -83,7 +83,7 @@ describe('offline', function () {
     const smallDoc = {test: 187}
     cozy.offline.startSync(DOCTYPE, 3)
     await new Promise(resolve => setTimeout(resolve, 1 * 1000))
-    let doc = await cozy.create(DOCTYPE, smallDoc)
+    let doc = await cozy.data.create(DOCTYPE, smallDoc)
     const docId = doc._id
 
     let err = null

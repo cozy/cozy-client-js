@@ -3,7 +3,7 @@ import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
 import * as auth from './auth_v3'
-import * as crud from './crud'
+import * as data from './data'
 import * as mango from './mango'
 import * as files from './files'
 import * as offline from './offline'
@@ -25,19 +25,19 @@ const defaultClientParams = {
   softwareID: 'github.com/cozy/cozy-client-js'
 }
 
-const mainProto = {
-  create: crud.create,
-  find: crud.find,
-  update: crud.update,
-  delete: crud._delete,
-  updateAttributes: crud.updateAttributes,
+const dataProto = {
+  create: data.create,
+  find: data.find,
+  update: data.update,
+  delete: data._delete,
+  updateAttributes: data.updateAttributes,
   defineIndex: mango.defineIndex,
   query: mango.query,
   addReferencedFiles: relations.addReferencedFiles,
   listReferencedFiles: relations.listReferencedFiles,
   destroy: function (...args) {
-    warn('destroy is deprecated, use cozy.delete instead.')
-    return crud._delete(...args)
+    warn('destroy is deprecated, use cozy.data.delete instead.')
+    return data._delete(...args)
   }
 }
 
@@ -93,6 +93,7 @@ const settingsProto = {
 
 class Cozy {
   constructor (options) {
+    this.data = {}
     this.files = {}
     this.offline = {}
     this.settings = {}
@@ -143,7 +144,7 @@ class Cozy {
     this._url = url
 
     const disablePromises = !!options.disablePromises
-    addToProto(this, this, mainProto, disablePromises)
+    addToProto(this, this.data, dataProto, disablePromises)
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
     addToProto(this, this.offline, offlineProto, disablePromises)

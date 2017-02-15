@@ -37,31 +37,31 @@ describe('mango API', function () {
 
   before(async function () {
     for (var i = 0, l = docs.length; i < l; i++) {
-      docs[i] = await cozy.create(DOCTYPE, docs[i])
+      docs[i] = await cozy.data.create(DOCTYPE, docs[i])
     }
   })
 
   after(async function () {
     for (var i = 0, l = docs.length; i < l; i++) {
-      await cozy.delete(DOCTYPE, docs[i])
+      await cozy.data.delete(DOCTYPE, docs[i])
     }
   })
 
   it('Define indexOnGroup', async function () {
-    indexOnGroup = await cozy.defineIndex(DOCTYPE, ['group'])
+    indexOnGroup = await cozy.data.defineIndex(DOCTYPE, ['group'])
   })
 
   it('Redefine the same index', async function () {
-    await cozy.defineIndex(DOCTYPE, ['group'])
+    await cozy.data.defineIndex(DOCTYPE, ['group'])
     // should.not.throw
   })
 
   it('Define indexOnGroupAndYear', async function () {
-    indexOnGroupAndYear = await cozy.defineIndex(DOCTYPE, ['group', 'year'])
+    indexOnGroupAndYear = await cozy.data.defineIndex(DOCTYPE, ['group', 'year'])
   })
 
   it('Query indexOnGroup', async function () {
-    let results = await cozy.query(indexOnGroup, {
+    let results = await cozy.data.query(indexOnGroup, {
       selector: {group: 'A'}
     })
 
@@ -70,7 +70,7 @@ describe('mango API', function () {
   })
 
   it('Query indexOnGroupAndYear', async function () {
-    let results = await cozy.query(indexOnGroupAndYear, {
+    let results = await cozy.data.query(indexOnGroupAndYear, {
       selector: {group: 'A'}
     })
 
@@ -79,7 +79,7 @@ describe('mango API', function () {
   })
 
   it('Query indexOnGroupAndYear with 2 fields', async function () {
-    let results = await cozy.query(indexOnGroupAndYear, {
+    let results = await cozy.data.query(indexOnGroupAndYear, {
       selector: {group: 'A', year: {$gte: 1900, $lt: 2200}}
     })
 
@@ -88,11 +88,11 @@ describe('mango API', function () {
   })
 
   it('Query indexOnGroupAndYear with 2 fields and sorted', async function () {
-    let sortedResults = await cozy.query(indexOnGroupAndYear, {
+    let sortedResults = await cozy.data.query(indexOnGroupAndYear, {
       selector: {group: 'A', year: {$gte: 1900, $lt: 2200}},
       descending: true
     })
-    let nonSortedresults = await cozy.query(indexOnGroupAndYear, {
+    let nonSortedresults = await cozy.data.query(indexOnGroupAndYear, {
       selector: {group: 'A', year: {$gte: 1900, $lt: 2200}}
     })
 

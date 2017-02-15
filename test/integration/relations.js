@@ -35,13 +35,13 @@ describe('references', async function () {
       ids.push(file._id)
     }
 
-    const doc = await cozy.create('io.cozy.testreferencer', {
+    const doc = await cozy.data.create('io.cozy.testreferencer', {
       name: 'foo_' + random()
     })
 
-    await cozy.addReferencedFiles(doc, ids)
+    await cozy.data.addReferencedFiles(doc, ids)
 
-    const ids2 = await cozy.listReferencedFiles(doc)
+    const ids2 = await cozy.data.listReferencedFiles(doc)
     ids2.should.eql(ids)
   })
 })
