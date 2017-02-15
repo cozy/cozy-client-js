@@ -9,6 +9,22 @@
   "slug": "testapp",
   "version": "0.1.0",
   "permissions": {
+    "files": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.files"
+    },
+    "testobject": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.testobject"
+    },
+    "testobject2": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.testobject2"
+    },
+    "testreferencer": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.testreferencer"
+    },
     "settings": {
       "description": "Required for tests of cozy-client-js",
       "type": "io.cozy.settings",

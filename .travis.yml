@@ -8,12 +8,15 @@ services:
   - docker
 
 env:
-  - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
+  global:
+    - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
+    - COZY_V3_DOMAIN="localhost:8080"
+    - COZY_V3_PASSPHRASE="CozyTest_1"
 
 hosts:
-    - alice.cozy.local
-    - bob.cozy.local
-    - charlie.cozy.local
+  - alice.cozy.local
+  - bob.cozy.local
+  - charlie.cozy.local
 
 cache:
   yarn: true
@@ -31,9 +34,9 @@ before_script:
   - go get -u github.com/rif/spark
   # start a stack v3 instance from master (listening on 8080)
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
-  - $GOPATH/bin/cozy-stack serve --assets=$GOPATH/src/github.com/cozy/cozy-stack/assets &
+  - $GOPATH/bin/cozy-stack serve &
   - sleep 1
-  - $GOPATH/bin/cozy-stack instances add --dev "localhost:8080"
+  - $GOPATH/bin/cozy-stack instances add --dev --passphrase "$COZY_V3_PASSPHRASE" "$COZY_V3_DOMAIN"
   # install stack v2
   - npm install -g coffee-script
   # start a stack v2 from NPM (listening on 9104 & 9101)
@@ -53,7 +56,7 @@ before_script:
   - sleep 2
   - "curl -X POST -H 'Accept: application/vnd.api+json' 'http://localhost:8080/apps/mini?Source=git://localhost/'"
   - sleep 2
-  - export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "localhost:8080" "mini")
+  - export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "$COZY_V3_DOMAIN" "mini")
 
 deploy:
   provider: npm
