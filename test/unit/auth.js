@@ -102,14 +102,9 @@ describe('Authentication', function () {
         token: 'apptoken'
       })
 
-      const client = await cozy.auth.getClient({
-        clientID: '123',
-        clientSecret: 'blabla',
-        redirectURI: 'http://coucou/',
-        softwareID: 'id',
-        clientName: 'client',
-        registrationAccessToken: '789'
-      })
+      const clientID = '123'
+      const registrationAccessToken = '789'
+      const client = await cozy.auth.getClient({ clientID, registrationAccessToken })
 
       client.clientID.should.equal('123')
       client.clientSecret.should.equal('456')
