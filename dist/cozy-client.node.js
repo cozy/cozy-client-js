@@ -90,15 +90,15 @@
 	
 	var files = _interopRequireWildcard(_files);
 	
-	var _offline = __webpack_require__(16);
+	var _offline = __webpack_require__(15);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(17);
+	var _settings = __webpack_require__(18);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(18);
+	var _relations = __webpack_require__(19);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -1910,11 +1910,6 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Readable = void 0;
-	try {
-	  Readable = __webpack_require__(15).Readable;
-	} catch (_) {}
-	
 	var contentTypeOctetStream = 'application/octet-stream';
 	
 	function doUpload(cozy, data, method, path, options) {
@@ -1930,7 +1925,7 @@
 	  var isBuffer = typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer;
 	  var isFile = typeof File !== 'undefined' && data instanceof File;
 	  var isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
-	  var isStream = typeof Readable !== 'undefined' && data instanceof Readable;
+	  var isStream = data.readable === true && typeof data.pipe === 'function';
 	  var isString = typeof data === 'string';
 	
 	  if (!isBuffer && !isFile && !isBlob && !isStream && !isString) {
@@ -2150,12 +2145,6 @@
 
 /***/ },
 /* 15 */
-/***/ function(module, exports) {
-
-	module.exports = require("stream");
-
-/***/ },
-/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2179,11 +2168,11 @@
 	exports.stopSync = stopSync;
 	exports.replicateFromCozy = replicateFromCozy;
 	
-	var _pouchdb = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pouchdb\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var _pouchdb = __webpack_require__(16);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"pouchdb-find\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var _pouchdbFind = __webpack_require__(17);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -2395,7 +2384,19 @@
 	}
 
 /***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	module.exports = require("pouchdb");
+
+/***/ },
 /* 17 */
+/***/ function(module, exports) {
+
+	module.exports = require("pouchdb-find");
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2412,7 +2413,7 @@
 	}
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
