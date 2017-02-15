@@ -28,14 +28,16 @@ export class Client {
     this.logoURI = opts.logoURI || opts.logo_uri || ''
     this.policyURI = opts.policyURI || opts.policy_uri || ''
 
-    if (this.redirectURI === '') {
-      throw new Error('Missing redirectURI field')
-    }
-    if (this.softwareID === '') {
-      throw new Error('Missing softwareID field')
-    }
-    if (this.clientName === '') {
-      throw new Error('Missing clientName field')
+    if (!this.registrationAccessToken) {
+      if (this.redirectURI === '') {
+        throw new Error('Missing redirectURI field')
+      }
+      if (this.softwareID === '') {
+        throw new Error('Missing softwareID field')
+      }
+      if (this.clientName === '') {
+        throw new Error('Missing clientName field')
+      }
     }
   }
 
