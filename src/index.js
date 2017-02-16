@@ -31,6 +31,7 @@ const dataProto = {
   update: data.update,
   delete: data._delete,
   updateAttributes: data.updateAttributes,
+  changesFeed: data.changesFeed,
   defineIndex: mango.defineIndex,
   query: mango.query,
   addReferencedFiles: relations.addReferencedFiles,

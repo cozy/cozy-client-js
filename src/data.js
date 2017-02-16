@@ -40,6 +40,14 @@ export function find (cozy, doctype, id) {
   })
 }
 
+export function changesFeed (cozy, doctype, options) {
+  return cozy.isV2().then((isV2) => {
+    doctype = normalizeDoctype(cozy, isV2, doctype)
+    const path = createPath(cozy, isV2, doctype, '_changes', options)
+    return cozyFetchJSON(cozy, 'GET', path)
+  })
+}
+
 export function update (cozy, doctype, doc, changes) {
   return cozy.isV2().then((isV2) => {
     doctype = normalizeDoctype(cozy, isV2, doctype)

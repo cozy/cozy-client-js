@@ -51,6 +51,22 @@ describe('data API', function () {
     })
   })
 
+  describe('Fetch the changes feed', function () {
+    before(mock.mockAPI('ChangesFeed'))
+
+    it('Call the proper route', async function () {
+      let fetched = await cozy.data.changesFeed('io.cozy.testobject', { since: 0 })
+
+      mock.calls('ChangesFeed').should.have.length(1)
+      mock.lastUrl('ChangesFeed').should.equal('http://my.cozy.io/data/io.cozy.testobject/_changes?since=0')
+      mock.lastOptions('ChangesFeed').should.not.have.property('body')
+
+      fetched.should.have.property('last_seq', '42-abcdef')
+      fetched.should.have.property('pending', 0)
+      fetched.should.have.property('results')
+    })
+  })
+
   describe('Update document', function () {
     beforeEach(mock.mockAPI('UpdateDoc'))
 

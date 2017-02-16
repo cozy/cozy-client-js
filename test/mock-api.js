@@ -50,6 +50,28 @@ const ROUTES = [
     }
   },
   {
+    name: 'ChangesFeed',
+    method: 'GET',
+    matcher: /\/data\/io.cozy.testobject\/_changes\?since=0$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        last_seq: '42-abcdef',
+        pending: 0,
+        results: [
+          {
+            id: 'e2914a852e49f767263859c42201606e',
+            seq: '42-abcdef',
+            doc: null,
+            changes: [{ rev: '1-9cc26943123556f6b91408d885383aa7' }]
+          }
+        ]
+      }
+    }
+  },
+  {
     name: 'UpdateDoc',
     method: 'PUT',
     matcher: /\/data\/io.cozy.testobject\/42$/,
