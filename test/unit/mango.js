@@ -2,15 +2,15 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import {Cozy} from '../../src'
+import {Client} from '../../src'
 import mock from '../mock-api'
 
 describe('mango API', function () {
   let indexRef
-  let cozy
+  const cozy = {}
 
   beforeEach(() => {
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: 'http://my.cozy.io///',
       token: 'apptoken'
     })
@@ -23,7 +23,7 @@ describe('mango API', function () {
 
     it('Call the proper route', async function () {
       const testIndex = ['field1', 'field2']
-      indexRef = await cozy.data.defineIndex('io.cozy.testobject', testIndex)
+      indexRef = await cozy.client.data.defineIndex('io.cozy.testobject', testIndex)
 
       mock.calls('CreateIndex').should.have.length(1)
       mock.lastUrl('CreateIndex').should.equal('http://my.cozy.io/data/io.cozy.testobject/_index')
@@ -43,7 +43,7 @@ describe('mango API', function () {
     before(mock.mockAPI('FindDocuments'))
 
     it('Call the proper route', async function () {
-      let fetched = await cozy.data.query(indexRef, {
+      let fetched = await cozy.client.data.query(indexRef, {
         selector: {field1: 'value'}
       })
 

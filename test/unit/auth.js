@@ -2,16 +2,16 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import {Cozy, MemoryStorage} from '../../src'
+import {Client, MemoryStorage} from '../../src'
 import {oauthFlow, AccessToken} from '../../src/auth_v3'
 import mock from '../mock-api'
 import {decodeQuery} from '../../src/utils'
 
 describe('Authentication', function () {
-  let cozy
+  const cozy = {}
 
   beforeEach(() => {
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: 'http://foobar/',
       token: 'apptoken'
     })
@@ -20,24 +20,24 @@ describe('Authentication', function () {
 
   describe('Client', function () {
     it('should be defined', function () {
-      cozy.auth.Client.should.be.type('function')
+      cozy.client.auth.Client.should.be.type('function')
     })
 
     it('should create a client', function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         redirectURI: 'http://coucou/',
         softwareID: 'id',
         clientName: 'client'
       })
 
-      client.should.be.instanceOf(cozy.auth.Client)
+      client.should.be.instanceOf(cozy.client.auth.Client)
       client.redirectURI.should.be.type('string')
       client.softwareID.should.be.type('string')
       client.clientName.should.be.type('string')
     })
 
     it('should create a client from API data', function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -81,7 +81,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('AuthRegisterClient'))
 
     it('works', async function () {
-      const client = await cozy.auth.registerClient({
+      const client = await cozy.client.auth.registerClient({
         redirectURI: 'http://coucou/',
         softwareID: 'id',
         clientName: 'client'
@@ -97,14 +97,14 @@ describe('Authentication', function () {
     before(mock.mockAPI('AuthGetClient'))
 
     it('works', async function () {
-      cozy = new Cozy({
+      cozy.client = new Client({
         cozyURL: 'http://foobar/',
         token: 'apptoken'
       })
 
       const clientID = '123'
       const registrationAccessToken = '789'
-      const client = await cozy.auth.getClient({ clientID, registrationAccessToken })
+      const client = await cozy.client.auth.getClient({ clientID, registrationAccessToken })
 
       client.clientID.should.equal('123')
       client.clientSecret.should.equal('456')
@@ -117,7 +117,7 @@ describe('Authentication', function () {
 
   describe('getAuthCodeURL', function () {
     it('works', function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -131,7 +131,7 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      const {url, state} = cozy.auth.getAuthCodeURL(client, ['a', 'b'])
+      const {url, state} = cozy.client.auth.getAuthCodeURL(client, ['a', 'b'])
       state.should.be.type('string')
       state.length.should.not.equal(0)
       url.indexOf('http://foobar/auth/authorize?').should.equal(0)
@@ -149,7 +149,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('AccessToken'))
 
     it('works', async function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -163,10 +163,10 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      const {url, state} = cozy.auth.getAuthCodeURL(client, ['a', 'b'])
+      const {url, state} = cozy.client.auth.getAuthCodeURL(client, ['a', 'b'])
 
-      const token = await cozy.auth.getAccessToken(client, state, url)
-      token.should.eql(new cozy.auth.AccessToken({
+      const token = await cozy.client.auth.getAccessToken(client, state, url)
+      token.should.eql(new cozy.client.auth.AccessToken({
         tokenType: 'Bearer',
         accessToken: '123',
         refreshToken: '456',
@@ -179,7 +179,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('AccessToken'))
 
     it('works', async function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -193,15 +193,15 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      const token1 = new cozy.auth.AccessToken({
+      const token1 = new cozy.client.auth.AccessToken({
         tokenType: 'Bearer',
         accessToken: '123',
         refreshToken: '456',
         scope: 'a b'
       })
 
-      const token2 = await cozy.auth.refreshToken(client, token1)
-      token2.should.eql(new cozy.auth.AccessToken({
+      const token2 = await cozy.client.auth.refreshToken(client, token1)
+      token2.should.eql(new cozy.client.auth.AccessToken({
         tokenType: 'Bearer',
         accessToken: '123',
         refreshToken: '456',
@@ -214,7 +214,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('UpdateClient'))
 
     it('can update client data', async function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -230,7 +230,7 @@ describe('Authentication', function () {
 
       client.logoURI = '321'
 
-      let client2 = await cozy.auth.updateClient(client)
+      let client2 = await cozy.client.auth.updateClient(client)
       client2.clientID.should.eql('123')
       client2.logoURI.should.eql('321')
       client2.registrationAccessToken.should.eql('789')
@@ -244,7 +244,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('ResetClientToken'))
 
     it('can reset client token', async function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -258,7 +258,7 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      let client2 = await cozy.auth.updateClient(client, true)
+      let client2 = await cozy.client.auth.updateClient(client, true)
       client2.clientID.should.eql('123')
       client2.registrationAccessToken.should.eql('789')
 
@@ -273,7 +273,7 @@ describe('Authentication', function () {
     before(mock.mockAPI('UnregisterClient'))
 
     it('works', async function () {
-      const client = new cozy.auth.Client({
+      const client = new cozy.client.auth.Client({
         client_id: '123',
         client_secret: '456',
         registration_access_token: '789',
@@ -287,7 +287,7 @@ describe('Authentication', function () {
         policy_uri: '123'
       })
 
-      await cozy.auth.unregisterClient(client)
+      await cozy.client.auth.unregisterClient(client)
     })
   })
 
@@ -302,7 +302,7 @@ describe('Authentication', function () {
       const storage = new MemoryStorage()
       const err = new Error()
       oauthFlow(
-        cozy, storage,
+        cozy.client, storage,
         {
           redirectURI: 'http://babelu/',
           softwareID: 'id',
@@ -338,7 +338,7 @@ describe('Authentication', function () {
       let error
       try {
         await oauthFlow(
-          cozy, storage,
+          cozy.client, storage,
           () => {},
           () => 'http://coucou/?state=123'
         )
@@ -355,7 +355,7 @@ describe('Authentication', function () {
 
       function doRegistration () {
         return oauthFlow(
-          cozy, storage,
+          cozy.client, storage,
           {
             redirectURI: 'http://coucou/',
             softwareID: 'id',
@@ -371,7 +371,7 @@ describe('Authentication', function () {
 
       async function doThen () {
         const credentials = await oauthFlow(
-          cozy, storage,
+          cozy.client, storage,
           () => {},
           () => ''
         )
@@ -391,8 +391,8 @@ describe('Authentication', function () {
           throw new Error('should not have state anymore')
         }
 
-        creds.client.should.be.instanceOf(cozy.auth.Client)
-        creds.token.should.be.instanceOf(cozy.auth.AccessToken)
+        creds.client.should.be.instanceOf(cozy.client.auth.Client)
+        creds.token.should.be.instanceOf(cozy.client.auth.AccessToken)
         done()
       }
 
@@ -404,7 +404,7 @@ describe('Authentication', function () {
 
       function doRegistration () {
         return oauthFlow(
-          cozy, storage,
+          cozy.client, storage,
           {
             redirectURI: 'http://coucou/',
             softwareID: 'id',
@@ -420,10 +420,10 @@ describe('Authentication', function () {
 
       async function doThen () {
         const creds1 = await oauthFlow(
-          cozy, storage)
+          cozy.client, storage)
 
         const creds2 = await oauthFlow(
-          cozy, storage)
+          cozy.client, storage)
 
         creds2.should.eql(creds1)
         done()

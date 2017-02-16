@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
 import 'isomorphic-fetch'
-import {Cozy} from '../../src'
+import {Client} from '../../src'
 import PouchDB from 'pouchdb'
 PouchDB.plugin(require('pouchdb-adapter-memory'))
 
@@ -21,35 +21,35 @@ let docs = [
 ]
 
 describe('offline', function () {
-  let cozy
+  const cozy = {}
 
   before(async function () {
     if (COZY_STACK_VERSION === '2') {
       return this.skip()
     }
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: COZY_STACK_URL,
       token: COZY_STACK_TOKEN
     })
     for (var i = 0, l = docs.length; i < l; i++) {
-      docs[i] = await cozy.data.create(DOCTYPE, docs[i])
+      docs[i] = await cozy.client.data.create(DOCTYPE, docs[i])
     }
   })
 
   after(async function () {
     if (COZY_STACK_VERSION === '3') {
       for (var i = 0, l = docs.length; i < l; i++) {
-        await cozy.data.delete(DOCTYPE, docs[i])
+        await cozy.client.data.delete(DOCTYPE, docs[i])
       }
-      cozy.offline.stopAllSync()
+      cozy.client.offline.stopAllSync()
     }
   })
 
   it('can replicate database from cozy', async function () {
-    cozy.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
-    let complete = await cozy.offline.replicateFromCozy(DOCTYPE)
+    cozy.client.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
+    let complete = await cozy.client.offline.replicateFromCozy(DOCTYPE)
     complete.docs_written.should.not.equal(0)
-    complete = await cozy.offline.replicateFromCozy(DOCTYPE)
+    complete = await cozy.client.offline.replicateFromCozy(DOCTYPE)
     complete.docs_written.should.equal(0)
   }).timeout(3 * 1000)
 
@@ -57,8 +57,8 @@ describe('offline', function () {
     let err = null
 
     try {
-      cozy.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
-      await cozy.offline.replicateFromCozy(DOCTYPE, {live: true})
+      cozy.client.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
+      await cozy.client.offline.replicateFromCozy(DOCTYPE, {live: true})
     } catch (e) {
       err = e
     } finally {
@@ -67,9 +67,9 @@ describe('offline', function () {
   })
 
   it('can auto replicate database', async function () {
-    let db = cozy.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
+    let db = cozy.client.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
     const lastSeq = await new Promise((resolve) => {
-      cozy.offline.replicateFromCozy(DOCTYPE, {}, {complete: (info) => {
+      cozy.client.offline.replicateFromCozy(DOCTYPE, {}, {complete: (info) => {
         db.changes().on('complete', (info) => {
           resolve(info.last_seq)
         })
@@ -81,9 +81,9 @@ describe('offline', function () {
       .on('change', (change) => { count++ })
 
     const smallDoc = {test: 187}
-    cozy.offline.startSync(DOCTYPE, 3)
+    cozy.client.offline.startSync(DOCTYPE, 3)
     await new Promise(resolve => setTimeout(resolve, 1 * 1000))
-    let doc = await cozy.data.create(DOCTYPE, smallDoc)
+    let doc = await cozy.client.data.create(DOCTYPE, smallDoc)
     const docId = doc._id
 
     let err = null

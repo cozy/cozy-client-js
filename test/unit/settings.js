@@ -2,14 +2,14 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import {Cozy} from '../../src'
+import {Client} from '../../src'
 import mock from '../mock-api'
 
 describe('settings', function () {
-  let cozy
+  const cozy = {}
 
   beforeEach(() => {
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: 'http://my.cozy.io///',
       token: 'apptoken'
     })
@@ -20,7 +20,7 @@ describe('settings', function () {
     before(mock.mockAPI('DiskUsage'))
 
     it('should work', async function () {
-      const usage = await cozy.settings.diskUsage()
+      const usage = await cozy.client.settings.diskUsage()
       usage._id.should.equal('io.cozy.settings.disk-usage')
       usage._type.should.equal('io.cozy.settings')
       usage.attributes.used.should.equal('123')
