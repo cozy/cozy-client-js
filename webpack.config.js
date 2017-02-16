@@ -11,13 +11,17 @@ var output = {
 }
 
 if (NODE_TARGET === 'web') {
-  output.filename = 'cozy-client.js'
-  output.library = 'cozy-client-js'
-  output.libraryTarget = 'umd'
-  output.umdNamedDefine = true
+  Object.assign(output, {
+    filename: 'cozy-client.js',
+    library: ['cozy', 'client'],
+    libraryTarget: 'umd',
+    umdNamedDefine: true
+  })
 } else {
-  output.filename = 'cozy-client.node.js'
-  output.libraryTarget = 'commonjs'
+  Object.assign(output, {
+    filename: 'cozy-client.node.js',
+    libraryTarget: 'commonjs'
+  })
 }
 
 var config = {
@@ -25,6 +29,14 @@ var config = {
   devtool: 'source-map',
   target: NODE_TARGET,
   output: output,
+  externals: {
+    pouchdb: 'pouchdb',
+    'pouchdb-find': 'pouchdb-find'
+  },
+  resolve: {
+    root: path.resolve('./src'),
+    extensions: ['', '.js']
+  },
   module: {
     loaders: [
       {
@@ -41,14 +53,6 @@ var config = {
   },
   node: {
     'crypto': false
-  },
-  resolve: {
-    root: path.resolve('./src'),
-    extensions: ['', '.js']
-  },
-  externals: {
-    pouchdb: 'pouchdb',
-    'pouchdb-find': 'pouchdb-find'
   }
 }
 

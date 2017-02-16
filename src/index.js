@@ -1,4 +1,5 @@
 /* global fetch */
+
 import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
@@ -92,7 +93,7 @@ const settingsProto = {
   diskUsage: settings.diskUsage
 }
 
-class Cozy {
+class Client {
   constructor (options) {
     this.data = {}
     this.files = {}
@@ -246,12 +247,5 @@ function addToProto (ctx, obj, proto, disablePromises) {
   }
 }
 
-const cozy = new Cozy()
-
-export default cozy
-export { Cozy, LocalStorage, MemoryStorage }
-
-if ((typeof window) !== 'undefined') {
-  window.cozy = cozy
-  window.Cozy = Cozy
-}
+module.exports = new Client()
+Object.assign(module.exports, {Client, LocalStorage, MemoryStorage})
