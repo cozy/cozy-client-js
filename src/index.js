@@ -246,5 +246,4 @@ function addToProto (ctx, obj, proto, disablePromises) {
 }
 
 module.exports = new Client()
-module.exports.LocalStorage = LocalStorage
-module.exports.MemoryStorage = MemoryStorage
+Object.assign(module.exports, {Client, LocalStorage, MemoryStorage})

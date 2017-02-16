@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
 import 'isomorphic-fetch'
-import {Cozy} from '../../src'
+import {Client} from '../../src'
 import {randomGenerator} from '../helpers'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
@@ -12,13 +12,13 @@ const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 
 describe('references', async function () {
   let random
-  let cozy
+  const cozy = {}
 
   beforeEach(function () {
     if (COZY_STACK_VERSION === '2') {
       this.skip()
     }
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: COZY_STACK_URL,
       token: COZY_STACK_TOKEN
     })
@@ -28,20 +28,20 @@ describe('references', async function () {
   it('bind files to a doc', async function () {
     const ids = []
     for (let i = 0; i < 3; i++) {
-      let file = await cozy.files.create('datastring1', {
+      let file = await cozy.client.files.create('datastring1', {
         name: 'foo_' + random(),
         contentType: 'application/json'
       })
       ids.push(file._id)
     }
 
-    const doc = await cozy.create('io.cozy.testreferencer', {
+    const doc = await cozy.client.create('io.cozy.testreferencer', {
       name: 'foo_' + random()
     })
 
-    await cozy.addReferencedFiles(doc, ids)
+    await cozy.client.addReferencedFiles(doc, ids)
 
-    const ids2 = await cozy.listReferencedFiles(doc)
+    const ids2 = await cozy.client.listReferencedFiles(doc)
     ids2.should.eql(ids)
   })
 })

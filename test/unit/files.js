@@ -3,14 +3,14 @@
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
 import { Readable } from 'stream'
-import {Cozy} from '../../src'
+import {Client} from '../../src'
 import mock from '../mock-api'
 
 describe('Files', function () {
-  let cozy
+  const cozy = {}
 
   beforeEach(() => {
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: 'http://my.cozy.io///',
       token: 'apptoken'
     })
@@ -27,10 +27,10 @@ describe('Files', function () {
       stream.push('somestreamdata')
       stream.push(null)
 
-      const res1 = await cozy.files.create('somestringdata', { name: 'foo', dirID: '12345', contentType: 'text/html' })
-      const res2 = await cozy.files.create(new Uint8Array(10), { name: 'foo', dirID: '12345', lastModifiedDate: date })
-      const res3 = await cozy.files.create(stream, { name: 'foo', dirID: '12345', contentType: 'text/plain' })
-      const res4 = await cozy.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
+      const res1 = await cozy.client.files.create('somestringdata', { name: 'foo', dirID: '12345', contentType: 'text/html' })
+      const res2 = await cozy.client.files.create(new Uint8Array(10), { name: 'foo', dirID: '12345', lastModifiedDate: date })
+      const res3 = await cozy.client.files.create(stream, { name: 'foo', dirID: '12345', contentType: 'text/plain' })
+      const res4 = await cozy.client.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
 
       const calls = mock.calls('UploadFile')
       calls.should.have.length(4)
@@ -48,7 +48,7 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.files.create(1, { name: 'name' })
+        await cozy.client.files.create(1, { name: 'name' })
       } catch (e) {
         err = e
       } finally {
@@ -58,7 +58,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.create({}, { name: 'name' })
+        await cozy.client.files.create({}, { name: 'name' })
       } catch (e) {
         err = e
       } finally {
@@ -68,7 +68,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.create('', { name: 'name' })
+        await cozy.client.files.create('', { name: 'name' })
       } catch (e) {
         err = e
       } finally {
@@ -78,7 +78,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.create('somestringdata')
+        await cozy.client.files.create('somestringdata')
       } catch (e) {
         err = e
       } finally {
@@ -88,7 +88,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.updateById('12345', 1)
+        await cozy.client.files.updateById('12345', 1)
       } catch (e) {
         err = e
       } finally {
@@ -98,7 +98,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.updateById('12345', {})
+        await cozy.client.files.updateById('12345', {})
       } catch (e) {
         err = e
       } finally {
@@ -108,7 +108,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.updateById('12345', '')
+        await cozy.client.files.updateById('12345', '')
       } catch (e) {
         err = e
       } finally {
@@ -125,10 +125,10 @@ describe('Files', function () {
     it('should work', async function () {
       const dateString = 'Wed, 01 Feb 2017 10:24:42 GMT'
       const date = new Date(dateString)
-      const res1 = await cozy.files.createDirectory({ name: 'foo' })
-      const res2 = await cozy.files.createDirectory({ name: 'foo', lastModifiedDate: date })
-      const res3 = await cozy.files.createDirectory({ name: 'foo', lastModifiedDate: dateString })
-      const res4 = await cozy.files.createDirectory({ name: 'foo', dirID: '12345' })
+      const res1 = await cozy.client.files.createDirectory({ name: 'foo' })
+      const res2 = await cozy.client.files.createDirectory({ name: 'foo', lastModifiedDate: date })
+      const res3 = await cozy.client.files.createDirectory({ name: 'foo', lastModifiedDate: dateString })
+      const res4 = await cozy.client.files.createDirectory({ name: 'foo', dirID: '12345' })
 
       const calls = mock.calls('CreateDirectory')
       calls.should.have.length(4)
@@ -146,7 +146,7 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.files.createDirectory(null)
+        await cozy.client.files.createDirectory(null)
       } catch (e) {
         err = e
       } finally {
@@ -156,7 +156,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.createDirectory({})
+        await cozy.client.files.createDirectory({})
       } catch (e) {
         err = e
       } finally {
@@ -166,7 +166,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.createDirectory({ name: '' })
+        await cozy.client.files.createDirectory({ name: '' })
       } catch (e) {
         err = e
       } finally {
@@ -181,7 +181,7 @@ describe('Files', function () {
     before(mock.mockAPI('Trash'))
 
     it('should work', async function () {
-      const res1 = await cozy.files.trashById('1234')
+      const res1 = await cozy.client.files.trashById('1234')
 
       mock.calls('Trash').should.have.length(1)
       mock.lastUrl('Trash').should.equal('http://my.cozy.io/files/1234')
@@ -193,7 +193,7 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.files.trashById(null)
+        await cozy.client.files.trashById(null)
       } catch (e) {
         err = e
       } finally {
@@ -203,7 +203,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.trashById({})
+        await cozy.client.files.trashById({})
       } catch (e) {
         err = e
       } finally {
@@ -213,7 +213,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.trashById('')
+        await cozy.client.files.trashById('')
       } catch (e) {
         err = e
       } finally {
@@ -230,11 +230,11 @@ describe('Files', function () {
     it('should work with good arguments', async function () {
       const attrs = { tags: ['foo', 'bar'] }
 
-      const res1 = await cozy.files.updateAttributesById('12345', attrs)
+      const res1 = await cozy.client.files.updateAttributesById('12345', attrs)
       mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/12345')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
-      const res2 = await cozy.files.updateAttributesByPath('/foo/bar', attrs)
+      const res2 = await cozy.client.files.updateAttributesByPath('/foo/bar', attrs)
       mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/metadata?Path=%2Ffoo%2Fbar')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
@@ -248,7 +248,7 @@ describe('Files', function () {
       let err = null
 
       try {
-        await cozy.files.updateAttributesById('12345', null)
+        await cozy.client.files.updateAttributesById('12345', null)
       } catch (e) {
         err = e
       } finally {
@@ -258,7 +258,7 @@ describe('Files', function () {
       err = null
 
       try {
-        await cozy.files.updateAttributesByPath('/12345', null)
+        await cozy.client.files.updateAttributesByPath('/12345', null)
       } catch (e) {
         err = e
       } finally {
@@ -273,7 +273,7 @@ describe('Files', function () {
     before(mock.mockAPI('StatByID'))
 
     it('should work', async function () {
-      const res1 = await cozy.files.statById('id42')
+      const res1 = await cozy.client.files.statById('id42')
 
       mock.calls('StatByID').should.have.length(1)
       mock.lastUrl('StatByID').should.equal('http://my.cozy.io/files/id42')
@@ -289,7 +289,7 @@ describe('Files', function () {
     before(mock.mockAPI('StatByPath'))
 
     it('should work', async function () {
-      const res1 = await cozy.files.statByPath('/bills/hôpital.pdf')
+      const res1 = await cozy.client.files.statByPath('/bills/hôpital.pdf')
 
       mock.calls('StatByPath').should.have.length(1)
       mock.lastUrl('StatByPath').should.equal('http://my.cozy.io/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
@@ -306,7 +306,7 @@ describe('Files', function () {
       before(mock.mockAPI('DownloadByID'))
 
       it('should work', async function () {
-        const res = await cozy.files.downloadById('id42')
+        const res = await cozy.client.files.downloadById('id42')
 
         mock.calls('DownloadByID').should.have.length(1)
         mock.lastUrl('DownloadByID').should.equal('http://my.cozy.io/files/download/id42')
@@ -321,7 +321,7 @@ describe('Files', function () {
       before(mock.mockAPI('DownloadByPath'))
 
       it('should work', async function () {
-        const res = await cozy.files.downloadByPath('/bills/hôpital.pdf')
+        const res = await cozy.client.files.downloadByPath('/bills/hôpital.pdf')
 
         mock.calls('DownloadByPath').should.have.length(1)
         mock.lastUrl('DownloadByPath').should.equal('http://my.cozy.io/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')

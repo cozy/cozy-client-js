@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
 import 'isomorphic-fetch'
-import {Cozy} from '../../src'
+import {Client} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
@@ -13,14 +13,14 @@ const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 describe('crud API', function () {
   let docID = null
   let docRev = null
-  let cozy
+  const cozy = {}
 
   if (COZY_STACK_VERSION === '2') {
     before(mockTokenRetrieve)
   }
 
   beforeEach(() => {
-    cozy = new Cozy({
+    cozy.client = new Client({
       cozyURL: COZY_STACK_URL,
       token: COZY_STACK_TOKEN
     })
@@ -31,7 +31,7 @@ describe('crud API', function () {
       const testDoc = {
         'test': 'value'
       }
-      const created = await cozy.create('io.cozy.testobject', testDoc)
+      const created = await cozy.client.create('io.cozy.testobject', testDoc)
       created.should.have.property('_id')
       created.should.have.property('_rev')
       created.should.have.property('test', 'value')
@@ -42,7 +42,7 @@ describe('crud API', function () {
 
   describe('Fetch document', function () {
     it('Works', async function () {
-      let fetched = await cozy.find('io.cozy.testobject', docID)
+      let fetched = await cozy.client.find('io.cozy.testobject', docID)
       fetched.should.have.property('_id', docID)
       fetched.should.have.property('_rev', docRev)
       fetched.should.have.property('test', 'value')
@@ -54,7 +54,7 @@ describe('crud API', function () {
       const changes = {
         'test': 'value2'
       }
-      const updated = await cozy.update('io.cozy.testobject', { _id: docID, _rev: docRev }, changes)
+      const updated = await cozy.client.update('io.cozy.testobject', { _id: docID, _rev: docRev }, changes)
       updated.should.have.property('_id', docID)
       updated.should.have.property('_rev')
       updated.should.have.property('test', 'value2')
@@ -65,7 +65,7 @@ describe('crud API', function () {
 
   describe('Delete document', function () {
     it('Works', async function () {
-      const deleted = await cozy.delete('io.cozy.testobject', { _id: docID, _rev: docRev })
+      const deleted = await cozy.client.delete('io.cozy.testobject', { _id: docID, _rev: docRev })
       deleted.should.have.property('id', docID)
       deleted.should.have.property('rev')
     })
