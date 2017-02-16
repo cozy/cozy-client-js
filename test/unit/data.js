@@ -5,7 +5,7 @@ import should from 'should'
 import {Cozy} from '../../src'
 import mock from '../mock-api'
 
-describe('crud API', function () {
+describe('data API', function () {
   let cozy
 
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('crud API', function () {
 
     it('Call the proper route', async function () {
       const testDoc = { 'test': 'value' }
-      const created = await cozy.create('io.cozy.testobject', testDoc)
+      const created = await cozy.data.create('io.cozy.testobject', testDoc)
 
       mock.calls('CreateDoc').should.have.length(1)
       mock.lastUrl('CreateDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/')
@@ -39,7 +39,7 @@ describe('crud API', function () {
     before(mock.mockAPI('GetDoc'))
 
     it('Call the proper route', async function () {
-      let fetched = await cozy.find('io.cozy.testobject', '42')
+      let fetched = await cozy.data.find('io.cozy.testobject', '42')
 
       mock.calls('GetDoc').should.have.length(1)
       mock.lastUrl('GetDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/42')
@@ -56,7 +56,7 @@ describe('crud API', function () {
 
     it('Call the proper route', async function () {
       const changes = { 'test': 'value2' }
-      const updated = await cozy.update('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' }, changes)
+      const updated = await cozy.data.update('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' }, changes)
 
       mock.calls('UpdateDoc').should.have.length(1)
       mock.lastUrl('UpdateDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/42')
@@ -75,7 +75,7 @@ describe('crud API', function () {
       const changes = { 'test': 'value2' }
 
       try {
-        await cozy.update('io.cozy.testobject', { _rev: '1-5444878785445' }, changes)
+        await cozy.data.update('io.cozy.testobject', { _rev: '1-5444878785445' }, changes)
       } catch (e) {
         err = e
       } finally {
@@ -85,7 +85,7 @@ describe('crud API', function () {
       err = null
 
       try {
-        await cozy.update('io.cozy.testobject', { _id: '42' }, changes)
+        await cozy.data.update('io.cozy.testobject', { _id: '42' }, changes)
       } catch (e) {
         err = e
       } finally {
@@ -98,7 +98,7 @@ describe('crud API', function () {
     before(mock.mockAPI('DeleteDoc'))
 
     it('Call the proper route', async function () {
-      const deleted = await cozy.delete('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' })
+      const deleted = await cozy.data.delete('io.cozy.testobject', { _id: '42', _rev: '1-5444878785445' })
 
       mock.calls('DeleteDoc').should.have.length(1)
       mock.lastUrl('DeleteDoc').should.equal('http://my.cozy.io/data/io.cozy.testobject/42?rev=1-5444878785445')

@@ -15,11 +15,11 @@ To ensure retrocompatibility, when used on stack v2, all known doctypes will be 
 
 ```javascript
 // old version, using cozy-browser-sdk
-cozy.create("Contact", {})
-cozy.create("Book", {})
+cozysdk.create("Contact", {})
+cozysdk.create("Book", {})
 // new version, with cozy-client-js
-cozy.create("io.cozy.contacts", {})
-cozy.create("com.mydomain.book", {})
+cozy.data.create("io.cozy.contacts", {})
+cozy.data.create("com.mydomain.book", {})
 ```
 
 ## MapReduce Views vs Mango queries
@@ -35,8 +35,8 @@ If you need the full power of MapReduce, please open a issue on cozy-stack with 
 cozysdk.defineMapReduceView('Event', 'all', function(doc) { emit(doc.year); })
 cozysdk.queryView('Event', 'all', {key: 2016, limit: 10})
 // cozy-client-js
-index = cozysdk.defineIndex('Event', ['year'])
-cozysdk.query(index, {selector: {year: 2016}, limit: 10})
+index = cozy.data.defineIndex('Event', ['year'])
+cozy.data.query(index, {selector: {year: 2016}, limit: 10})
 
 ```
 
@@ -49,8 +49,8 @@ They will be probably placed in the VFS under a special path.
 
 The following functions have the same signature than the cozy-browser-sdk
 ```javascript
-created = await cozy.create(myType, book)
-doc = await cozy.find(myType, id)
-doc2 = await cozy.updateAttributes(myType, id, {year: 1851})
-await cozy.destroy("my.domain.book", id)
+created = await cozy.data.create(myType, book)
+doc = await cozy.data.find(myType, id)
+doc2 = await cozy.data.updateAttributes(myType, id, {year: 1851})
+await cozy.data.destroy("my.domain.book", id)
 ```

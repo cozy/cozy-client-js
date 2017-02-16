@@ -67,7 +67,7 @@ All cozy-client-js functions support callback or promise.
 
 If no callback is provided, a promise is returned.
 ```javascript
-cozy.create(myBooksDoctype, doc)
+cozy.data.create(myBooksDoctype, doc)
     .then(function(result){ console.log('done', result); });
     .catch(function(err){ console.log('fail', err); });
 ```
@@ -75,7 +75,7 @@ cozy.create(myBooksDoctype, doc)
 If your build pipeline supports it, use async/await for sweet sweet async
 ```javascript
 try {
-  result = await cozy.create(myBooksDoctype, doc)
+  result = await cozy.data.create(myBooksDoctype, doc)
   console.log('done', result)
 } catch(err) {
   console.log('fail', err)
@@ -86,7 +86,7 @@ If for some reason you do not want to use promises, you can pass the `disablePro
 
 ```javascript
 cozy.init({ disablePromises: true })
-cozy.create(myBooksDoctype, doc, function(err, result) {
+cozy.data.create(myBooksDoctype, doc, function(err, result) {
     if (err) {
       console.log('fail', err);
     } else {
@@ -136,9 +136,9 @@ cozy.init({
 
 ## Data API
 
-### `cozy.create(doctype, attributes)`
+### `cozy.data.create(doctype, attributes)`
 
-`cozy.create(doctype, attributes)` adds a document to the database.
+`cozy.data.create(doctype, attributes)` adds a document to the database.
 
 It returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It's the unique identifier for the created document.
 
@@ -152,7 +152,7 @@ If you use an existing doctype, you should follow its expected format. **v2** do
 ```javascript
 // simple object
 const book = { title: "Moby Dick", author:"Herman Melville", isbn: "42" }
-const created = await cozy.create(myBooksDoctype, book)
+const created = await cozy.data.create(myBooksDoctype, book)
 // same fields
 console.log(created.title, created.author, created.isbn)
 // _id, _rev are added
@@ -162,9 +162,9 @@ createdBookId = created._id
 ```
 
 
-### `cozy.find(doctype, id)`
+### `cozy.data.find(doctype, id)`
 
-`cozy.find(doctype, id)` returns the document associated to the given ID.
+`cozy.data.find(doctype, id)` returns the document associated to the given ID.
 
 It returns a promise for the document. It will have the same fields as the return value from `create`, including `_id` and `_rev`.
 
@@ -174,14 +174,14 @@ If the document does not exist, the promise will reject or the callback will be 
 - `id` is a string specifying the identifier of the document you search for
 
 ```javascript
-const doc = await cozy.find(myBooksDoctype, createdBookId)
+const doc = await cozy.data.find(myBooksDoctype, createdBookId)
 console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
 
-### `cozy.update(doctype, doc, newdoc)`
+### `cozy.data.update(doctype, doc, newdoc)`
 
-`cozy.update(doctype, doc, newdoc)` replaces the document by a new version.
+`cozy.data.update(doctype, doc, newdoc)` replaces the document by a new version.
 
 It returns a promise for the updated document. The updated document will have the same fields and values than provided newdoc, the same `_id` than doc, and a `_rev` incremented from doc's number.
 
@@ -195,7 +195,7 @@ If the document current `_rev` does not match the passed one, it means there is 
 
 ```javascript
 const updates = { title: "Moby Dick !", author:"THE Herman Melville"}
-const updated = await cozy.update(myBooksDoctype, doc, updates)
+const updated = await cozy.data.update(myBooksDoctype, doc, updates)
 console.log(updated._id === doc._id) // _id does not change
 console.log(updated._rev) // 2-xxxxxx
 console.log(updated.title, updated.year) // fields are changed
@@ -203,9 +203,9 @@ console.log(updated.isbn === undefined) // update erase fields
 ```
 
 
-### `cozy.updateAttributes(doctype, id, changes)`
+### `cozy.data.updateAttributes(doctype, id, changes)`
 
-`cozy.updateAttributes(doctype, id, changes)` applies change to the document.
+`cozy.data.updateAttributes(doctype, id, changes)` applies change to the document.
 
 It returns a promise for the updated document. The updated document will be the result of merging changes into the document with given `_id` and a incremented `_rev`.
 
@@ -219,7 +219,7 @@ This function gives 3 attempts not to conflict.
 
 ```javascript
 const updates = { year: 1852}
-const updated = await cozy.updateAttributes(myBooksDoctype, id, updates)
+const updated = await cozy.data.updateAttributes(myBooksDoctype, id, updates)
 console.log(updated._id === doc._id) // _id does not change
 console.log(updated._rev) // 3-xxxxxx
 console.log(updated.year) // fields are changed
@@ -227,9 +227,9 @@ console.log(updated.isbn) // updateAttributes preserve other fields
 ```
 
 
-### `cozy.destroy(doctype, doc)`
+### `cozy.data.delete(doctype, doc)`
 
-`cozy.destroy(doctype, doc )` will erase the document from the database.
+`cozy.data.delete(doctype, doc )` will erase the document from the database.
 
 It returns a promise which will resolve when the document has been deleted.
 
@@ -239,15 +239,15 @@ If the document does not exist, the promise will reject with an error. If the do
 - `doc` is an object with *at least* the fields `_id` and `_rev` containing the identifier and revision of the file you want to destroy.
 
 ```javascript
-await cozy.destroy(myBooksDoctype, updated)
+await cozy.data.delete(myBooksDoctype, updated)
 ```
 
 
-### `cozy.defineIndex(doctype, fields)`
+### `cozy.data.defineIndex(doctype, fields)`
 
-`defineIndex(doctype, fields)` creates an index for a document type. It is idempotent, it can be called several time with no bad effect.
+`cozy.data.defineIndex(doctype, fields)` creates an index for a document type. It is idempotent, it can be called several time with no bad effect.
 
-It returns a promise for an **indexReference**, which can be passed to `cozy.query`.
+It returns a promise for an **indexReference**, which can be passed to `cozy.data.query`.
 
 - `doctype` is a string specifying the [doctype](#doctypes--permissions)
 - `fields` is an array of the fields name to index
@@ -255,13 +255,13 @@ It returns a promise for an **indexReference**, which can be passed to `cozy.que
 **Warning**: when used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries. Because of this, more complex queries are not (yet) supported with **v2**.
 
 ```javascript
-const booksByYearRef = await cozy.defineIndex(myType, ['year', 'rating'])
+const booksByYearRef = await cozy.data.defineIndex(myType, ['year', 'rating'])
 ```
 
 
-### `cozy.query(indexReference, query)`
+### `cozy.data.query(indexReference, query)`
 
-`cozy.query(indexReference, query)` find documents using an index.
+`cozy.data.query(indexReference, query)` find documents using an index.
 
 It returns a promise with a list of documents matching the query. Results will be returned in order according to the index.
 
@@ -273,7 +273,7 @@ It returns a promise with a list of documents matching the query. Results will b
 **Warning**: complex mango queries are not, and may never be compatible with **v2**
 
 ```javascript
-const results = await cozy.query(booksByYearRef, {
+const results = await cozy.data.query(booksByYearRef, {
   "selector": {year: 1851},
   "limit": 3,
   "skip": 1
