@@ -117,7 +117,7 @@ It does not return a value.
 
 - `options` is an object with the following fields:
   * `cozyURL`: absolute url of the cozy stack
-  * `disablePromises`: boolean to make function that returns promise used with a classical "callback as last argument"
+  * `disablePromises`: boolean to make function that returns promise used with a classical "callback as last argument" (default value is *false*)
   * `oauth`: an object with the OAuth parameters, see [OAuth](./oauth.md) for details
 
 ```javascript
