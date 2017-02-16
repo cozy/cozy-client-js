@@ -60,13 +60,7 @@
 
 	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.MemoryStorage = exports.LocalStorage = exports.Cozy = undefined;
-	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch */
-	
 	
 	var _utils = __webpack_require__(3);
 	
@@ -78,9 +72,9 @@
 	
 	var auth = _interopRequireWildcard(_auth_v2);
 	
-	var _crud = __webpack_require__(11);
+	var _data = __webpack_require__(11);
 	
-	var crud = _interopRequireWildcard(_crud);
+	var data = _interopRequireWildcard(_data);
 	
 	var _mango = __webpack_require__(13);
 	
@@ -120,19 +114,20 @@
 	  softwareID: 'github.com/cozy/cozy-client-js'
 	};
 	
-	var mainProto = {
-	  create: crud.create,
-	  find: crud.find,
-	  update: crud.update,
-	  delete: crud._delete,
-	  updateAttributes: crud.updateAttributes,
+	var dataProto = {
+	  create: data.create,
+	  find: data.find,
+	  update: data.update,
+	  delete: data._delete,
+	  updateAttributes: data.updateAttributes,
+	  changesFeed: data.changesFeed,
 	  defineIndex: mango.defineIndex,
 	  query: mango.query,
 	  addReferencedFiles: relations.addReferencedFiles,
 	  listReferencedFiles: relations.listReferencedFiles,
 	  destroy: function destroy() {
-	    (0, _utils.warn)('destroy is deprecated, use cozy.delete instead.');
-	    return crud._delete.apply(crud, arguments);
+	    (0, _utils.warn)('destroy is deprecated, use cozy.data.delete instead.');
+	    return data._delete.apply(data, arguments);
 	  }
 	};
 	
@@ -186,10 +181,11 @@
 	  diskUsage: settings.diskUsage
 	};
 	
-	var Cozy = function () {
-	  function Cozy(options) {
-	    _classCallCheck(this, Cozy);
+	var Client = function () {
+	  function Client(options) {
+	    _classCallCheck(this, Client);
 	
+	    this.data = {};
 	    this.files = {};
 	    this.offline = {};
 	    this.settings = {};
@@ -207,7 +203,7 @@
 	    }
 	  }
 	
-	  _createClass(Cozy, [{
+	  _createClass(Client, [{
 	    key: 'init',
 	    value: function init() {
 	      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -244,7 +240,7 @@
 	      this._url = url;
 	
 	      var disablePromises = !!options.disablePromises;
-	      addToProto(this, this, mainProto, disablePromises);
+	      addToProto(this, this.data, dataProto, disablePromises);
 	      addToProto(this, this.auth, authProto, disablePromises);
 	      addToProto(this, this.files, filesProto, disablePromises);
 	      addToProto(this, this.offline, offlineProto, disablePromises);
@@ -334,7 +330,7 @@
 	    }
 	  }]);
 	
-	  return Cozy;
+	  return Client;
 	}();
 	
 	function nopOnRegistered() {
@@ -361,18 +357,8 @@
 	  }
 	}
 	
-	var cozy = new Cozy();
-	
-	exports.default = cozy;
-	exports.Cozy = Cozy;
-	exports.LocalStorage = _auth_storage.LocalStorage;
-	exports.MemoryStorage = _auth_storage.MemoryStorage;
-	
-	
-	if (typeof window !== 'undefined') {
-	  window.cozy = cozy;
-	  window.Cozy = Cozy;
-	}
+	module.exports = new Client();
+	Object.assign(module.exports, { Client: Client, LocalStorage: _auth_storage.LocalStorage, MemoryStorage: _auth_storage.MemoryStorage });
 
 /***/ },
 /* 3 */
@@ -791,14 +777,16 @@
 	    this.logoURI = opts.logoURI || opts.logo_uri || '';
 	    this.policyURI = opts.policyURI || opts.policy_uri || '';
 	
-	    if (this.redirectURI === '') {
-	      throw new Error('Missing redirectURI field');
-	    }
-	    if (this.softwareID === '') {
-	      throw new Error('Missing softwareID field');
-	    }
-	    if (this.clientName === '') {
-	      throw new Error('Missing clientName field');
+	    if (!this.registrationAccessToken) {
+	      if (this.redirectURI === '') {
+	        throw new Error('Missing redirectURI field');
+	      }
+	      if (this.softwareID === '') {
+	        throw new Error('Missing softwareID field');
+	      }
+	      if (this.clientName === '') {
+	        throw new Error('Missing clientName field');
+	      }
 	    }
 	  }
 	
@@ -846,6 +834,11 @@
 	    value: function toAuthHeader() {
 	      return 'Bearer ' + this.accessToken;
 	    }
+	  }, {
+	    key: 'toBasicAuth',
+	    value: function toBasicAuth() {
+	      return 'user:' + this.accessToken + '@';
+	    }
 	  }]);
 	
 	  return AccessToken;
@@ -862,6 +855,11 @@
 	    key: 'toAuthHeader',
 	    value: function toAuthHeader() {
 	      return 'Bearer ' + this.token;
+	    }
+	  }, {
+	    key: 'toBasicAuth',
+	    value: function toBasicAuth() {
+	      return 'user:' + this.token + '@';
 	    }
 	  }]);
 	
@@ -1408,6 +1406,7 @@
 	});
 	exports.create = create;
 	exports.find = find;
+	exports.changesFeed = changesFeed;
 	exports.update = update;
 	exports.updateAttributes = updateAttributes;
 	exports._delete = _delete;
@@ -1453,6 +1452,14 @@
 	        return resp;
 	      }
 	    });
+	  });
+	}
+	
+	function changesFeed(cozy, doctype, options) {
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_changes', options);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path);
 	  });
 	}
 	
@@ -2167,6 +2174,7 @@
 	exports.hasSync = hasSync;
 	exports.stopSync = stopSync;
 	exports.replicateFromCozy = replicateFromCozy;
+	exports.replicateFromCozyWithAuth = replicateFromCozyWithAuth;
 	
 	var _pouchdb = __webpack_require__(16);
 	
@@ -2305,8 +2313,11 @@
 	      offline.timer = timer;
 	      offline.autoSync = setInterval(function () {
 	        if (offline.replicate === undefined) {
-	          offline.replicate = replicateFromCozy(cozy, doctype).on('complete', function (info) {
-	            delete offline.replicate;
+	          offline.replicate = replicateFromCozy(cozy, doctype);
+	          offline.replicate.then(function (db) {
+	            db.on('complete', function (info) {
+	              delete offline.replicate;
+	            });
 	          });
 	          // TODO: add replicationToCozy
 	        }
@@ -2340,41 +2351,52 @@
 	    if (options.live === true) {
 	      throw new Error('You can\'t use `live` option with Cozy couchdb.');
 	    }
-	    var url = cozy._url + '/data/' + doctype;
-	    var db = getDatabase(cozy, doctype);
-	    var replication = db.replicate.from(url, options);
-	    var eventNames = ['change', 'paused', 'active', 'denied', 'complete', 'error'];
-	    var _iteratorNormalCompletion2 = true;
-	    var _didIteratorError2 = false;
-	    var _iteratorError2 = undefined;
-	
-	    try {
-	      for (var _iterator2 = eventNames[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	        var eventName = _step2.value;
-	
-	        if (typeof events[eventName] === 'function') {
-	          replication.on(eventName, events[eventName]);
-	        }
-	      }
-	    } catch (err) {
-	      _didIteratorError2 = true;
-	      _iteratorError2 = err;
-	    } finally {
-	      try {
-	        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	          _iterator2.return();
-	        }
-	      } finally {
-	        if (_didIteratorError2) {
-	          throw _iteratorError2;
-	        }
-	      }
+	    if (options.manualAuthCredentials) {
+	      return replicateFromCozyWithAuth(cozy, doctype, options, events, options.manualAuthCredentials);
+	    } else {
+	      return cozy.authorize().then(function (credentials) {
+	        return replicateFromCozyWithAuth(cozy, doctype, options, events, credentials);
+	      });
 	    }
-	
-	    return replication;
 	  } else {
 	    throw new Error('You should add this doctype: ' + doctype + ' to offline.');
 	  }
+	}
+	
+	function replicateFromCozyWithAuth(cozy, doctype, options, events, credentials) {
+	  var basic = credentials.token.toBasicAuth();
+	  var url = (cozy._url + '/data/' + doctype).replace('//', '//' + basic);
+	  var db = getDatabase(cozy, doctype);
+	  var replication = db.replicate.from(url, options);
+	  var eventNames = ['change', 'paused', 'active', 'denied', 'complete', 'error'];
+	  var _iteratorNormalCompletion2 = true;
+	  var _didIteratorError2 = false;
+	  var _iteratorError2 = undefined;
+	
+	  try {
+	    for (var _iterator2 = eventNames[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	      var eventName = _step2.value;
+	
+	      if (typeof events[eventName] === 'function') {
+	        replication.on(eventName, events[eventName]);
+	      }
+	    }
+	  } catch (err) {
+	    _didIteratorError2 = true;
+	    _iteratorError2 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	        _iterator2.return();
+	      }
+	    } finally {
+	      if (_didIteratorError2) {
+	        throw _iteratorError2;
+	      }
+	    }
+	  }
+	
+	  return replication;
 	}
 	
 	function createIndexes(cozy, db, doctype) {
