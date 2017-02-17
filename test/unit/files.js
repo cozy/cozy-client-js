@@ -18,30 +18,59 @@ describe('Files', function () {
   afterEach(() => mock.restore())
 
   describe('Upload', function () {
-    before(mock.mockAPI('UploadFile'))
+    beforeEach(mock.mockAPI('UploadFile'))
+    beforeEach(mock.mockAPI('UpdateFile'))
+    beforeEach(mock.mockAPI('Status'))
 
     it('should work for supported data types', async function () {
-      const date = new Date('Wed, 01 Feb 2017 10:24:42 GMT')
       const stream = new Readable()
 
       stream.push('somestreamdata')
       stream.push(null)
 
       const res1 = await cozy.client.files.create('somestringdata', { name: 'foo', dirID: '12345', contentType: 'text/html' })
-      const res2 = await cozy.client.files.create(new Uint8Array(10), { name: 'foo', dirID: '12345', lastModifiedDate: date })
+      const res2 = await cozy.client.files.create(new Uint8Array(10), { name: 'foo', dirID: '12345' })
       const res3 = await cozy.client.files.create(stream, { name: 'foo', dirID: '12345', contentType: 'text/plain' })
       const res4 = await cozy.client.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
 
       const calls = mock.calls('UploadFile')
       calls.should.have.length(4)
       calls[0][1].headers['Content-Type'].should.equal('text/html')
-      calls[1][1].headers['Date'].should.equal(date.toGMTString())
       mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
       res3.should.have.property('attributes')
       res4.should.have.property('attributes')
+    })
+
+    it('should pass the relevant options as headers', async function () {
+      const creationDate = new Date('Wed, 01 Feb 2017 10:24:42 GMT')
+      const modificationDate = 'Wed, 01 Feb 2017 10:24:42 GMT'
+      const fooChecksum = 'rL0Y20zC+Fzt72VPzMSk2A=='
+      const barChecksum = 'N7UdGUp1E+RbVvZSTy1R8g=='
+      const previousRev = '1-0e6d5b72'
+
+      const file = await cozy.client.files.create('foo', {
+        name: 'foo',
+        checksum: fooChecksum,
+        lastModifiedDate: creationDate
+      })
+      await cozy.client.files.updateById(file._id, 'bar', {
+        checksum: barChecksum,
+        lastModifiedDate: modificationDate,
+        ifMatch: previousRev
+      })
+
+      const createCalls = mock.calls('UploadFile')
+      should(createCalls).have.length(1)
+      should(createCalls[0][1].headers['Content-MD5']).equal(fooChecksum)
+      should(createCalls[0][1].headers['Date']).equal(creationDate.toGMTString())
+      const updateCalls = mock.calls('UpdateFile')
+      should(updateCalls).have.length(1)
+      should(updateCalls[0][1].headers['Content-MD5']).equal(barChecksum)
+      should(updateCalls[0][1].headers['Date']).equal(modificationDate)
+      should(updateCalls[0][1].headers['If-Match']).equal(previousRev)
     })
 
     it('should fail for unsupported data types', async function () {
@@ -229,16 +258,20 @@ describe('Files', function () {
 
     it('should work with good arguments', async function () {
       const attrs = { tags: ['foo', 'bar'] }
+      const previousRev = '1-0e6d5b72'
 
-      const res1 = await cozy.client.files.updateAttributesById('12345', attrs)
+      const res1 = await cozy.client.files.updateAttributesById('12345', attrs, {ifMatch: previousRev})
       mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/12345')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
-      const res2 = await cozy.client.files.updateAttributesByPath('/foo/bar', attrs)
+      const res2 = await cozy.client.files.updateAttributesByPath('/foo/bar', attrs, {ifMatch: previousRev})
       mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/metadata?Path=%2Ffoo%2Fbar')
       JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
 
-      mock.calls('UpdateAttributes').should.have.length(2)
+      const calls = mock.calls('UpdateAttributes')
+      should(calls).have.length(2)
+      should(calls[0][1].headers['If-Match']).equal(previousRev)
+      should(calls[1][1].headers['If-Match']).equal(previousRev)
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')

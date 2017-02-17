@@ -25,7 +25,7 @@ function doUpload (cozy, data, method, path, options) {
     throw new Error('invalid data type')
   }
 
-  let {contentType, lastModifiedDate} = options || {}
+  let {contentType, checksum, lastModifiedDate, ifMatch} = options || {}
   if (!contentType) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
@@ -51,7 +51,9 @@ function doUpload (cozy, data, method, path, options) {
     method: method,
     headers: {
       'Content-Type': contentType,
-      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+      'Content-MD5': checksum || '',
+      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : '',
+      'If-Match': ifMatch || ''
     },
     body: data
   })
@@ -106,24 +108,28 @@ export function updateById (cozy, id, data, options) {
   return doUpload(cozy, data, 'PUT', `/files/${encodeURIComponent(id)}`, options)
 }
 
-export function updateAttributesById (cozy, id, attrs) {
+function doUpdateAttributes (cozy, attrs, path, options) {
   if (!attrs || typeof attrs !== 'object') {
     throw new Error('missing attrs argument')
   }
 
+  const {ifMatch} = options || {}
   const body = { data: { attributes: attrs } }
-  return cozyFetchJSON(cozy, 'PATCH',
-    `/files/${encodeURIComponent(id)}`, body)
+  return cozyFetchJSON(cozy, 'PATCH', path, body, {
+    headers: {
+      'If-Match': ifMatch || ''
+    }
+  })
 }
 
-export function updateAttributesByPath (cozy, path, attrs) {
-  if (!attrs || typeof attrs !== 'object') {
-    throw new Error('missing attrs argument')
-  }
+export function updateAttributesById (cozy, id, attrs, options) {
+  return doUpdateAttributes(cozy, attrs,
+    `/files/${encodeURIComponent(id)}`, options)
+}
 
-  const body = { data: { attributes: attrs } }
-  return cozyFetchJSON(cozy, 'PATCH',
-    `/files/metadata?Path=${encodeURIComponent(path)}`, body)
+export function updateAttributesByPath (cozy, path, attrs, options) {
+  return doUpdateAttributes(cozy, attrs,
+    `/files/metadata?Path=${encodeURIComponent(path)}`, options)
 }
 
 export function trashById (cozy, id) {
