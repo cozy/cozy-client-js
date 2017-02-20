@@ -60,7 +60,7 @@ function onRegistered(client, url) {
       if (request.url.indexOf('/do_access') === 0) {
         console.log('Received access from user with url', request.url)
         resolve(request.url)
-        response.end();
+        response.end()
       }
     })
     server.listen(3333, () => {
