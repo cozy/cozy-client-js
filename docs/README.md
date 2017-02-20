@@ -125,7 +125,7 @@ cozy.init({
   cozyURL: 'http://my.cozy.local',
   disablePromises: false,
   oauth: {
-    client: {/*...*/},
+    clientParams: {/*...*/},
     scopes: ["io.cozy.files:GET"],
     onRegistered: (client, url) => { /* */ },
     storage: new cozy.auth.LocalStorage(window.localStorage)
