@@ -91,7 +91,7 @@ const offlineProto = {
 
 const settingsProto = {
   diskUsage: settings.diskUsage,
-  passphrase: settings.passphrase,
+  changePassphrase: settings.changePassphrase,
   getInstance: settings.getInstance,
   updateInstance: settings.updateInstance,
   getClients: settings.getClients,

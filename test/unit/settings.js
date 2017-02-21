@@ -27,11 +27,11 @@ describe('settings', function () {
     })
   })
 
-  describe('Passphrase', function () {
+  describe('Changing the passphrase', function () {
     before(mock.mockAPI('Passphrase'))
 
     it('should work', async function () {
-      await cozy.client.settings.passphrase('current', 'new')
+      await cozy.client.settings.changePassphrase('current', 'new')
     })
   })
 

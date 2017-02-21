@@ -4,7 +4,7 @@ export function diskUsage (cozy) {
   return cozyFetchJSON(cozy, 'GET', `/settings/disk-usage`)
 }
 
-export function passphrase (cozy, currentPassPhrase, newPassPhrase) {
+export function changePassphrase (cozy, currentPassPhrase, newPassPhrase) {
   return cozyFetchJSON(cozy, 'PUT', `/settings/passphrase`, {
     current_passphrase: currentPassPhrase,
     new_passphrase: newPassPhrase
