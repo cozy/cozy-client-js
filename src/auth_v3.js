@@ -123,7 +123,18 @@ export function updateClient (cozy, client, resetSecret = false) {
 }
 
 export function unregisterClient (cozy, client) {
-  return cozyFetchJSON(cozy, 'DELETE', `/auth/register/${client.clientID}`)
+  if (!(client instanceof Client)) {
+    client = new Client(client)
+  }
+  if (!client.isRegistered()) {
+    return Promise.reject(new Error('Client not registered'))
+  }
+  return cozyFetchJSON(cozy, 'DELETE', `/auth/register/${client.clientID}`, null, {
+    manualAuthCredentials: {
+      client: client,
+      token: client
+    }
+  })
 }
 
 // getClient will retrive the registered client informations from the server.
