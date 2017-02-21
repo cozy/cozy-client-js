@@ -314,6 +314,7 @@ It returns a promise for the document of the file created.
   * `name`: specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
   * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+  * `checksum`: the base64-encoded (with padding) MD5 digest of the file (optional).
   * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
 
 **Warning**: this API is not v2 compatible.
@@ -325,6 +326,7 @@ const created = await cozy.files.create(blob, {
 })
 const fileCreated = await cozy.files.create(fileInput.files[0], {
   dirID: "",
+  checksum: "rL0Y20zC+Fzt72VPzMSk2A==",
   lastModifiedDate: new Date()
 })
 ```
@@ -360,39 +362,49 @@ It returns a promise for the document of the file updated.
 - `data` can be of the following type: `Blob`, `File`, `ArrayBuffer`, `ArrayBufferView` or `string`.
 - `options` is an object with the following fields:
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+  * `checksum`: the base64-encoded (with padding) MD5 digest of the file (optional).
+  * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
+  * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
 
 ```javascript
-const updated = await cozy.files.updateById("654321", blob, { contentType: "text/plain" })
+const updated = await cozy.files.updateById("654321", blob, {
+  contentType: "text/plain",
+  checksum: "rL0Y20zC+Fzt72VPzMSk2A==",
+  lastModifiedDate: new Date(),
+  ifMatch: "1-0e6d5b72"
+})
 ```
 
 
-### `cozy.files.updateAttributesById(id, attrs)`
+### `cozy.files.updateAttributesById(id, attrs, options)`
 
-`cozy.files.updateAttributesById(id, attrs)` is used to update the attributes associated to a file or directory specified by its id.
+`cozy.files.updateAttributesById(id, attrs, options)` is used to update the attributes associated to a file or directory specified by its id.
 
 It returns a promise for the document of the updated directory or file.
 
 - `id` is a string specifying the identifier of the file or directory to update
 - `attrs` is an object containing the changes
+- `options` is an object with the following fields:
+  * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
 
 ```javascript
-const updated = await cozy.files.updateAttributesById("12345", { tags: ["foo"] })
+const updated = await cozy.files.updateAttributesById("12345", { tags: ["foo"] }, { ifMatch: "1-0e6d5b72" })
 ```
 
-  * `path`: string specifying the path of the file or directory to update
 
+### `cozy.files.updateAttributesByPath(path, attrs, options)`
 
-### `cozy.files.updateAttributesByPath(path, attrs)`
-
-`cozy.files.updateAttributesByPath(path, attrs)` is used to update the attributes associated to a file or directory specified by its id.
+`cozy.files.updateAttributesByPath(path, attrs, options)` is used to update the attributes associated to a file or directory specified by its id.
 
 It returns a promise for the document of the updated directory or file.
 
 - `path`: string specifying the path of the file or directory to update
 - `attrs` is an object containing the changes
+- `options` is an object with the following fields:
+  * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
 
 ```javascript
-const updated = await cozy.files.updateAttributes("/foo/bar", { executable: true })
+const updated = await cozy.files.updateAttributes("/foo/bar", { executable: true }, { ifMatch: "1-0e6d5b72" })
 ```
 
 

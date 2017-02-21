@@ -166,6 +166,36 @@ const ROUTES = [
     }
   },
   {
+    name: 'UpdateFile',
+    method: 'PUT',
+    matcher: /\/files\/[^/]*$/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: { data: {
+        type: 'io.cozy.files',
+        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+        attributes: {
+          type: 'file',
+          name: 'hospi.pdf',
+          dir_id: 'io.cozy.files.root-dir',
+          created_at: '2016-11-25T16:07:45.398867198+01:00',
+          updated_at: '2016-11-25T16:07:45.398867198+01:00',
+          size: '0',
+          md5sum: '1B2M2Y8AsgTpgAmY7PhCfg==',
+          mime: 'application/pdf',
+          class: 'application',
+          executable: false,
+          tags: []
+        },
+        meta: {},
+        links: {},
+        relationships: {}
+      } }
+    }
+  },
+  {
     name: 'CreateDirectory',
     method: 'POST',
     matcher: /\/files\/.*Type=directory.*$/,
