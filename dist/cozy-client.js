@@ -2407,7 +2407,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var _ref = options || {},
 	      contentType = _ref.contentType,
-	      lastModifiedDate = _ref.lastModifiedDate;
+	      checksum = _ref.checksum,
+	      lastModifiedDate = _ref.lastModifiedDate,
+	      ifMatch = _ref.ifMatch;
 	
 	  if (!contentType) {
 	    if (isBuffer) {
@@ -2434,7 +2436,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    method: method,
 	    headers: {
 	      'Content-Type': contentType,
-	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+	      'Content-MD5': checksum || '',
+	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : '',
+	      'If-Match': ifMatch || ''
 	    },
 	    body: data
 	  }).then(function (res) {
@@ -2497,22 +2501,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return doUpload(cozy, data, 'PUT', '/files/' + encodeURIComponent(id), options);
 	}
 	
-	function updateAttributesById(cozy, id, attrs) {
+	function doUpdateAttributes(cozy, attrs, path, options) {
 	  if (!attrs || (typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs)) !== 'object') {
 	    throw new Error('missing attrs argument');
 	  }
 	
+	  var _ref4 = options || {},
+	      ifMatch = _ref4.ifMatch;
+	
 	  var body = { data: { attributes: attrs } };
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'PATCH', '/files/' + encodeURIComponent(id), body);
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'PATCH', path, body, {
+	    headers: {
+	      'If-Match': ifMatch || ''
+	    }
+	  });
 	}
 	
-	function updateAttributesByPath(cozy, path, attrs) {
-	  if (!attrs || (typeof attrs === 'undefined' ? 'undefined' : _typeof(attrs)) !== 'object') {
-	    throw new Error('missing attrs argument');
-	  }
+	function updateAttributesById(cozy, id, attrs, options) {
+	  return doUpdateAttributes(cozy, attrs, '/files/' + encodeURIComponent(id), options);
+	}
 	
-	  var body = { data: { attributes: attrs } };
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'PATCH', '/files/metadata?Path=' + encodeURIComponent(path), body);
+	function updateAttributesByPath(cozy, path, attrs, options) {
+	  return doUpdateAttributes(cozy, attrs, '/files/metadata?Path=' + encodeURIComponent(path), options);
 	}
 	
 	function trashById(cozy, id) {
@@ -2527,10 +2537,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
 	    var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-	    return Promise.all([db.get(id), db.find({ selector: { 'dir_id': id } })]).then(function (_ref4) {
-	      var _ref5 = _slicedToArray(_ref4, 2),
-	          doc = _ref5[0],
-	          children = _ref5[1];
+	    return Promise.all([db.get(id), db.find({ selector: { 'dir_id': id } })]).then(function (_ref5) {
+	      var _ref6 = _slicedToArray(_ref5, 2),
+	          doc = _ref6[0],
+	          children = _ref6[1];
 	
 	      children = children.docs.map(function (doc) {
 	        return addIsDir(toJsonApi(cozy, doc));
