@@ -90,7 +90,12 @@ const offlineProto = {
 }
 
 const settingsProto = {
-  diskUsage: settings.diskUsage
+  diskUsage: settings.diskUsage,
+  passphrase: settings.passphrase,
+  getInstance: settings.getInstance,
+  updateInstance: settings.updateInstance,
+  getClients: settings.getClients,
+  deleteClientById: settings.deleteClientById
 }
 
 class Client {
