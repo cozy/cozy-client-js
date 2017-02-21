@@ -2,11 +2,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("pouchdb"), require("pouchdb-find"));
 	else if(typeof define === 'function' && define.amd)
-		define("client", ["pouchdb", "pouchdb-find"], factory);
+		define("cozy-client-js", ["pouchdb", "pouchdb-find"], factory);
 	else if(typeof exports === 'object')
-		exports["client"] = factory(require("pouchdb"), require("pouchdb-find"));
+		exports["cozy-client-js"] = factory(require("pouchdb"), require("pouchdb-find"));
 	else
-		root["cozy"] = root["cozy"] || {}, root["cozy"]["client"] = factory(root["pouchdb"], root["pouchdb-find"]);
+		root["cozy-client-js"] = factory(root["pouchdb"], root["pouchdb-find"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -552,7 +552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var auth = _interopRequireWildcard(_auth_v2);
 	
-	var _data = __webpack_require__(10);
+	var _data = __webpack_require__(19);
 	
 	var data = _interopRequireWildcard(_data);
 	
@@ -1372,7 +1372,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function unregisterClient(cozy, client) {
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/auth/register/' + client.clientID);
+	  if (!(client instanceof Client)) {
+	    client = new Client(client);
+	  }
+	  if (!client.isRegistered()) {
+	    return Promise.reject(new Error('Client not registered'));
+	  }
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/auth/register/' + client.clientID, null, {
+	    manualAuthCredentials: {
+	      client: client,
+	      token: client
+	    }
+	  });
 	}
 	
 	// getClient will retrive the registered client informations from the server.
@@ -1862,150 +1873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = handleTopLevel;
 
 /***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.create = create;
-	exports.find = find;
-	exports.changesFeed = changesFeed;
-	exports.update = update;
-	exports.updateAttributes = updateAttributes;
-	exports._delete = _delete;
-	
-	var _utils = __webpack_require__(4);
-	
-	var _doctypes = __webpack_require__(11);
-	
-	var _fetch = __webpack_require__(8);
-	
-	var NOREV = 'stack-v2-no-rev';
-	
-	function create(cozy, doctype, attributes) {
-	  return cozy.isV2().then(function (isV2) {
-	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
-	    if (isV2) {
-	      attributes.docType = doctype;
-	    }
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype);
-	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, attributes).then(function (resp) {
-	      if (isV2) {
-	        return find(cozy, doctype, resp._id);
-	      } else {
-	        return resp.data;
-	      }
-	    });
-	  });
-	}
-	
-	function find(cozy, doctype, id) {
-	  return cozy.isV2().then(function (isV2) {
-	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
-	
-	    if (!id) {
-	      return Promise.reject(new Error('Missing id parameter'));
-	    }
-	
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, id);
-	    return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path).then(function (resp) {
-	      if (isV2) {
-	        return Object.assign(resp, { _rev: NOREV });
-	      } else {
-	        return resp;
-	      }
-	    });
-	  });
-	}
-	
-	function changesFeed(cozy, doctype, options) {
-	  return cozy.isV2().then(function (isV2) {
-	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_changes', options);
-	    return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path);
-	  });
-	}
-	
-	function update(cozy, doctype, doc, changes) {
-	  return cozy.isV2().then(function (isV2) {
-	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
-	    var _id = doc._id,
-	        _rev = doc._rev;
-	
-	
-	    if (!_id) {
-	      return Promise.reject(new Error('Missing _id field in passed document'));
-	    }
-	
-	    if (!isV2 && !_rev) {
-	      return Promise.reject(new Error('Missing _rev field in passed document'));
-	    }
-	
-	    if (isV2) {
-	      changes = Object.assign({ _id: _id }, changes);
-	    } else {
-	      changes = Object.assign({ _id: _id, _rev: _rev }, changes);
-	    }
-	
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, _id);
-	    return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', path, changes).then(function (resp) {
-	      if (isV2) {
-	        return find(cozy, doctype, _id);
-	      } else {
-	        return resp.data;
-	      }
-	    });
-	  });
-	}
-	
-	function updateAttributes(cozy, doctype, _id, changes) {
-	  var tries = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 3;
-	
-	  return cozy.isV2().then(function (isV2) {
-	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
-	    return find(cozy, doctype, _id).then(function (doc) {
-	      return update(cozy, doctype, doc, Object.assign({ _id: _id }, doc, changes));
-	    }).catch(function (err) {
-	      if (tries > 0) {
-	        return updateAttributes(cozy, doctype, _id, changes, tries - 1);
-	      } else {
-	        throw err;
-	      }
-	    });
-	  });
-	}
-	
-	function _delete(cozy, doctype, doc) {
-	  return cozy.isV2().then(function (isV2) {
-	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
-	    var _id = doc._id,
-	        _rev = doc._rev;
-	
-	
-	    if (!_id) {
-	      return Promise.reject(new Error('Missing _id field in passed document'));
-	    }
-	
-	    if (!isV2 && !_rev) {
-	      return Promise.reject(new Error('Missing _rev field in passed document'));
-	    }
-	
-	    var query = isV2 ? null : { rev: _rev };
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, _id, query);
-	    return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', path).then(function (resp) {
-	      if (isV2) {
-	        return { id: _id, rev: NOREV };
-	      } else {
-	        return resp;
-	      }
-	    });
-	  });
-	}
-
-/***/ },
+/* 10 */,
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2950,6 +2818,150 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var type = encodeURIComponent(doc._type);
 	  var id = encodeURIComponent(doc._id);
 	  return '/data/' + type + '/' + id + '/relationships/references';
+	}
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.create = create;
+	exports.find = find;
+	exports.changesFeed = changesFeed;
+	exports.update = update;
+	exports.updateAttributes = updateAttributes;
+	exports._delete = _delete;
+	
+	var _utils = __webpack_require__(4);
+	
+	var _doctypes = __webpack_require__(11);
+	
+	var _fetch = __webpack_require__(8);
+	
+	var NOREV = 'stack-v2-no-rev';
+	
+	function create(cozy, doctype, attributes) {
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    if (isV2) {
+	      attributes.docType = doctype;
+	    }
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, attributes).then(function (resp) {
+	      if (isV2) {
+	        return find(cozy, doctype, resp._id);
+	      } else {
+	        return resp.data;
+	      }
+	    });
+	  });
+	}
+	
+	function find(cozy, doctype, id) {
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	
+	    if (!id) {
+	      return Promise.reject(new Error('Missing id parameter'));
+	    }
+	
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, id);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path).then(function (resp) {
+	      if (isV2) {
+	        return Object.assign(resp, { _rev: NOREV });
+	      } else {
+	        return resp;
+	      }
+	    });
+	  });
+	}
+	
+	function changesFeed(cozy, doctype, options) {
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_changes', options);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'GET', path);
+	  });
+	}
+	
+	function update(cozy, doctype, doc, changes) {
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    var _id = doc._id,
+	        _rev = doc._rev;
+	
+	
+	    if (!_id) {
+	      return Promise.reject(new Error('Missing _id field in passed document'));
+	    }
+	
+	    if (!isV2 && !_rev) {
+	      return Promise.reject(new Error('Missing _rev field in passed document'));
+	    }
+	
+	    if (isV2) {
+	      changes = Object.assign({ _id: _id }, changes);
+	    } else {
+	      changes = Object.assign({ _id: _id, _rev: _rev }, changes);
+	    }
+	
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, _id);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', path, changes).then(function (resp) {
+	      if (isV2) {
+	        return find(cozy, doctype, _id);
+	      } else {
+	        return resp.data;
+	      }
+	    });
+	  });
+	}
+	
+	function updateAttributes(cozy, doctype, _id, changes) {
+	  var tries = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 3;
+	
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    return find(cozy, doctype, _id).then(function (doc) {
+	      return update(cozy, doctype, doc, Object.assign({ _id: _id }, doc, changes));
+	    }).catch(function (err) {
+	      if (tries > 0) {
+	        return updateAttributes(cozy, doctype, _id, changes, tries - 1);
+	      } else {
+	        throw err;
+	      }
+	    });
+	  });
+	}
+	
+	function _delete(cozy, doctype, doc) {
+	  return cozy.isV2().then(function (isV2) {
+	    doctype = (0, _doctypes.normalizeDoctype)(cozy, isV2, doctype);
+	    var _id = doc._id,
+	        _rev = doc._rev;
+	
+	
+	    if (!_id) {
+	      return Promise.reject(new Error('Missing _id field in passed document'));
+	    }
+	
+	    if (!isV2 && !_rev) {
+	      return Promise.reject(new Error('Missing _rev field in passed document'));
+	    }
+	
+	    var query = isV2 ? null : { rev: _rev };
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, _id, query);
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', path).then(function (resp) {
+	      if (isV2) {
+	        return { id: _id, rev: NOREV };
+	      } else {
+	        return resp;
+	      }
+	    });
+	  });
 	}
 
 /***/ }
