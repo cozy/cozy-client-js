@@ -58,7 +58,7 @@ They are two types of test :
 - In **test/unit**, we mock `fetch` and ensure each function calls the proper route(s) and parse the results as expected if the server is correct.
 - In **test/integration**, we run a complex scenario against both **v2** and **v3** cozy and ensure compatibility.
 
-To run integration tests, you will need one or both versions of cozy started. Have a look at the [.travis.yml](./travis.yml) to see how it can be done.
+To run integration tests, you will need one or both versions of cozy started. Have a look at the [.travis.yml](./.travis.yml) to see how it can be done.
 
 
 ```sh
