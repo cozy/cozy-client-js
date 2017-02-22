@@ -4,14 +4,14 @@ import { DOCTYPE_FILES } from './doctypes'
 
 let pluginLoaded = false
 
-export function init (cozy, { options = {}, doctypes = [], timer = false }) {
+export function init (cozy, { options = {}, doctypes = [], timer }) {
   for (let doctype of doctypes) {
     createDatabase(cozy, doctype, options)
   }
-  if (timer) { startAllSync(cozy, timer) }
+  if (timer !== undefined) { startAllSync(cozy, timer) }
 }
 
-export function createDatabase (cozy, doctype, options = {}, timer = false) {
+export function createDatabase (cozy, doctype, options = {}, timer) {
   if (!pluginLoaded) {
     PouchDB.plugin(pouchdbFind)
     pluginLoaded = true
@@ -23,7 +23,7 @@ export function createDatabase (cozy, doctype, options = {}, timer = false) {
   offline.database = new PouchDB(doctype, options)
   offline.timer = timer
   offline.autoSync = null
-  if (timer) { startSync(cozy, doctype, timer) }
+  if (timer !== undefined) { startSync(cozy, doctype, timer) }
   createIndexes(cozy, offline.database, doctype)
   return offline.database
 }
