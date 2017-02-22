@@ -44,6 +44,7 @@ const dataProto = {
 }
 
 const authProto = {
+  client: auth.client,
   registerClient: auth.registerClient,
   updateClient: auth.updateClient,
   unregisterClient: auth.unregisterClient,

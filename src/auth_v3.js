@@ -94,53 +94,67 @@ export class AppToken {
   }
 }
 
-export function registerClient (cozy, client) {
-  if (!(client instanceof Client)) {
-    client = new Client(client)
+export function client (cozy, clientParams) {
+  if (!clientParams) {
+    clientParams = cozy._clientParams
   }
-  if (client.isRegistered()) {
+  if (clientParams instanceof Client) {
+    return clientParams
+  }
+  return new Client(clientParams)
+}
+
+export function registerClient (cozy, clientParams) {
+  const cli = client(cozy, clientParams)
+  if (cli.isRegistered()) {
     return Promise.reject(new Error('Client already registered'))
   }
-  return cozyFetchJSON(cozy, 'POST', '/auth/register', client.toRegisterJSON(), {
+  return cozyFetchJSON(cozy, 'POST', '/auth/register', cli.toRegisterJSON(), {
     disableAuth: true
   })
     .then((data) => new Client(data))
 }
 
-export function updateClient (cozy, client, resetSecret = false) {
-  if (!(client instanceof Client)) {
-    client = new Client(client)
-  }
-  if (!client.isRegistered()) {
+export function updateClient (cozy, clientParams, resetSecret = false) {
+  const cli = client(cozy, clientParams)
+  if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  let data = client.toRegisterJSON()
-  data.client_id = client.clientID
-  if (resetSecret) data.client_secret = client.clientSecret
+  let data = cli.toRegisterJSON()
+  data.client_id = cli.clientID
+  if (resetSecret) data.client_secret = cli.clientSecret
 
-  return cozyFetchJSON(cozy, 'PUT', `/auth/register/${client.clientID}`, data)
-    .then((data) => createClient(data, client))
+  return cozyFetchJSON(cozy, 'PUT', `/auth/register/${cli.clientID}`, data, {
+    manualAuthCredentials: {
+      token: cli
+    }
+  }).then((data) => createClient(data, cli))
 }
 
-export function unregisterClient (cozy, client) {
-  return cozyFetchJSON(cozy, 'DELETE', `/auth/register/${client.clientID}`)
+export function unregisterClient (cozy, clientParams) {
+  const cli = client(cozy, clientParams)
+  if (!cli.isRegistered()) {
+    return Promise.reject(new Error('Client not registered'))
+  }
+  return cozyFetchJSON(cozy, 'DELETE', `/auth/register/${cli.clientID}`, null, {
+    manualAuthCredentials: {
+      token: cli
+    }
+  })
 }
 
 // getClient will retrive the registered client informations from the server.
-export function getClient (cozy, client) {
-  if (!(client instanceof Client)) {
-    client = new Client(client)
-  }
-  if (!client.isRegistered()) {
+export function getClient (cozy, clientParams) {
+  const cli = client(cozy, clientParams)
+  if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  return cozyFetchJSON(cozy, 'GET', `/auth/register/${client.clientID}`, null, {
+  return cozyFetchJSON(cozy, 'GET', `/auth/register/${cli.clientID}`, null, {
     manualAuthCredentials: {
-      client: client,
-      token: client
+      token: cli
     }
   })
-    .then((data) => createClient(data, client))
+    .then((data) => createClient(data, cli))
 }
 
 // createClient returns a new Client instance given on object containing the
