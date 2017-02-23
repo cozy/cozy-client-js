@@ -448,6 +448,95 @@ const ROUTES = [
         }
       } }
     }
+  },
+  {
+    name: 'Passphrase',
+    method: 'PUT',
+    matcher: /settings\/passphrase/,
+    response: { body: '' }
+  },
+  {
+    name: 'GetInstance',
+    method: 'GET',
+    matcher: /settings\/instance/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: {
+        data: {
+          type: 'io.cozy.settings',
+          id: 'io.cozy.settings.instance',
+          meta: {
+            rev: '1'
+          },
+          attributes: {
+            locale: 'fr',
+            email: 'alice@example.com',
+            public_name: 'Alice Martin'
+          }
+        }
+      }
+    }
+  },
+  {
+    name: 'UpdateInstance',
+    method: 'PUT',
+    matcher: /settings\/instance/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: {
+        data: {
+          type: 'io.cozy.settings',
+          id: 'io.cozy.settings.instance',
+          meta: {
+            rev: '2'
+          },
+          attributes: {
+            locale: 'en',
+            email: 'alice@example.com',
+            public_name: 'Alice Martin'
+          }
+        }
+      }
+    }
+  },
+  {
+    name: 'GetClients',
+    method: 'GET',
+    matcher: /settings\/clients/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: {
+        data: [{
+          type: 'io.cozy.oauth.clients',
+          id: '30e84c10-e6cf-11e6-9bfd-a7106972de51',
+          attributes: {
+            redirect_uris: ['http://localhost:4000/oauth/callback'],
+            client_name: 'Cozy-Desktop on my-new-laptop',
+            client_kind: 'desktop',
+            client_uri: 'https://docs.cozy.io/en/mobile/desktop.html',
+            logo_uri: 'https://docs.cozy.io/assets/images/cozy-logo-docs.svg',
+            policy_uri: 'https://cozy.io/policy',
+            software_id: '/github.com/cozy-labs/cozy-desktop',
+            software_version: '0.16.0'
+          },
+          links: {
+            self: '/settings/clients/30e84c10-e6cf-11e6-9bfd-a7106972de51'
+          }
+        }]
+      }
+    }
+  },
+  {
+    name: 'DeleteClient',
+    method: 'DELETE',
+    matcher: /settings\/clients\/123/,
+    response: { body: '' }
   }
 ]
 

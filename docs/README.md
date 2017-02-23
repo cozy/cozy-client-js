@@ -571,6 +571,25 @@ const usage = await cozy.settings.diskUsage()
 console.log(usage.attributes.used)
 ```
 
+### `cozy.settings.changePassphrase(oldPassphrase, newPassphrase)`
+
+`cozy.settings.changePassphrase`is used to change the passphrase of the current user. You must supply the currently used passphrase, as well as the new one. It simply returns a promise that will resolve if the change was successful.
+
+### `cozy.settings.getInstance()`
+
+`cozy.settings.getInstance` returns a promise with informations about the current Cozy instance, such as the locale or the public name. See cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/settings.md#response-3) for more details.
+
+### `cozy.settings.updateInstance(instance)`
+
+`cozy.settings.updateInstance` is used to update informations about the current instance. `instance` is an object that should be based on to the one you receive from `cozy.settings.getInstance()`. It returns a promise with the updated instance information.
+
+### `cozy.settings.getClients()`
+
+`cozy.settings.getClients` returns a promise for an array of registered clients. See the [cozy-stack documentation](https://github.com/cozy/cozy-stack/blob/master/docs/settings.md#response-5) for more details.
+
+### `cozy.settings.deleteClientById('123')`
+
+`cozy.settings.deleteClientById` revokes the specified client from the instance. This method returns a promise that simply resolves if the revokation was successful.
 
 ## Authentication and OAuth (internal)
 
