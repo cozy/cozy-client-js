@@ -176,7 +176,7 @@ describe('Authentication', function () {
   })
 
   describe('refreshToken', function () {
-    before(mock.mockAPI('AccessToken'))
+    before(mock.mockAPI('RefreshToken'))
 
     it('works', async function () {
       const client = new cozy.client.auth.Client({
@@ -203,7 +203,7 @@ describe('Authentication', function () {
       const token2 = await cozy.client.auth.refreshToken(client, token1)
       token2.should.eql(new cozy.client.auth.AccessToken({
         tokenType: 'Bearer',
-        accessToken: '123',
+        accessToken: '124',
         refreshToken: '456',
         scope: 'a b'
       }))

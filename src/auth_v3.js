@@ -228,7 +228,7 @@ export function getAccessToken (cozy, client, state, pageURL = '') {
 export function refreshToken (cozy, client, token) {
   return retrieveToken(cozy, client, token, {
     'grant_type': 'refresh_token',
-    'code': token.refreshToken
+    'refresh_token': token.refreshToken
   })
 }
 
@@ -339,7 +339,10 @@ function retrieveToken (cozy, client, token, query) {
     manualAuthCredentials: { client, token },
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   })
-    .then((data) => new AccessToken(data))
+    .then((data) => {
+      data.refreshToken = data.refreshToken || query.refresh_token
+      return new AccessToken(data)
+    })
 }
 
 // getGrantCodeFromPageURL extract the state and access_code query parameters
