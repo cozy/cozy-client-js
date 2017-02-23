@@ -8,7 +8,7 @@ import {Client, MemoryStorage} from '../../src'
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
 
-describe('files API', async function () {
+describe('oauth API', async function () {
   let client, oauthClient
 
   beforeEach(function () {
