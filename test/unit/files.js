@@ -36,7 +36,7 @@ describe('Files', function () {
       const calls = mock.calls('UploadFile')
       calls.should.have.length(4)
       calls[0][1].headers['Content-Type'].should.equal('text/html')
-      mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file')
+      mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file&Executable=false')
 
       res1.should.have.property('attributes')
       res2.should.have.property('attributes')
@@ -44,7 +44,7 @@ describe('Files', function () {
       res4.should.have.property('attributes')
     })
 
-    it('should pass the relevant options as headers', async function () {
+    it('should pass the options as headers or as query parameters', async function () {
       const creationDate = new Date('Wed, 01 Feb 2017 10:24:42 GMT')
       const modificationDate = 'Wed, 01 Feb 2017 10:24:42 GMT'
       const fooChecksum = 'rL0Y20zC+Fzt72VPzMSk2A=='
@@ -53,10 +53,12 @@ describe('Files', function () {
 
       const file = await cozy.client.files.create('foo', {
         name: 'foo',
+        executable: true,
         checksum: fooChecksum,
         lastModifiedDate: creationDate
       })
       await cozy.client.files.updateById(file._id, 'bar', {
+        executable: false,
         checksum: barChecksum,
         lastModifiedDate: modificationDate,
         ifMatch: previousRev
@@ -64,6 +66,7 @@ describe('Files', function () {
 
       const createCalls = mock.calls('UploadFile')
       should(createCalls).have.length(1)
+      should(createCalls[0][0]).match(/[?&]Executable=true[&]?$/)
       should(createCalls[0][1].headers['Content-MD5']).equal(fooChecksum)
       should(createCalls[0][1].headers['Date']).equal(creationDate.toGMTString())
       const updateCalls = mock.calls('UpdateFile')

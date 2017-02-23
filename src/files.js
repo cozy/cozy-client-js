@@ -68,7 +68,7 @@ function doUpload (cozy, data, method, path, options) {
 }
 
 export function create (cozy, data, options) {
-  let {name, dirID} = options || {}
+  let {name, dirID, executable} = options || {}
 
   // handle case where data is a file and contains the name
   if (!name && typeof data.name === 'string') {
@@ -79,8 +79,12 @@ export function create (cozy, data, options) {
     throw new Error('missing name argument')
   }
 
+  if (executable === undefined) {
+    executable = false
+  }
+
   const path = `/files/${encodeURIComponent(dirID || '')}`
-  const query = `?Name=${encodeURIComponent(name)}&Type=file`
+  const query = `?Name=${encodeURIComponent(name)}&Type=file&Executable=${executable}`
   return doUpload(cozy, data, 'POST', `${path}${query}`, options)
 }
 
