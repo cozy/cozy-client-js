@@ -472,7 +472,7 @@ await cozy.files.clearTrash()
 
 It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
 
-- `id` is a string specying the identifier of the file
+- `id` is a string specifying the identifier of the file
 
 ```javascript
 const response = await cozy.files.downloadById("1234567")
@@ -489,7 +489,7 @@ response.pipe(fs.createWriteStream('/some/file'))
 
 It returns a promise of a fetch `Response` object. This response object can be used to extract the information in the wanted form.
 
-- `path` is a string specying the path of the file
+- `path` is a string specifying the path of the file
 
 ```javascript
 const response = await cozy.files.downloadByPath("/foo/hello.txt")
@@ -515,7 +515,7 @@ link.download = fileName
 document.body.appendChild(link) && link.click()
 ```
 
-- `path` is a string specying the path of the file
+- `path` is a string specifying the path of the file
 
 
 ### `cozy.files.getArchiveLink(paths, name)`
