@@ -67,8 +67,10 @@ describe('offline', function () {
   })
 
   it('can auto replicate database', async function () {
+    // create a database
     let db = cozy.client.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
     const lastSeq = await new Promise((resolve) => {
+      // replicate data from gozy
       cozy.client.offline.replicateFromCozy(DOCTYPE, {}, {complete: (info) => {
         db.changes().on('complete', (info) => {
           resolve(info.last_seq)
@@ -81,8 +83,11 @@ describe('offline', function () {
       .on('change', (change) => { count++ })
 
     const smallDoc = {test: 187}
+    // activate synchronisation every 3000ms
     cozy.client.offline.startSync(DOCTYPE, 3)
     await new Promise(resolve => setTimeout(resolve, 1 * 1000))
+
+    // create a doc
     let doc = await cozy.client.data.create(DOCTYPE, smallDoc)
     const docId = doc._id
 
@@ -90,6 +95,7 @@ describe('offline', function () {
     doc = null
 
     try {
+      // check the db to look for the new doc
       doc = await db.get(docId)
     } catch (e) {
       err = e
@@ -104,6 +110,7 @@ describe('offline', function () {
     err = null
 
     try {
+      // after a certain amount of time, doc should exist
       doc = await db.get(docId)
     } catch (e) {
       err = e
