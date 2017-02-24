@@ -371,6 +371,21 @@ const ROUTES = [
     }
   },
   {
+    name: 'RefreshToken',
+    method: 'POST',
+    matcher: /\/auth\/access_token$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        token_type: 'Bearer',
+        access_token: '124',
+        scope: 'a b'
+      }
+    }
+  },
+  {
     name: 'AccessToken',
     method: 'POST',
     matcher: /\/auth\/access_token$/,
