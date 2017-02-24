@@ -41,7 +41,7 @@ describe('offline', function () {
   after(async function () {
     if (COZY_STACK_VERSION === '3') {
       await docs.forEach(doc => cozy.client.data.delete(DOCTYPE, doc))
-      cozy.client.offline.stopAllSync('after')
+      cozy.client.offline.stopAllSync()
     }
   })
 
