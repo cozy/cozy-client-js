@@ -91,7 +91,7 @@ describe('offline', function () {
     const remoteDoc = await cozy.client.data.create(DOCTYPE, sampleDoc)
     // check the db to look for the new doc
     db.get(remoteDoc._id).should.be.rejectedWith({ message: 'missing' })
-    // activate synchronisation every 1000ms
+    // activate synchronisation x ms
     cozy.client.offline.startSync(DOCTYPE, 0.1)
     // after a certain amount of time, doc should exist
     await sleep(300)
