@@ -612,6 +612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var authProto = {
+	  client: auth.client,
 	  registerClient: auth.registerClient,
 	  updateClient: auth.updateClient,
 	  unregisterClient: auth.unregisterClient,
@@ -658,7 +659,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var settingsProto = {
-	  diskUsage: settings.diskUsage
+	  diskUsage: settings.diskUsage,
+	  changePassphrase: settings.changePassphrase,
+	  getInstance: settings.getInstance,
+	  updateInstance: settings.updateInstance,
+	  getClients: settings.getClients,
+	  deleteClientById: settings.deleteClientById
 	};
 	
 	var Client = function () {
@@ -1207,6 +1213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global btoa */
 	
 	
+	exports.client = client;
 	exports.registerClient = registerClient;
 	exports.updateClient = updateClient;
 	exports.unregisterClient = unregisterClient;
@@ -1339,57 +1346,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return AppToken;
 	}();
 	
-	function registerClient(cozy, client) {
-	  if (!(client instanceof Client)) {
-	    client = new Client(client);
+	function client(cozy, clientParams) {
+	  if (!clientParams) {
+	    clientParams = cozy._clientParams;
 	  }
-	  if (client.isRegistered()) {
+	  if (clientParams instanceof Client) {
+	    return clientParams;
+	  }
+	  return new Client(clientParams);
+	}
+	
+	function registerClient(cozy, clientParams) {
+	  var cli = client(cozy, clientParams);
+	  if (cli.isRegistered()) {
 	    return Promise.reject(new Error('Client already registered'));
 	  }
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/auth/register', client.toRegisterJSON(), {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/auth/register', cli.toRegisterJSON(), {
 	    disableAuth: true
 	  }).then(function (data) {
 	    return new Client(data);
 	  });
 	}
 	
-	function updateClient(cozy, client) {
+	function updateClient(cozy, clientParams) {
 	  var resetSecret = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 	
-	  if (!(client instanceof Client)) {
-	    client = new Client(client);
-	  }
-	  if (!client.isRegistered()) {
+	  var cli = client(cozy, clientParams);
+	  if (!cli.isRegistered()) {
 	    return Promise.reject(new Error('Client not registered'));
 	  }
-	  var data = client.toRegisterJSON();
-	  data.client_id = client.clientID;
-	  if (resetSecret) data.client_secret = client.clientSecret;
+	  var data = cli.toRegisterJSON();
+	  data.client_id = cli.clientID;
+	  if (resetSecret) data.client_secret = cli.clientSecret;
 	
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', '/auth/register/' + client.clientID, data).then(function (data) {
-	    return createClient(data, client);
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', '/auth/register/' + cli.clientID, data, {
+	    manualAuthCredentials: {
+	      token: cli
+	    }
+	  }).then(function (data) {
+	    return createClient(data, cli);
 	  });
 	}
 	
-	function unregisterClient(cozy, client) {
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/auth/register/' + client.clientID);
+	function unregisterClient(cozy, clientParams) {
+	  var cli = client(cozy, clientParams);
+	  if (!cli.isRegistered()) {
+	    return Promise.reject(new Error('Client not registered'));
+	  }
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/auth/register/' + cli.clientID, null, {
+	    manualAuthCredentials: {
+	      token: cli
+	    }
+	  });
 	}
 	
 	// getClient will retrive the registered client informations from the server.
-	function getClient(cozy, client) {
-	  if (!(client instanceof Client)) {
-	    client = new Client(client);
-	  }
-	  if (!client.isRegistered()) {
+	function getClient(cozy, clientParams) {
+	  var cli = client(cozy, clientParams);
+	  if (!cli.isRegistered()) {
 	    return Promise.reject(new Error('Client not registered'));
 	  }
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/auth/register/' + client.clientID, null, {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/auth/register/' + cli.clientID, null, {
 	    manualAuthCredentials: {
-	      client: client,
-	      token: client
+	      token: cli
 	    }
 	  }).then(function (data) {
-	    return createClient(data, client);
+	    return createClient(data, cli);
 	  });
 	}
 	
@@ -1464,7 +1486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function refreshToken(cozy, client, token) {
 	  return retrieveToken(cozy, client, token, {
 	    'grant_type': 'refresh_token',
-	    'code': token.refreshToken
+	    'refresh_token': token.refreshToken
 	  });
 	}
 	
@@ -1592,6 +1614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    manualAuthCredentials: { client: client, token: token },
 	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 	  }).then(function (data) {
+	    data.refreshToken = data.refreshToken || query.refresh_token;
 	    return new AccessToken(data);
 	  });
 	}
@@ -2456,7 +2479,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function create(cozy, data, options) {
 	  var _ref2 = options || {},
 	      name = _ref2.name,
-	      dirID = _ref2.dirID;
+	      dirID = _ref2.dirID,
+	      executable = _ref2.executable;
 	
 	  // handle case where data is a file and contains the name
 	
@@ -2469,8 +2493,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw new Error('missing name argument');
 	  }
 	
+	  if (executable === undefined) {
+	    executable = false;
+	  }
+	
 	  var path = '/files/' + encodeURIComponent(dirID || '');
-	  var query = '?Name=' + encodeURIComponent(name) + '&Type=file';
+	  var query = '?Name=' + encodeURIComponent(name) + '&Type=file&Executable=' + executable;
 	  return doUpload(cozy, data, 'POST', '' + path + query, options);
 	}
 	
@@ -2903,11 +2931,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.diskUsage = diskUsage;
+	exports.changePassphrase = changePassphrase;
+	exports.getInstance = getInstance;
+	exports.updateInstance = updateInstance;
+	exports.getClients = getClients;
+	exports.deleteClientById = deleteClientById;
 	
 	var _fetch = __webpack_require__(8);
 	
 	function diskUsage(cozy) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/disk-usage');
+	}
+	
+	function changePassphrase(cozy, currentPassPhrase, newPassPhrase) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', '/settings/passphrase', {
+	    current_passphrase: currentPassPhrase,
+	    new_passphrase: newPassPhrase
+	  });
+	}
+	
+	function getInstance(cozy) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/instance');
+	}
+	
+	function updateInstance(cozy, instance) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', '/settings/instance', instance);
+	}
+	
+	function getClients(cozy) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/clients');
+	}
+	
+	function deleteClientById(cozy, id) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/settings/clients/' + id);
 	}
 
 /***/ },
