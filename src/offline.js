@@ -38,7 +38,7 @@ export function getDatabase (cozy, doctype) {
   if (hasDatabase(cozy, doctype)) {
     return cozy._offline[doctype].database
   }
-  return
+  return null
 }
 
 export function destroyDatabase (cozy, doctype) {
@@ -77,21 +77,13 @@ export function stopAllSync (cozy) {
 export function startSync (cozy, doctype, timer) {
   // TODO: add timer limitation for not flooding Gozy
   if (hasDatabase(cozy, doctype)) {
-    if (hasSync(cozy, doctype)) {
-      if (timer === cozy._offline[doctype].timer) {
-        return
-      }
-      stopSync(cozy, doctype)
-    }
     let offline = cozy._offline[doctype]
     offline.timer = timer
     offline.autoSync = setInterval(() => {
       if (offline.replicate === undefined) {
-        replicateFromCozy(cozy, doctype).then(info => {
-          offline.replicate = info
-        })
-        // TODO: add replicationToCozy
+        offline.replicate = replicateFromCozy(cozy, doctype)
       }
+      // TODO: add replicationToCozy
     }, timer * 1000)
   }
 }
@@ -103,6 +95,7 @@ export function hasSync (cozy, doctype) {
 }
 
 export function stopSync (cozy, doctype) {
+  clearInterval(cozy._offline[doctype].autoSync)
   if (hasSync(cozy, doctype)) {
     let offline = cozy._offline[doctype]
     if (offline.replication) { offline.replication.cancel() }
@@ -131,19 +124,8 @@ export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
 export function replicateFromCozyWithAuth (cozy, doctype, options, events, credentials) {
   let basic = credentials.token.toBasicAuth()
   let url = (cozy._url + '/data/' + doctype).replace('//', `//${basic}`)
-  let db = getDatabase(cozy, doctype)
-  let replication = db.replicate.from(url, options).on('complete', info => {
-    replication = undefined
-  })
-  const eventNames = [
-    'change', 'paused', 'active', 'denied', 'complete', 'error'
-  ]
-  for (let eventName of eventNames) {
-    if (typeof events[eventName] === 'function') {
-      replication.on(eventName, events[eventName])
-    }
-  }
-  return replication
+  const db = getDatabase(cozy, doctype)
+  return db.replicate.from(url, options)
 }
 
 function createIndexes (cozy, db, doctype) {

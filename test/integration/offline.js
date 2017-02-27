@@ -21,7 +21,10 @@ let docs = [
 ]
 
 function sleep (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  console.time('sleep')
+  return new Promise(resolve => setTimeout(resolve, ms)).then(() => {
+    console.timeEnd('sleep')
+  })
 }
 
 describe('offline', function () {
@@ -41,7 +44,7 @@ describe('offline', function () {
   after(async function () {
     if (COZY_STACK_VERSION === '3') {
       await docs.forEach(doc => cozy.client.data.delete(DOCTYPE, doc))
-      cozy.client.offline.stopAllSync('after')
+      cozy.client.offline.stopAllSync()
     }
   })
 
@@ -51,7 +54,7 @@ describe('offline', function () {
     complete.docs_written.should.not.equal(0)
     complete = await cozy.client.offline.replicateFromCozy(DOCTYPE)
     complete.docs_written.should.equal(0)
-  }).timeout(3 * 1000)
+  }).timeout(2500)
 
   it('can\'t replicate with live option.', async function () {
     cozy.client.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
@@ -81,7 +84,7 @@ describe('offline', function () {
     await cozy.client.offline.replicateFromCozy(DOCTYPE)
     // doc should exist
     return db.get(remoteDoc._id).should.be.fulfilledWith({ _id: remoteDoc._id, _rev: remoteDoc._rev, data: remoteDoc.data })
-  })
+  }).timeout(1000)
 
   it('can sync and stop sync a database', async function () {
     // create a database
@@ -93,15 +96,19 @@ describe('offline', function () {
     db.get(remoteDoc._id).should.be.rejectedWith({ message: 'missing' })
     // activate synchronisation x ms
     cozy.client.offline.startSync(DOCTYPE, 0.1)
+    // await cozy.client.offline.replicateFromCozy(DOCTYPE)
     // after a certain amount of time, doc should exist
-    await sleep(300)
-    cozy.client.offline.stopAllSync()
+    await sleep(2000)
+    // cozy.client.offline.stopAllSync()
     // create another doc after sync
     const anotherDoc = { data: 'some other Data' }
     const anotherRemoteDoc = await cozy.client.data.create(DOCTYPE, anotherDoc)
     const promises = []
-    promises.push(db.get(remoteDoc._id).should.be.fulfilledWith({ _id: remoteDoc._id, _rev: remoteDoc._rev, data: remoteDoc.data }))
+    promises.push(
+    db.get(remoteDoc._id).should.be.fulfilledWith({ _id: remoteDoc._id, _rev: remoteDoc._rev, data: remoteDoc.data })
+    )
     promises.push(db.get(anotherRemoteDoc._id).should.be.rejectedWith({ message: 'missing', status: 404 }))
+    cozy.client.offline.destroyDatabase(DOCTYPE)
     return Promise.all(promises)
-  })
+  }).timeout(4000)
 })
