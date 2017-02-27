@@ -48,32 +48,6 @@ Contribute
 If you want to work on cozy-client-js itself and submit code modifications, feel free to open pull-requests! See the [contributing guide][contribute] for more information about this repository structure, testing, linting and how to properly open pull-requests.
 
 
-Run tests on local environment
-------------------------------
-
-To run unit tests, there is nothing special, just run:
-
-```
-yarn test:unit
-```
-
-To run integration tests, you need to communicate with a [cozy-stack](https://github.com/cozy/cozy-stack) and therefore you need to get a oauth token. Run the following command and adapt commands for you own needs:
-
-```
-./cozy-stack serve
-./cozy-stack instances add --dev --passphrase "cozy" "cozy.local:8080"
-./cozy-stack instances client-oauth cozy.local:8080 http://localhost test-app test-app
-./cozy-stack instances token-oauth cozy.local:8080 <the client token from previous command> 'io.cozy.files io.cozy.testobject io.cozy.testobject2 datastrings1'
-```
-
-It runs the cozy-stack's server, then creates a new instance with the passphrase *"cozy"* accessible on *"cozy.local:8080"* (don't forget to adapt your `/etc/hosts`). `client-oauth` creates a new client app and gives back an application token. Finally `token-oauth` creates an access token with permissions for all listed doctypes.
-
-When you have an access token, you can run integration tests on your local environment with command like this:
-
-```
-COZY_STACK_TOKEN=<the access token> NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://cozy.local:8080 mocha-webpack 'test/integration/**.js'
-```
-
 Community
 ---------
 
