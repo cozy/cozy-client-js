@@ -18,7 +18,8 @@
     "test:unit": "NODE_ENV=test NODE_TARGET=node mocha-webpack 'test/unit/**.js'",
     "test:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
     "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
-    "clean": "rm -r dist && rm -r .tmp"
+    "clean": "rm -r dist && rm -r .tmp",
+    "localtest:v3": "COZY_STACK_TOKEN=eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhY2Nlc3MiLCJpYXQiOjE0ODc5NTQ4MzUsImlzcyI6ImNvenkubG9jYWw6ODA4MCIsInN1YiI6IjUzNjUxOGVjZDgxOTcxZWExMmIwNTdmZmI0MDA0ZDJkIiwic2NvcGUiOiJpby5jb3p5LmZpbGVzIGlvLmNvenkudGVzdG9iamVjdCBpby5jb3p5LnRlc3RvYmplY3QyIGRhdGFzdHJpbmdzMSJ9.FcpK99fbQVSCf-jMQuhpoG8OyiRy5qMA1omQ_Q_w9Li8u8CGf169UUm2Hmky5o7KzJ4Be24lJ8uvGCOEsjOItA NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://cozy.local:8080 mocha-webpack"
   },
   "repository": {
     "type": "git",
@@ -51,7 +52,7 @@
     "mocha": "3.1.2",
     "mocha-webpack": "0.7.0",
     "pouchdb": "6.1.1",
-    "pouchdb-adapter-memory": "6.1.1",
+    "pouchdb-adapter-memory": "^6.1.2",
     "pouchdb-find": "0.10.4",
     "should": "11.1.1",
     "source-map-support": "0.4.5",
