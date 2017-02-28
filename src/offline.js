@@ -97,15 +97,15 @@ export function startSync (cozy, doctype, timer) {
 export function hasSync (cozy, doctype) {
   return cozy._offline !== null &&
     doctype in cozy._offline &&
-    !cozy._offline[doctype].autoSync
+    cozy._offline[doctype].autoSync !== null
 }
 
 export function stopSync (cozy, doctype) {
   if (hasSync(cozy, doctype)) {
     let offline = cozy._offline[doctype]
-    if (offline.replication) { offline.replication.cancel() }
     clearInterval(offline.autoSync)
     delete offline.autoSync
+    if (offline.replication) { offline.replication.cancel() }
   }
 }
 
@@ -115,7 +115,7 @@ export function replicateFromCozy (cozy, doctype, options = {}) {
       return Promise.reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
     }
     if (options.manualAuthCredentials) {
-      return replicateFromCozyWithAuth(cozy, doctype, options, options.manualAuthCredentials)
+      return Promise.resolve(replicateFromCozyWithAuth(cozy, doctype, options, options.manualAuthCredentials))
     } else {
       return cozy.authorize().then((credentials) => {
         return replicateFromCozyWithAuth(cozy, doctype, options, credentials)
