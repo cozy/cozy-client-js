@@ -99,8 +99,11 @@ function handleJSONResponse (res) {
   }
 }
 
-export class FetchError {
+export class FetchError extends Error {
   constructor (res, reason) {
+    super()
+    Error.captureStackTrace(this, this.constructor)
+    this.name = this.constructor.name
     this.response = res
     this.url = res.url
     this.status = res.status
