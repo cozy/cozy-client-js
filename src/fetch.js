@@ -103,18 +103,17 @@ export class FetchError extends Error {
   constructor (res, reason) {
     super()
     Error.captureStackTrace(this, this.constructor)
-    this.name = this.constructor.name
+    // XXX We have to hardcode this because babel doesn't play nice when extending Error
+    this.name = 'FetchError'
     this.response = res
     this.url = res.url
     this.status = res.status
     this.reason = reason
   }
-
-  isUnauthorized () {
-    return this.status === 401
-  }
 }
 
 FetchError.isUnauthorized = function (err) {
-  return (err instanceof FetchError && err.isUnauthorized())
+  // XXX We can't use err instanceof FetchError because of the caveats of babel
+  return err.name === 'FetchError' && err.status === 401
+}
 }
