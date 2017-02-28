@@ -113,23 +113,6 @@ describe('offline', () => {
       cozy.client.offline.hasSync(fileDoctype).should.be.false
     })
 
-    it('should be enable all on init and stop all sync', () => {
-      cozy.client.offline.hasSync(fileDoctype).should.be.false
-      cozy.client.offline.hasSync(otherDoctype).should.be.false
-      let copy = JSON.parse(JSON.stringify(offlineParameter))
-      copy.timer = 10
-      cozy.client = new Client({
-        cozyURL: cozyUrl,
-        offline: copy,
-        token: 'apptoken'
-      })
-      cozy.client.offline.hasSync(fileDoctype).should.be.true
-      cozy.client.offline.hasSync(otherDoctype).should.be.true
-      cozy.client.offline.stopAllSync()
-      cozy.client.offline.hasSync(fileDoctype).should.be.false
-      cozy.client.offline.hasSync(otherDoctype).should.be.false
-    })
-
     it('should be enable after init and stop it', () => {
       cozy.client.offline.hasSync(fileDoctype).should.be.false
       cozy.client.offline.startSync(fileDoctype)
