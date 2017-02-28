@@ -2699,8 +2699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      options = _ref$options === undefined ? {} : _ref$options,
 	      _ref$doctypes = _ref.doctypes,
 	      doctypes = _ref$doctypes === undefined ? [] : _ref$doctypes,
-	      _ref$timer = _ref.timer,
-	      timer = _ref$timer === undefined ? false : _ref$timer;
+	      timer = _ref.timer;
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
@@ -2726,14 +2725,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
-	  if (timer) {
+	  if (timer !== undefined) {
 	    startAllSync(cozy, timer);
 	  }
 	}
 	
 	function createDatabase(cozy, doctype) {
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-	  var timer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+	  var timer = arguments[3];
 	
 	  if (!pluginLoaded) {
 	    _pouchdb2.default.plugin(_pouchdbFind2.default);
@@ -2748,7 +2747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  offline.database = new _pouchdb2.default(doctype, options);
 	  offline.timer = timer;
 	  offline.autoSync = null;
-	  if (timer) {
+	  if (timer !== undefined) {
 	    startSync(cozy, doctype, timer);
 	  }
 	  createIndexes(cozy, offline.database, doctype);
@@ -2817,12 +2816,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      offline.timer = timer;
 	      offline.autoSync = setInterval(function () {
 	        if (offline.replicate === undefined) {
-	          offline.replicate = replicateFromCozy(cozy, doctype);
-	          offline.replicate.then(function (db) {
-	            db.on('complete', function (info) {
-	              delete offline.replicate;
-	            });
-	          });
+	          replicateFromCozy(cozy, doctype);
 	          // TODO: add replicationToCozy
 	        }
 	      }, timer * 1000);
@@ -2839,68 +2833,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	function stopSync(cozy, doctype) {
 	  if (hasSync(cozy, doctype)) {
 	    var offline = cozy._offline[doctype];
+	    clearInterval(offline.autoSync);
+	    delete offline.autoSync;
 	    if (offline.replication) {
 	      offline.replication.cancel();
 	    }
-	    clearInterval(offline.autoSync);
-	    delete offline.autoSync;
 	  }
 	}
 	
 	function replicateFromCozy(cozy, doctype) {
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-	  var events = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 	
 	  if (hasDatabase(cozy, doctype)) {
 	    if (options.live === true) {
-	      throw new Error('You can\'t use `live` option with Cozy couchdb.');
+	      return Promise.reject(new Error('You can\'t use `live` option with Cozy couchdb.'));
 	    }
 	    if (options.manualAuthCredentials) {
-	      return replicateFromCozyWithAuth(cozy, doctype, options, events, options.manualAuthCredentials);
+	      return Promise.resolve(replicateFromCozyWithAuth(cozy, doctype, options, options.manualAuthCredentials));
 	    } else {
 	      return cozy.authorize().then(function (credentials) {
-	        return replicateFromCozyWithAuth(cozy, doctype, options, events, credentials);
+	        return replicateFromCozyWithAuth(cozy, doctype, options, credentials);
 	      });
 	    }
 	  } else {
-	    throw new Error('You should add this doctype: ' + doctype + ' to offline.');
+	    return Promise.reject(new Error('You should add this doctype: ' + doctype + ' to offline.'));
 	  }
 	}
 	
-	function replicateFromCozyWithAuth(cozy, doctype, options, events, credentials) {
+	function replicateFromCozyWithAuth(cozy, doctype, options, credentials) {
 	  var basic = credentials.token.toBasicAuth();
 	  var url = (cozy._url + '/data/' + doctype).replace('//', '//' + basic);
 	  var db = getDatabase(cozy, doctype);
-	  var replication = db.replicate.from(url, options);
-	  var eventNames = ['change', 'paused', 'active', 'denied', 'complete', 'error'];
-	  var _iteratorNormalCompletion2 = true;
-	  var _didIteratorError2 = false;
-	  var _iteratorError2 = undefined;
-	
-	  try {
-	    for (var _iterator2 = eventNames[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	      var eventName = _step2.value;
-	
-	      if (typeof events[eventName] === 'function') {
-	        replication.on(eventName, events[eventName]);
-	      }
-	    }
-	  } catch (err) {
-	    _didIteratorError2 = true;
-	    _iteratorError2 = err;
-	  } finally {
-	    try {
-	      if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	        _iterator2.return();
-	      }
-	    } finally {
-	      if (_didIteratorError2) {
-	        throw _iteratorError2;
-	      }
-	    }
-	  }
-	
-	  return replication;
+	  var offline = cozy._offline[doctype];
+	  offline.replication = db.replicate.from(url, options).on('complete', function () {
+	    offline.replication = undefined;
+	  });
+	  return offline.replication;
 	}
 	
 	function createIndexes(cozy, db, doctype) {
