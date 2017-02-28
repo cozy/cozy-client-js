@@ -87,9 +87,7 @@ export function startSync (cozy, doctype, timer) {
     offline.timer = timer
     offline.autoSync = setInterval(() => {
       if (offline.replicate === undefined) {
-        replicateFromCozy(cozy, doctype).then(info => {
-          offline.replicate = info
-        })
+        replicateFromCozy(cozy, doctype)
         // TODO: add replicationToCozy
       }
     }, timer * 1000)
@@ -132,10 +130,11 @@ export function replicateFromCozyWithAuth (cozy, doctype, options, credentials) 
   let basic = credentials.token.toBasicAuth()
   let url = (cozy._url + '/data/' + doctype).replace('//', `//${basic}`)
   let db = getDatabase(cozy, doctype)
-  let replication = db.replicate.from(url, options).on('complete', info => {
-    replication = undefined
+  let offline = cozy._offline[doctype]
+  offline.replication = db.replicate.from(url, options).on('complete', () => {
+    offline.replication = undefined
   })
-  return replication
+  return offline.replication
 }
 
 function createIndexes (cozy, db, doctype) {
