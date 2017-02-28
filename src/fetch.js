@@ -102,7 +102,9 @@ function handleJSONResponse (res) {
 export class FetchError extends Error {
   constructor (res, reason) {
     super()
-    Error.captureStackTrace(this, this.constructor)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor)
+    }
     // XXX We have to hardcode this because babel doesn't play nice when extending Error
     this.name = 'FetchError'
     this.response = res
