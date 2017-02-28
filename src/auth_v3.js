@@ -281,7 +281,7 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered) {
           //
           // If it is an explicit Unauthorized error though, we bail, clear th
           // cache and retry.
-          if (FetchError.isUnauthorized(err)) {
+          if (FetchError.isUnauthorized(err) || FetchError.isNotFound(err)) {
             throw err
           }
           return { client: oldClient, token }

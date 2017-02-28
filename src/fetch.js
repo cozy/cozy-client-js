@@ -116,4 +116,8 @@ FetchError.isUnauthorized = function (err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
   return err.name === 'FetchError' && err.status === 401
 }
+
+FetchError.isNotFound = function (err) {
+  // XXX We can't use err instanceof FetchError because of the caveats of babel
+  return err.name === 'FetchError' && err.status === 404
 }
