@@ -4,14 +4,14 @@ import { DOCTYPE_FILES } from './doctypes'
 
 let pluginLoaded = false
 
-export function init (cozy, { options = {}, doctypes = [], timer = false }) {
+export function init (cozy, { options = {}, doctypes = [], timer }) {
   for (let doctype of doctypes) {
     createDatabase(cozy, doctype, options)
   }
-  if (timer) { startAllSync(cozy, timer) }
+  if (timer !== undefined) { startAllSync(cozy, timer) }
 }
 
-export function createDatabase (cozy, doctype, options = {}, timer = false) {
+export function createDatabase (cozy, doctype, options = {}, timer) {
   if (!pluginLoaded) {
     PouchDB.plugin(pouchdbFind)
     pluginLoaded = true
@@ -23,7 +23,7 @@ export function createDatabase (cozy, doctype, options = {}, timer = false) {
   offline.database = new PouchDB(doctype, options)
   offline.timer = timer
   offline.autoSync = null
-  if (timer) { startSync(cozy, doctype, timer) }
+  if (timer !== undefined) { startSync(cozy, doctype, timer) }
   createIndexes(cozy, offline.database, doctype)
   return offline.database
 }
@@ -78,18 +78,17 @@ export function startSync (cozy, doctype, timer) {
   // TODO: add timer limitation for not flooding Gozy
   if (hasDatabase(cozy, doctype)) {
     if (hasSync(cozy, doctype)) {
-      if (timer === cozy._offline[doctype].timer) { return }
+      if (timer === cozy._offline[doctype].timer) {
+        return
+      }
       stopSync(cozy, doctype)
     }
     let offline = cozy._offline[doctype]
     offline.timer = timer
     offline.autoSync = setInterval(() => {
       if (offline.replicate === undefined) {
-        offline.replicate = replicateFromCozy(cozy, doctype)
-        offline.replicate.then((db) => {
-          db.on('complete', (info) => {
-            delete offline.replicate
-          })
+        replicateFromCozy(cozy, doctype).then(info => {
+          offline.replicate = info
         })
         // TODO: add replicationToCozy
       }
@@ -100,7 +99,7 @@ export function startSync (cozy, doctype, timer) {
 export function hasSync (cozy, doctype) {
   return cozy._offline !== null &&
     doctype in cozy._offline &&
-    cozy._offline[doctype].autoSync !== null
+    !cozy._offline[doctype].autoSync
 }
 
 export function stopSync (cozy, doctype) {
@@ -115,7 +114,7 @@ export function stopSync (cozy, doctype) {
 export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
   if (hasDatabase(cozy, doctype)) {
     if (options.live === true) {
-      throw new Error('You can\'t use `live` option with Cozy couchdb.')
+      return Promise.reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
     }
     if (options.manualAuthCredentials) {
       return replicateFromCozyWithAuth(cozy, doctype, options, events, options.manualAuthCredentials)
@@ -125,7 +124,7 @@ export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
       })
     }
   } else {
-    throw new Error(`You should add this doctype: ${doctype} to offline.`)
+    return Promise.reject(new Error(`You should add this doctype: ${doctype} to offline.`))
   }
 }
 
@@ -133,7 +132,9 @@ export function replicateFromCozyWithAuth (cozy, doctype, options, events, crede
   let basic = credentials.token.toBasicAuth()
   let url = (cozy._url + '/data/' + doctype).replace('//', `//${basic}`)
   let db = getDatabase(cozy, doctype)
-  let replication = db.replicate.from(url, options)
+  let replication = db.replicate.from(url, options).on('complete', info => {
+    replication = undefined
+  })
   const eventNames = [
     'change', 'paused', 'active', 'denied', 'complete', 'error'
   ]
