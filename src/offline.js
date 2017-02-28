@@ -111,16 +111,16 @@ export function stopSync (cozy, doctype) {
   }
 }
 
-export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
+export function replicateFromCozy (cozy, doctype, options = {}) {
   if (hasDatabase(cozy, doctype)) {
     if (options.live === true) {
       return Promise.reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
     }
     if (options.manualAuthCredentials) {
-      return replicateFromCozyWithAuth(cozy, doctype, options, events, options.manualAuthCredentials)
+      return replicateFromCozyWithAuth(cozy, doctype, options, options.manualAuthCredentials)
     } else {
       return cozy.authorize().then((credentials) => {
-        return replicateFromCozyWithAuth(cozy, doctype, options, events, credentials)
+        return replicateFromCozyWithAuth(cozy, doctype, options, credentials)
       })
     }
   } else {
@@ -128,21 +128,13 @@ export function replicateFromCozy (cozy, doctype, options = {}, events = {}) {
   }
 }
 
-export function replicateFromCozyWithAuth (cozy, doctype, options, events, credentials) {
+export function replicateFromCozyWithAuth (cozy, doctype, options, credentials) {
   let basic = credentials.token.toBasicAuth()
   let url = (cozy._url + '/data/' + doctype).replace('//', `//${basic}`)
   let db = getDatabase(cozy, doctype)
   let replication = db.replicate.from(url, options).on('complete', info => {
     replication = undefined
   })
-  const eventNames = [
-    'change', 'paused', 'active', 'denied', 'complete', 'error'
-  ]
-  for (let eventName of eventNames) {
-    if (typeof events[eventName] === 'function') {
-      replication.on(eventName, events[eventName])
-    }
-  }
   return replication
 }
 
