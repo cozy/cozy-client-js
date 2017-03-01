@@ -4,11 +4,10 @@ import { DOCTYPE_FILES } from './doctypes'
 
 let pluginLoaded = false
 
-export function init (cozy, { options = {}, doctypes = [], timer }) {
+export function init (cozy, { options = {}, doctypes = [] }) {
   for (let doctype of doctypes) {
     createDatabase(cozy, doctype, options)
   }
-  if (timer !== undefined) { startAllSync(cozy, timer) }
 }
 
 export function createDatabase (cozy, doctype, options = {}, timer) {
