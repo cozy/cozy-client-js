@@ -81,6 +81,7 @@ const offlineProto = {
   hasDatabase: offline.hasDatabase,
   getDatabase: offline.getDatabase,
   destroyDatabase: offline.destroyDatabase,
+  destroyAllDatabase: offline.destroyAllDatabase,
   // replication
   replicateFromCozy: offline.replicateFromCozy,
   hasSync: offline.hasSync,

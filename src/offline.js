@@ -49,6 +49,10 @@ export function destroyDatabase (cozy, doctype) {
   }
 }
 
+export function destroyAllDatabase (cozy) {
+  getDoctypes(cozy).forEach(doctype => destroyDatabase(cozy, doctype))
+}
+
 export function getDoctypes (cozy) {
   if (cozy._offline === null) { return [] }
   return Object.keys(cozy._offline)
