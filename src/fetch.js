@@ -99,19 +99,27 @@ function handleJSONResponse (res) {
   }
 }
 
-export class FetchError {
+export class FetchError extends Error {
   constructor (res, reason) {
+    super()
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor)
+    }
+    // XXX We have to hardcode this because babel doesn't play nice when extending Error
+    this.name = 'FetchError'
     this.response = res
     this.url = res.url
     this.status = res.status
     this.reason = reason
   }
-
-  isUnauthorized () {
-    return this.status === 401
-  }
 }
 
 FetchError.isUnauthorized = function (err) {
-  return (err instanceof FetchError && err.isUnauthorized())
+  // XXX We can't use err instanceof FetchError because of the caveats of babel
+  return err.name === 'FetchError' && err.status === 401
+}
+
+FetchError.isNotFound = function (err) {
+  // XXX We can't use err instanceof FetchError because of the caveats of babel
+  return err.name === 'FetchError' && err.status === 404
 }
