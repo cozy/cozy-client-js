@@ -77,18 +77,21 @@ const offlineProto = {
   init: offline.init,
   getDoctypes: offline.getDoctypes,
   // database
-  createDatabase: offline.createDatabase,
   hasDatabase: offline.hasDatabase,
   getDatabase: offline.getDatabase,
+  createDatabase: offline.createDatabase,
   destroyDatabase: offline.destroyDatabase,
   destroyAllDatabase: offline.destroyAllDatabase,
   // replication
+  hasReplication: offline.hasReplication,
   replicateFromCozy: offline.replicateFromCozy,
-  hasSync: offline.hasSync,
-  startAllSync: offline.startAllSync,
-  startSync: offline.startSync,
-  stopAllSync: offline.stopAllSync,
-  stopSync: offline.stopSync
+  stopReplication: offline.stopReplication,
+  stopAllReplication: offline.stopAllReplication,
+  // repeated replication
+  hasRepeatedReplication: offline.hasRepeatedReplication,
+  startRepeatedReplication: offline.startRepeatedReplication,
+  stopRepeatedReplication: offline.stopRepeatedReplication,
+  stopAllRepeatedReplication: offline.stopAllRepeatedReplication
 }
 
 const settingsProto = {
