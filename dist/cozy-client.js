@@ -649,6 +649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  hasDatabase: offline.hasDatabase,
 	  getDatabase: offline.getDatabase,
 	  destroyDatabase: offline.destroyDatabase,
+	  destroyAllDatabase: offline.destroyAllDatabase,
 	  // replication
 	  replicateFromCozy: offline.replicateFromCozy,
 	  hasSync: offline.hasSync,
@@ -1548,8 +1549,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            //
 	            // If it is an explicit Unauthorized error though, we bail, clear th
 	            // cache and retry.
-	            if (_fetch.FetchError.isUnauthorized(err)) {
-	              throw err;
+	            if (_fetch.FetchError.isUnauthorized(err) || _fetch.FetchError.isNotFound(err)) {
+	              throw new Error('Client has been revoked');
 	            }
 	            return { client: oldClient, token: token };
 	          })
@@ -1670,8 +1671,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.FetchError = undefined;
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); /* global fetch */
 	
 	
@@ -1689,6 +1688,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	function cozyFetch(cozy, path) {
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -1797,28 +1800,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 	
-	var FetchError = exports.FetchError = function () {
+	var FetchError = exports.FetchError = function (_Error) {
+	  _inherits(FetchError, _Error);
+	
 	  function FetchError(res, reason) {
 	    _classCallCheck(this, FetchError);
 	
-	    this.response = res;
-	    this.url = res.url;
-	    this.status = res.status;
-	    this.reason = reason;
+	    var _this = _possibleConstructorReturn(this, (FetchError.__proto__ || Object.getPrototypeOf(FetchError)).call(this));
+	
+	    if (Error.captureStackTrace) {
+	      Error.captureStackTrace(_this, _this.constructor);
+	    }
+	    // XXX We have to hardcode this because babel doesn't play nice when extending Error
+	    _this.name = 'FetchError';
+	    _this.response = res;
+	    _this.url = res.url;
+	    _this.status = res.status;
+	    _this.reason = reason;
+	    return _this;
 	  }
 	
-	  _createClass(FetchError, [{
-	    key: 'isUnauthorized',
-	    value: function isUnauthorized() {
-	      return this.status === 401;
-	    }
-	  }]);
-	
 	  return FetchError;
-	}();
+	}(Error);
 	
 	FetchError.isUnauthorized = function (err) {
-	  return err instanceof FetchError && err.isUnauthorized();
+	  // XXX We can't use err instanceof FetchError because of the caveats of babel
+	  return err.name === 'FetchError' && err.status === 401;
+	};
+	
+	FetchError.isNotFound = function (err) {
+	  // XXX We can't use err instanceof FetchError because of the caveats of babel
+	  return err.name === 'FetchError' && err.status === 404;
 	};
 
 /***/ },
@@ -2671,6 +2683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.hasDatabase = hasDatabase;
 	exports.getDatabase = getDatabase;
 	exports.destroyDatabase = destroyDatabase;
+	exports.destroyAllDatabase = destroyAllDatabase;
 	exports.getDoctypes = getDoctypes;
 	exports.startAllSync = startAllSync;
 	exports.stopAllSync = stopAllSync;
@@ -2771,6 +2784,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getDatabase(cozy, doctype).destroy();
 	    delete getDatabase(cozy, doctype);
 	  }
+	}
+	
+	function destroyAllDatabase(cozy) {
+	  getDoctypes(cozy).forEach(function (doctype) {
+	    return destroyDatabase(cozy, doctype);
+	  });
 	}
 	
 	function getDoctypes(cozy) {
