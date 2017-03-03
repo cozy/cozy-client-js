@@ -541,6 +541,12 @@ const href = await cozy.client.files.getArchiveLink(["/foo/hello.txt"], "secretp
 - `name` is the optional name for the generated archive file (default "files").
 
 
+### `cozy.client.getFilePath(file, folder)`
+
+`cozy.client.getFilePath(file, folder)` is a helper that generate the file path from root directory. It may be used to specify the path parameter for functions like
+`cozy.client.files.downloadByPath`, `cozy.client.files.getDownloadLink` or `cozy.client.files.getArchiveLink`.
+
+
 ### `cozy.client.addReferencedFiles(doc, fileIds)`
 
 `cozy.client.addReferencedFiles(doc, fileIds)` binds the files to the document.

@@ -368,4 +368,67 @@ describe('Files', function () {
       })
     })
   })
+
+  describe('Get file path', function () {
+    it('should throw error on missing folder', function () {
+      const file = {}
+      const call = () => {
+        cozy.client.files.getFilePath(file)
+      }
+      should.throws(call, 'Folder should be valid with an attributes.path property')
+    })
+
+    it('should throw error on invalid folder', function () {
+      const file = {}
+      const folder = {}
+      const call = () => {
+        cozy.client.files.getFilePath(file, folder)
+      }
+      should.throws(call, 'Folder should be valid with an attributes.path property')
+    })
+
+    it('should return file path in root', function () {
+      const file = {name: 'random.ext'}
+      const folder = {
+        attributes: {
+          path: '/'
+        }
+      }
+      const res = cozy.client.files.getFilePath(file, folder)
+      res.should.be.equal('/random.ext')
+    })
+
+    it('should return file path in root with empty path', function () {
+      const file = {name: 'random.ext'}
+      const folder = {
+        attributes: {
+          path: ''
+        }
+      }
+      const res = cozy.client.files.getFilePath(file, folder)
+      res.should.be.equal('/random.ext')
+    })
+
+    it('should return file path in folder ending with `/`', function () {
+      const file = {name: 'random.ext'}
+      const folder = {
+        attributes: {
+          path: '/test/'
+        }
+      }
+      const res = cozy.client.files.getFilePath(file, folder)
+      res.should.be.equal('/test/random.ext')
+    })
+
+    it('should return file path in folder ending with no `/``', function () {
+      const file = {name: 'random.ext'}
+      const folder = {
+        attributes: {
+          path: '/test'
+        }
+      }
+      const res = cozy.client.files.getFilePath(file, folder)
+      res.should.be.equal('/test/random.ext')
+    })
+  })
 })

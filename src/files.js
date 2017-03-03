@@ -184,6 +184,18 @@ export function getDowloadLink (cozy, path) {
     .then(extractResponseLinkRelated)
 }
 
+export function getFilePath (cozy, file = {}, folder) {
+  if (!folder || !folder.attributes) {
+    throw Error('Folder should be valid with an attributes.path property')
+  }
+
+  const folderPath = folder.attributes.path.endsWith('/')
+    ? folder.attributes.path
+      : `${folder.attributes.path}/`
+
+  return `${folderPath}${file.name}`
+}
+
 export function getArchiveLink (cozy, paths, name = 'files') {
   const archive = {
     type: 'io.cozy.archives',
