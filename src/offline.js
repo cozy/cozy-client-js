@@ -59,33 +59,27 @@ export function createDatabase (cozy, doctype, options = {}) {
     PouchDB.plugin(pouchdbFind)
     pluginLoaded = true
   }
-  return new Promise((resolve, reject) => {
-    if (!hasDatabase(cozy, doctype)) {
-      setDatabase(cozy, doctype, new PouchDB(doctype, options))
-      return createIndexes(cozy, doctype).then(() => {
-        resolve(getDatabase(cozy, doctype))
-      }).catch(reject)
-    }
 
-    return resolve(getDatabase(cozy, doctype))
-  })
+  if (hasDatabase(cozy, doctype)) {
+    return Promise.resolve(getDatabase(cozy, doctype))
+  }
+
+  setDatabase(cozy, doctype, new PouchDB(doctype, options))
+  return createIndexes(cozy, doctype).then(() => getDatabase(cozy, doctype))
 }
 
 export function destroyDatabase (cozy, doctype) {
-  return new Promise((resolve, reject) => {
-    if (hasDatabase(cozy, doctype)) {
-      stopRepeatedReplication(cozy, doctype).then(() => {
-        stopReplication(cozy, doctype).then(() => {
-          getDatabase(cozy, doctype).destroy().then(response => {
-            setDatabase(cozy, doctype, undefined)
-            return resolve(response)
-          }).catch(reject)
-        }).catch(reject)
-      }).catch(reject)
-    } else {
-      resolve(false)
-    }
-  })
+  if (!hasDatabase(cozy, doctype)) {
+    return Promise.resolve(false)
+  }
+
+  return stopRepeatedReplication(cozy, doctype)
+    .then(() => stopReplication(cozy, doctype))
+    .then(() => getDatabase(cozy, doctype).destroy())
+    .then(response => {
+      setDatabase(cozy, doctype, undefined)
+      return response
+    })
 }
 
 export function destroyAllDatabase (cozy) {
@@ -95,16 +89,10 @@ export function destroyAllDatabase (cozy) {
 }
 
 function createIndexes (cozy, doctype) {
-  return new Promise((resolve, reject) => {
-    if (doctype === DOCTYPE_FILES) {
-      return getDatabase(cozy, doctype).createIndex({index: {fields: ['dir_id']}}).then(() => {
-        resolve()
-      }).catch(() => {
-        reject()
-      })
-    }
-    return resolve()
-  })
+  if (doctype === DOCTYPE_FILES) {
+    return getDatabase(cozy, doctype).createIndex({index: {fields: ['dir_id']}})
+  }
+  return Promise.resolve()
 }
 
 //
@@ -125,7 +113,11 @@ function setReplication (cozy, doctype, replication) {
 }
 
 function getReplicationUrl (cozy, doctype) {
-  return cozy._url + '/data/' + doctype
+  return cozy.authorize()
+    .then(credentials => {
+      const basic = credentials.token.toBasicAuth()
+      return (cozy._url + '/data/' + doctype).replace('//', `//${basic}`)
+    })
 }
 
 function getReplicationPromise (cozy, doctype) {
@@ -139,46 +131,43 @@ function setReplicationPromise (cozy, doctype, promise) {
 
 export function replicateFromCozy (cozy, doctype, options = {}) {
   return setReplicationPromise(cozy, doctype, new Promise((resolve, reject) => {
-    if (hasDatabase(cozy, doctype)) {
-      if (options.live === true) {
-        return reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
-      }
-
-      cozy.authorize().then(credentials => {
-        const basic = credentials.token.toBasicAuth()
-        const url = getReplicationUrl(cozy, doctype).replace('//', `//${basic}`)
-        let db = getDatabase(cozy, doctype)
-        return setReplication(cozy, doctype,
-          db.replicate.from(url, options).on('complete', (info) => {
-            setReplication(cozy, doctype, undefined)
-            resolve(info)
-          }).on('error', (err) => {
-            console.warn(`ReplicateFromCozy '${doctype}' Error:`)
-            console.warn(err)
-            setReplication(cozy, doctype, undefined)
-            reject(err)
-          })
-        )
-      }).catch(reject)
-    } else {
+    if (!hasDatabase(cozy, doctype)) {
       return reject(errorDatabase(doctype))
     }
+    if (options.live === true) {
+      return reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
+    }
+
+    getReplicationUrl(cozy, doctype)
+      .then(url => setReplication(cozy, doctype,
+        getDatabase(cozy, doctype).replicate.from(url, options).on('complete', (info) => {
+          setReplication(cozy, doctype, undefined)
+          resolve(info)
+        }).on('error', (err) => {
+          console.warn(`ReplicateFromCozy '${doctype}' Error:`)
+          console.warn(err)
+          setReplication(cozy, doctype, undefined)
+          reject(err)
+        })
+      ))
   }))
 }
 
 export function stopReplication (cozy, doctype) {
-  return new Promise((resolve, reject) => {
-    if (getDatabase(cozy, doctype) && hasReplication(cozy, doctype)) {
-      try {
-        getReplicationPromise(cozy, doctype).then(() => {
-          resolve()
-        })
-        getReplication(cozy, doctype).cancel()
-        // replication is set to undefined by complete replication
-      } catch (e) {
-      }
+  if (!getDatabase(cozy, doctype) || !hasReplication(cozy, doctype)) {
+    return Promise.resolve()
+  }
+
+  return new Promise(resolve => {
+    try {
+      getReplicationPromise(cozy, doctype).then(() => {
+        resolve()
+      })
+      getReplication(cozy, doctype).cancel()
+      // replication is set to undefined by complete replication
+    } catch (e) {
+      resolve()
     }
-    return resolve()
   })
 }
 
@@ -206,33 +195,32 @@ export function hasRepeatedReplication (cozy, doctype) {
 
 export function startRepeatedReplication (cozy, doctype, timer, options = {}) {
   // TODO: add timer limitation for not flooding Gozy
-  if (hasDatabase(cozy, doctype)) {
-    if (!hasRepeatedReplication(cozy, doctype)) {
-      return setRepeatedReplication(cozy, doctype, setInterval(() => {
-        if (!hasReplication(cozy, doctype)) {
-          replicateFromCozy(cozy, doctype, options)
-          // TODO: add replicationToCozy
-        }
-      }, timer * 1000))
-    }
-
-    return getRepeatedReplication(cozy, doctype)
-  } else {
+  if (!hasDatabase(cozy, doctype)) {
     return Promise.reject(errorDatabase(doctype))
   }
+
+  if (hasRepeatedReplication(cozy, doctype)) {
+    return getRepeatedReplication(cozy, doctype)
+  }
+
+  return setRepeatedReplication(cozy, doctype, setInterval(() => {
+    if (!hasReplication(cozy, doctype)) {
+      replicateFromCozy(cozy, doctype, options)
+      // TODO: add replicationToCozy
+    }
+  }, timer * 1000))
 }
 
 export function stopRepeatedReplication (cozy, doctype) {
   if (hasRepeatedReplication(cozy, doctype)) {
-    // clearInterval return undefined
-    setRepeatedReplication(cozy, doctype, clearInterval(getRepeatedReplication(cozy, doctype)))
-    if (hasReplication(cozy, doctype)) {
-      getReplication(cozy, doctype).cancel()
-    }
-    return Promise.resolve(true)
-  } else {
-    return Promise.resolve(false)
+    clearInterval(getRepeatedReplication(cozy, doctype))
+    setRepeatedReplication(cozy, doctype, undefined)
   }
+  if (hasReplication(cozy, doctype)) {
+    return stopReplication(cozy, doctype)
+  }
+
+  return Promise.resolve()
 }
 
 export function stopAllRepeatedReplication (cozy) {
