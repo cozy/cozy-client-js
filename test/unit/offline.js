@@ -55,8 +55,8 @@ describe('offline', () => {
       })
     })
 
-    it('should create database', () => {
-      let db = cozy.client.offline.createDatabase(fileDoctype, {adapter: 'memory'})
+    it('should create database', async () => {
+      let db = await cozy.client.offline.createDatabase(fileDoctype, {adapter: 'memory'})
       db.name.should.be.equal(fileDoctype)
       db.should.be.an.instanceof(PouchDB)
     })
@@ -67,9 +67,9 @@ describe('offline', () => {
       cozy.client.offline.hasDatabase(fileDoctype).should.be.true
     })
 
-    it('should get database', () => {
+    it('should get database', async () => {
       should.not.exist(cozy.client.offline.getDatabase(fileDoctype))
-      cozy.client.offline.createDatabase(fileDoctype, {adapter: 'memory'})
+      await cozy.client.offline.createDatabase(fileDoctype, {adapter: 'memory'})
       let db = cozy.client.offline.getDatabase(fileDoctype)
       db.name.should.be.equal(fileDoctype)
       db.should.be.an.instanceof(PouchDB)
@@ -93,32 +93,10 @@ describe('offline', () => {
     })
 
     it('should create mongo index when create database', async () => {
-      let db = cozy.client.offline.createDatabase(fileDoctype, {adapter: 'memory'})
+      let db = await cozy.client.offline.createDatabase(fileDoctype, {adapter: 'memory'})
       await db.getIndexes().then(result => {
-        result.indexes.length.should.exactly(1)
+        result.indexes.length.should.be.greaterThan(0)
       })
-    })
-  })
-
-  describe('sync database', () => {
-    beforeEach(() => {
-      cozy.client = new Client({
-        cozyURL: cozyUrl,
-        offline: offlineParameter,
-        token: 'apptoken'
-      })
-    })
-
-    it('is disable by default', () => {
-      cozy.client.offline.hasSync(fileDoctype).should.be.false
-    })
-
-    it('should be enable after init and stop it', () => {
-      cozy.client.offline.hasSync(fileDoctype).should.be.false
-      cozy.client.offline.startSync(fileDoctype)
-      cozy.client.offline.hasSync(fileDoctype).should.be.true
-      cozy.client.offline.stopSync(fileDoctype)
-      cozy.client.offline.hasSync(fileDoctype).should.be.false
     })
   })
 })
