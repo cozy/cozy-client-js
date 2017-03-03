@@ -67,6 +67,7 @@ const filesProto = {
   downloadByPath: files.downloadByPath,
   getDowloadLink: files.getDowloadLink,
   getArchiveLink: files.getArchiveLink,
+  getFilePath: files.getFilePath,
   listTrash: files.listTrash,
   clearTrash: files.clearTrash,
   restoreById: files.restoreById,
