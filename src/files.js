@@ -179,7 +179,7 @@ function extractResponseLinkRelated (res) {
   return href
 }
 
-export function getDowloadLink (cozy, path) {
+export function getDownloadLink (cozy, path) {
   return cozyFetchJSON(cozy, 'POST', `/files/downloads?Path=${encodeURIComponent(path)}`)
     .then(extractResponseLinkRelated)
 }
