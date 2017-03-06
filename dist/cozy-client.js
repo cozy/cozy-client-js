@@ -633,8 +633,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  statByPath: files.statByPath,
 	  downloadById: files.downloadById,
 	  downloadByPath: files.downloadByPath,
-	  getDowloadLink: files.getDowloadLink,
+	  getDownloadLink: files.getDownloadLink,
 	  getArchiveLink: files.getArchiveLink,
+	  getFilePath: files.getFilePath,
 	  listTrash: files.listTrash,
 	  clearTrash: files.clearTrash,
 	  restoreById: files.restoreById,
@@ -2404,7 +2405,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.statByPath = statByPath;
 	exports.downloadById = downloadById;
 	exports.downloadByPath = downloadByPath;
-	exports.getDowloadLink = getDowloadLink;
+	exports.getDownloadLink = getDownloadLink;
+	exports.getFilePath = getFilePath;
 	exports.getArchiveLink = getArchiveLink;
 	exports.listTrash = listTrash;
 	exports.clearTrash = clearTrash;
@@ -2612,8 +2614,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return href;
 	}
 	
-	function getDowloadLink(cozy, path) {
+	function getDownloadLink(cozy, path) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/downloads?Path=' + encodeURIComponent(path)).then(extractResponseLinkRelated);
+	}
+	
+	function getFilePath(cozy) {
+	  var file = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  var folder = arguments[2];
+	
+	  if (!folder || !folder.attributes) {
+	    throw Error('Folder should be valid with an attributes.path property');
+	  }
+	
+	  var folderPath = folder.attributes.path.endsWith('/') ? folder.attributes.path : folder.attributes.path + '/';
+	
+	  return '' + folderPath + file.name;
 	}
 	
 	function getArchiveLink(cozy, paths) {
@@ -2878,9 +2893,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    getReplicationUrl(cozy, doctype).then(function (url) {
 	      return setReplication(cozy, doctype, getDatabase(cozy, doctype).replicate.from(url, options).on('complete', function (info) {
+	        options.onComplete && options.onComplete(info);
 	        setReplication(cozy, doctype, undefined);
 	        resolve(info);
 	      }).on('error', function (err) {
+	        options.onError && options.onError(err);
 	        console.warn('ReplicateFromCozy \'' + doctype + '\' Error:');
 	        console.warn(err);
 	        setReplication(cozy, doctype, undefined);
