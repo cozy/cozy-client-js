@@ -149,12 +149,26 @@ export function getClient (cozy, clientParams) {
   if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  return cozyFetchJSON(cozy, 'GET', `/auth/register/${cli.clientID}`, null, {
-    manualAuthCredentials: {
-      token: cli
-    }
-  })
+  return cozyFetchJSON(cozy, 'GET', `/auth/register/${cli.clientID}`, null,
+    {
+      manualAuthCredentials: {
+        token: cli
+      }
+    })
     .then((data) => createClient(data, cli))
+    .catch((err) => {
+      // If we fall into an error while fetching the client (because of a
+      // bad connectivity for instance), we do not bail the whole process
+      // since the client should be able to continue with the persisted
+      // client and token.
+      //
+      // If it is an explicit Unauthorized error though, we bail, clear th
+      // cache and retry.
+      if (FetchError.isUnauthorized(err) || FetchError.isNotFound(err)) {
+        throw new Error('Client has been revoked')
+      }
+      throw err
+    })
 }
 
 // createClient returns a new Client instance given on object containing the
