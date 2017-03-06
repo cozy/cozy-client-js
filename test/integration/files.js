@@ -203,7 +203,7 @@ describe('files API', async function () {
       contentType: 'application/json'
     })
     const path = '/' + created.attributes.name
-    let link = await cozy.client.files.getDowloadLink(path)
+    let link = await cozy.client.files.getDownloadLink(path)
     let downloaded = await fetch(COZY_STACK_URL + link)
     const txt1 = await downloaded.text()
     txt1.should.equal('foo')
