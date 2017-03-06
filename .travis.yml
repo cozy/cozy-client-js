@@ -54,8 +54,7 @@ before_script:
   - sleep 2
   - sudo $GOPATH/bin/spark -port 80 /tmp/testapp &
   - sleep 2
-  - "curl -X POST -H 'Accept: application/vnd.api+json' 'http://localhost:8080/apps/mini?Source=git://localhost/'"
-  - sleep 2
+  - $GOPATH/bin/cozy-stack apps install --domain "$COZY_V3_DOMAIN" mini "git://localhost/"
   - export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "$COZY_V3_DOMAIN" "mini")
 
 deploy:
