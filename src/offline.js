@@ -141,9 +141,11 @@ export function replicateFromCozy (cozy, doctype, options = {}) {
     getReplicationUrl(cozy, doctype)
       .then(url => setReplication(cozy, doctype,
         getDatabase(cozy, doctype).replicate.from(url, options).on('complete', (info) => {
+          options.onComplete && options.onComplete(info)
           setReplication(cozy, doctype, undefined)
           resolve(info)
         }).on('error', (err) => {
+          options.onError && options.onError(err)
           console.warn(`ReplicateFromCozy '${doctype}' Error:`)
           console.warn(err)
           setReplication(cozy, doctype, undefined)
