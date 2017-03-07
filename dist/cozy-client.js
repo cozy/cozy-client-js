@@ -1417,6 +1417,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }).then(function (data) {
 	    return createClient(data, cli);
+	  }).catch(function (err) {
+	    // If we fall into an error while fetching the client (because of a
+	    // bad connectivity for instance), we do not bail the whole process
+	    // since the client should be able to continue with the persisted
+	    // client and token.
+	    //
+	    // If it is an explicit Unauthorized error though, we bail, clear th
+	    // cache and retry.
+	    if (_fetch.FetchError.isUnauthorized(err) || _fetch.FetchError.isNotFound(err)) {
+	      throw new Error('Client has been revoked');
+	    }
+	    throw err;
 	  });
 	}
 	
