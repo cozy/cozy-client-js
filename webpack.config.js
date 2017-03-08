@@ -62,6 +62,15 @@ if (NODE_TARGET === 'node') {
     new webpack.ProvidePlugin({ 'btoa': 'btoa' }),
     new webpack.EnvironmentPlugin(Object.keys(process.env))
   ]
+} else {
+  config.plugins = [
+    new webpack.optimize.UglifyJsPlugin({
+      mangle: true,
+      compress: {
+        warnings: false
+      }
+    })
+  ]
 }
 
 module.exports = config
