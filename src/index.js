@@ -1,4 +1,5 @@
 /* global fetch */
+import 'babel-polyfill'
 
 import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'

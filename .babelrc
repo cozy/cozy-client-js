@@ -8,5 +8,10 @@
       },
       "useBuiltIns": true
     }]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["transform-async-to-generator"]
+    }
+  }
 }
