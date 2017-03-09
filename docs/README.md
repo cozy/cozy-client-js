@@ -499,16 +499,35 @@ const buff = await response.arrayBuffer()
 response.pipe(fs.createWriteStream('/some/file'))
 ```
 
-### `cozy.client.files.getDownloadLink(path)`
+### `cozy.client.files.getDownloadLinkById(id)`
 
-`cozy.client.files.getDownloadLink(path)` is used to get a download link for the file  identified by the given path.
+`cozy.client.files.getDownloadLinkById(id)` is used to get a download link for the file identified by the given id.
 
 It returns a promise for the download link.
 Download link are only valid for a short while (default 1 hour)
 You can use this link to start a browser download like this:
 
 ```javascript
-const href = await cozy.client.files.getDownloadLink("/foo/hello.txt")
+const href = await cozy.client.files.getDownloadLinkById("id424242")
+const link = document.createElement('a')
+link.href = href
+link.download = fileName
+document.body.appendChild(link) && link.click()
+```
+
+- `id` is a string specifying the id of the file
+
+
+### `cozy.client.files.getDownloadLinkByPath(path)`
+
+`cozy.client.files.getDownloadLinkByPath(path)` is used to get a download link for the file identified by the given path.
+
+It returns a promise for the download link.
+Download link are only valid for a short while (default 1 hour)
+You can use this link to start a browser download like this:
+
+```javascript
+const href = await cozy.client.files.getDownloadLinkByPath("/foo/hello.txt")
 const link = document.createElement('a')
 link.href = href
 link.download = fileName
