@@ -5,6 +5,7 @@ var path = require('path')
 var webpack = require('webpack')
 
 var NODE_TARGET = process.env.NODE_TARGET || 'web'
+var production = process.env.NODE_ENV === 'production'
 
 var output = {
   path: path.join(__dirname, '/dist')
@@ -12,7 +13,7 @@ var output = {
 
 if (NODE_TARGET === 'web') {
   Object.assign(output, {
-    filename: 'cozy-client.js',
+    filename: production ? 'cozy-client.min.js' : 'cozy-client.js',
     library: ['cozy', 'client'],
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -59,11 +60,14 @@ var config = {
 if (NODE_TARGET === 'node') {
   config.externals = [nodeExternals()]
   config.plugins = [
+    new webpack.optimize.DedupePlugin(),
     new webpack.ProvidePlugin({ 'btoa': 'btoa' }),
     new webpack.EnvironmentPlugin(Object.keys(process.env))
   ]
-} else {
+} else if (production) {
   config.plugins = [
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       mangle: true,
       compress: {
