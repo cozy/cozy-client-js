@@ -1427,8 +1427,6 @@
 	});
 	exports.AppToken = exports.AccessToken = exports.Client = exports.StateKey = exports.CredsKey = undefined;
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global btoa */
@@ -1758,38 +1756,30 @@
 	    // said token. Fetching the client, if the token is outdated we should try
 	    // the token is refreshed.
 	    if (credentials) {
-	      var _ret = function () {
-	        var oldClient = void 0,
-	            token = void 0;
-	        try {
-	          oldClient = new Client(credentials.client);
-	          token = new AccessToken(credentials.token);
-	        } catch (err) {
-	          // bad cache, we should clear and retry the process
-	          return {
-	            v: clearAndRetry(err)
-	          };
+	      var oldClient = void 0,
+	          _token = void 0;
+	      try {
+	        oldClient = new Client(credentials.client);
+	        _token = new AccessToken(credentials.token);
+	      } catch (err) {
+	        // bad cache, we should clear and retry the process
+	        return clearAndRetry(err);
+	      }
+	      return getClient(cozy, oldClient).then(function (client) {
+	        return { client: client, token: _token };
+	      }).catch(function (err) {
+	        // If we fall into an error while fetching the client (because of a
+	        // bad connectivity for instance), we do not bail the whole process
+	        // since the client should be able to continue with the persisted
+	        // client and token.
+	        //
+	        // If it is an explicit Unauthorized error though, we bail, clear th
+	        // cache and retry.
+	        if (_fetch.FetchError.isUnauthorized(err) || _fetch.FetchError.isNotFound(err)) {
+	          throw new Error('Client has been revoked');
 	        }
-	        return {
-	          v: getClient(cozy, oldClient).then(function (client) {
-	            return { client: client, token: token };
-	          }).catch(function (err) {
-	            // If we fall into an error while fetching the client (because of a
-	            // bad connectivity for instance), we do not bail the whole process
-	            // since the client should be able to continue with the persisted
-	            // client and token.
-	            //
-	            // If it is an explicit Unauthorized error though, we bail, clear th
-	            // cache and retry.
-	            if (_fetch.FetchError.isUnauthorized(err) || _fetch.FetchError.isNotFound(err)) {
-	              throw new Error('Client has been revoked');
-	            }
-	            return { client: oldClient, token: token };
-	          })
-	        };
-	      }();
-	
-	      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	        return { client: oldClient, token: _token };
+	      });
 	    }
 	
 	    // Otherwise register a new client if necessary (ie. no client is stored)
