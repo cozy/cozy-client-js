@@ -326,7 +326,9 @@
 	  statByPath: files.statByPath,
 	  downloadById: files.downloadById,
 	  downloadByPath: files.downloadByPath,
-	  getDownloadLink: files.getDownloadLink,
+	  getDownloadLinkById: files.getDownloadLinkById,
+	  getDownloadLink: files.getDownloadLinkByPath, // DEPRECATED, should be removed very soon
+	  getDownloadLinkByPath: files.getDownloadLinkByPath,
 	  getArchiveLink: files.getArchiveLink,
 	  getFilePath: files.getFilePath,
 	  listTrash: files.listTrash,
@@ -2630,7 +2632,8 @@
 	exports.statByPath = statByPath;
 	exports.downloadById = downloadById;
 	exports.downloadByPath = downloadByPath;
-	exports.getDownloadLink = getDownloadLink;
+	exports.getDownloadLinkByPath = getDownloadLinkByPath;
+	exports.getDownloadLinkById = getDownloadLinkById;
 	exports.getFilePath = getFilePath;
 	exports.getArchiveLink = getArchiveLink;
 	exports.listTrash = listTrash;
@@ -2839,8 +2842,12 @@
 	  return href;
 	}
 	
-	function getDownloadLink(cozy, path) {
+	function getDownloadLinkByPath(cozy, path) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/downloads?Path=' + encodeURIComponent(path)).then(extractResponseLinkRelated);
+	}
+	
+	function getDownloadLinkById(cozy, id) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/downloads?Id=' + encodeURIComponent(id)).then(extractResponseLinkRelated);
 	}
 	
 	function getFilePath(cozy) {
