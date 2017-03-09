@@ -369,6 +369,34 @@ describe('Files', function () {
     })
   })
 
+  describe('Get file download link', function () {
+    describe('by ID', function () {
+      before(mock.mockAPI('GetDownloadLinkById'))
+
+      it('should work', async function () {
+        const res = await cozy.client.files.getDownloadLinkById('id42')
+
+        mock.calls('GetDownloadLinkById').should.have.length(1)
+        mock.lastUrl('GetDownloadLinkById').should.equal('http://my.cozy.io/files/downloads?Id=id42')
+
+        res.should.equal('http://my.cozy.io/files/downloads/secret42/foo')
+      })
+    })
+
+    describe('by Path', function () {
+      before(mock.mockAPI('GetDownloadLinkByPath'))
+
+      it('should work', async function () {
+        const res = await cozy.client.files.getDownloadLinkByPath('/bills/foo.pdf')
+
+        mock.calls('GetDownloadLinkByPath').should.have.length(1)
+        mock.lastUrl('GetDownloadLinkByPath').should.equal('http://my.cozy.io/files/downloads?Path=%2Fbills%2Ffoo.pdf')
+
+        res.should.equal('http://my.cozy.io/files/downloads/secret42/foo')
+      })
+    })
+  })
+
   describe('Get file path', function () {
     it('should throw error on missing folder', function () {
       const file = {}

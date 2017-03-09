@@ -333,6 +333,36 @@ const ROUTES = [
     response: 'foo'
   },
   {
+    name: 'GetDownloadLinkById',
+    method: 'POST',
+    matcher: /\/files\/downloads\?Id=id42/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        links: {
+          related: 'http://my.cozy.io/files/downloads/secret42/foo'
+        }
+      }
+    }
+  },
+  {
+    name: 'GetDownloadLinkByPath',
+    method: 'POST',
+    matcher: /\/files\/downloads\?Path=.*$/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        links: {
+          related: 'http://my.cozy.io/files/downloads/secret42/foo'
+        }
+      }
+    }
+  },
+  {
     name: 'AuthRegisterClient',
     method: 'POST',
     matcher: /\/auth\/register$/,

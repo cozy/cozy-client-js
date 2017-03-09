@@ -66,7 +66,9 @@ const filesProto = {
   statByPath: files.statByPath,
   downloadById: files.downloadById,
   downloadByPath: files.downloadByPath,
-  getDownloadLink: files.getDownloadLink,
+  getDownloadLinkById: files.getDownloadLinkById,
+  getDownloadLink: files.getDownloadLinkByPath, // DEPRECATED, should be removed very soon
+  getDownloadLinkByPath: files.getDownloadLinkByPath,
   getArchiveLink: files.getArchiveLink,
   getFilePath: files.getFilePath,
   listTrash: files.listTrash,

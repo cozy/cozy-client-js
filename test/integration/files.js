@@ -196,17 +196,23 @@ describe('files API', async function () {
     trashed.should.have.length(0)
   })
 
-  it('creates download link for 1 file', async function () {
+  it('creates download link for 1 file by id and by path', async function () {
     const filename = 'foo_' + random()
     const created = await cozy.client.files.create('foo', {
       name: filename,
       contentType: 'application/json'
     })
+
     const path = '/' + created.attributes.name
-    let link = await cozy.client.files.getDownloadLink(path)
-    let downloaded = await fetch(COZY_STACK_URL + link)
-    const txt1 = await downloaded.text()
+    let link1 = await cozy.client.files.getDownloadLinkByPath(path)
+    let downloaded1 = await fetch(COZY_STACK_URL + link1)
+    const txt1 = await downloaded1.text()
     txt1.should.equal('foo')
+
+    let link2 = await cozy.client.files.getDownloadLinkById(created._id)
+    let downloaded2 = await fetch(COZY_STACK_URL + link2)
+    const txt2 = await downloaded2.text()
+    txt2.should.equal('foo')
   })
 
   it('creates download link for archive', async function () {
