@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.1.8] - 2017-03-13
+### Changed
+- `onComplete` & `onError` are call after replication end.
+- The offline database is created during a replication if it does not exist
+
+
 ## [v0.1.5] - 2017-03-07
 ### Changed
 - `getClient` throws a specific error for revoked client
@@ -37,7 +43,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.1.8...HEAD
+[v0.1.8]: https://github.com/cozy/cozy-client-js/compare/v0.1.7...v0.1.8
 [v0.1.5]: https://github.com/cozy/cozy-client-js/compare/v0.1.4...v0.1.5
 [v0.1.4]: https://github.com/cozy/cozy-client-js/compare/v0.1.3...v0.1.4
 [v0.1.3]: https://github.com/cozy/cozy-client-js/compare/v0.1.2...v0.1.3
