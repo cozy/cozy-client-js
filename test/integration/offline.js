@@ -56,19 +56,6 @@ describe('offline', function () {
       .should.be.rejectedWith({ message: 'You can\'t use `live` option with Cozy couchdb.' })
   })
 
-  it('can\'t replicate without adding the correct doctype.', async function () {
-    await cozy.client.offline.createDatabase(DOCTYPE, {adapter: 'memory'})
-    const wrongDoctype = 'another.doctype'
-    return cozy.client.offline.replicateFromCozy(wrongDoctype)
-      .should.be.rejectedWith({ message: `You should add this doctype: ${wrongDoctype} to offline.` })
-  })
-
-  it('can\'t replicate without creating the database in offline.', async function () {
-    const someDoctype = 'some.doctype'
-    return cozy.client.offline.replicateFromCozy(someDoctype)
-      .should.be.rejectedWith({ message: `You should add this doctype: ${someDoctype} to offline.` })
-  })
-
   it('can replicate created object in local database', async function () {
     // create a database
     const db = await cozy.client.offline.createDatabase(DOCTYPE, { adapter: 'memory' })

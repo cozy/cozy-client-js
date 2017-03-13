@@ -50,10 +50,6 @@ export function setDatabase (cozy, doctype, database) {
   return getDatabase(cozy, doctype)
 }
 
-function errorDatabase (doctype) {
-  return new Error(`You should add this doctype: ${doctype} to offline.`)
-}
-
 export function createDatabase (cozy, doctype, options = {}) {
   if (!pluginLoaded) {
     PouchDB.plugin(pouchdbFind)
@@ -132,7 +128,7 @@ function setReplicationPromise (cozy, doctype, promise) {
 export function replicateFromCozy (cozy, doctype, options = {}) {
   return setReplicationPromise(cozy, doctype, new Promise((resolve, reject) => {
     if (!hasDatabase(cozy, doctype)) {
-      return reject(errorDatabase(doctype))
+      createDatabase(cozy, doctype)
     }
     if (options.live === true) {
       return reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
@@ -141,15 +137,15 @@ export function replicateFromCozy (cozy, doctype, options = {}) {
     getReplicationUrl(cozy, doctype)
       .then(url => setReplication(cozy, doctype,
         getDatabase(cozy, doctype).replicate.from(url, options).on('complete', (info) => {
-          options.onComplete && options.onComplete(info)
           setReplication(cozy, doctype, undefined)
           resolve(info)
+          options.onComplete && options.onComplete(info)
         }).on('error', (err) => {
-          options.onError && options.onError(err)
           console.warn(`ReplicateFromCozy '${doctype}' Error:`)
           console.warn(err)
           setReplication(cozy, doctype, undefined)
           reject(err)
+          options.onError && options.onError(err)
         })
       ))
   }))
@@ -197,10 +193,6 @@ export function hasRepeatedReplication (cozy, doctype) {
 
 export function startRepeatedReplication (cozy, doctype, timer, options = {}) {
   // TODO: add timer limitation for not flooding Gozy
-  if (!hasDatabase(cozy, doctype)) {
-    return Promise.reject(errorDatabase(doctype))
-  }
-
   if (hasRepeatedReplication(cozy, doctype)) {
     return getRepeatedReplication(cozy, doctype)
   }

@@ -150,9 +150,7 @@ export function statById (cozy, id, offline = true) {
       db.get(id),
       db.find({selector: {'dir_id': id}})
     ]).then(([doc, children]) => {
-      children = children.docs.map(doc => {
-        return addIsDir(toJsonApi(cozy, doc))
-      })
+      children = children.docs.map(doc => addIsDir(toJsonApi(cozy, doc)))
       return addIsDir(toJsonApi(cozy, doc, children))
     })
   }
