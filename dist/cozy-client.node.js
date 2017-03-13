@@ -3027,10 +3027,6 @@
 	  return getDatabase(cozy, doctype);
 	}
 	
-	function errorDatabase(doctype) {
-	  return new Error('You should add this doctype: ' + doctype + ' to offline.');
-	}
-	
 	function createDatabase(cozy, doctype) {
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
@@ -3117,7 +3113,7 @@
 	
 	  return setReplicationPromise(cozy, doctype, new Promise(function (resolve, reject) {
 	    if (!hasDatabase(cozy, doctype)) {
-	      return reject(errorDatabase(doctype));
+	      createDatabase(cozy, doctype);
 	    }
 	    if (options.live === true) {
 	      return reject(new Error('You can\'t use `live` option with Cozy couchdb.'));
@@ -3125,15 +3121,15 @@
 	
 	    getReplicationUrl(cozy, doctype).then(function (url) {
 	      return setReplication(cozy, doctype, getDatabase(cozy, doctype).replicate.from(url, options).on('complete', function (info) {
-	        options.onComplete && options.onComplete(info);
 	        setReplication(cozy, doctype, undefined);
 	        resolve(info);
+	        options.onComplete && options.onComplete(info);
 	      }).on('error', function (err) {
-	        options.onError && options.onError(err);
 	        console.warn('ReplicateFromCozy \'' + doctype + '\' Error:');
 	        console.warn(err);
 	        setReplication(cozy, doctype, undefined);
 	        reject(err);
+	        options.onError && options.onError(err);
 	      }));
 	    });
 	  }));
@@ -3185,10 +3181,6 @@
 	  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 	
 	  // TODO: add timer limitation for not flooding Gozy
-	  if (!hasDatabase(cozy, doctype)) {
-	    return Promise.reject(errorDatabase(doctype));
-	  }
-	
 	  if (hasRepeatedReplication(cozy, doctype)) {
 	    return getRepeatedReplication(cozy, doctype);
 	  }
