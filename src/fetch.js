@@ -32,7 +32,7 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
     cozy.isV2(),
     fetch(fullpath, options)
   ]).then(([isV2, res]) => {
-    if (res.status !== 401 || isV2 || !credentials) {
+    if ((res.status !== 401 && res.status !== 400) || isV2 || !credentials) {
       return res
     }
     // we try to refresh the token only for OAuth, ie, the client defined
