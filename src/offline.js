@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb'
 import pouchdbFind from 'pouchdb-find'
-import { DOCTYPE_FILES } from './doctypes'
+import {DOCTYPE_FILES} from './doctypes'
+import {refreshToken} from './auth_v3'
 
 let pluginLoaded = false
 
@@ -141,11 +142,19 @@ export function replicateFromCozy (cozy, doctype, options = {}) {
           resolve(info)
           options.onComplete && options.onComplete(info)
         }).on('error', (err) => {
-          console.warn(`ReplicateFromCozy '${doctype}' Error:`)
-          console.warn(err)
-          setReplication(cozy, doctype, undefined)
-          reject(err)
-          options.onError && options.onError(err)
+          if (err.error === 'code=400, message=Expired token') {
+            cozy.authorize().then(({client, token}) => {
+              refreshToken(cozy, client, token)
+                .then((newToken) => cozy.saveCredentials(client, newToken))
+                .then((credentials) => replicateFromCozy(cozy, doctype, options))
+            })
+          } else {
+            console.warn(`ReplicateFromCozy '${doctype}' Error:`)
+            console.warn(err)
+            setReplication(cozy, doctype, undefined)
+            reject(err)
+            options.onError && options.onError(err)
+          }
         })
       ))
   }))
