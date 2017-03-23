@@ -251,15 +251,16 @@ describe('files API', async function () {
       cozy.client.offline.destroyDatabase('io.cozy.files')
     })
 
-    it('should be same document offline/online', async () => {
+    it('and online should have same properties except for *links*', async () => {
       const folder = await createRandomDirectory(cozy.client)
       await cozy.client.offline.replicateFromCozy('io.cozy.files')
       const offline = await cozy.client.files.statById(folder._id)
       const online = await cozy.client.files.statById(folder._id, false)
-      Object.keys(online).forEach(key => { key === 'links' || offline.should.have.keys(key) })
-      Object.keys(offline).forEach(key => { online.should.have.keys(key) })
-      Object.keys(online.attributes).forEach(key => { offline.attributes.should.have.keys(key) })
-      Object.keys(offline.attributes).forEach(key => { online.attributes.should.have.keys(key) })
+      delete online.links
+      online.should.have.properties(Object.keys(offline))
+      offline.should.have.properties(Object.keys(online))
+      offline.attributes.should.have.properties(Object.keys(online.attributes))
+      online.attributes.should.have.properties(Object.keys(offline.attributes))
     }).timeout(4 * 1000)
   })
 })
