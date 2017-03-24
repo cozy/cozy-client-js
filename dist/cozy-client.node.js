@@ -1951,7 +1951,7 @@
 	        isV2 = _ref2[0],
 	        res = _ref2[1];
 	
-	    if (res.status !== 401 || isV2 || !credentials) {
+	    if (res.status !== 401 && res.status !== 400 || isV2 || !credentials) {
 	      return res;
 	    }
 	    // we try to refresh the token only for OAuth, ie, the client defined
@@ -2688,7 +2688,7 @@
 	        lastModifiedDate = data.lastModifiedDate;
 	      }
 	    } else if (isBlob) {
-	      contentType = contentTypeOctetStream;
+	      contentType = data.type || contentTypeOctetStream;
 	    } else if (isStream) {
 	      contentType = contentTypeOctetStream;
 	    } else if (typeof data === 'string') {
@@ -2952,6 +2952,8 @@
 	
 	var _doctypes = __webpack_require__(98);
 	
+	var _auth_v = __webpack_require__(93);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var pluginLoaded = false;
@@ -3125,11 +3127,24 @@
 	        resolve(info);
 	        options.onComplete && options.onComplete(info);
 	      }).on('error', function (err) {
-	        console.warn('ReplicateFromCozy \'' + doctype + '\' Error:');
-	        console.warn(err);
-	        setReplication(cozy, doctype, undefined);
-	        reject(err);
-	        options.onError && options.onError(err);
+	        if (err.error === 'code=400, message=Expired token') {
+	          cozy.authorize().then(function (_ref2) {
+	            var client = _ref2.client,
+	                token = _ref2.token;
+	
+	            (0, _auth_v.refreshToken)(cozy, client, token).then(function (newToken) {
+	              return cozy.saveCredentials(client, newToken);
+	            }).then(function (credentials) {
+	              return replicateFromCozy(cozy, doctype, options);
+	            });
+	          });
+	        } else {
+	          console.warn('ReplicateFromCozy \'' + doctype + '\' Error:');
+	          console.warn(err);
+	          setReplication(cozy, doctype, undefined);
+	          reject(err);
+	          options.onError && options.onError(err);
+	        }
 	      }));
 	    });
 	  }));
