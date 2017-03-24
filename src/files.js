@@ -35,7 +35,7 @@ function doUpload (cozy, data, method, path, options) {
         lastModifiedDate = data.lastModifiedDate
       }
     } else if (isBlob) {
-      contentType = contentTypeOctetStream
+      contentType = data.type || contentTypeOctetStream
     } else if (isStream) {
       contentType = contentTypeOctetStream
     } else if (typeof data === 'string') {
