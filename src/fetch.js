@@ -111,6 +111,11 @@ export class FetchError extends Error {
     this.url = res.url
     this.status = res.status
     this.reason = reason
+
+    Object.defineProperty(this, 'message', {
+      value: reason.message || `${this.name}: ` +
+        (typeof reason === 'string' ? reason : JSON.stringify(reason))
+    })
   }
 }
 
