@@ -122,7 +122,7 @@ It does not return a value.
 
 ```javascript
 cozy.client.init({
-  cozyURL: 'http://my.cozy.local',
+  cozyURL: 'http://cozy.tools:8080',
   disablePromises: false,
   oauth: {
     clientParams: {/*...*/},

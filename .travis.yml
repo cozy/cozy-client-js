@@ -13,11 +13,6 @@ env:
     - COZY_V3_DOMAIN="localhost:8080"
     - COZY_V3_PASSPHRASE="CozyTest_1"
 
-hosts:
-  - alice.cozy.local
-  - bob.cozy.local
-  - charlie.cozy.local
-
 cache:
   yarn: true
   directories:
