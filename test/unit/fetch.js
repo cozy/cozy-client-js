@@ -13,7 +13,7 @@ describe('FetchError', function () {
     before(() => { reason = new Error('some error') })
 
     it('has the same message', async function () {
-      should(error.message).equal(reason.message)
+      should(error.toString()).equal(`FetchError: ${reason.message}`)
     })
   })
 
@@ -21,7 +21,7 @@ describe('FetchError', function () {
     before(() => { reason = 'some error string' })
 
     it('has the String as an error message', () => {
-      should(error.message).equal(`FetchError: some error string`)
+      should(error.toString()).equal(`FetchError: some error string`)
     })
   })
 
@@ -29,7 +29,7 @@ describe('FetchError', function () {
     before(() => { reason = {error: 'not_found', status: 404} })
 
     it('has the string representation of the object as an error message', () => {
-      should(error.message).equal('FetchError: {"error":"not_found","status":404}')
+      should(error.toString()).equal('FetchError: {"error":"not_found","status":404}')
     })
   })
 })
