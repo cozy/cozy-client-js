@@ -13,7 +13,7 @@
     "build:web:min": "NODE_ENV=production NODE_TARGET=web webpack",
     "build:node": "NODE_ENV=production NODE_TARGET=node webpack",
     "build": "npm-run-all --parallel 'build:*' 'build:*:*'",
-    "watch": "NODE_ENV=production NODE_TARGET=web webpack --watch",
+    "watch": "NODE_ENV=development NODE_TARGET=web webpack --watch",
     "lint": "standard './src/**/*.js' './test/**/*.js' webpack.config.js",
     "test": "npm-run-all 'test:*'",
     "test:unit": "NODE_ENV=test NODE_TARGET=node mocha-webpack 'test/unit/**.js'",
