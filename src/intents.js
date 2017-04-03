@@ -1,3 +1,4 @@
+/* global URL */
 const intentClass = 'coz-intent'
 
 function getUrl (intent, temporaryMockedIntentUrl) {
@@ -17,7 +18,7 @@ function injectService (url, element, intent) {
   element.appendChild(iframe)
 
   // Keeps only http://domain:port/
-  const serviceOrigin = url.split('/', 3).join('/')
+  const serviceOrigin = new URL(url).origin
 
   return new Promise((resolve, reject) => {
     let handshaken = false
