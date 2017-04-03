@@ -560,21 +560,21 @@ const href = await cozy.client.files.getArchiveLink(["/foo/hello.txt"], "secretp
 - `name` is the optional name for the generated archive file (default "files").
 
 
-### `cozy.client.getFilePath(file, folder)`
+### `cozy.client.files.getFilePath(file, folder)`
 
-`cozy.client.getFilePath(file, folder)` is a helper that generate the file path from root directory. It may be used to specify the path parameter for functions like
+`cozy.client.files.getFilePath(file, folder)` is a helper that generate the file path from root directory. It may be used to specify the path parameter for functions like
 `cozy.client.files.downloadByPath`, `cozy.client.files.getDownloadLink` or `cozy.client.files.getArchiveLink`.
 
 
-### `cozy.client.addReferencedFiles(doc, fileIds)`
+### `cozy.client.data.addReferencedFiles(doc, fileIds)`
 
-`cozy.client.addReferencedFiles(doc, fileIds)` binds the files to the document.
+`cozy.client.data.addReferencedFiles(doc, fileIds)` binds the files to the document.
 (see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details)
 
 
-### `cozy.client.listReferencedFiles(doc)`
+### `cozy.client.data.listReferencedFiles(doc)`
 
-`cozy.client.listReferencedFiles(doc)` list the files bound to the document.
+`cozy.client.data.listReferencedFiles(doc)` list the files bound to the document.
 (see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details).
 
 It returns a promise for a list of filesIds. Files must then be fetched separately.
