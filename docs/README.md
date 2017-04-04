@@ -394,7 +394,7 @@ const updated = await cozy.client.files.updateAttributesById("12345", { tags: ["
 
 ### `cozy.client.files.updateAttributesByPath(path, attrs, options)`
 
-`cozy.client.files.updateAttributesByPath(path, attrs, options)` is used to update the attributes associated to a file or directory specified by its id.
+`cozy.client.files.updateAttributesByPath(path, attrs, options)` is used to update the attributes associated to a file or directory specified by the given path.
 
 It returns a promise for the document of the updated directory or file.
 
@@ -406,6 +406,31 @@ It returns a promise for the document of the updated directory or file.
 ```javascript
 const updated = await cozy.client.files.updateAttributes("/foo/bar", { executable: true }, { ifMatch: "1-0e6d5b72" })
 ```
+
+
+### `cozy.client.files.statById(id, offline)`
+
+`cozy.client.files.statById(id, offline)` is used to get the metadata of a file specified by its id.
+
+It returns a promise for the information of the file or directory. In the case of a directory, it contains the list of files and sub-directories inside it.
+
+- `id` is a string specifying the identifier of the file or directory;
+- `offline` is a boolean (default to `true`).
+
+By default, `statById` will fetch the metadata from the local database, if it is available. Set the second parameter to `false` to query the server.
+
+Directory returned have a `relations()` method that allow to access to their content:
+```javascript
+const dir = await cozy.client.files.statById("io.cozy.files.root-dir");
+dir.relations('contents').forEach( (file) => … )
+```
+
+
+### `cozy.client.files.statByPath(path)`
+
+`cozy.client.files.statByPath(path)` is used to get the metadata of a file specified by its path.
+
+- `path`: string specifying the path of the file or directory;
 
 
 ### `cozy.client.files.trashById(id)`
