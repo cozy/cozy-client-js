@@ -9,7 +9,7 @@ PouchDB.plugin(require('pouchdb-adapter-memory'))
 describe('offline', () => {
   const fileDoctype = 'io.cozy.files'
   const otherDoctype = 'io.cozy.others'
-  const cozyUrl = 'http://cozy.local:8080/'
+  const cozyUrl = 'http://cozy.tools:8080/'
   let offlineParameter = {doctypes: [fileDoctype, otherDoctype], options: {adapter: 'memory'}}
   const cozy = {}
 
