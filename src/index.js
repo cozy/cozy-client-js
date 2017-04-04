@@ -8,6 +8,7 @@ import * as auth from './auth_v3'
 import * as data from './data'
 import * as mango from './mango'
 import * as files from './files'
+import * as intents from './intents'
 import * as offline from './offline'
 import * as settings from './settings'
 import * as relations from './relations'
@@ -77,6 +78,11 @@ const filesProto = {
   destroyById: files.destroyById
 }
 
+const intentsProto = {
+  start: intents.start,
+  resovle: intents.resolve
+}
+
 const offlineProto = {
   init: offline.init,
   getDoctypes: offline.getDoctypes,
@@ -111,6 +117,7 @@ class Client {
   constructor (options) {
     this.data = {}
     this.files = {}
+    this.intents = {}
     this.offline = {}
     this.settings = {}
     this.auth = {
@@ -163,6 +170,7 @@ class Client {
     addToProto(this, this.data, dataProto, disablePromises)
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
+    addToProto(this, this.intents, intentsProto, disablePromises)
     addToProto(this, this.offline, offlineProto, disablePromises)
     addToProto(this, this.settings, settingsProto, disablePromises)
 
