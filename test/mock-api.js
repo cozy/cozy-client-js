@@ -582,6 +582,64 @@ const ROUTES = [
     method: 'DELETE',
     matcher: /settings\/clients\/123/,
     response: { body: '' }
+  },
+  {
+    name: 'CreateIntent',
+    method: 'POST',
+    matcher: /intents/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: {
+        data: {
+          id: '77bcc42c-0fd8-11e7-ac95-8f605f6e8338',
+          type: 'io.cozy.intents',
+          attributes: {
+            action: 'PICK',
+            type: 'io.cozy.files',
+            permissions: ['GET'],
+            client: 'contacts.cozy.example.net',
+            services: [
+              {
+                slug: 'files',
+                href: 'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+              }
+            ]
+          },
+          links: {
+            self: '/intents/77bcc42c-0fd8-11e7-ac95-8f605f6e8338',
+            permissions: '/permissions/a340d5e0-d647-11e6-b66c-5fc9ce1e17c6'
+          }
+        }
+      }
+    }
+  }, {
+    name: 'CreateIntentWithNoService',
+    method: 'POST',
+    matcher: /intents/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: {
+        data: {
+          id: '77bcc42c-0fd8-11e7-ac95-8f605f6e8338',
+          type: 'io.cozy.intents',
+          attributes: {
+            action: 'PICK',
+            type: 'io.cozy.files',
+            permissions: ['GET'],
+            client: 'contacts.cozy.example.net',
+            services: null
+          },
+          links: {
+            self: '/intents/77bcc42c-0fd8-11e7-ac95-8f605f6e8338',
+            permissions: '/permissions/a340d5e0-d647-11e6-b66c-5fc9ce1e17c6'
+          }
+        }
+      }
+    }
   }
 ]
 
