@@ -79,8 +79,8 @@ const filesProto = {
 }
 
 const intentsProto = {
-  start: intents.start,
-  resovle: intents.resolve
+  create: intents.create,
+  resolve: intents.resolve
 }
 
 const offlineProto = {

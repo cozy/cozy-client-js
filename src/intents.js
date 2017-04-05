@@ -1,11 +1,9 @@
-/* global URL */
+import {cozyFetchJSON} from './fetch'
+
 const intentClass = 'coz-intent'
 
-function getUrl (intent, temporaryMockedIntentUrl) {
-  return Promise.resolve(temporaryMockedIntentUrl)
-}
-
-function injectService (url, element, intent) {
+// inject iframe for service in given element
+function injectService (url, element, data) {
   const document = element.ownerDocument
   if (!document) throw new Error('Cannot retrieve document object from given element')
 
@@ -18,7 +16,7 @@ function injectService (url, element, intent) {
   element.appendChild(iframe)
 
   // Keeps only http://domain:port/
-  const serviceOrigin = new URL(url).origin
+  const serviceOrigin = url.split('/', 3).join('/')
 
   return new Promise((resolve, reject) => {
     let handshaken = false
@@ -27,17 +25,18 @@ function injectService (url, element, intent) {
 
       if (event.data === 'intent:ready') {
         handshaken = true
-        return event.source.postMessage(intent.data, event.origin)
+        return event.source.postMessage(data, event.origin)
       }
 
       window.removeEventListener('message', messageHandler)
+      iframe.parentNode.removeChild(iframe)
 
       if (event.data === 'intent:error') {
         return reject(new Error('Intent error'))
       }
 
       return handshaken
-        ? iframe.parentNode.removeChild(iframe) && resolve(event.data)
+        ? resolve(event.data)
         : reject(new Error('Unexpected handshake message from intent service'))
     }
 
@@ -45,16 +44,35 @@ function injectService (url, element, intent) {
   })
 }
 
-export function start (client, intent, element, temporaryMockedIntentUrl) {
-  ['action', 'type'].forEach((property) => {
-    if (!intent[property]) {
-      throw new Error(`Misformed intent, "${property}" property must be provided`)
+export function create (cozy, action, type, data = {}, permissions = []) {
+  if (!action) throw new Error(`Misformed intent, "action" property must be provided`)
+  if (!type) throw new Error(`Misformed intent, "type" property must be provided`)
+
+  const createPromise = cozyFetchJSON(cozy, 'POST', '/intents', {
+    data: {
+      type: 'io.cozy.intents',
+      attributes: {
+        action: action,
+        type: type,
+        data: data,
+        permissions: permissions
+      }
     }
   })
 
-  // To replace with a call to client
-  return getUrl(intent, temporaryMockedIntentUrl)
-    .then(url => injectService(url, element, intent))
+  createPromise.start = (element) => {
+    return createPromise.then(intent => {
+      let service = intent.attributes.services && intent.attributes.services[0]
+
+      if (!service) {
+        return Promise.reject(new Error('Unable to find a service'))
+      }
+
+      return injectService(service.href, element, data)
+    })
+  }
+
+  return createPromise
 }
 
 export function resolve () {
