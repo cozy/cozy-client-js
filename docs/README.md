@@ -414,12 +414,12 @@ const updated = await cozy.client.files.updateAttributes("/foo/bar", { executabl
 
 It returns a promise for the information of the file or directory. In the case of a directory, it contains the list of files and sub-directories inside it.
 
-- `id` is a string specifying the identifier of the file or directory;
+- `id` is a string specifying the file’s or directory’s identifier;
 - `offline` is a boolean (default to `true`).
 
 By default, `statById` will fetch the metadata from the local database, if it is available. Set the second parameter to `false` to query the server.
 
-Directory returned have a `relations()` method that allow to access to their content:
+Returned directory have a `relations()` method that allow to access to their content:
 ```javascript
 const dir = await cozy.client.files.statById("io.cozy.files.root-dir");
 dir.relations('contents').forEach( (file) => … )
@@ -587,7 +587,7 @@ const href = await cozy.client.files.getArchiveLink(["/foo/hello.txt"], "secretp
 
 ### `cozy.client.files.getFilePath(file, folder)`
 
-`cozy.client.files.getFilePath(file, folder)` is a helper that generate the file path from root directory. It may be used to specify the path parameter for functions like
+`cozy.client.files.getFilePath(file, folder)` is a helper that generates the file path from root directory. It may be used to specify the path parameter for functions like
 `cozy.client.files.downloadByPath`, `cozy.client.files.getDownloadLink` or `cozy.client.files.getArchiveLink`.
 
 
