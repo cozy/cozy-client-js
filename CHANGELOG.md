@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.1.10] - 2017-04-06
+### Changed
+- Doc now use `cozy.tools:8080` as example and default domain. No need to edit /etc/hosts.
+
+### Added
+- Add `cozy.client.intents.create` to create an intent. Allow next to `start` into an HTML element.
+- Add `cozy.client.intents.createService` to instanciate a service able to deal with a client.
+
+### Fixed
+- Documentation improvements
+
+
 ## [v0.1.9] - 2017-03-24
 ### Changed
 - PouchDB replication can refresh its token if needed
