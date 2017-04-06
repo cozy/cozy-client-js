@@ -4,6 +4,7 @@
 import should from 'should'
 import sinon from 'sinon'
 import {Client} from '../../src'
+import mock from '../mock-api'
 
 function mockElement () {
   const windowMock = {
@@ -14,7 +15,7 @@ function mockElement () {
   const iframeMock = {
     setAttribute: sinon.spy(),
     parentNode: {
-      removeChild: sinon.spy()
+      removeChild: sinon.stub().returns(iframeMock)
     },
     classList: {
       add: sinon.spy()
@@ -24,26 +25,45 @@ function mockElement () {
     defaultView: windowMock,
     createElement: sinon.stub().returns(iframeMock)
   }
+  const iframeWindowMock = {
+    postMessage: sinon.spy()
+  }
   return {
     ownerDocument: documentMock,
     appendChild: sinon.spy(),
     iframeMock: iframeMock,
     documentMock: documentMock,
-    windowMock: windowMock
+    windowMock: windowMock,
+    iframeWindowMock: iframeWindowMock
   }
 }
 
 describe('Intents', function () {
   const cozy = {}
-  const intent = {
-    action: 'PICK',
-    type: 'io.cozy.contact',
-    data: {
-      firstname: 'claude',
-      lastname: 'causi'
+
+  const expectedIntent = {
+    _id: '77bcc42c-0fd8-11e7-ac95-8f605f6e8338',
+    _rev: undefined,
+    _type: 'io.cozy.intents',
+    attributes: {
+      action: 'PICK',
+      type: 'io.cozy.files',
+      permissions: ['GET'],
+      client: 'contacts.cozy.example.net',
+      services: [
+        {
+          slug: 'files',
+          href: 'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+        }
+      ]
+    },
+    links: {
+      self: '/intents/77bcc42c-0fd8-11e7-ac95-8f605f6e8338',
+      permissions: '/permissions/a340d5e0-d647-11e6-b66c-5fc9ce1e17c6'
     }
   }
-  const serviceUrl = 'test.cozy.local'
+
+  const serviceUrl = 'https://files.cozy.example.net'
 
   beforeEach(() => {
     cozy.client = new Client({
@@ -51,105 +71,284 @@ describe('Intents', function () {
       token: 'apptoken'
     })
   })
+  afterEach(() => mock.restore())
 
-  describe('Start', function () {
+  describe('Create', function () {
+    beforeEach(mock.mockAPI('CreateIntent'))
+
+    it('should return created intent', async function () {
+      return cozy.client.intents.create('PICK', 'io.cozy.whatever.i.am.a.mock')
+        .then(intent => {
+          // added by cozy-client-js
+          expectedIntent.relations = intent.relations
+          should.deepEqual(intent, expectedIntent)
+        })
+    })
+
     it('should throw error for malformed intents', function () {
-      const worstIntentEver = {}
-      const intentWithoutAction = {type: 'io.cozy.files'}
-      const intentWithoutType = {action: 'PICK'}
-
       should.throws(
-        () => cozy.client.intents.start(worstIntentEver, mockElement()),
+        () => cozy.client.intents.create(),
         /Misformed intent, "action" property must be provided/
       )
 
       should.throws(
-        () => cozy.client.intents.start(intentWithoutAction, mockElement()),
+        () => cozy.client.intents.create(null, 'io.cozy.contacts'),
         /Misformed intent, "action" property must be provided/
       )
 
       should.throws(
-        () => cozy.client.intents.start(intentWithoutType, mockElement()),
+        () => cozy.client.intents.create('PICK'),
         /Misformed intent, "type" property must be provided/
       )
     })
+  })
 
-    it('should inject iframe', function () {
-      const element = mockElement()
-      const {documentMock, iframeMock} = element
-      cozy.client.intents.start(intent, element, serviceUrl)
+  describe('Intent.start', function () {
+    beforeEach(mock.mockAPI('CreateIntent'))
 
-      should(documentMock.createElement.withArgs('iframe').calledOnce).be.true
-      should(iframeMock.setAttribute.withArgs('src', serviceUrl).calledOnce).be.true
-      should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true
-      should(element.appendChild.withArgs(iframeMock).calledOnce).be.true
+    describe('No Service', function () {
+      before(mock.mockAPI('CreateIntentWithNoService'))
+
+      it('should reject with error', async function () {
+        const element = mockElement()
+
+        return cozy.client.intents
+          .create('EDIT', 'io.cozy.files')
+          .start(element)
+          .should.be.rejectedWith(/Unable to find a service/)
+      })
     })
 
-    it('shoud manage handshake', async function () {
+    it('should inject iframe (not async)', function (done) {
       const element = mockElement()
-      const {windowMock} = element
+      const {documentMock, iframeMock} = element
 
-      windowMock.addEventListener
-        .withArgs('message')
-        .onFirstCall()
-        .callsArgWith(1, 'intent:ready', serviceUrl)
+      cozy.client.intents
+        .create('PICK', 'io.cozy.files')
+        .start(element)
 
-      cozy.client.intents.start(intent, element, serviceUrl)
+      setTimeout(() => {
+        should(documentMock.createElement.withArgs('iframe').calledOnce).be.true()
+        should(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).be.true()
+        should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true()
+        should(element.appendChild.withArgs(iframeMock).calledOnce).be.true()
+        done()
+      }, 10)
+    })
 
-      should(windowMock.addEventListener.withArgs('message').calledOnce).be.true
-      should(windowMock.removeEventListener.neverCalledWith('message')).be.true
-      should(windowMock.postMessage.calledWithMatch(intent.data, serviceUrl)).be.true
+    it('shoud manage handshake', function (done) {
+      const element = mockElement()
+      const {windowMock, iframeWindowMock} = element
+
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: 'intent:ready',
+        source: iframeWindowMock
+      }
+
+      cozy.client.intents
+        .create('PICK', 'io.cozy.files', {key: 'value'})
+        .start(element)
+
+      setTimeout(() => {
+        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
+        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+
+        messageEventListener(handshakeEventMessageMock)
+        should(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).be.true()
+        done()
+      }, 10)
     })
 
     it('should manage handshake fail', async function () {
       const element = mockElement()
-      const {windowMock} = element
+      const {windowMock, iframeWindowMock} = element
 
-      windowMock.addEventListener
-        .withArgs('message')
-        .onFirstCall()
-        .callsArgWith(1, 'totally unexpected message', serviceUrl)
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: 'unexpected handshake data',
+        source: iframeWindowMock
+      }
 
-      cozy.client.intents.start(intent, element, serviceUrl)
-        .should.be.rejectedWith(/Unexpected handshake message from intent service/)
+      const call = cozy.client.intents
+        .create('PICK', 'io.cozy.files', {key: 'value'})
+        .start(element)
 
-      should(windowMock.removeEventListener.withArgs('message').calledOnce).be.true
+      setTimeout(() => {
+        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
+        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+        messageEventListener(handshakeEventMessageMock)
+
+        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+      }, 10)
+
+      return call.should.be.rejectedWith(/Unexpected handshake message from intent service/)
     })
 
     it('should handle intent error', async function () {
       const element = mockElement()
-      const {windowMock} = element
+      const {windowMock, iframeWindowMock} = element
 
-      windowMock.addEventListener
-        .withArgs('message')
-        .onFirstCall()
-        .callsArgWith(1, 'intent:error', serviceUrl)
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: 'intent:error',
+        source: iframeWindowMock
+      }
 
-      cozy.client.intents.start(intent, element, serviceUrl)
-        .should.be.rejectedWith(/Intent error/)
+      const call = cozy.client.intents
+        .create('PICK', 'io.cozy.files', {key: 'value'})
+        .start(element)
 
-      should(windowMock.removeEventListener.withArgs('message').calledOnce).be.true
+      setTimeout(() => {
+        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
+        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+        messageEventListener(handshakeEventMessageMock)
+
+        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+      }, 10)
+
+      return call.should.be.rejectedWith(/Intent error/)
     })
 
     it('should handle intent success', async function () {
       const element = mockElement()
-      const {windowMock, iframeMock} = element
-      const intentResult = {
-        lastname: 'Causi',
-        firstname: 'Claude'
+      const {windowMock, iframeWindowMock} = element
+
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: 'intent:ready',
+        source: iframeWindowMock
       }
 
-      windowMock.addEventListener
-        .withArgs('message')
-        .onFirstCall()
-        .callsArgWith(1, 'intent:ready', serviceUrl)
-        .callsArgWith(1, intentResult, serviceUrl)
+      const result = {
+        id: 'abcde1234'
+      }
 
-      cozy.client.intents.start(intent, element, serviceUrl)
-        .should.be.fulfilledWith(intentResult)
+      const resolveEventMessageMock = {
+        origin: serviceUrl,
+        data: result,
+        source: iframeWindowMock
+      }
 
-      should(iframeMock.parentNode.removeChild.withArgs(iframeMock).calledOnce).be.true
-      should(windowMock.removeEventListener.withArgs('message').calledOnce).be.true
+      const call = cozy.client.intents
+        .create('PICK', 'io.cozy.files', {key: 'value'})
+        .start(element)
+
+      setTimeout(() => {
+        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
+        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+
+        messageEventListener(handshakeEventMessageMock)
+        should(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).be.true()
+
+        messageEventListener(resolveEventMessageMock)
+        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+      }, 10)
+
+      return call.should.be.fulfilledWith(result)
+    })
+  })
+
+  describe('CreateService', function () {
+    function mockWindow () {
+      return {
+        addEventListener: sinon.spy(),
+        removeEventListener: sinon.spy(),
+        parent: {
+          postMessage: sinon.stub()
+        }
+      }
+    }
+
+    beforeEach(mock.mockAPI('GetIntent'))
+
+    it('should manage handshake', async function () {
+      const windowMock = mockWindow()
+
+      const clientHandshakeEventMessageMock = {
+        origin: expectedIntent.attributes.client,
+        data: { foo: 'bar' }
+      }
+
+      windowMock.parent.postMessage.callsFake(() => {
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+        windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+
+        messageEventListener(clientHandshakeEventMessageMock)
+        windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+      })
+
+      return cozy.client.intents.createService(expectedIntent._id, windowMock)
+        .then(service => {
+          should(typeof service.getData === 'function').be.true()
+          should(typeof service.getIntent === 'function').be.true()
+          should(typeof service.terminate === 'function').be.true()
+          service.getData().should.deepEqual({foo: 'bar'})
+          return true
+        }).should.be.fulfilledWith(true)
+    })
+
+    describe('Service', function () {
+      describe('Terminate', function () {
+        it('should send result document to Client', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.terminate(result)
+
+          windowMock.parent.postMessage
+            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+
+        it('should not be called twice', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.terminate(result)
+
+          should.throws(() => {
+            service.terminate(result)
+          }, /Intent service has already been terminated/)
+        })
+      })
     })
   })
 })
