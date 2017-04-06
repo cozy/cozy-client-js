@@ -75,6 +75,36 @@ export function create (cozy, action, type, data = {}, permissions = []) {
   return createPromise
 }
 
-export function resolve () {
-  // TODO
+function listenClientData (intent, window) {
+  return new Promise((resolve, reject) => {
+    const messageEventListener = (event) => {
+      if (event.origin !== intent.attributes.client) return
+
+      window.removeEventListener('message', messageEventListener)
+      resolve(event.data)
+    }
+
+    window.addEventListener('message', messageEventListener)
+    window.parent.postMessage('intent:ready', intent.attributes.client)
+  })
+}
+
+// returns a service to communicate with intent client
+export function createService (cozy, id, window) {
+  return cozyFetchJSON(cozy, 'GET', `/intents/${id}`)
+    .then(intent => {
+      return listenClientData(intent, window)
+        .then(data => {
+          let terminated = false
+          return {
+            getData: () => data,
+            getIntent: () => intent,
+            terminate: (doc) => {
+              if (terminated) throw new Error('Intent service has already been terminated')
+              terminated = true
+              window.parent.postMessage(doc, intent.attributes.client)
+            }
+          }
+        })
+    })
 }

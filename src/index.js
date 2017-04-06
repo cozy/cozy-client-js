@@ -80,7 +80,7 @@ const filesProto = {
 
 const intentsProto = {
   create: intents.create,
-  resolve: intents.resolve
+  createService: intents.createService
 }
 
 const offlineProto = {
