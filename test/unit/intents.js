@@ -256,4 +256,99 @@ describe('Intents', function () {
       return call.should.be.fulfilledWith(result)
     })
   })
+
+  describe('CreateService', function () {
+    function mockWindow () {
+      return {
+        addEventListener: sinon.spy(),
+        removeEventListener: sinon.spy(),
+        parent: {
+          postMessage: sinon.stub()
+        }
+      }
+    }
+
+    beforeEach(mock.mockAPI('GetIntent'))
+
+    it('should manage handshake', async function () {
+      const windowMock = mockWindow()
+
+      const clientHandshakeEventMessageMock = {
+        origin: expectedIntent.attributes.client,
+        data: { foo: 'bar' }
+      }
+
+      windowMock.parent.postMessage.callsFake(() => {
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+        windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+
+        messageEventListener(clientHandshakeEventMessageMock)
+        windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+      })
+
+      return cozy.client.intents.createService(expectedIntent._id, windowMock)
+        .then(service => {
+          should(typeof service.getData === 'function').be.true()
+          should(typeof service.getIntent === 'function').be.true()
+          should(typeof service.terminate === 'function').be.true()
+          service.getData().should.deepEqual({foo: 'bar'})
+          return true
+        }).should.be.fulfilledWith(true)
+    })
+
+    describe('Service', function () {
+      describe('Terminate', function () {
+        it('should send result document to Client', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.terminate(result)
+
+          windowMock.parent.postMessage
+            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+
+        it('should not be called twice', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.terminate(result)
+
+          should.throws(() => {
+            service.terminate(result)
+          }, /Intent service has already been terminated/)
+        })
+      })
+    })
+  })
 })
