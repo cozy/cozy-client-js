@@ -445,7 +445,7 @@ It returns a promise for the document of the file or directory moved to trash.
 const trashed = await cozy.client.files.trash("1234567")
 ```
 
-## `cozy.client.files.destroyById(id)`
+### `cozy.client.files.destroyById(id)`
 
 `cozy.client.files.destroyById(id)` is used to shred (destroy definitively) a file or directory identified by the given id.
 
@@ -460,7 +460,7 @@ const trashed = await cozy.client.files.trash("1234567")
 await cozy.client.files.destroyById("1234567")
 ```
 
-## `cozy.client.files.restoreById(id)`
+### `cozy.client.files.restoreById(id)`
 
 `cozy.client.files.restoreById(id)` is used to restore a file or directory identified by the given id. The file must be in the trash folder.
 
@@ -473,7 +473,7 @@ const trashed = await cozy.client.files.trash("1234567")
 const restored = await cozy.client.files.restore("1234567")
 ```
 
-## `cozy.client.files.listTrash()`
+### `cozy.client.files.listTrash()`
 
 `cozy.client.files.listTrash()` returns a promise for the list of all files in the trash.
 
@@ -482,7 +482,7 @@ const trashedFilesAndFolders = await cozy.client.files.listTrash()
 ```
 
 
-## `cozy.client.files.clearTrash()`
+### `cozy.client.files.clearTrash()`
 
 `cozy.client.files.clearTrash()` destroys definitively all trash content.
 
