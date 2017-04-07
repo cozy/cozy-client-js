@@ -257,15 +257,19 @@
 	
 	var files = _interopRequireWildcard(_files);
 	
-	var _offline = __webpack_require__(101);
+	var _intents = __webpack_require__(101);
+	
+	var intents = _interopRequireWildcard(_intents);
+	
+	var _offline = __webpack_require__(102);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(104);
+	var _settings = __webpack_require__(105);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(105);
+	var _relations = __webpack_require__(106);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -337,6 +341,11 @@
 	  destroyById: files.destroyById
 	};
 	
+	var intentsProto = {
+	  create: intents.create,
+	  createService: intents.createService
+	};
+	
 	var offlineProto = {
 	  init: offline.init,
 	  getDoctypes: offline.getDoctypes,
@@ -373,6 +382,7 @@
 	
 	    this.data = {};
 	    this.files = {};
+	    this.intents = {};
 	    this.offline = {};
 	    this.settings = {};
 	    this.auth = {
@@ -429,6 +439,7 @@
 	      addToProto(this, this.data, dataProto, disablePromises);
 	      addToProto(this, this.auth, authProto, disablePromises);
 	      addToProto(this, this.files, filesProto, disablePromises);
+	      addToProto(this, this.intents, intentsProto, disablePromises);
 	      addToProto(this, this.offline, offlineProto, disablePromises);
 	      addToProto(this, this.settings, settingsProto, disablePromises);
 	
@@ -2042,6 +2053,10 @@
 	    _this.url = res.url;
 	    _this.status = res.status;
 	    _this.reason = reason;
+	
+	    Object.defineProperty(_this, 'message', {
+	      value: reason.message || (typeof reason === 'string' ? reason : JSON.stringify(reason))
+	    });
 	    return _this;
 	  }
 	
@@ -2925,6 +2940,132 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.create = create;
+	exports.createService = createService;
+	
+	var _fetch = __webpack_require__(94);
+	
+	var intentClass = 'coz-intent';
+	
+	// inject iframe for service in given element
+	function injectService(url, element, data) {
+	  var document = element.ownerDocument;
+	  if (!document) throw new Error('Cannot retrieve document object from given element');
+	
+	  var window = document.defaultView;
+	  if (!window) throw new Error('Cannot retrieve window object from document');
+	
+	  var iframe = document.createElement('iframe');
+	  iframe.setAttribute('src', url);
+	  iframe.classList.add(intentClass);
+	  element.appendChild(iframe);
+	
+	  // Keeps only http://domain:port/
+	  var serviceOrigin = url.split('/', 3).join('/');
+	
+	  return new Promise(function (resolve, reject) {
+	    var handshaken = false;
+	    var messageHandler = function messageHandler(event) {
+	      if (event.origin !== serviceOrigin) return;
+	
+	      if (event.data === 'intent:ready') {
+	        handshaken = true;
+	        return event.source.postMessage(data, event.origin);
+	      }
+	
+	      window.removeEventListener('message', messageHandler);
+	      iframe.parentNode.removeChild(iframe);
+	
+	      if (event.data === 'intent:error') {
+	        return reject(new Error('Intent error'));
+	      }
+	
+	      return handshaken ? resolve(event.data) : reject(new Error('Unexpected handshake message from intent service'));
+	    };
+	
+	    window.addEventListener('message', messageHandler);
+	  });
+	}
+	
+	function create(cozy, action, type) {
+	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+	  var permissions = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+	
+	  if (!action) throw new Error('Misformed intent, "action" property must be provided');
+	  if (!type) throw new Error('Misformed intent, "type" property must be provided');
+	
+	  var createPromise = (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/intents', {
+	    data: {
+	      type: 'io.cozy.intents',
+	      attributes: {
+	        action: action,
+	        type: type,
+	        data: data,
+	        permissions: permissions
+	      }
+	    }
+	  });
+	
+	  createPromise.start = function (element) {
+	    return createPromise.then(function (intent) {
+	      var service = intent.attributes.services && intent.attributes.services[0];
+	
+	      if (!service) {
+	        return Promise.reject(new Error('Unable to find a service'));
+	      }
+	
+	      return injectService(service.href, element, data);
+	    });
+	  };
+	
+	  return createPromise;
+	}
+	
+	function listenClientData(intent, window) {
+	  return new Promise(function (resolve, reject) {
+	    var messageEventListener = function messageEventListener(event) {
+	      if (event.origin !== intent.attributes.client) return;
+	
+	      window.removeEventListener('message', messageEventListener);
+	      resolve(event.data);
+	    };
+	
+	    window.addEventListener('message', messageEventListener);
+	    window.parent.postMessage('intent:ready', intent.attributes.client);
+	  });
+	}
+	
+	// returns a service to communicate with intent client
+	function createService(cozy, id, window) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + id).then(function (intent) {
+	    return listenClientData(intent, window).then(function (data) {
+	      var terminated = false;
+	      return {
+	        getData: function getData() {
+	          return data;
+	        },
+	        getIntent: function getIntent() {
+	          return intent;
+	        },
+	        terminate: function terminate(doc) {
+	          if (terminated) throw new Error('Intent service has already been terminated');
+	          terminated = true;
+	          window.parent.postMessage(doc, intent.attributes.client);
+	        }
+	      };
+	    });
+	  });
+	}
+
+/***/ },
+/* 102 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	exports.init = init;
 	exports.getDoctypes = getDoctypes;
 	exports.hasDatabase = hasDatabase;
@@ -2942,11 +3083,11 @@
 	exports.stopRepeatedReplication = stopRepeatedReplication;
 	exports.stopAllRepeatedReplication = stopAllRepeatedReplication;
 	
-	var _pouchdb = __webpack_require__(102);
+	var _pouchdb = __webpack_require__(103);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(103);
+	var _pouchdbFind = __webpack_require__(104);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -3229,19 +3370,19 @@
 	}
 
 /***/ },
-/* 102 */
+/* 103 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb");
 
 /***/ },
-/* 103 */
+/* 104 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb-find");
 
 /***/ },
-/* 104 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3286,7 +3427,7 @@
 	}
 
 /***/ },
-/* 105 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
