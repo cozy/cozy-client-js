@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.1.11] - 2017-04-07
+### Fixed
+- Missing min.js files. Oops !
+
+### Added
+- Documentation about intents API
+
+
 ## [v0.1.10] - 2017-04-06
 ### Changed
 - Doc now use `cozy.tools:8080` as example and default domain. No need to edit /etc/hosts.
