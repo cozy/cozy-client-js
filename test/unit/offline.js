@@ -4,7 +4,13 @@
 import should from 'should'
 import {Client} from '../../src'
 import PouchDB from 'pouchdb'
+import pouchdbFind from 'pouchdb-find'
 PouchDB.plugin(require('pouchdb-adapter-memory'))
+
+// PouchDB should not be a mandatory dependency as it is only used in mobile
+// environment, so we declare it in global scope here.
+global.PouchDB = PouchDB
+global.pouchdbFind = pouchdbFind
 
 describe('offline', () => {
   const fileDoctype = 'io.cozy.files'

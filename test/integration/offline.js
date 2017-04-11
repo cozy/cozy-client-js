@@ -5,8 +5,14 @@ import should from 'should'
 import 'isomorphic-fetch'
 import { Client } from '../../src'
 import PouchDB from 'pouchdb'
+import pouchdbFind from 'pouchdb-find'
 import { sleep } from '../../src/utils'
 PouchDB.plugin(require('pouchdb-adapter-memory'))
+
+// PouchDB should not be a mandatory dependency as it is only used in mobile
+// environment, so we declare it in global scope here.
+global.PouchDB = PouchDB
+global.pouchdbFind = pouchdbFind
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
