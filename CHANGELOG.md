@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.2.0]
+## Removed
+- ⚠️ `pouchdb` and `pouchdb-find` required dependencies, see [offline documentation](https://github.com/cozy/cozy-client-js/blob/master/docs/offline.md)
+
 ## [v0.1.11] - 2017-04-07
 ### Fixed
 - Missing min.js files. Oops !

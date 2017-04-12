@@ -265,11 +265,11 @@
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(105);
+	var _settings = __webpack_require__(103);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(106);
+	var _relations = __webpack_require__(104);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -3083,20 +3083,11 @@
 	exports.stopRepeatedReplication = stopRepeatedReplication;
 	exports.stopAllRepeatedReplication = stopAllRepeatedReplication;
 	
-	var _pouchdb = __webpack_require__(103);
-	
-	var _pouchdb2 = _interopRequireDefault(_pouchdb);
-	
-	var _pouchdbFind = __webpack_require__(104);
-	
-	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
-	
 	var _doctypes = __webpack_require__(98);
 	
 	var _auth_v = __webpack_require__(93);
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
+	/* global PouchDB, pouchdbFind */
 	var pluginLoaded = false;
 	
 	/*
@@ -3114,6 +3105,9 @@
 	      options = _ref$options === undefined ? {} : _ref$options,
 	      _ref$doctypes = _ref.doctypes,
 	      doctypes = _ref$doctypes === undefined ? [] : _ref$doctypes;
+	
+	  if (typeof PouchDB === 'undefined') throw new Error('Missing pouchdb dependency for offline mode. Please run "yarn add pouchdb" and provide PouchDB as a webpack plugin.');
+	  if (typeof pouchdbFind === 'undefined') throw new Error('Missing pouchdb-find dependency for offline mode. Please run "yarn add pouchdb-find" and provide pouchdbFind as webpack plugin.');
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
@@ -3174,7 +3168,7 @@
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 	  if (!pluginLoaded) {
-	    _pouchdb2.default.plugin(_pouchdbFind2.default);
+	    PouchDB.plugin(pouchdbFind);
 	    pluginLoaded = true;
 	  }
 	
@@ -3182,7 +3176,7 @@
 	    return Promise.resolve(getDatabase(cozy, doctype));
 	  }
 	
-	  setDatabase(cozy, doctype, new _pouchdb2.default(doctype, options));
+	  setDatabase(cozy, doctype, new PouchDB(doctype, options));
 	  return createIndexes(cozy, doctype).then(function () {
 	    return getDatabase(cozy, doctype);
 	  });
@@ -3371,18 +3365,6 @@
 
 /***/ },
 /* 103 */
-/***/ function(module, exports) {
-
-	module.exports = require("pouchdb");
-
-/***/ },
-/* 104 */
-/***/ function(module, exports) {
-
-	module.exports = require("pouchdb-find");
-
-/***/ },
-/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3427,7 +3409,7 @@
 	}
 
 /***/ },
-/* 106 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

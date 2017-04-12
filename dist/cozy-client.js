@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("pouchdb"), require("pouchdb-find"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("client", ["pouchdb", "pouchdb-find"], factory);
+		define("client", [], factory);
 	else if(typeof exports === 'object')
-		exports["client"] = factory(require("pouchdb"), require("pouchdb-find"));
+		exports["client"] = factory();
 	else
-		root["cozy"] = root["cozy"] || {}, root["cozy"]["client"] = factory(root["pouchdb"], root["pouchdb-find"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_204__, __WEBPACK_EXTERNAL_MODULE_205__) {
+		root["cozy"] = root["cozy"] || {}, root["cozy"]["client"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -748,11 +748,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(206);
+	var _settings = __webpack_require__(204);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(207);
+	var _relations = __webpack_require__(205);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -8904,20 +8904,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.stopRepeatedReplication = stopRepeatedReplication;
 	exports.stopAllRepeatedReplication = stopAllRepeatedReplication;
 	
-	var _pouchdb = __webpack_require__(204);
-	
-	var _pouchdb2 = _interopRequireDefault(_pouchdb);
-	
-	var _pouchdbFind = __webpack_require__(205);
-	
-	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
-	
 	var _doctypes = __webpack_require__(199);
 	
 	var _auth_v = __webpack_require__(195);
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
+	/* global PouchDB, pouchdbFind */
 	var pluginLoaded = false;
 	
 	/*
@@ -8935,6 +8926,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      options = _ref$options === undefined ? {} : _ref$options,
 	      _ref$doctypes = _ref.doctypes,
 	      doctypes = _ref$doctypes === undefined ? [] : _ref$doctypes;
+	
+	  if (typeof PouchDB === 'undefined') throw new Error('Missing pouchdb dependency for offline mode. Please run "yarn add pouchdb" and provide PouchDB as a webpack plugin.');
+	  if (typeof pouchdbFind === 'undefined') throw new Error('Missing pouchdb-find dependency for offline mode. Please run "yarn add pouchdb-find" and provide pouchdbFind as webpack plugin.');
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
@@ -8995,7 +8989,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 	  if (!pluginLoaded) {
-	    _pouchdb2.default.plugin(_pouchdbFind2.default);
+	    PouchDB.plugin(pouchdbFind);
 	    pluginLoaded = true;
 	  }
 	
@@ -9003,7 +8997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Promise.resolve(getDatabase(cozy, doctype));
 	  }
 	
-	  setDatabase(cozy, doctype, new _pouchdb2.default(doctype, options));
+	  setDatabase(cozy, doctype, new PouchDB(doctype, options));
 	  return createIndexes(cozy, doctype).then(function () {
 	    return getDatabase(cozy, doctype);
 	  });
@@ -9192,18 +9186,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 204 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_204__;
-
-/***/ },
-/* 205 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_205__;
-
-/***/ },
-/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9248,7 +9230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 207 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
