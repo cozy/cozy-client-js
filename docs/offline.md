@@ -1,13 +1,13 @@
 This document describes in more details how to use this library in offline mode.
 
-All applications do not require offline mode, and offline mode needs two large dependencies : `pouchdb` and `pouchdb-find`.
-As those two dependencies are expensive in size, we decided to not provide them by default, since v0.2.0.
+All applications do not require offline mode, and offline mode needs two dependencies : `pouchdb` and `pouchdb-find`.
+As both are very large, we decide not to provide them by default, since v0.2.0.
 
-So if an app needs to use offline mode, it will need to add those dependencies by itself. It means that developers just need to do:
+So if your app needs to use offline mode, you have to add those dependencies by yourself. It means you just need to do:
 
 ```bash
-yarn add pouchdb
-yarn add pouchdb-find
+$/your-app> yarn add pouchdb
+$/your-app> yarn add pouchdb-find
 ```
 
 Then they will have to import `pouchdb` and `pouchdbfind` globally, as they are not imported in codebase anymore. This means adding the following configuration in all concerned webpack target files (for example `webpack.target.mobile.js`) :
