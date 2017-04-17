@@ -141,7 +141,7 @@ class Client {
     this._authstate = AuthNone
     this._authcreds = null
     this._storage = null
-    this._version = null
+    this._version = options.version || null
     this._offline = null
 
     const token = options.token
@@ -235,7 +235,7 @@ class Client {
 
   isV2 () {
     if (!this._version) {
-      this._version = retry(() => fetch(`${this._url}/status/`), 3)()
+      return retry(() => fetch(`${this._url}/status/`), 3)()
         .then((res) => {
           if (!res.ok) {
             throw new Error('Could not fetch cozy status')
@@ -243,9 +243,12 @@ class Client {
             return res.json()
           }
         })
-        .then((status) => status.datasystem !== undefined)
+        .then((status) => {
+          this._version = status.datasystem !== undefined ? 2 : 3
+          return this.isV2()
+        })
     }
-    return this._version
+    return Promise.resolve(this._version === 2)
   }
 }
 
