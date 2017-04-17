@@ -13,6 +13,7 @@ PouchDB.plugin(require('pouchdb-adapter-memory'))
 // environment, so we declare it in global scope here.
 global.PouchDB = PouchDB
 global.pouchdbFind = pouchdbFind
+global.navigator = undefined
 
 const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
