@@ -410,7 +410,7 @@
 	      this._authstate = AuthNone;
 	      this._authcreds = null;
 	      this._storage = null;
-	      this._version = null;
+	      this._version = options.version || null;
 	      this._offline = null;
 	
 	      var token = options.token;
@@ -511,7 +511,7 @@
 	      var _this3 = this;
 	
 	      if (!this._version) {
-	        this._version = (0, _utils.retry)(function () {
+	        return (0, _utils.retry)(function () {
 	          return fetch(_this3._url + '/status/');
 	        }, 3)().then(function (res) {
 	          if (!res.ok) {
@@ -520,10 +520,11 @@
 	            return res.json();
 	          }
 	        }).then(function (status) {
-	          return status.datasystem !== undefined;
+	          _this3._version = status.datasystem !== undefined ? 2 : 3;
+	          return _this3.isV2();
 	        });
 	      }
-	      return this._version;
+	      return Promise.resolve(this._version === 2);
 	    }
 	  }]);
 	
@@ -1084,6 +1085,8 @@
 	});
 	exports.unpromiser = unpromiser;
 	exports.isPromise = isPromise;
+	exports.isOnline = isOnline;
+	exports.isOffline = isOffline;
 	exports.sleep = sleep;
 	exports.retry = retry;
 	exports.getFuzzedDelay = getFuzzedDelay;
@@ -1092,6 +1095,7 @@
 	exports.encodeQuery = encodeQuery;
 	exports.decodeQuery = decodeQuery;
 	exports.warn = warn;
+	/* global navigator */
 	var FuzzFactor = 0.3;
 	
 	function unpromiser(fn) {
@@ -1120,6 +1124,14 @@
 	
 	function isPromise(value) {
 	  return !!value && typeof value.then === 'function';
+	}
+	
+	function isOnline() {
+	  return typeof navigator !== 'undefined' ? navigator.onLine : true;
+	}
+	
+	function isOffline() {
+	  return !isOnline();
 	}
 	
 	function sleep(time, args) {
@@ -1638,6 +1650,9 @@
 	  if (!cli.isRegistered()) {
 	    return Promise.reject(new Error('Client not registered'));
 	  }
+	  if ((0, _utils.isOffline)()) {
+	    return Promise.resolve(cli);
+	  }
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/auth/register/' + cli.clientID, null, {
 	    manualAuthCredentials: {
 	      token: cli
@@ -1847,6 +1862,7 @@
 	  }));
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/auth/access_token', body, {
 	    disableAuth: token === null,
+	    dontRetry: true,
 	    manualAuthCredentials: { client: client, token: token },
 	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 	  }).then(function (data) {
@@ -1962,7 +1978,7 @@
 	        isV2 = _ref2[0],
 	        res = _ref2[1];
 	
-	    if (res.status !== 401 && res.status !== 400 || isV2 || !credentials) {
+	    if (res.status !== 400 && res.status !== 401 || isV2 || !credentials || options.dontRetry) {
 	      return res;
 	    }
 	    // we try to refresh the token only for OAuth, ie, the client defined
@@ -1973,6 +1989,7 @@
 	    if (!client || !(token instanceof _auth_v.AccessToken)) {
 	      return res;
 	    }
+	    options.dontRetry = true;
 	    return (0, _utils.retry)(function () {
 	      return (0, _auth_v.refreshToken)(cozy, client, token);
 	    }, 3)().then(function (newToken) {
@@ -3066,6 +3083,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.replicationOfflineError = undefined;
 	exports.init = init;
 	exports.getDoctypes = getDoctypes;
 	exports.hasDatabase = hasDatabase;
@@ -3087,7 +3105,11 @@
 	
 	var _auth_v = __webpack_require__(93);
 	
-	/* global PouchDB, pouchdbFind */
+	var _utils = __webpack_require__(89);
+	
+	var replicationOfflineError = exports.replicationOfflineError = 'Replication abort, your device is actually offline.'; /* global PouchDB, pouchdbFind */
+	
+	
 	var pluginLoaded = false;
 	
 	/*
@@ -3256,6 +3278,12 @@
 	      return reject(new Error('You can\'t use `live` option with Cozy couchdb.'));
 	    }
 	
+	    if ((0, _utils.isOffline)()) {
+	      reject(replicationOfflineError);
+	      options.onError && options.onError(replicationOfflineError);
+	      return;
+	    }
+	
 	    getReplicationUrl(cozy, doctype).then(function (url) {
 	      return setReplication(cozy, doctype, getDatabase(cozy, doctype).replicate.from(url, options).on('complete', function (info) {
 	        setReplication(cozy, doctype, undefined);
@@ -3336,6 +3364,11 @@
 	  }
 	
 	  return setRepeatedReplication(cozy, doctype, setInterval(function () {
+	    if ((0, _utils.isOffline)()) {
+	      // network is offline, replication cannot be launched
+	      console.info(replicationOfflineError);
+	      return;
+	    }
 	    if (!hasReplication(cozy, doctype)) {
 	      replicateFromCozy(cozy, doctype, options);
 	      // TODO: add replicationToCozy
