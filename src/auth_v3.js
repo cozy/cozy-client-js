@@ -353,6 +353,7 @@ function retrieveToken (cozy, client, token, query) {
   }))
   return cozyFetchJSON(cozy, 'POST', '/auth/access_token', body, {
     disableAuth: (token === null),
+    dontRetry: true,
     manualAuthCredentials: { client, token },
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   })
