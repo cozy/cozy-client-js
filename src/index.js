@@ -4,6 +4,7 @@ import 'babel-polyfill'
 import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
+import * as accounts from './accounts'
 import * as auth from './auth_v3'
 import * as data from './data'
 import * as mango from './mango'
@@ -26,6 +27,10 @@ const AuthOK = 3
 
 const defaultClientParams = {
   softwareID: 'github.com/cozy/cozy-client-js'
+}
+
+const accountsProto = {
+  create: accounts.create
 }
 
 const dataProto = {
@@ -116,6 +121,7 @@ const settingsProto = {
 
 class Client {
   constructor (options) {
+    this.accounts = {}
     this.data = {}
     this.files = {}
     this.intents = {}
@@ -168,6 +174,7 @@ class Client {
     this._url = url
 
     const disablePromises = !!options.disablePromises
+    addToProto(this, this.accounts, accountsProto, disablePromises)
     addToProto(this, this.data, dataProto, disablePromises)
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
