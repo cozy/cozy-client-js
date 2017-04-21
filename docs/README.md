@@ -119,11 +119,13 @@ It does not return a value.
   * `cozyURL`: absolute url of the cozy stack
   * `disablePromises`: boolean to make function that returns promise used with a classical "callback as last argument" (default value is *false*)
   * `oauth`: an object with the OAuth parameters, see [OAuth](./oauth.md) for details
+  * `version`: the version of Cozy (2 or 3), it's optional, by default with a request to the server it can deduce automatically the version. (To be specified for an offline mode)
 
 ```javascript
 cozy.client.init({
   cozyURL: 'http://cozy.tools:8080',
   disablePromises: false,
+  version: 3,
   oauth: {
     clientParams: {/*...*/},
     scopes: ["io.cozy.files:GET"],
