@@ -7,8 +7,6 @@ import {oauthFlow, AccessToken} from '../../src/auth_v3'
 import mock from '../mock-api'
 import {decodeQuery} from '../../src/utils'
 
-global.navigator = undefined
-
 describe('Authentication', function () {
   const cozy = {}
 

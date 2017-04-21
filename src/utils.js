@@ -25,19 +25,11 @@ export function isPromise (value) {
 }
 
 export function isOnline () {
-  if (navigator === undefined) {
-    return undefined
-  }
-
-  return navigator.onLine === true
+  return typeof navigator !== 'undefined' ? navigator.onLine : true
 }
 
 export function isOffline () {
-  if (navigator === undefined) {
-    return undefined
-  }
-
-  return navigator.onLine === false
+  return !isOnline()
 }
 
 export function sleep (time, args) {

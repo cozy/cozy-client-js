@@ -141,7 +141,8 @@ export function replicateFromCozy (cozy, doctype, options = {}) {
 
     if (isOffline()) {
       reject(replicationOfflineError)
-      return options.onError && options.onError(replicationOfflineError)
+      options.onError && options.onError(replicationOfflineError)
+      return
     }
 
     getReplicationUrl(cozy, doctype)
@@ -218,7 +219,8 @@ export function startRepeatedReplication (cozy, doctype, timer, options = {}) {
   return setRepeatedReplication(cozy, doctype, setInterval(() => {
     if (isOffline()) {
       // network is offline, replication cannot be launched
-      return console.info(replicationOfflineError)
+      console.info(replicationOfflineError)
+      return
     }
     if (!hasReplication(cozy, doctype)) {
       replicateFromCozy(cozy, doctype, options)

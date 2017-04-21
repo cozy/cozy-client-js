@@ -12,8 +12,6 @@ const COZY_STACK_URL = process.env && process.env.COZY_STACK_URL || ''
 const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
 const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 
-global.navigator = undefined
-
 describe('files API', async function () {
   let random
   const cozy = {}
