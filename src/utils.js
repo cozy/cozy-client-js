@@ -1,3 +1,4 @@
+/* global navigator */
 const FuzzFactor = 0.3
 
 export function unpromiser (fn) {
@@ -21,6 +22,14 @@ export function unpromiser (fn) {
 
 export function isPromise (value) {
   return !!value && typeof value.then === 'function'
+}
+
+export function isOnline () {
+  return typeof navigator !== 'undefined' ? navigator.onLine : true
+}
+
+export function isOffline () {
+  return !isOnline()
 }
 
 export function sleep (time, args) {

@@ -1,6 +1,9 @@
 /* global PouchDB, pouchdbFind */
 import {DOCTYPE_FILES} from './doctypes'
 import {refreshToken} from './auth_v3'
+import {isOffline} from './utils'
+
+export const replicationOfflineError = 'Replication abort, your device is actually offline.'
 
 let pluginLoaded = false
 
@@ -136,6 +139,12 @@ export function replicateFromCozy (cozy, doctype, options = {}) {
       return reject(new Error('You can\'t use `live` option with Cozy couchdb.'))
     }
 
+    if (isOffline()) {
+      reject(replicationOfflineError)
+      options.onError && options.onError(replicationOfflineError)
+      return
+    }
+
     getReplicationUrl(cozy, doctype)
       .then(url => setReplication(cozy, doctype,
         getDatabase(cozy, doctype).replicate.from(url, options).on('complete', (info) => {
@@ -208,6 +217,11 @@ export function startRepeatedReplication (cozy, doctype, timer, options = {}) {
   }
 
   return setRepeatedReplication(cozy, doctype, setInterval(() => {
+    if (isOffline()) {
+      // network is offline, replication cannot be launched
+      console.info(replicationOfflineError)
+      return
+    }
     if (!hasReplication(cozy, doctype)) {
       replicateFromCozy(cozy, doctype, options)
       // TODO: add replicationToCozy

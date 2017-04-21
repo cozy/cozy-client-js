@@ -1,5 +1,5 @@
 /* global btoa */
-import {encodeQuery, decodeQuery} from './utils'
+import {encodeQuery, decodeQuery, isOffline} from './utils'
 import {cozyFetchJSON, FetchError} from './fetch'
 
 const StateSize = 16
@@ -148,6 +148,9 @@ export function getClient (cozy, clientParams) {
   const cli = client(cozy, clientParams)
   if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
+  }
+  if (isOffline()) {
+    return Promise.resolve(cli)
   }
   return cozyFetchJSON(cozy, 'GET', `/auth/register/${cli.clientID}`, null,
     {
