@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- none yet
+- Accept an optional revision to be sent as `If-Match` when trashing a file/folder
 
 ### Fixed
 - none yet
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v0.2.1]
 ### Changed
-- Checks if there is a connection before starting replication
+- Check if there is a connection before starting replication
 - Return client registered on offline mode
 - Do not try to refresh token if retreiving a token fails
 
