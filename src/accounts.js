@@ -1,8 +1,9 @@
 import {cozyFetchJSON} from './fetch'
 
-export function create (cozy, type, login = '', password = '') {
+export function create (cozy, konnector, login = '', password = '', name = '') {
   return cozyFetchJSON(cozy, 'POST', '/data/io.cozy.accounts', {
-    account_type: type,
+    name: name,
+    account_type: konnector.vendorLink,
     status: 'PENDING',
     auth: {
       login: login,
