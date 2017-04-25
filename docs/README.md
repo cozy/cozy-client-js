@@ -435,13 +435,15 @@ dir.relations('contents').forEach( (file) => … )
 - `path`: string specifying the path of the file or directory;
 
 
-### `cozy.client.files.trashById(id)`
+### `cozy.client.files.trashById(id, options)`
 
-`cozy.client.files.trashById(id)` is used to move the file or directory identified by the given id to trash.
+`cozy.client.files.trashById(id, options)` is used to move the file or directory identified by the given id to trash.
 
 It returns a promise for the document of the file or directory moved to trash.
 
 - `id` is a string specifying the identifier of the file or directory
+- `options` is an object with the following fields:
+  * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
 
 ```javascript
 const trashed = await cozy.client.files.trash("1234567")

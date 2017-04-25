@@ -136,11 +136,16 @@ export function updateAttributesByPath (cozy, path, attrs, options) {
     `/files/metadata?Path=${encodeURIComponent(path)}`, options)
 }
 
-export function trashById (cozy, id) {
+export function trashById (cozy, id, options) {
   if (typeof id !== 'string' || id === '') {
     throw new Error('missing id argument')
   }
-  return cozyFetchJSON(cozy, 'DELETE', `/files/${encodeURIComponent(id)}`)
+  const {ifMatch} = options || {}
+  return cozyFetchJSON(cozy, 'DELETE', `/files/${encodeURIComponent(id)}`, undefined, {
+    headers: {
+      'If-Match': ifMatch || ''
+    }
+  })
 }
 
 export function statById (cozy, id, offline = true) {
