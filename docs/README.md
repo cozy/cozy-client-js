@@ -19,7 +19,7 @@ There is two actives cozy architectures:
 
 **v3** will not support **server-side** applications. We will support server side modules managed by server administrator, but the applications themselves will all be **client-side** application.
 
-This repository provides a library which allows you build a **client-side** application compatible with both version.
+This repository provides a library which allows you to build a **client-side** application compatible with both version.
 
 The former javascript library for making client-side application was `cozy-browser-sdk`. We aim to deprecate it once `cozy-client-js` reaches feature-parity.
 
@@ -142,7 +142,7 @@ cozy.client.init({
 
 `cozy.client.data.create(doctype, attributes)` adds a document to the database.
 
-It returns a promise for the created object. The created object has the same attributes than passed with an added `_id`. It's the unique identifier for the created document.
+It returns a promise for the created object. The created object has the same attributes than thoses passed, with an added `_id`. It's the unique identifier for the created document.
 
 If you use an existing doctype, you should follow its expected format. **v2** does not enforce this, but we plan to on **v3**. Anyway, do you want to be the app that creates empty contacts in the native app ?
 
@@ -168,12 +168,12 @@ createdBookId = created._id
 
 `cozy.client.data.find(doctype, id)` returns the document associated to the given ID.
 
-It returns a promise for the document. It will have the same fields as the return value from `create`, including `_id` and `_rev`.
+It returns a promise for the document. It will have the same fields than the returned value of `create`, including `_id` and `_rev`.
 
-If the document does not exist, the promise will reject or the callback will be passed an error.
+If the document does not exist, the promise will be rejected or the callback will be passed an error.
 
 - `doctype` is a string specifying the [doctype](#doctypes--permissions)
-- `id` is a string specifying the identifier of the document you search for
+- `id` is a string specifying the identifier of the document you look for
 
 ```javascript
 const doc = await cozy.client.data.find(myBooksDoctype, createdBookId)
@@ -200,11 +200,11 @@ console.log(changes.last_seq, changes.results)
 
 `cozy.client.data.update(doctype, doc, newdoc)` replaces the document by a new version.
 
-It returns a promise for the updated document. The updated document will have the same fields and values than provided newdoc, the same `_id` than doc, and a `_rev` incremented from doc's number.
+It returns a promise for the updated document. The updated document will have the same fields and values than provided in newdoc, the same `_id` than doc, and a `_rev` incremented from doc's number.
 
 If the document does not exist, the promise will reject with an error.
 
-If the document current `_rev` does not match the passed one, it means there is a conflict and the promise reject with an error.
+If the document current `_rev` does not match the passed one, it means there is a conflict and the promise is rejected with an error.
 
 - `doctype` is a string specifying the [doctype](#doctypes--permissions)
 - `doc` is an object with *at least* the fields `_id` and `_rev` containing the identifier and revision of the file you want to update.
@@ -226,7 +226,7 @@ console.log(updated.isbn === undefined) // update erase fields
 
 It returns a promise for the updated document. The updated document will be the result of merging changes into the document with given `_id` and a incremented `_rev`.
 
-If the document does not exist, the promise will reject or the callback will be passed an error.
+If the document does not exist, the promise will be rejected or the callback will be passed an error.
 
 This function gives 3 attempts not to conflict.
 
@@ -248,9 +248,9 @@ console.log(updated.isbn) // updateAttributes preserve other fields
 
 `cozy.client.data.delete(doctype, doc )` will erase the document from the database.
 
-It returns a promise which will resolve when the document has been deleted.
+It returns a promise which will be resolved when the document has been deleted.
 
-If the document does not exist, the promise will reject with an error. If the document current `_rev` does not match the passed one, it means there is a conflict and the promise reject with an error.
+If the document does not exist, the promise will be rejected with an error. If the document current `_rev` does not match the passed one, it means there is a conflict and the promise is rejected with an error.
 
 - `doctype` is a string specifying the [doctype](#doctypes--permissions)
 - `doc` is an object with *at least* the fields `_id` and `_rev` containing the identifier and revision of the file you want to destroy.
@@ -280,7 +280,7 @@ const booksByYearRef = await cozy.client.data.defineIndex(myType, ['year', 'rati
 
 `cozy.client.data.query(indexReference, query)` find documents using an index.
 
-It returns a promise with a list of documents matching the query. Results will be returned in order according to the index.
+It returns a promise with a list of documents matching the query. Results will be returned in the order defined for the index.
 
 - `query` is an object with the following fields:
   * `selector`: a mango selector
