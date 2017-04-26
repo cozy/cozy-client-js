@@ -59,6 +59,7 @@ const authProto = {
 const filesProto = {
   create: files.create,
   createDirectory: files.createDirectory,
+  createDirectoryRecursively: files.createDirectoryRecursively,
   updateById: files.updateById,
   updateAttributesById: files.updateAttributesById,
   updateAttributesByPath: files.updateAttributesByPath,

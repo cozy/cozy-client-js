@@ -352,6 +352,19 @@ const created = await cozy.client.files.createDirectory({
 ```
 
 
+### `cozy.client.files.createDirectoryRecursively(path)`
+
+`cozy.client.files.createDirectory(path)` is used to create one or more directories for a given path.
+
+It returns a promise for the document of the last directory created.
+
+- `path` is a string
+
+```javascript
+const barDirectory = await cozy.client.files.createDirectoryRecursively('/Foo/Bar')
+```
+
+
 ### `cozy.client.files.updateById(id, data, options)`
 
 `cozy.client.files.updateById(id, data, options)` is used to update the content of an already existing file.
