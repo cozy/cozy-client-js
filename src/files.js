@@ -3,6 +3,7 @@ import {cozyFetch, cozyFetchJSON} from './fetch'
 import jsonapi from './jsonapi'
 import { DOCTYPE_FILES } from './doctypes'
 
+const ROOT_ID = 'io.cozy.files.root-dir'
 const contentTypeOctetStream = 'application/octet-stream'
 
 function doUpload (cozy, data, method, path, options) {
@@ -106,6 +107,39 @@ export function createDirectory (cozy, options) {
       'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
     }
   })
+}
+
+function getDirectoryOrCreate (cozy, name, parentDirectory) {
+  if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory')
+
+  const path = `${parentDirectory._id === ROOT_ID ? '' : parentDirectory.attributes.path}/${name}`
+
+  return cozy.files.statByPath(path || '/')
+    .catch(error => {
+      const parsedError = JSON.parse(error.message)
+      const errors = parsedError.errors
+      if (errors && errors.length && errors[0].status === '404') {
+        return cozy.files.createDirectory({
+          name: name,
+          dirID: parentDirectory && parentDirectory._id
+        })
+      }
+
+      throw errors
+    })
+}
+
+export function createDirectoryByPath (cozy, path) {
+  const parts = path.split('/').filter(part => part !== '')
+
+  const rootDirectoryPromise = cozy.files.statById(ROOT_ID)
+
+  return parts.length
+    ? parts.reduce((parentDirectoryPromise, part) => {
+      return parentDirectoryPromise
+        .then(parentDirectory => getDirectoryOrCreate(cozy, part, parentDirectory))
+    }, rootDirectoryPromise)
+      : rootDirectoryPromise
 }
 
 export function updateById (cozy, id, data, options) {
