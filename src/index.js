@@ -10,6 +10,7 @@ import * as data from './data'
 import * as mango from './mango'
 import * as files from './files'
 import * as intents from './intents'
+import * as konnectors from './konnectors'
 import * as offline from './offline'
 import * as settings from './settings'
 import * as relations from './relations'
@@ -89,6 +90,14 @@ const intentsProto = {
   createService: intents.createService
 }
 
+const konnectorsProto = {
+  addAccount: konnectors.addAccount,
+  fetchManifest: konnectors.fetchManifest,
+  get: konnectors.get,
+  getBySlug: konnectors.getBySlug,
+  install: konnectors.install
+}
+
 const offlineProto = {
   init: offline.init,
   getDoctypes: offline.getDoctypes,
@@ -125,6 +134,7 @@ class Client {
     this.data = {}
     this.files = {}
     this.intents = {}
+    this.konnectors = {}
     this.offline = {}
     this.settings = {}
     this.auth = {
@@ -179,6 +189,7 @@ class Client {
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
     addToProto(this, this.intents, intentsProto, disablePromises)
+    addToProto(this, this.konnectors, konnectorsProto, disablePromises)
     addToProto(this, this.offline, offlineProto, disablePromises)
     addToProto(this, this.settings, settingsProto, disablePromises)
 
