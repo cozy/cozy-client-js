@@ -108,6 +108,37 @@ export function createDirectory (cozy, options) {
   })
 }
 
+function getDirectoryOrCreate (cozy, name, parentDirectory) {
+  if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory')
+
+  const path = `${parentDirectory ? parentDirectory.attributes.path : ''}/${name}`
+
+  return statByPath(cozy, path)
+    .catch(error => {
+      const parsedError = JSON.parse(error.message)
+      const errors = parsedError.errors
+
+      if (errors.length && errors[0].status === '404') {
+        return cozy.files.createDirectory({
+          name: name,
+          dirID: parentDirectory && parentDirectory._id
+        })
+      }
+
+      throw errors
+    })
+}
+
+export function createDirectoryRecursively (cozy, path) {
+  const parts = path.split('/')
+
+  return parts.reduce((parentDirectoryPromise, part) => {
+    return parentDirectoryPromise
+      ? parentDirectoryPromise.then(parentDirectory => getDirectoryOrCreate(cozy, part, parentDirectory))
+        : getDirectoryOrCreate(cozy, part)
+  }, null)
+}
+
 export function updateById (cozy, id, data, options) {
   return doUpload(cozy, data, 'PUT', `/files/${encodeURIComponent(id)}`, options)
 }
