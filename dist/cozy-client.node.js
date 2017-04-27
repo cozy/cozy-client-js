@@ -322,6 +322,7 @@
 	var filesProto = {
 	  create: files.create,
 	  createDirectory: files.createDirectory,
+	  createDirectoryByPath: files.createDirectoryByPath,
 	  updateById: files.updateById,
 	  updateAttributesById: files.updateAttributesById,
 	  updateAttributesByPath: files.updateAttributesByPath,
@@ -2656,6 +2657,7 @@
 	
 	exports.create = create;
 	exports.createDirectory = createDirectory;
+	exports.createDirectoryByPath = createDirectoryByPath;
 	exports.updateById = updateById;
 	exports.updateAttributesById = updateAttributesById;
 	exports.updateAttributesByPath = updateAttributesByPath;
@@ -2683,6 +2685,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var ROOT_ID = 'io.cozy.files.root-dir';
 	var contentTypeOctetStream = 'application/octet-stream';
 	
 	function doUpload(cozy, data, method, path, options) {
@@ -2802,6 +2805,39 @@
 	  });
 	}
 	
+	function getDirectoryOrCreate(cozy, name, parentDirectory) {
+	  if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory');
+	
+	  var path = (parentDirectory._id === ROOT_ID ? '' : parentDirectory.attributes.path) + '/' + name;
+	
+	  return cozy.files.statByPath(path || '/').catch(function (error) {
+	    var parsedError = JSON.parse(error.message);
+	    var errors = parsedError.errors;
+	    if (errors && errors.length && errors[0].status === '404') {
+	      return cozy.files.createDirectory({
+	        name: name,
+	        dirID: parentDirectory && parentDirectory._id
+	      });
+	    }
+	
+	    throw errors;
+	  });
+	}
+	
+	function createDirectoryByPath(cozy, path) {
+	  var parts = path.split('/').filter(function (part) {
+	    return part !== '';
+	  });
+	
+	  var rootDirectoryPromise = cozy.files.statById(ROOT_ID);
+	
+	  return parts.length ? parts.reduce(function (parentDirectoryPromise, part) {
+	    return parentDirectoryPromise.then(function (parentDirectory) {
+	      return getDirectoryOrCreate(cozy, part, parentDirectory);
+	    });
+	  }, rootDirectoryPromise) : rootDirectoryPromise;
+	}
+	
 	function updateById(cozy, id, data, options) {
 	  return doUpload(cozy, data, 'PUT', '/files/' + encodeURIComponent(id), options);
 	}
@@ -2830,11 +2866,19 @@
 	  return doUpdateAttributes(cozy, attrs, '/files/metadata?Path=' + encodeURIComponent(path), options);
 	}
 	
-	function trashById(cozy, id) {
+	function trashById(cozy, id, options) {
 	  if (typeof id !== 'string' || id === '') {
 	    throw new Error('missing id argument');
 	  }
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/' + encodeURIComponent(id));
+	
+	  var _ref5 = options || {},
+	      ifMatch = _ref5.ifMatch;
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/' + encodeURIComponent(id), undefined, {
+	    headers: {
+	      'If-Match': ifMatch || ''
+	    }
+	  });
 	}
 	
 	function statById(cozy, id) {
@@ -2842,10 +2886,10 @@
 	
 	  if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
 	    var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-	    return Promise.all([db.get(id), db.find({ selector: { 'dir_id': id } })]).then(function (_ref5) {
-	      var _ref6 = _slicedToArray(_ref5, 2),
-	          doc = _ref6[0],
-	          children = _ref6[1];
+	    return Promise.all([db.get(id), db.find({ selector: { 'dir_id': id } })]).then(function (_ref6) {
+	      var _ref7 = _slicedToArray(_ref6, 2),
+	          doc = _ref7[0],
+	          children = _ref7[1];
 	
 	      children = children.docs.map(function (doc) {
 	        return addIsDir(toJsonApi(cozy, doc));
