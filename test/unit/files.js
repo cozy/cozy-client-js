@@ -5,6 +5,8 @@ import should from 'should'
 import { Readable } from 'stream'
 import {Client} from '../../src'
 import mock from '../mock-api'
+import sinon from 'sinon'
+import * as files from '../../src/files'
 
 describe('Files', function () {
   const cozy = {}
@@ -206,6 +208,142 @@ describe('Files', function () {
       }
 
       err = null
+    })
+  })
+
+  describe('CreateDirectoryByPath', function () {
+    let cozyMock
+
+    beforeEach(() => {
+      cozyMock = {
+        files: {
+          statByPath: sinon.stub(),
+          statById: sinon.stub(),
+          createDirectory: sinon.stub()
+        }
+      }
+
+      cozyMock.files.statById
+        .withArgs('io.cozy.files.root-dir')
+        .resolves({
+          _id: 'io.cozy.files.root-dir',
+          _rev: '1-972356a16f6ebc1d218ae3ebfcec95c5',
+          attributes: {
+            type: 'directory',
+            name: '',
+            dir_id: '',
+            created_at: '0001-01-01T00:00:00Z',
+            updated_at: '0001-01-01T00:00:00Z',
+            tags: [],
+            path: '/'
+          }
+        })
+
+      cozyMock.files.statByPath
+        .withArgs('/foo')
+        .resolves({
+          _id: '8c217f9bf5e7118a34627f1ab800243b',
+          _rev: '1-db38424a16e76319ea667f64e12f6f39',
+          attributes: {
+            type: 'directory',
+            name: 'foo',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '0001-01-01T00:00:00Z',
+            updated_at: '0001-01-01T00:00:00Z',
+            tags: [],
+            path: '/foo'
+          }
+        })
+
+      cozyMock.files.statByPath
+        .rejects(new Error(JSON.stringify({
+          errors: [{
+            status: '404'
+          }]
+        })))
+
+      cozyMock.files.createDirectory
+        .withArgs(sinon.match({
+          name: 'bar',
+          dirID: '8c217f9bf5e7118a34627f1ab800243b'
+        }))
+        .resolves({
+          _id: '9c217f9bf5e7118a34627f1ab800243b',
+          _rev: '1-db38424a16e76319ea667f64e12f6f39',
+          attributes: {
+            type: 'directory',
+            name: 'bar',
+            dir_id: '8c217f9bf5e7118a34627f1ab800243b',
+            created_at: '0001-01-01T00:00:00Z',
+            updated_at: '0001-01-01T00:00:00Z',
+            tags: [],
+            path: '/foo/bar'
+          }
+        })
+
+      cozyMock.files.createDirectory
+        .withArgs(sinon.match({
+          name: 'baz',
+          dirID: '9c217f9bf5e7118a34627f1ab800243b'
+        }))
+        .resolves({
+          _id: '7c217f9bf5e7118a34627f1ab800243b',
+          _rev: '1-db38424a16e76319ea667f64e12f6f39',
+          attributes: {
+            type: 'directory',
+            name: 'baz',
+            dir_id: '8c217f9bf5e7118a34627f1ab800243b',
+            created_at: '0001-01-01T00:00:00Z',
+            updated_at: '0001-01-01T00:00:00Z',
+            tags: [],
+            path: '/foo/bar/baz'
+          }
+        })
+    })
+
+    it('should work with empty path', async function () {
+      return files.createDirectoryByPath(cozyMock, '/')
+        .then(folder => {
+          folder._id.should.be.equal('io.cozy.files.root-dir')
+          cozyMock.files.createDirectory.notCalled.should.be.true()
+        })
+    })
+
+    it('should work with not existing path', async function () {
+      return files.createDirectoryByPath(cozyMock, '/foo/bar')
+        .then(folder => {
+          folder._id.should.be.equal('9c217f9bf5e7118a34627f1ab800243b')
+          cozyMock.files.statByPath.callCount.should.equal(2)
+          cozyMock.files.createDirectory.calledOnce.should.be.true()
+          cozyMock.files.createDirectory.calledWith(sinon.match({
+            name: 'bar',
+            dirID: '8c217f9bf5e7118a34627f1ab800243b'
+          })).should.be.true()
+        })
+    })
+
+    it('should work with not existing long path', async function () {
+      return files.createDirectoryByPath(cozyMock, '/foo/bar/baz')
+        .then(folder => {
+          folder._id.should.be.equal('7c217f9bf5e7118a34627f1ab800243b')
+
+          cozyMock.files.statByPath.callCount.should.equal(3)
+          cozyMock.files.createDirectory.calledTwice.should.be.true()
+
+          cozyMock.files.createDirectory.calledWith(sinon.match({
+            name: 'bar',
+            dirID: '8c217f9bf5e7118a34627f1ab800243b'
+          })).should.be.true()
+
+          cozyMock.files.createDirectory.calledWith(sinon.match({
+            name: 'baz',
+            dirID: '9c217f9bf5e7118a34627f1ab800243b'
+          })).should.be.true()
+        })
+    })
+
+    afterEach(() => {
+      cozyMock = {}
     })
   })
 
