@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
-## [v0.2.1]
+## [v0.2.1] - 2017-04-27
 ### Changed
 - Check if there is a connection before starting replication
 - Return client registered on offline mode
@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Add cozy version parameter to remove '/status/' request on offline mode
+- Add `method cozy.client.files.createDirectoryByPath()``
 
 
 ## [v0.2.0]
