@@ -21,6 +21,9 @@ function handleResource (rawResource, resources, links) {
       return rels.data.map(ref => findByRef(resources, ref))
     }
   }
+  if (rawResource.relationships) {
+    resource.relationships = rawResource.relationships
+  }
 
   resources[indexKey(rawResource)] = resource
 

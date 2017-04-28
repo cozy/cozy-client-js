@@ -423,14 +423,18 @@ const updated = await cozy.client.files.updateAttributes("/foo/bar", { executabl
 ```
 
 
-### `cozy.client.files.statById(id, offline)`
+### `cozy.client.files.statById(id, offline, options)`
 
-`cozy.client.files.statById(id, offline)` is used to get the metadata of a file specified by its id.
+`cozy.client.files.statById(id, offline, options)` is used to get the metadata of a file specified by its id.
 
-It returns a promise for the information of the file or directory. In the case of a directory, it contains the list of files and sub-directories inside it.
+It returns a promise for the information of the file or directory. In the case of a directory, it contains the list of files and sub-directories inside it. This list is limited to 30 items by default, but the `options` argument allows you
+to fetch more items.
 
-- `id` is a string specifying the file’s or directory’s identifier;
-- `offline` is a boolean (default to `true`).
+- `id` is a string specifying the file’s or directory’s identifier
+- `offline` is a boolean (default to `true`)
+- `options` is an object with the following fields:
+  * `skip`: number of items to skip (optional)
+  * `limit`: maximum number of items to return (optional).
 
 By default, `statById` will fetch the metadata from the local database, if it is available. Set the second parameter to `false` to query the server.
 
