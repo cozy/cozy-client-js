@@ -249,6 +249,10 @@
 	
 	var data = _interopRequireWildcard(_data);
 	
+	var _fetch = __webpack_require__(94);
+	
+	var cozyFetch = _interopRequireWildcard(_fetch);
+	
 	var _mango = __webpack_require__(99);
 	
 	var mango = _interopRequireWildcard(_mango);
@@ -447,6 +451,13 @@
 	      if (options.offline) {
 	        this.offline.init(options.offline);
 	      }
+	
+	      // Exposing cozyFetchJSON to make some development easier. Should be temporary.
+	      this.fetchJSON = function _fetchJSON() {
+	        console.warn && console.warn('cozy.client.fetchJSON is a temporary method for development purpose, you should avoid using it.');
+	        var args = [this].concat(Array.prototype.slice.call(arguments));
+	        return cozyFetch.cozyFetchJSON.apply(this, args);
+	      };
 	    }
 	  }, {
 	    key: 'authorize',
@@ -2125,6 +2136,9 @@
 	      });
 	    }
 	  };
+	  if (rawResource.relationships) {
+	    resource.relationships = rawResource.relationships;
+	  }
 	
 	  resources[indexKey(rawResource)] = resource;
 	
@@ -2883,10 +2897,11 @@
 	
 	function statById(cozy, id) {
 	  var offline = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+	  var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 	
 	  if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
 	    var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-	    return Promise.all([db.get(id), db.find({ selector: { 'dir_id': id } })]).then(function (_ref6) {
+	    return Promise.all([db.get(id), db.find(Object.assign({ selector: { 'dir_id': id } }, options))]).then(function (_ref6) {
 	      var _ref7 = _slicedToArray(_ref6, 2),
 	          doc = _ref7[0],
 	          children = _ref7[1];
@@ -2897,7 +2912,8 @@
 	      return addIsDir(toJsonApi(cozy, doc, children));
 	    });
 	  }
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/files/' + encodeURIComponent(id)).then(addIsDir);
+	  var query = Object.keys(options).length === 0 ? '' : '?' + encodePageOptions(options);
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/files/' + encodeURIComponent(id) + query).then(addIsDir);
 	}
 	
 	function statByPath(cozy, path) {
@@ -2973,6 +2989,14 @@
 	  return obj;
 	}
 	
+	function encodePageOptions(options) {
+	  var opts = [];
+	  for (var name in options) {
+	    opts.push('page[' + encodeURIComponent(name) + ']=' + encodeURIComponent(options[name]));
+	  }
+	  return opts.join('&');
+	}
+	
 	function toJsonApi(cozy, doc) {
 	  var contents = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 	
@@ -2984,6 +3008,14 @@
 	    _rev: doc._rev,
 	    _type: _doctypes.DOCTYPE_FILES,
 	    attributes: clone,
+	    relationships: {
+	      contents: {
+	        data: contents,
+	        meta: {
+	          count: contents.length
+	        }
+	      }
+	    },
 	    relations: function relations(name) {
 	      if (name === 'contents') {
 	        return contents;
