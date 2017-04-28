@@ -1,5 +1,5 @@
 /* global Blob, File */
-import {cozyFetch, cozyFetchJSON} from './fetch'
+import { cozyFetch, cozyFetchJSON } from './fetch'
 import jsonapi from './jsonapi'
 import { DOCTYPE_FILES } from './doctypes'
 
@@ -182,18 +182,19 @@ export function trashById (cozy, id, options) {
   })
 }
 
-export function statById (cozy, id, offline = true) {
+export function statById (cozy, id, offline = true, options = {}) {
   if (offline && cozy.offline.hasDatabase(DOCTYPE_FILES)) {
     let db = cozy.offline.getDatabase(DOCTYPE_FILES)
     return Promise.all([
       db.get(id),
-      db.find({selector: {'dir_id': id}})
+      db.find(Object.assign({ selector: { 'dir_id': id } }, options))
     ]).then(([doc, children]) => {
       children = children.docs.map(doc => addIsDir(toJsonApi(cozy, doc)))
       return addIsDir(toJsonApi(cozy, doc, children))
     })
   }
-  return cozyFetchJSON(cozy, 'GET', `/files/${encodeURIComponent(id)}`)
+  const query = Object.keys(options).length === 0 ? '' : `?${encodePageOptions(options)}`
+  return cozyFetchJSON(cozy, 'GET', `/files/${encodeURIComponent(id)}${query}`)
     .then(addIsDir)
 }
 
@@ -271,6 +272,14 @@ function addIsDir (obj) {
   return obj
 }
 
+function encodePageOptions (options) {
+  let opts = []
+  for (const name in options) {
+    opts.push(`page[${encodeURIComponent(name)}]=${encodeURIComponent(options[name])}`)
+  }
+  return opts.join('&')
+}
+
 function toJsonApi (cozy, doc, contents = []) {
   let clone = JSON.parse(JSON.stringify(doc))
   delete clone._id
@@ -280,6 +289,14 @@ function toJsonApi (cozy, doc, contents = []) {
     _rev: doc._rev,
     _type: DOCTYPE_FILES,
     attributes: clone,
+    relationships: {
+      contents: {
+        data: contents,
+        meta: {
+          count: contents.length
+        }
+      }
+    },
     relations: (name) => {
       if (name === 'contents') {
         return contents

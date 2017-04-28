@@ -455,6 +455,7 @@ describe('Files', function () {
       res1.should.have.property('_id', 'id42')
       res1.should.have.property('isDir', true)
       res1.should.have.property('attributes')
+      res1.should.have.property('relationships')
       res1.attributes.should.have.property('name', 'bills')
     })
   })
