@@ -193,7 +193,7 @@ export function statById (cozy, id, offline = true, options = {}) {
       return addIsDir(toJsonApi(cozy, doc, children))
     })
   }
-  const query = !options ? '' : `?${encodePageOptions(options)}`
+  const query = Object.keys(options).length === 0 ? '' : `?${encodePageOptions(options)}`
   return cozyFetchJSON(cozy, 'GET', `/files/${encodeURIComponent(id)}${query}`)
     .then(addIsDir)
 }
