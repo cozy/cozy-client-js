@@ -13,10 +13,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
-- Temporary `cozy.client.fetchJSON()`, to facilitated development process.
+- none yet
 
 ### Removed
 - none yet
+
+
+## [v0.2.3] - 2017-04-28
+### Changed
+- Add skip and limit options to cozy.client.files.statByID
+
+### Added
+- Temporary `cozy.client.fetchJSON()`, to facilitated development process.
 
 
 ## [v0.2.2] - 2017-04-27
