@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
-- none yet
+- Temporary `cozy.client.fetchJSON()`, to facilitated development process.
 
 ### Removed
 - none yet

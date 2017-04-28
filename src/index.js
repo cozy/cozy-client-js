@@ -6,6 +6,7 @@ import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
 import * as auth from './auth_v3'
 import * as data from './data'
+import * as cozyFetch from './fetch'
 import * as mango from './mango'
 import * as files from './files'
 import * as intents from './intents'
@@ -177,6 +178,13 @@ class Client {
 
     if (options.offline) {
       this.offline.init(options.offline)
+    }
+
+    // Exposing cozyFetchJSON to make some development easier. Should be temporary.
+    this.fetchJSON = function _fetchJSON () {
+      console.warn && console.warn('cozy.client.fetchJSON is a temporary method for development purpose, you should avoid using it.')
+      const args = [this].concat(Array.prototype.slice.call(arguments))
+      return cozyFetch.cozyFetchJSON.apply(this, args)
     }
   }
 
