@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
-- none yet
+- `cancel()` method on service object returned by `cozy.client.intents.createService()``
 
 ### Removed
 - none yet
