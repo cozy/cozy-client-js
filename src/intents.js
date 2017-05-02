@@ -96,14 +96,18 @@ export function createService (cozy, id, window) {
       return listenClientData(intent, window)
         .then(data => {
           let terminated = false
+
+          const terminate = (doc) => {
+            if (terminated) throw new Error('Intent service has already been terminated')
+            terminated = true
+            window.parent.postMessage(doc, intent.attributes.client)
+          }
+
           return {
             getData: () => data,
             getIntent: () => intent,
-            terminate: (doc) => {
-              if (terminated) throw new Error('Intent service has already been terminated')
-              terminated = true
-              window.parent.postMessage(doc, intent.attributes.client)
-            }
+            terminate: terminate,
+            cancel: () => terminate(null)
           }
         })
     })
