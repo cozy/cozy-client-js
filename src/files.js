@@ -3,7 +3,10 @@ import { cozyFetch, cozyFetchJSON } from './fetch'
 import jsonapi from './jsonapi'
 import { DOCTYPE_FILES } from './doctypes'
 
-const ROOT_ID = 'io.cozy.files.root-dir'
+// global variables
+export const ROOT_DIR_ID = 'io.cozy.files.root-dir'
+export const TRASH_DIR_ID = 'io.cozy.files.trash-dir'
+
 const contentTypeOctetStream = 'application/octet-stream'
 
 function doUpload (cozy, data, method, path, options) {
@@ -112,7 +115,7 @@ export function createDirectory (cozy, options) {
 function getDirectoryOrCreate (cozy, name, parentDirectory) {
   if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory')
 
-  const path = `${parentDirectory._id === ROOT_ID ? '' : parentDirectory.attributes.path}/${name}`
+  const path = `${parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path}/${name}`
 
   return cozy.files.statByPath(path || '/')
     .catch(error => {
@@ -132,7 +135,7 @@ function getDirectoryOrCreate (cozy, name, parentDirectory) {
 export function createDirectoryByPath (cozy, path) {
   const parts = path.split('/').filter(part => part !== '')
 
-  const rootDirectoryPromise = cozy.files.statById(ROOT_ID)
+  const rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID)
 
   return parts.length
     ? parts.reduce((parentDirectoryPromise, part) => {
@@ -189,6 +192,9 @@ export function statById (cozy, id, offline = true, options = {}) {
       db.get(id),
       db.find(Object.assign({ selector: { 'dir_id': id } }, options))
     ]).then(([doc, children]) => {
+      if (id === ROOT_DIR_ID) {
+        children.docs = children.docs.filter(doc => doc._id !== TRASH_DIR_ID)
+      }
       children = children.docs.map(doc => addIsDir(toJsonApi(cozy, doc)))
       return addIsDir(toJsonApi(cozy, doc, children))
     })
