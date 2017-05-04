@@ -647,7 +647,11 @@ See cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/do
 
 ### `cozy.client.intents.createService()`
 
-`cozy.client.intents.createService(intentId, window)` has to be used in the intent service page. It initializes communication with the parent window (remember: the service is supposed to be in an iframe). It returns a *service* object, which provides the following methods :
+`cozy.client.intents.createService([intentId, window])` has to be used in the intent service page. It initializes communication with the parent window (remember: the service is supposed to be in an iframe).
+
+If `intentId` and `window` parameters are not provided the method will try to retrieve them automatically.
+
+It returns a *service* object, which provides the following methods :
  * `getData()`: returns the data passed to the service by the client.
  * `getIntent()`: returns the intent
  * `terminate(doc)`: ends the intent process by passing to the client the resulting document `doc`. An intent service may only be terminated once.
