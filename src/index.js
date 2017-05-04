@@ -39,6 +39,7 @@ const dataProto = {
   defineIndex: mango.defineIndex,
   query: mango.query,
   addReferencedFiles: relations.addReferencedFiles,
+  removeReferencedFiles: relations.removeReferencedFiles,
   listReferencedFiles: relations.listReferencedFiles,
   destroy: function (...args) {
     warn('destroy is deprecated, use cozy.data.delete instead.')

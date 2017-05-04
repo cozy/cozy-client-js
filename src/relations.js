@@ -1,14 +1,19 @@
 import {cozyFetchJSON} from './fetch'
 import { DOCTYPE_FILES } from './doctypes'
 
-export function addReferencedFiles (cozy, doc, ids) {
-  if (!doc) throw new Error('missing doc argument')
-  if (!Array.isArray(ids)) ids = [ids]
+function updateRelations (verb) {
+  return function (cozy, doc, ids) {
+    if (!doc) throw new Error('missing doc argument')
+    if (!Array.isArray(ids)) ids = [ids]
 
-  const refs = ids.map((id) => ({type: DOCTYPE_FILES, id: id}))
+    const refs = ids.map((id) => ({type: DOCTYPE_FILES, id}))
 
-  return cozyFetchJSON(cozy, 'POST', makeReferencesPath(doc), {data: refs})
+    return cozyFetchJSON(cozy, verb, makeReferencesPath(doc), {data: refs})
+  }
 }
+
+export const addReferencedFiles = updateRelations('POST')
+export const removeReferencedFiles = updateRelations('DELETE')
 
 export function listReferencedFiles (cozy, doc) {
   if (!doc) throw new Error('missing doc argument')
