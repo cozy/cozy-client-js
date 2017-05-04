@@ -10,13 +10,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Fixed
-- Remove trash folder on offline request
+- none yet
 
 ### Added
-- `cancel()` method on service object returned by `cozy.client.intents.createService()``
+- none yet
 
 ### Removed
 - none yet
+
+
+## [v0.2.4] - 2017-05-04
+### Fixed
+- Remove trash folder on offline request
+
+### Added
+- Add feature to remove referenced files
+- `cancel()` method on service object returned by `cozy.client.intents.createService()``
 
 
 ## [v0.2.3] - 2017-04-28
@@ -106,8 +115,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.2.1...HEAD
-[v0.2.2]: https://github.com/cozy/cozy-client-js/compare/v0.2.0...v0.2.2
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.2.4...HEAD
+[v0.2.4]: https://github.com/cozy/cozy-client-js/compare/v0.2.3...v0.2.4
+[v0.2.3]: https://github.com/cozy/cozy-client-js/compare/v0.2.2...v0.2.3
+[v0.2.2]: https://github.com/cozy/cozy-client-js/compare/v0.2.1...v0.2.2
 [v0.2.1]: https://github.com/cozy/cozy-client-js/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/cozy/cozy-client-js/compare/v0.1.9...v0.2.0
 [v0.1.9]: https://github.com/cozy/cozy-client-js/compare/v0.1.8...v0.1.9

@@ -305,6 +305,7 @@
 	  defineIndex: mango.defineIndex,
 	  query: mango.query,
 	  addReferencedFiles: relations.addReferencedFiles,
+	  removeReferencedFiles: relations.removeReferencedFiles,
 	  listReferencedFiles: relations.listReferencedFiles,
 	  destroy: function destroy() {
 	    (0, _utils.warn)('destroy is deprecated, use cozy.data.delete instead.');
@@ -2663,6 +2664,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.TRASH_DIR_ID = exports.ROOT_DIR_ID = undefined;
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -2699,7 +2701,10 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var ROOT_ID = 'io.cozy.files.root-dir';
+	// global variables
+	var ROOT_DIR_ID = exports.ROOT_DIR_ID = 'io.cozy.files.root-dir';
+	var TRASH_DIR_ID = exports.TRASH_DIR_ID = 'io.cozy.files.trash-dir';
+	
 	var contentTypeOctetStream = 'application/octet-stream';
 	
 	function doUpload(cozy, data, method, path, options) {
@@ -2822,7 +2827,7 @@
 	function getDirectoryOrCreate(cozy, name, parentDirectory) {
 	  if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory');
 	
-	  var path = (parentDirectory._id === ROOT_ID ? '' : parentDirectory.attributes.path) + '/' + name;
+	  var path = (parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path) + '/' + name;
 	
 	  return cozy.files.statByPath(path || '/').catch(function (error) {
 	    var parsedError = JSON.parse(error.message);
@@ -2843,7 +2848,7 @@
 	    return part !== '';
 	  });
 	
-	  var rootDirectoryPromise = cozy.files.statById(ROOT_ID);
+	  var rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID);
 	
 	  return parts.length ? parts.reduce(function (parentDirectoryPromise, part) {
 	    return parentDirectoryPromise.then(function (parentDirectory) {
@@ -2906,6 +2911,11 @@
 	          doc = _ref7[0],
 	          children = _ref7[1];
 	
+	      if (id === ROOT_DIR_ID) {
+	        children.docs = children.docs.filter(function (doc) {
+	          return doc._id !== TRASH_DIR_ID;
+	        });
+	      }
 	      children = children.docs.map(function (doc) {
 	        return addIsDir(toJsonApi(cozy, doc));
 	      });
@@ -3133,6 +3143,13 @@
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + id).then(function (intent) {
 	    return listenClientData(intent, window).then(function (data) {
 	      var terminated = false;
+	
+	      var terminate = function terminate(doc) {
+	        if (terminated) throw new Error('Intent service has already been terminated');
+	        terminated = true;
+	        window.parent.postMessage(doc, intent.attributes.client);
+	      };
+	
 	      return {
 	        getData: function getData() {
 	          return data;
@@ -3140,10 +3157,9 @@
 	        getIntent: function getIntent() {
 	          return intent;
 	        },
-	        terminate: function terminate(doc) {
-	          if (terminated) throw new Error('Intent service has already been terminated');
-	          terminated = true;
-	          window.parent.postMessage(doc, intent.attributes.client);
+	        terminate: terminate,
+	        cancel: function cancel() {
+	          return terminate(null);
 	        }
 	      };
 	    });
@@ -3526,23 +3542,28 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.addReferencedFiles = addReferencedFiles;
+	exports.removeReferencedFiles = exports.addReferencedFiles = undefined;
 	exports.listReferencedFiles = listReferencedFiles;
 	
 	var _fetch = __webpack_require__(94);
 	
 	var _doctypes = __webpack_require__(98);
 	
-	function addReferencedFiles(cozy, doc, ids) {
-	  if (!doc) throw new Error('missing doc argument');
-	  if (!Array.isArray(ids)) ids = [ids];
+	function updateRelations(verb) {
+	  return function (cozy, doc, ids) {
+	    if (!doc) throw new Error('missing doc argument');
+	    if (!Array.isArray(ids)) ids = [ids];
 	
-	  var refs = ids.map(function (id) {
-	    return { type: _doctypes.DOCTYPE_FILES, id: id };
-	  });
+	    var refs = ids.map(function (id) {
+	      return { type: _doctypes.DOCTYPE_FILES, id: id };
+	    });
 	
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', makeReferencesPath(doc), { data: refs });
+	    return (0, _fetch.cozyFetchJSON)(cozy, verb, makeReferencesPath(doc), { data: refs });
+	  };
 	}
+	
+	var addReferencedFiles = exports.addReferencedFiles = updateRelations('POST');
+	var removeReferencedFiles = exports.removeReferencedFiles = updateRelations('DELETE');
 	
 	function listReferencedFiles(cozy, doc) {
 	  if (!doc) throw new Error('missing doc argument');
