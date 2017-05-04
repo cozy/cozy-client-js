@@ -90,17 +90,23 @@ function listenClientData (intent, window) {
 }
 
 // returns a service to communicate with intent client
-export function createService (cozy, id, window) {
-  return cozyFetchJSON(cozy, 'GET', `/intents/${id}`)
+export function createService (cozy, intentId, serviceWindow) {
+  serviceWindow = serviceWindow || typeof window !== 'undefined' && window
+  if (!serviceWindow) throw new Error('Intent service should be used in browser')
+
+  intentId = intentId || serviceWindow.location.search.split('=')[1]
+  if (!intentId) throw new Error('Cannot retrieve intent from URL')
+
+  return cozyFetchJSON(cozy, 'GET', `/intents/${intentId}`)
     .then(intent => {
-      return listenClientData(intent, window)
+      return listenClientData(intent, serviceWindow)
         .then(data => {
           let terminated = false
 
           const terminate = (doc) => {
             if (terminated) throw new Error('Intent service has already been terminated')
             terminated = true
-            window.parent.postMessage(doc, intent.attributes.client)
+            serviceWindow.parent.postMessage(doc, intent.attributes.client)
           }
 
           return {
