@@ -258,14 +258,17 @@ describe('Intents', function () {
   })
 
   describe('CreateService', function () {
-    function mockWindow () {
-      return {
+    function mockWindow (props) {
+      return Object.assign({
         addEventListener: sinon.spy(),
         removeEventListener: sinon.spy(),
         parent: {
           postMessage: sinon.stub()
+        },
+        location: {
+          search: 'intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
         }
-      }
+      }, props)
     }
 
     beforeEach(mock.mockAPI('GetIntent'))
@@ -296,6 +299,26 @@ describe('Intents', function () {
         }).should.be.fulfilledWith(true)
     })
 
+    it('should throw error when not in a browser context', () => {
+      should.throws(
+        () => cozy.client.intents.createService(),
+        /Intent service should be used in browser/
+      )
+    })
+
+    it('should throw error when no intent is passed in URL', () => {
+      global.window = mockWindow({
+        location: {search: ''}
+      })
+
+      should.throws(
+        () => cozy.client.intents.createService(),
+        /Cannot retrieve intent from URL/
+      )
+
+      delete global.window
+    })
+
     describe('Service', function () {
       describe('Terminate', function () {
         it('should send result document to Client', async function () {
@@ -321,6 +344,33 @@ describe('Intents', function () {
 
           windowMock.parent.postMessage
             .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+
+        it('should send result document to Client also with no params', async function () {
+          global.window = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          window.parent.postMessage.callsFake(() => {
+            const messageEventListener = window.addEventListener.firstCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService()
+
+          service.terminate(result)
+
+          window.parent.postMessage
+            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+
+          delete global.window
         })
 
         it('should not be called twice', async function () {
@@ -370,6 +420,29 @@ describe('Intents', function () {
 
           windowMock.parent.postMessage
             .withArgs(null, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+
+        it('should send null to Client also with no parameters', async function () {
+          global.window = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          window.parent.postMessage.callsFake(() => {
+            const messageEventListener = window.addEventListener.firstCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, window)
+
+          service.cancel()
+
+          window.parent.postMessage
+            .withArgs(null, expectedIntent.attributes.client).calledOnce.should.be.true()
+
+          delete global.window
         })
 
         it('should not be called twice', async function () {
