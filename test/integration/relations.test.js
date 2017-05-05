@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import 'isomorphic-fetch'
 import {Client} from '../../src'
 import {randomGenerator} from '../helpers'
@@ -23,7 +22,7 @@ describe('references', async function () {
   let specialDoc
   let ids = []
 
-  before(async function () {
+  beforeAll(async function () {
     if (COZY_STACK_VERSION === '2') {
       this.skip()
     }
@@ -48,12 +47,12 @@ describe('references', async function () {
     const anotherDoc = await createRandomFile(cozy, random)
     await cozy.client.data.addReferencedFiles(specialDoc, anotherDoc._id)
     const ids2 = await cozy.client.data.listReferencedFiles(specialDoc)
-    ids2.should.eql(ids.concat(anotherDoc._id))
+    expect(ids2).toEqual(ids.concat(anotherDoc._id))
   })
 
   it('remove references', async function () {
     await cozy.client.data.removeReferencedFiles(specialDoc, ids[0])
     const ids2 = await cozy.client.data.listReferencedFiles(specialDoc)
-    ids2.should.not.containEql(ids[0])
+    expect(ids2).not.toContain(ids[0])
   })
 })

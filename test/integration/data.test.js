@@ -1,8 +1,7 @@
 /* eslint-env mocha */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
-import 'isomorphic-fetch'
+import 'isomorphic-fetch';
 import {Client} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
 
@@ -16,7 +15,7 @@ describe('data API', function () {
   const cozy = {}
 
   if (COZY_STACK_VERSION === '2') {
-    before(mockTokenRetrieve)
+    beforeAll(mockTokenRetrieve)
   }
 
   beforeEach(() => {
@@ -32,9 +31,9 @@ describe('data API', function () {
         'test': 'value'
       }
       const created = await cozy.client.data.create('io.cozy.testobject', testDoc)
-      created.should.have.property('_id')
-      created.should.have.property('_rev')
-      created.should.have.property('test', 'value')
+      expect(created).toHaveProperty('_id')
+      expect(created).toHaveProperty('_rev')
+      expect(created).toHaveProperty('test', 'value')
       docID = created._id
       docRev = created._rev
     })
@@ -43,9 +42,9 @@ describe('data API', function () {
   describe('Fetch document', function () {
     it('Works', async function () {
       let fetched = await cozy.client.data.find('io.cozy.testobject', docID)
-      fetched.should.have.property('_id', docID)
-      fetched.should.have.property('_rev', docRev)
-      fetched.should.have.property('test', 'value')
+      expect(fetched).toHaveProperty('_id', docID)
+      expect(fetched).toHaveProperty('_rev', docRev)
+      expect(fetched).toHaveProperty('test', 'value')
     })
   })
 
@@ -55,9 +54,9 @@ describe('data API', function () {
         'test': 'value2'
       }
       const updated = await cozy.client.data.update('io.cozy.testobject', { _id: docID, _rev: docRev }, changes)
-      updated.should.have.property('_id', docID)
-      updated.should.have.property('_rev')
-      updated.should.have.property('test', 'value2')
+      expect(updated).toHaveProperty('_id', docID)
+      expect(updated).toHaveProperty('_rev')
+      expect(updated).toHaveProperty('test', 'value2')
       docID = updated._id
       docRev = updated._rev
     })
@@ -66,8 +65,8 @@ describe('data API', function () {
   describe('Delete document', function () {
     it('Works', async function () {
       const deleted = await cozy.client.data.delete('io.cozy.testobject', { _id: docID, _rev: docRev })
-      deleted.should.have.property('id', docID)
-      deleted.should.have.property('rev')
+      expect(deleted).toHaveProperty('id', docID)
+      expect(deleted).toHaveProperty('rev')
     })
   })
 })

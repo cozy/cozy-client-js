@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import 'isomorphic-fetch'
 import {Client} from '../../src'
 
@@ -24,7 +23,7 @@ describe('settings api', async function () {
 
   it('gets the disk usage', async function () {
     const usage = await cozy.client.settings.diskUsage()
-    usage.should.have.property('attributes')
-    usage.attributes.used.should.be.type('string')
+    expect(usage).toHaveProperty('attributes')
+    expect(typeof usage.attributes.used).toBe('string')
   })
 })

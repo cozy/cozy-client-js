@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import 'isomorphic-fetch'
 import {Client, MemoryStorage} from '../../src'
 
@@ -31,23 +30,23 @@ describe('oauth API', async function () {
       }
     })
     oauthClient = await client.auth.registerClient()
-    oauthClient.clientID.should.not.be.empty()
-    oauthClient.clientSecret.should.not.be.empty()
+    expect(oauthClient.clientID).not.toHaveLength(0)
+    expect(oauthClient.clientSecret).not.toHaveLength(0)
   })
 
   it('Update the client', async function () {
     oauthClient.clientKind = 'test'
     oauthClient = await client.auth.updateClient(oauthClient)
-    oauthClient.clientID.should.not.be.empty()
-    oauthClient.clientSecret.should.not.be.empty()
-    oauthClient.clientKind.should.equal('test')
+    expect(oauthClient.clientID).not.toHaveLength(0)
+    expect(oauthClient.clientSecret).not.toHaveLength(0)
+    expect(oauthClient.clientKind).toBe('test')
   })
 
   it('Get the client', async function () {
     const infos = await client.auth.getClient(oauthClient)
-    infos.clientID.should.not.be.empty()
-    infos.clientSecret.should.not.be.empty()
-    infos.clientKind.should.equal('test')
+    expect(infos.clientID).not.toHaveLength(0)
+    expect(infos.clientSecret).not.toHaveLength(0)
+    expect(infos.clientKind).toBe('test')
   })
 
   it('Unregister the client', async function () {
@@ -58,6 +57,6 @@ describe('oauth API', async function () {
     } catch (e) {
       err = e
     }
-    err.should.not.be.null()
+    expect(err).not.toBeNull()
   })
 })

@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`offline only v3 can replicate created object in local database 1`] = `"received is not a function"`;
+
+exports[`offline only v3 can't replicate with live option. 1`] = `"received is not a function"`;
