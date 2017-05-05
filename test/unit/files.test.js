@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import { Readable } from 'stream'
 import {Client} from '../../src'
 import mock from '../mock-api'
@@ -36,14 +35,14 @@ describe('Files', function () {
       const res4 = await cozy.client.files.create(new ArrayBuffer(10), { name: 'foo', dirID: '12345' })
 
       const calls = mock.calls('UploadFile')
-      calls.should.have.length(4)
-      calls[0][1].headers['Content-Type'].should.equal('text/html')
-      mock.lastUrl('UploadFile').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=file&Executable=false')
+      expect(calls).toHaveLength(4)
+      expect(calls[0][1].headers['Content-Type']).toBe('text/html')
+      expect(mock.lastUrl('UploadFile')).toBe('http://my.cozy.io/files/12345?Name=foo&Type=file&Executable=false')
 
-      res1.should.have.property('attributes')
-      res2.should.have.property('attributes')
-      res3.should.have.property('attributes')
-      res4.should.have.property('attributes')
+      expect(res1).toHaveProperty('attributes')
+      expect(res2).toHaveProperty('attributes')
+      expect(res3).toHaveProperty('attributes')
+      expect(res4).toHaveProperty('attributes')
     })
 
     it('should pass the options as headers or as query parameters', async function () {
@@ -67,15 +66,15 @@ describe('Files', function () {
       })
 
       const createCalls = mock.calls('UploadFile')
-      should(createCalls).have.length(1)
-      should(createCalls[0][0]).match(/[?&]Executable=true[&]?$/)
-      should(createCalls[0][1].headers['Content-MD5']).equal(fooChecksum)
-      should(createCalls[0][1].headers['Date']).equal(creationDate.toGMTString())
+      expect(createCalls).toHaveLength(1)
+      expect(createCalls[0][0]).toMatch(/[?&]Executable=true[&]?$/)
+      expect(createCalls[0][1].headers['Content-MD5']).toBe(fooChecksum)
+      expect(createCalls[0][1].headers['Date']).toBe(creationDate.toGMTString())
       const updateCalls = mock.calls('UpdateFile')
-      should(updateCalls).have.length(1)
-      should(updateCalls[0][1].headers['Content-MD5']).equal(barChecksum)
-      should(updateCalls[0][1].headers['Date']).equal(modificationDate)
-      should(updateCalls[0][1].headers['If-Match']).equal(previousRev)
+      expect(updateCalls).toHaveLength(1)
+      expect(updateCalls[0][1].headers['Content-MD5']).toBe(barChecksum)
+      expect(updateCalls[0][1].headers['Date']).toBe(modificationDate)
+      expect(updateCalls[0][1].headers['If-Match']).toBe(previousRev)
     })
 
     it('should fail for unsupported data types', async function () {
@@ -86,7 +85,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('invalid data type'))
+        expect(err).toEqual(new Error('invalid data type'))
       }
 
       err = null
@@ -96,7 +95,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('invalid data type'))
+        expect(err).toEqual(new Error('invalid data type'))
       }
 
       err = null
@@ -106,7 +105,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing data argument'))
+        expect(err).toEqual(new Error('missing data argument'))
       }
 
       err = null
@@ -116,7 +115,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing name argument'))
+        expect(err).toEqual(new Error('missing name argument'))
       }
 
       err = null
@@ -126,7 +125,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('invalid data type'))
+        expect(err).toEqual(new Error('invalid data type'))
       }
 
       err = null
@@ -136,7 +135,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('invalid data type'))
+        expect(err).toEqual(new Error('invalid data type'))
       }
 
       err = null
@@ -146,7 +145,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing data argument'))
+        expect(err).toEqual(new Error('missing data argument'))
       }
 
       err = null
@@ -154,7 +153,7 @@ describe('Files', function () {
   })
 
   describe('Create directory', function () {
-    before(mock.mockAPI('CreateDirectory'))
+    beforeAll(mock.mockAPI('CreateDirectory'))
 
     it('should work', async function () {
       const dateString = 'Wed, 01 Feb 2017 10:24:42 GMT'
@@ -165,15 +164,15 @@ describe('Files', function () {
       const res4 = await cozy.client.files.createDirectory({ name: 'foo', dirID: '12345' })
 
       const calls = mock.calls('CreateDirectory')
-      calls.should.have.length(4)
-      calls[1][1].headers['Date'].should.equal(dateString)
-      calls[2][1].headers['Date'].should.equal(dateString)
-      mock.lastUrl('CreateDirectory').should.equal('http://my.cozy.io/files/12345?Name=foo&Type=directory')
+      expect(calls).toHaveLength(4)
+      expect(calls[1][1].headers['Date']).toBe(dateString)
+      expect(calls[2][1].headers['Date']).toBe(dateString)
+      expect(mock.lastUrl('CreateDirectory')).toBe('http://my.cozy.io/files/12345?Name=foo&Type=directory')
 
-      res1.should.have.property('attributes')
-      res2.should.have.property('attributes')
-      res3.should.have.property('attributes')
-      res4.should.have.property('attributes')
+      expect(res1).toHaveProperty('attributes')
+      expect(res2).toHaveProperty('attributes')
+      expect(res3).toHaveProperty('attributes')
+      expect(res4).toHaveProperty('attributes')
     })
 
     it('should fail with wrong arguments', async function () {
@@ -184,7 +183,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing name argument'))
+        expect(err).toEqual(new Error('missing name argument'))
       }
 
       err = null
@@ -194,7 +193,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing name argument'))
+        expect(err).toEqual(new Error('missing name argument'))
       }
 
       err = null
@@ -204,7 +203,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing name argument'))
+        expect(err).toEqual(new Error('missing name argument'))
       }
 
       err = null
@@ -304,42 +303,42 @@ describe('Files', function () {
     it('should work with empty path', async function () {
       return files.createDirectoryByPath(cozyMock, '/')
         .then(folder => {
-          folder._id.should.be.equal('io.cozy.files.root-dir')
-          cozyMock.files.createDirectory.notCalled.should.be.true()
-        })
+          expect(folder._id).toBe('io.cozy.files.root-dir')
+          expect(cozyMock.files.createDirectory.notCalled).toBe(true)
+        });
     })
 
     it('should work with not existing path', async function () {
       return files.createDirectoryByPath(cozyMock, '/foo/bar')
         .then(folder => {
-          folder._id.should.be.equal('9c217f9bf5e7118a34627f1ab800243b')
-          cozyMock.files.statByPath.callCount.should.equal(2)
-          cozyMock.files.createDirectory.calledOnce.should.be.true()
-          cozyMock.files.createDirectory.calledWith(sinon.match({
+          expect(folder._id).toBe('9c217f9bf5e7118a34627f1ab800243b')
+          expect(cozyMock.files.statByPath.callCount).toBe(2)
+          expect(cozyMock.files.createDirectory.calledOnce).toBe(true)
+          expect(cozyMock.files.createDirectory.calledWith(sinon.match({
             name: 'bar',
             dirID: '8c217f9bf5e7118a34627f1ab800243b'
-          })).should.be.true()
-        })
+          }))).toBe(true)
+        });
     })
 
     it('should work with not existing long path', async function () {
       return files.createDirectoryByPath(cozyMock, '/foo/bar/baz')
         .then(folder => {
-          folder._id.should.be.equal('7c217f9bf5e7118a34627f1ab800243b')
+          expect(folder._id).toBe('7c217f9bf5e7118a34627f1ab800243b')
 
-          cozyMock.files.statByPath.callCount.should.equal(3)
-          cozyMock.files.createDirectory.calledTwice.should.be.true()
+          expect(cozyMock.files.statByPath.callCount).toBe(3)
+          expect(cozyMock.files.createDirectory.calledTwice).toBe(true)
 
-          cozyMock.files.createDirectory.calledWith(sinon.match({
+          expect(cozyMock.files.createDirectory.calledWith(sinon.match({
             name: 'bar',
             dirID: '8c217f9bf5e7118a34627f1ab800243b'
-          })).should.be.true()
+          }))).toBe(true)
 
-          cozyMock.files.createDirectory.calledWith(sinon.match({
+          expect(cozyMock.files.createDirectory.calledWith(sinon.match({
             name: 'baz',
             dirID: '9c217f9bf5e7118a34627f1ab800243b'
-          })).should.be.true()
-        })
+          }))).toBe(true)
+        });
     })
 
     afterEach(() => {
@@ -348,15 +347,15 @@ describe('Files', function () {
   })
 
   describe('Trash', function () {
-    before(mock.mockAPI('Trash'))
+    beforeAll(mock.mockAPI('Trash'))
 
     it('should work', async function () {
       const res1 = await cozy.client.files.trashById('1234')
 
-      mock.calls('Trash').should.have.length(1)
-      mock.lastUrl('Trash').should.equal('http://my.cozy.io/files/1234')
+      expect(mock.calls('Trash')).toHaveLength(1)
+      expect(mock.lastUrl('Trash')).toBe('http://my.cozy.io/files/1234')
 
-      res1.should.have.property('attributes')
+      expect(res1).toHaveProperty('attributes')
     })
 
     it('should fail with wrong arguments', async function () {
@@ -367,7 +366,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing id argument'))
+        expect(err).toEqual(new Error('missing id argument'))
       }
 
       err = null
@@ -377,7 +376,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing id argument'))
+        expect(err).toEqual(new Error('missing id argument'))
       }
 
       err = null
@@ -387,7 +386,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing id argument'))
+        expect(err).toEqual(new Error('missing id argument'))
       }
 
       err = null
@@ -395,27 +394,27 @@ describe('Files', function () {
   })
 
   describe('Update attributes', function () {
-    before(mock.mockAPI('UpdateAttributes'))
+    beforeAll(mock.mockAPI('UpdateAttributes'))
 
     it('should work with good arguments', async function () {
       const attrs = { tags: ['foo', 'bar'] }
       const previousRev = '1-0e6d5b72'
 
       const res1 = await cozy.client.files.updateAttributesById('12345', attrs, {ifMatch: previousRev})
-      mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/12345')
-      JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
+      expect(mock.lastUrl('UpdateAttributes')).toBe('http://my.cozy.io/files/12345')
+      expect(JSON.parse(mock.lastOptions('UpdateAttributes').body)).toEqual({data: { attributes: attrs }})
 
       const res2 = await cozy.client.files.updateAttributesByPath('/foo/bar', attrs, {ifMatch: previousRev})
-      mock.lastUrl('UpdateAttributes').should.equal('http://my.cozy.io/files/metadata?Path=%2Ffoo%2Fbar')
-      JSON.parse(mock.lastOptions('UpdateAttributes').body).should.eql({data: { attributes: attrs }})
+      expect(mock.lastUrl('UpdateAttributes')).toBe('http://my.cozy.io/files/metadata?Path=%2Ffoo%2Fbar')
+      expect(JSON.parse(mock.lastOptions('UpdateAttributes').body)).toEqual({data: { attributes: attrs }})
 
       const calls = mock.calls('UpdateAttributes')
-      should(calls).have.length(2)
-      should(calls[0][1].headers['If-Match']).equal(previousRev)
-      should(calls[1][1].headers['If-Match']).equal(previousRev)
+      expect(calls).toHaveLength(2)
+      expect(calls[0][1].headers['If-Match']).toBe(previousRev)
+      expect(calls[1][1].headers['If-Match']).toBe(previousRev)
 
-      res1.should.have.property('attributes')
-      res2.should.have.property('attributes')
+      expect(res1).toHaveProperty('attributes')
+      expect(res2).toHaveProperty('attributes')
     })
 
     it('should fail with bad arguments', async function () {
@@ -426,7 +425,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing attrs argument'))
+        expect(err).toEqual(new Error('missing attrs argument'))
       }
 
       err = null
@@ -436,7 +435,7 @@ describe('Files', function () {
       } catch (e) {
         err = e
       } finally {
-        err.should.eql(new Error('missing attrs argument'))
+        expect(err).toEqual(new Error('missing attrs argument'))
       }
 
       err = null
@@ -444,94 +443,94 @@ describe('Files', function () {
   })
 
   describe('Files stat by ID', function () {
-    before(mock.mockAPI('StatByID'))
+    beforeAll(mock.mockAPI('StatByID'))
 
     it('should work', async function () {
       const res1 = await cozy.client.files.statById('id42')
 
-      mock.calls('StatByID').should.have.length(1)
-      mock.lastUrl('StatByID').should.equal('http://my.cozy.io/files/id42')
+      expect(mock.calls('StatByID')).toHaveLength(1)
+      expect(mock.lastUrl('StatByID')).toBe('http://my.cozy.io/files/id42')
 
-      res1.should.have.property('_id', 'id42')
-      res1.should.have.property('isDir', true)
-      res1.should.have.property('attributes')
-      res1.should.have.property('relationships')
-      res1.attributes.should.have.property('name', 'bills')
+      expect(res1).toHaveProperty('_id', 'id42')
+      expect(res1).toHaveProperty('isDir', true)
+      expect(res1).toHaveProperty('attributes')
+      expect(res1).toHaveProperty('relationships')
+      expect(res1.attributes).toHaveProperty('name', 'bills')
     })
   })
 
   describe('Files stat by Path', function () {
-    before(mock.mockAPI('StatByPath'))
+    beforeAll(mock.mockAPI('StatByPath'))
 
     it('should work', async function () {
       const res1 = await cozy.client.files.statByPath('/bills/hôpital.pdf')
 
-      mock.calls('StatByPath').should.have.length(1)
-      mock.lastUrl('StatByPath').should.equal('http://my.cozy.io/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+      expect(mock.calls('StatByPath')).toHaveLength(1)
+      expect(mock.lastUrl('StatByPath')).toBe('http://my.cozy.io/files/metadata?Path=%2Fbills%2Fh%C3%B4pital.pdf')
 
-      res1.should.have.property('_id', 'cb1c159a8db1ee7aeb9441c3ff001753')
-      res1.should.have.property('isDir', false)
-      res1.should.have.property('attributes')
-      res1.attributes.should.have.property('name', 'hospi.pdf')
+      expect(res1).toHaveProperty('_id', 'cb1c159a8db1ee7aeb9441c3ff001753')
+      expect(res1).toHaveProperty('isDir', false)
+      expect(res1).toHaveProperty('attributes')
+      expect(res1.attributes).toHaveProperty('name', 'hospi.pdf')
     })
   })
 
   describe('Download file', function () {
     describe('by ID', function () {
-      before(mock.mockAPI('DownloadByID'))
+      beforeAll(mock.mockAPI('DownloadByID'))
 
       it('should work', async function () {
         const res = await cozy.client.files.downloadById('id42')
 
-        mock.calls('DownloadByID').should.have.length(1)
-        mock.lastUrl('DownloadByID').should.equal('http://my.cozy.io/files/download/id42')
-        res.body.should.be.instanceOf(Readable)
+        expect(mock.calls('DownloadByID')).toHaveLength(1)
+        expect(mock.lastUrl('DownloadByID')).toBe('http://my.cozy.io/files/download/id42')
+        expect(res.body).toBeInstanceOf(Readable)
 
         const txt = await res.text()
-        txt.should.equal('foo')
+        expect(txt).toBe('foo')
       })
     })
 
     describe('by Path', function () {
-      before(mock.mockAPI('DownloadByPath'))
+      beforeAll(mock.mockAPI('DownloadByPath'))
 
       it('should work', async function () {
         const res = await cozy.client.files.downloadByPath('/bills/hôpital.pdf')
 
-        mock.calls('DownloadByPath').should.have.length(1)
-        mock.lastUrl('DownloadByPath').should.equal('http://my.cozy.io/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')
-        res.body.should.be.instanceOf(Readable)
+        expect(mock.calls('DownloadByPath')).toHaveLength(1)
+        expect(mock.lastUrl('DownloadByPath')).toBe('http://my.cozy.io/files/download?Path=%2Fbills%2Fh%C3%B4pital.pdf')
+        expect(res.body).toBeInstanceOf(Readable)
 
         const txt = await res.text()
-        txt.should.equal('foo')
+        expect(txt).toBe('foo')
       })
     })
   })
 
   describe('Get file download link', function () {
     describe('by ID', function () {
-      before(mock.mockAPI('GetDownloadLinkById'))
+      beforeAll(mock.mockAPI('GetDownloadLinkById'))
 
       it('should work', async function () {
         const res = await cozy.client.files.getDownloadLinkById('id42')
 
-        mock.calls('GetDownloadLinkById').should.have.length(1)
-        mock.lastUrl('GetDownloadLinkById').should.equal('http://my.cozy.io/files/downloads?Id=id42')
+        expect(mock.calls('GetDownloadLinkById')).toHaveLength(1)
+        expect(mock.lastUrl('GetDownloadLinkById')).toBe('http://my.cozy.io/files/downloads?Id=id42')
 
-        res.should.equal('http://my.cozy.io/files/downloads/secret42/foo')
+        expect(res).toBe('http://my.cozy.io/files/downloads/secret42/foo')
       })
     })
 
     describe('by Path', function () {
-      before(mock.mockAPI('GetDownloadLinkByPath'))
+      beforeAll(mock.mockAPI('GetDownloadLinkByPath'))
 
       it('should work', async function () {
         const res = await cozy.client.files.getDownloadLinkByPath('/bills/foo.pdf')
 
-        mock.calls('GetDownloadLinkByPath').should.have.length(1)
-        mock.lastUrl('GetDownloadLinkByPath').should.equal('http://my.cozy.io/files/downloads?Path=%2Fbills%2Ffoo.pdf')
+        expect(mock.calls('GetDownloadLinkByPath')).toHaveLength(1)
+        expect(mock.lastUrl('GetDownloadLinkByPath')).toBe('http://my.cozy.io/files/downloads?Path=%2Fbills%2Ffoo.pdf')
 
-        res.should.equal('http://my.cozy.io/files/downloads/secret42/foo')
+        expect(res).toBe('http://my.cozy.io/files/downloads/secret42/foo')
       })
     })
   })
@@ -542,7 +541,7 @@ describe('Files', function () {
       const call = () => {
         cozy.client.files.getFilePath(file)
       }
-      should.throws(call, 'Folder should be valid with an attributes.path property')
+      expect(call).toThrowError('Folder should be valid with an attributes.path property')
     })
 
     it('should throw error on invalid folder', function () {
@@ -551,7 +550,7 @@ describe('Files', function () {
       const call = () => {
         cozy.client.files.getFilePath(file, folder)
       }
-      should.throws(call, 'Folder should be valid with an attributes.path property')
+      expect(call).toThrowError('Folder should be valid with an attributes.path property')
     })
 
     it('should return file path in root', function () {
@@ -562,7 +561,7 @@ describe('Files', function () {
         }
       }
       const res = cozy.client.files.getFilePath(file, folder)
-      res.should.be.equal('/random.ext')
+      expect(res).toBe('/random.ext')
     })
 
     it('should return file path in root with empty path', function () {
@@ -573,7 +572,7 @@ describe('Files', function () {
         }
       }
       const res = cozy.client.files.getFilePath(file, folder)
-      res.should.be.equal('/random.ext')
+      expect(res).toBe('/random.ext')
     })
 
     it('should return file path in folder ending with `/`', function () {
@@ -584,7 +583,7 @@ describe('Files', function () {
         }
       }
       const res = cozy.client.files.getFilePath(file, folder)
-      res.should.be.equal('/test/random.ext')
+      expect(res).toBe('/test/random.ext')
     })
 
     it('should return file path in folder ending with no `/``', function () {
@@ -595,7 +594,7 @@ describe('Files', function () {
         }
       }
       const res = cozy.client.files.getFilePath(file, folder)
-      res.should.be.equal('/test/random.ext')
+      expect(res).toBe('/test/random.ext')
     })
   })
 })

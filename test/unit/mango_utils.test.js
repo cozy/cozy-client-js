@@ -1,18 +1,17 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
-import {parseSelector, makeMapReduceQuery} from '../../src/mango'
+import { parseSelector, makeMapReduceQuery } from '../../src/mango'
 
 describe('selector parsing', function () {
   it('simple selector', function () {
     let parsed = parseSelector({'test': 'value'})
-    parsed.should.deepEqual([[['test'], '$eq', 'value']])
+    expect(parsed).toEqual([[['test'], '$eq', 'value']])
   })
 
   it('two fields selector', function () {
     let parsed = parseSelector({'test': 'value', 'test2': 'value2'})
-    parsed.should.deepEqual([
+    expect(parsed).toEqual([
       [['test'], '$eq', 'value'],
       [['test2'], '$eq', 'value2']
     ])
@@ -20,7 +19,7 @@ describe('selector parsing', function () {
 
   it('two fields selector', function () {
     let parsed = parseSelector({'test': {'testdeep': 'value'}, 'test2': 'value2'})
-    parsed.should.deepEqual([
+    expect(parsed).toEqual([
       [['test', 'testdeep'], '$eq', 'value'],
       [['test2'], '$eq', 'value2']
     ])
@@ -28,14 +27,14 @@ describe('selector parsing', function () {
 
   it('operator selector', function () {
     let parsed = parseSelector({'test': {'$gt': 3}})
-    parsed.should.deepEqual([
+    expect(parsed).toEqual([
       [['test'], '$gt', 3]
     ])
   })
 
   it('double operator selector', function () {
     let parsed = parseSelector({'test': {'$gt': 2, '$lt': 3}})
-    parsed.should.deepEqual([
+    expect(parsed).toEqual([
       [['test'], '$gt', 2],
       [['test'], '$lt', 3]
     ])
@@ -47,7 +46,7 @@ describe('selector to MR query', function () {
     let indexDef = {type: 'mapreduce', fields: ['dirID', 'date'], name: 'testindex'}
     let mrq = makeMapReduceQuery(indexDef, {selector: {'dirID': '42'}})
 
-    mrq.should.deepEqual({
+    expect(mrq).toEqual({
       startkey: ['42'],
       reduce: false,
       endkey: ['42', {'\uFFFF': '\uFFFF'}]})
@@ -62,7 +61,7 @@ describe('selector to MR query', function () {
       }
     })
 
-    mrq.should.deepEqual({
+    expect(mrq).toEqual({
       startkey: ['42', '2101'],
       reduce: false,
       endkey: ['42', '2101']})
@@ -77,7 +76,7 @@ describe('selector to MR query', function () {
       }
     })
 
-    mrq.should.deepEqual({
+    expect(mrq).toEqual({
       startkey: ['42', '2101'],
       reduce: false,
       endkey: ['42', {'\uFFFF': '\uFFFF'}]})
@@ -92,7 +91,7 @@ describe('selector to MR query', function () {
       }
     })
 
-    mrq.should.deepEqual({
+    expect(mrq).toEqual({
       startkey: ['42', '2101'],
       reduce: false,
       endkey: ['42', '2201'],

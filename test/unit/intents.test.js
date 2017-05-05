@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import sinon from 'sinon'
 import {Client} from '../../src'
 import mock from '../mock-api'
@@ -76,30 +75,21 @@ describe('Intents', function () {
   describe('Create', function () {
     beforeEach(mock.mockAPI('CreateIntent'))
 
-    it('should return created intent', async function () {
+    it('should return created intent', function () {
       return cozy.client.intents.create('PICK', 'io.cozy.whatever.i.am.a.mock')
         .then(intent => {
           // added by cozy-client-js
           expectedIntent.relations = intent.relations
-          should.deepEqual(intent, expectedIntent)
+          expect(intent).toEqual(expectedIntent)
         })
     })
 
     it('should throw error for malformed intents', function () {
-      should.throws(
-        () => cozy.client.intents.create(),
-        /Misformed intent, "action" property must be provided/
-      )
+      expect(() => cozy.client.intents.create()).toThrowError(/Misformed intent, "action" property must be provided/)
 
-      should.throws(
-        () => cozy.client.intents.create(null, 'io.cozy.contacts'),
-        /Misformed intent, "action" property must be provided/
-      )
+      expect(() => cozy.client.intents.create(null, 'io.cozy.contacts')).toThrowError(/Misformed intent, "action" property must be provided/)
 
-      should.throws(
-        () => cozy.client.intents.create('PICK'),
-        /Misformed intent, "type" property must be provided/
-      )
+      expect(() => cozy.client.intents.create('PICK')).toThrowError(/Misformed intent, "type" property must be provided/)
     })
   })
 
@@ -107,19 +97,17 @@ describe('Intents', function () {
     beforeEach(mock.mockAPI('CreateIntent'))
 
     describe('No Service', function () {
-      before(mock.mockAPI('CreateIntentWithNoService'))
+      beforeAll(mock.mockAPI('CreateIntentWithNoService'))
 
-      it('should reject with error', async function () {
+      it('should reject with error', function () {
         const element = mockElement()
-
         return cozy.client.intents
           .create('EDIT', 'io.cozy.files')
-          .start(element)
-          .should.be.rejectedWith(/Unable to find a service/)
+          .start(element).catch(err => expect(err.message).toBe('Unable to find a service'))
       })
     })
 
-    it('should inject iframe (not async)', function (done) {
+    it('should inject iframe (not async)', async function () {
       const element = mockElement()
       const {documentMock, iframeMock} = element
 
@@ -127,16 +115,15 @@ describe('Intents', function () {
         .create('PICK', 'io.cozy.files')
         .start(element)
 
-      setTimeout(() => {
-        should(documentMock.createElement.withArgs('iframe').calledOnce).be.true()
-        should(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).be.true()
-        should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true()
-        should(element.appendChild.withArgs(iframeMock).calledOnce).be.true()
-        done()
+      await setTimeout(() => {
+        expect(documentMock.createElement.withArgs('iframe').calledOnce).toBe(true)
+        expect(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).toBe(true)
+        expect(iframeMock.classList.add.withArgs('coz-intent').calledOnce).toBe(true)
+        expect(element.appendChild.withArgs(iframeMock).calledOnce).toBe(true)
       }, 10)
     })
 
-    it('shoud manage handshake', function (done) {
+    it('shoud manage handshake', async function () {
       const element = mockElement()
       const {windowMock, iframeWindowMock} = element
 
@@ -152,19 +139,18 @@ describe('Intents', function () {
         .create('PICK', 'io.cozy.files', {key: 'value'})
         .start(element)
 
-      setTimeout(() => {
-        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
-        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+      await setTimeout(() => {
+        expect(windowMock.addEventListener.withArgs('message').calledOnce).toBe(true)
+        expect(windowMock.removeEventListener.neverCalledWith('message')).toBe(true)
 
         const messageEventListener = windowMock.addEventListener.firstCall.args[1]
 
         messageEventListener(handshakeEventMessageMock)
-        should(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).be.true()
-        done()
+        expect(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).toBe(true)
       }, 10)
     })
 
-    it('should manage handshake fail', async function () {
+    it('should manage handshake fail', function () {
       const element = mockElement()
       const {windowMock, iframeWindowMock} = element
 
@@ -179,19 +165,19 @@ describe('Intents', function () {
         .start(element)
 
       setTimeout(() => {
-        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
-        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+        expect(windowMock.addEventListener.withArgs('message').calledOnce).toBe(true)
+        expect(windowMock.removeEventListener.neverCalledWith('message')).toBe(true)
 
         const messageEventListener = windowMock.addEventListener.firstCall.args[1]
         messageEventListener(handshakeEventMessageMock)
 
-        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+        expect(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).toBe(true)
       }, 10)
 
-      return call.should.be.rejectedWith(/Unexpected handshake message from intent service/)
+      return call.catch(err => expect(err.message).toBe('Unexpected handshake message from intent service'))
     })
 
-    it('should handle intent error', async function () {
+    it('should handle intent error', function () {
       const element = mockElement()
       const {windowMock, iframeWindowMock} = element
 
@@ -208,19 +194,19 @@ describe('Intents', function () {
         .start(element)
 
       setTimeout(() => {
-        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
-        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+        expect(windowMock.addEventListener.withArgs('message').calledOnce).toBe(true)
+        expect(windowMock.removeEventListener.neverCalledWith('message')).toBe(true)
 
         const messageEventListener = windowMock.addEventListener.firstCall.args[1]
         messageEventListener(handshakeEventMessageMock)
 
-        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+        expect(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).toBe(true)
       }, 10)
 
-      return call.should.be.rejectedWith(/Intent error/)
+      return call.catch(err => expect(err.message).toBe('Intent error'))
     })
 
-    it('should handle intent success', async function () {
+    it('should handle intent success', function () {
       const element = mockElement()
       const {windowMock, iframeWindowMock} = element
 
@@ -250,19 +236,19 @@ describe('Intents', function () {
         .start(element)
 
       setTimeout(() => {
-        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
-        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+        expect(windowMock.addEventListener.withArgs('message').calledOnce).toBe(true)
+        expect(windowMock.removeEventListener.neverCalledWith('message')).toBe(true)
 
         const messageEventListener = windowMock.addEventListener.firstCall.args[1]
 
         messageEventListener(handshakeEventMessageMock)
-        should(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).be.true()
+        expect(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).toBe(true)
 
         messageEventListener(resolveEventMessageMock)
-        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+        expect(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).toBe(true)
       }, 10)
 
-      return call.should.be.fulfilledWith(result)
+      return call.then(res => expect(res).toBe(result))
     })
   })
 
@@ -282,6 +268,7 @@ describe('Intents', function () {
 
     beforeEach(mock.mockAPI('GetIntent'))
 
+    it('should manage handshake', function () {
     it('starts handshake', async function () {
       const windowMock = mockWindow()
 
@@ -309,7 +296,6 @@ describe('Intents', function () {
         })
     })
 
-    it('should manage handshake', async function () {
       const windowMock = mockWindow()
 
       const clientHandshakeEventMessageMock = {
@@ -319,27 +305,28 @@ describe('Intents', function () {
 
       windowMock.parent.postMessage.callsFake(() => {
         const messageEventListener = windowMock.addEventListener.secondCall.args[1]
-        windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+        expect(
+          windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce
+        ).toBe(true)
 
         messageEventListener(clientHandshakeEventMessageMock)
-        windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+        expect(
+          windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce
+        ).toBe(true)
       })
 
       return cozy.client.intents.createService(expectedIntent._id, windowMock)
         .then(service => {
-          should(typeof service.getData === 'function').be.true()
-          should(typeof service.getIntent === 'function').be.true()
-          should(typeof service.terminate === 'function').be.true()
-          service.getData().should.deepEqual({foo: 'bar'})
-          return true
-        }).should.be.fulfilledWith(true)
+          expect(typeof service.getData === 'function').toBe(true)
+          expect(typeof service.getIntent === 'function').toBe(true)
+          expect(typeof service.terminate === 'function').toBe(true)
+          expect(service.getData()).toEqual({foo: 'bar'})
+        })
     })
 
     it('should throw error when not in a browser context', () => {
-      should.throws(
-        () => cozy.client.intents.createService(),
-        /Intent service should be used in browser/
-      )
+      delete global.window
+      expect(cozy.client.intents.createService).toThrowError(/Intent service should be used in browser/)
     })
 
     it('should throw error when no intent is passed in URL', () => {
@@ -347,10 +334,7 @@ describe('Intents', function () {
         location: {search: ''}
       })
 
-      should.throws(
-        () => cozy.client.intents.createService(),
-        /Cannot retrieve intent from URL/
-      )
+      expect(() => cozy.client.intents.createService()).toThrowError(/Cannot retrieve intent from URL/)
 
       delete global.window
     })
@@ -383,8 +367,8 @@ describe('Intents', function () {
             document: result
           })
 
-          windowMock.parent.postMessage
-            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+          expect(windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce).toBe(true)
         })
 
         it('should send result document to Client also with no params', async function () {
@@ -413,8 +397,8 @@ describe('Intents', function () {
             document: result
           })
 
-          window.parent.postMessage
-            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+          expect(window.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce).toBe(true)
 
           delete global.window
         })
@@ -440,9 +424,9 @@ describe('Intents', function () {
 
           service.terminate(result)
 
-          should.throws(() => {
+          expect(() => {
             service.terminate(result)
-          }, /Intent service has already been terminated/)
+          }).toThrowError(/Intent service has already been terminated/)
         })
       })
 
@@ -466,8 +450,8 @@ describe('Intents', function () {
 
           const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:cancel'})
 
-          windowMock.parent.postMessage
-            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+          expect(windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce).toBe(true)
         })
 
         it('should send null to Client also with no parameters', async function () {
@@ -489,8 +473,8 @@ describe('Intents', function () {
 
           const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:cancel'})
 
-          window.parent.postMessage
-            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+          expect(window.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce).toBe(true)
 
           delete global.window
         })
@@ -512,9 +496,9 @@ describe('Intents', function () {
 
           service.cancel()
 
-          should.throws(() => {
+          expect(() => {
             service.cancel()
-          }, /Intent service has already been terminated/)
+          }).toThrowError(/Intent service has already been terminated/)
         })
 
         it('should forbbid further calls to terminate()', async function () {
@@ -538,9 +522,9 @@ describe('Intents', function () {
 
           service.cancel()
 
-          should.throws(() => {
+          expect(() => {
             service.terminate(result)
-          }, /Intent service has already been terminated/)
+          }).toThrowError(/Intent service has already been terminated/)
         })
       })
     })

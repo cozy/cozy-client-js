@@ -16,9 +16,10 @@
     "watch": "NODE_ENV=development NODE_TARGET=web webpack --watch",
     "lint": "standard './src/**/*.js' './test/**/*.js' webpack.config.js",
     "test": "npm-run-all 'test:*'",
-    "test:unit": "NODE_ENV=test NODE_TARGET=node mocha-webpack 'test/unit/**.js'",
-    "test:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
-    "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
+    "test:unit": "jest test/unit/**.js",
+    "oldtest:unit": "NODE_ENV=test NODE_TARGET=node mocha-webpack 'test/unit/**.js'",
+    "oldtest:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
+    "oldtest:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
     "clean": "rm -r dist .tmp"
   },
   "repository": {
