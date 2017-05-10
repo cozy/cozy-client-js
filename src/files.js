@@ -3,10 +3,15 @@ import { cozyFetch, cozyFetchJSON } from './fetch'
 import jsonapi from './jsonapi'
 import { DOCTYPE_FILES } from './doctypes'
 
+<<<<<<< HEAD
 // global variables
 export const ROOT_DIR_ID = 'io.cozy.files.root-dir'
 export const TRASH_DIR_ID = 'io.cozy.files.trash-dir'
 
+=======
+const ROOT_ID = 'io.cozy.files.root-dir'
+const TRASH_ID = 'io.cozy.files.trash-dir'
+>>>>>>> fix: Files are now correctly sorted when offline
 const contentTypeOctetStream = 'application/octet-stream'
 
 function doUpload (cozy, data, method, path, options) {
@@ -195,7 +200,7 @@ export function statById (cozy, id, offline = true, options = {}) {
       if (id === ROOT_DIR_ID) {
         children.docs = children.docs.filter(doc => doc._id !== TRASH_DIR_ID)
       }
-      children = children.docs.map(doc => addIsDir(toJsonApi(cozy, doc)))
+      children = sortFiles(children.docs.map(doc => addIsDir(toJsonApi(cozy, doc))))
       return addIsDir(toJsonApi(cozy, doc, children))
     })
   }
@@ -309,4 +314,11 @@ function toJsonApi (cozy, doc, contents = []) {
       }
     }
   }
+}
+
+function sortFiles (allFiles) {
+  const folders = allFiles.filter(f => f.attributes.type === 'directory')
+  const files = allFiles.filter(f => f.attributes.type !== 'directory')
+  const sort = files => files.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
+  return sort(folders).concat(sort(files))
 }

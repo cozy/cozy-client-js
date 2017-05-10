@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Changed
 - Accept an optional wholeResponse query parameter in cozy.data.query
+- Files are now correctly sorted when offline
 
 ### Fixed
 - none yet
