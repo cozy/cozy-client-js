@@ -8309,6 +8309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fields: options.fields,
 	    selector: options.selector,
 	    limit: options.limit,
+	    skip: options.skip,
 	    since: options.since
 	  };
 	
@@ -8320,7 +8321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var path = (0, _utils.createPath)(cozy, false, indexRef.doctype, '_find');
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function (response) {
-	    return response.docs;
+	    return options.wholeResponse ? response : response.docs;
 	  });
 	}
 	
@@ -8737,9 +8738,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return doc._id !== TRASH_DIR_ID;
 	        });
 	      }
-	      children = children.docs.map(function (doc) {
+	      children = sortFiles(children.docs.map(function (doc) {
 	        return addIsDir(toJsonApi(cozy, doc));
-	      });
+	      }));
 	      return addIsDir(toJsonApi(cozy, doc, children));
 	    });
 	  }
@@ -8854,6 +8855,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	}
+	
+	function sortFiles(allFiles) {
+	  var folders = allFiles.filter(function (f) {
+	    return f.attributes.type === 'directory';
+	  });
+	  var files = allFiles.filter(function (f) {
+	    return f.attributes.type !== 'directory';
+	  });
+	  var sort = function sort(files) {
+	    return files.sort(function (a, b) {
+	      return a.attributes.name.localeCompare(b.attributes.name);
+	    });
+	  };
+	  return sort(folders).concat(sort(files));
+	}
 
 /***/ },
 /* 202 */
@@ -8960,15 +8976,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	// returns a service to communicate with intent client
-	function createService(cozy, id, window) {
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + id).then(function (intent) {
-	    return listenClientData(intent, window).then(function (data) {
+	function createService(cozy, intentId, serviceWindow) {
+	  serviceWindow = serviceWindow || typeof window !== 'undefined' && window;
+	  if (!serviceWindow) throw new Error('Intent service should be used in browser');
+	
+	  intentId = intentId || serviceWindow.location.search.split('=')[1];
+	  if (!intentId) throw new Error('Cannot retrieve intent from URL');
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
+	    return listenClientData(intent, serviceWindow).then(function (data) {
 	      var terminated = false;
 	
 	      var terminate = function terminate(doc) {
 	        if (terminated) throw new Error('Intent service has already been terminated');
 	        terminated = true;
-	        window.parent.postMessage(doc, intent.attributes.client);
+	        serviceWindow.parent.postMessage(doc, intent.attributes.client);
 	      };
 	
 	      return {
