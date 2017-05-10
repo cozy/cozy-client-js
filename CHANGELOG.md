@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- Accept an optional wholeResponse query parameter in cozy.data.query
-- Files are now correctly sorted when offline
+- none yet
 
 ### Fixed
 - none yet
@@ -18,6 +17,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - none yet
+
+
+## [v0.2.5] - 2017-05-10
+### Changed
+- Accept an optional wholeResponse query parameter in cozy.data.query
+- Files are now correctly sorted when offline
 
 
 ## [v0.2.4] - 2017-05-04
@@ -116,7 +121,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.2.5...HEAD
+[v0.2.5]: https://github.com/cozy/cozy-client-js/compare/v0.2.4...v0.2.5
 [v0.2.4]: https://github.com/cozy/cozy-client-js/compare/v0.2.3...v0.2.4
 [v0.2.3]: https://github.com/cozy/cozy-client-js/compare/v0.2.2...v0.2.3
 [v0.2.2]: https://github.com/cozy/cozy-client-js/compare/v0.2.1...v0.2.2
