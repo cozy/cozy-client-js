@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- none yet
+- Accept an optional wholeResponse query parameter in cozy.data.query
 
 ### Fixed
 - none yet

@@ -90,6 +90,7 @@ function queryV3 (cozy, indexRef, options) {
     fields: options.fields,
     selector: options.selector,
     limit: options.limit,
+    skip: options.skip,
     since: options.since
   }
 
@@ -99,7 +100,7 @@ function queryV3 (cozy, indexRef, options) {
 
   let path = createPath(cozy, false, indexRef.doctype, '_find')
   return cozyFetchJSON(cozy, 'POST', path, opts)
-    .then((response) => response.docs)
+    .then((response) => options.wholeResponse ? response : response.docs)
 }
 
 // misc

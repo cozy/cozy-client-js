@@ -286,6 +286,7 @@ It returns a promise with a list of documents matching the query. Results will b
   * `selector`: a mango selector
   * `limit`: maximum number of results
   * `skip`: ignore the first x results (pagination)
+  * `wholeResponse`: when set to true, the whole query response will be returned instead of just the docs. This is useful when paginating, because you'll get the `next` property in the response object.
 
 **Warning**: complex mango queries are not, and may never be compatible with **v2**
 
