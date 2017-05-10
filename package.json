@@ -17,7 +17,7 @@
     "lint": "standard './src/**/*.js' './test/**/*.js' webpack.config.js",
     "test": "npm-run-all 'test:*'",
     "test:unit": "jest test/unit",
-    "test_old:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 jest test/integration",
+    "test:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 jest test/integration",
     "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 jest test/integration",
     "clean": "rm -r dist .tmp"
   },
