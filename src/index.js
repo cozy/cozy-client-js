@@ -4,12 +4,14 @@ import 'babel-polyfill'
 import {unpromiser, retry, warn} from './utils'
 import {LocalStorage, MemoryStorage} from './auth_storage'
 import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
+import * as accounts from './accounts'
 import * as auth from './auth_v3'
 import * as data from './data'
 import * as cozyFetch from './fetch'
 import * as mango from './mango'
 import * as files from './files'
 import * as intents from './intents'
+import * as konnectors from './konnectors'
 import * as offline from './offline'
 import * as settings from './settings'
 import * as relations from './relations'
@@ -27,6 +29,10 @@ const AuthOK = 3
 
 const defaultClientParams = {
   softwareID: 'github.com/cozy/cozy-client-js'
+}
+
+const accountsProto = {
+  create: accounts.create
 }
 
 const dataProto = {
@@ -86,6 +92,14 @@ const intentsProto = {
   createService: intents.createService
 }
 
+const konnectorsProto = {
+  addAccount: konnectors.addAccount,
+  fetchManifest: konnectors.fetchManifest,
+  get: konnectors.get,
+  getBySlug: konnectors.getBySlug,
+  install: konnectors.install
+}
+
 const offlineProto = {
   init: offline.init,
   getDoctypes: offline.getDoctypes,
@@ -118,9 +132,11 @@ const settingsProto = {
 
 class Client {
   constructor (options) {
+    this.accounts = {}
     this.data = {}
     this.files = {}
     this.intents = {}
+    this.konnectors = {}
     this.offline = {}
     this.settings = {}
     this.auth = {
@@ -170,10 +186,12 @@ class Client {
     this._url = url
 
     const disablePromises = !!options.disablePromises
+    addToProto(this, this.accounts, accountsProto, disablePromises)
     addToProto(this, this.data, dataProto, disablePromises)
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
     addToProto(this, this.intents, intentsProto, disablePromises)
+    addToProto(this, this.konnectors, konnectorsProto, disablePromises)
     addToProto(this, this.offline, offlineProto, disablePromises)
     addToProto(this, this.settings, settingsProto, disablePromises)
 
