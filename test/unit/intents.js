@@ -142,7 +142,9 @@ describe('Intents', function () {
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
-        data: 'intent:ready',
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
         source: iframeWindowMock
       }
 
@@ -195,7 +197,9 @@ describe('Intents', function () {
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
-        data: 'intent:error',
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:error'
+        },
         source: iframeWindowMock
       }
 
@@ -222,7 +226,9 @@ describe('Intents', function () {
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
-        data: 'intent:ready',
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
         source: iframeWindowMock
       }
 

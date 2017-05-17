@@ -3,7 +3,7 @@ import {cozyFetchJSON} from './fetch'
 const intentClass = 'coz-intent'
 
 // inject iframe for service in given element
-function injectService (url, element, data) {
+function injectService (url, element, intent, data) {
   const document = element.ownerDocument
   if (!document) throw new Error('Cannot retrieve document object from given element')
 
@@ -23,7 +23,7 @@ function injectService (url, element, data) {
     const messageHandler = (event) => {
       if (event.origin !== serviceOrigin) return
 
-      if (event.data === 'intent:ready') {
+      if (event.data.type === `intent-${intent._id}:ready`) {
         handshaken = true
         return event.source.postMessage(data, event.origin)
       }
@@ -31,7 +31,7 @@ function injectService (url, element, data) {
       window.removeEventListener('message', messageHandler)
       iframe.parentNode.removeChild(iframe)
 
-      if (event.data === 'intent:error') {
+      if (event.data.type === `intent-${intent._id}:error`) {
         return reject(new Error('Intent error'))
       }
 
@@ -68,7 +68,7 @@ export function create (cozy, action, type, data = {}, permissions = []) {
         return Promise.reject(new Error('Unable to find a service'))
       }
 
-      return injectService(service.href, element, data)
+      return injectService(service.href, element, intent, data)
     })
   }
 
@@ -85,7 +85,7 @@ function listenClientData (intent, window) {
     }
 
     window.addEventListener('message', messageEventListener)
-    window.parent.postMessage('intent:ready', intent.attributes.client)
+    window.parent.postMessage(`intent-${intent._id}:ready`, intent.attributes.client)
   })
 }
 
