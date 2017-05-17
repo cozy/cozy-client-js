@@ -130,7 +130,9 @@ export function createService (cozy, intentId, serviceWindow) {
 
       // Prevent unfulfilled client promises when this window unloads for a
       // reason or another.
-      serviceWindow.addEventListener('unload', cancel)
+      serviceWindow.addEventListener('unload', () => {
+        if (!terminated) cancel()
+      })
 
       return listenClientData(intent, serviceWindow)
         .then(data => {
