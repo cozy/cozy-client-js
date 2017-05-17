@@ -99,21 +99,29 @@ export function createService (cozy, intentId, serviceWindow) {
 
   return cozyFetchJSON(cozy, 'GET', `/intents/${intentId}`)
     .then(intent => {
+      let terminated = false
+
+      const terminate = (doc) => {
+        if (terminated) throw new Error('Intent service has already been terminated')
+        terminated = true
+        serviceWindow.parent.postMessage(doc, intent.attributes.client)
+      }
+
+      const cancel = () => {
+        terminate(null)
+      }
+
+      // Prevent unfulfilled client promises when this window unloads for a
+      // reason or another.
+      serviceWindow.addEventListener('unload', cancel)
+
       return listenClientData(intent, serviceWindow)
         .then(data => {
-          let terminated = false
-
-          const terminate = (doc) => {
-            if (terminated) throw new Error('Intent service has already been terminated')
-            terminated = true
-            serviceWindow.parent.postMessage(doc, intent.attributes.client)
-          }
-
           return {
             getData: () => data,
             getIntent: () => intent,
             terminate: terminate,
-            cancel: () => terminate(null)
+            cancel: cancel
           }
         })
     })
