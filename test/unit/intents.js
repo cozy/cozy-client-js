@@ -282,6 +282,33 @@ describe('Intents', function () {
 
     beforeEach(mock.mockAPI('GetIntent'))
 
+    it('starts handshake', async function () {
+      const windowMock = mockWindow()
+
+      const clientHandshakeEventMessageMock = {
+        origin: expectedIntent.attributes.client,
+        data: { foo: 'bar' }
+      }
+
+      windowMock.parent.postMessage.callsFake(() => {
+        const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+        windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+
+        messageEventListener(clientHandshakeEventMessageMock)
+        windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+      })
+
+      return cozy.client.intents.createService(expectedIntent._id, windowMock)
+        .then(service => {
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+    })
+
     it('should manage handshake', async function () {
       const windowMock = mockWindow()
 

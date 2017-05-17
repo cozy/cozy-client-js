@@ -100,7 +100,9 @@ function listenClientData (intent, window) {
     }
 
     window.addEventListener('message', messageEventListener)
-    window.parent.postMessage(`intent-${intent._id}:ready`, intent.attributes.client)
+    window.parent.postMessage({
+      type: `intent-${intent._id}:ready`
+    }, intent.attributes.client)
   })
 }
 
