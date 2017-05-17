@@ -8912,7 +8912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var intentClass = 'coz-intent';
 	
 	// inject iframe for service in given element
-	function injectService(url, element, data) {
+	function injectService(url, element, intent, data) {
 	  var document = element.ownerDocument;
 	  if (!document) throw new Error('Cannot retrieve document object from given element');
 	
@@ -8932,7 +8932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var messageHandler = function messageHandler(event) {
 	      if (event.origin !== serviceOrigin) return;
 	
-	      if (event.data === 'intent:ready') {
+	      if (event.data.type === 'intent-' + intent._id + ':ready') {
 	        handshaken = true;
 	        return event.source.postMessage(data, event.origin);
 	      }
@@ -8940,11 +8940,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      window.removeEventListener('message', messageHandler);
 	      iframe.parentNode.removeChild(iframe);
 	
-	      if (event.data === 'intent:error') {
+	      if (event.data.type === 'intent-' + intent._id + ':error') {
 	        return reject(new Error('Intent error'));
 	      }
 	
-	      return handshaken ? resolve(event.data) : reject(new Error('Unexpected handshake message from intent service'));
+	      if (handshaken && event.data.type === 'intent-' + intent._id + ':cancel') {
+	        return resolve(null);
+	      }
+	
+	      if (handshaken && event.data.type === 'intent-' + intent._id + ':done') {
+	        return resolve(event.data.document);
+	      }
+	
+	      if (!handshaken) {
+	        return reject(new Error('Unexpected handshake message from intent service'));
+	      }
+	
+	      // We may be in a state where the messageHandler is still attached to then
+	      // window, but will not be needed anymore. For example, the service failed
+	      // before adding the `unload` listener, so no `intent:cancel` message has
+	      // never been sent.
+	      // So we simply ignore other messages, and this listener will stay here,
+	      // waiting for a message which will never come, forever (almost).
 	    };
 	
 	    window.addEventListener('message', messageHandler);
@@ -8978,7 +8995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return Promise.reject(new Error('Unable to find a service'));
 	      }
 	
-	      return injectService(service.href, element, data);
+	      return injectService(service.href, element, intent, data);
 	    });
 	  };
 	
@@ -8995,7 +9012,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    window.addEventListener('message', messageEventListener);
-	    window.parent.postMessage('intent:ready', intent.attributes.client);
+	    window.parent.postMessage({
+	      type: 'intent-' + intent._id + ':ready'
+	    }, intent.attributes.client);
 	  });
 	}
 	
@@ -9008,15 +9027,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!intentId) throw new Error('Cannot retrieve intent from URL');
 	
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
+	    var terminated = false;
+	
+	    var _terminate = function _terminate(message) {
+	      if (terminated) throw new Error('Intent service has already been terminated');
+	      terminated = true;
+	      serviceWindow.parent.postMessage(message, intent.attributes.client);
+	    };
+	
+	    var cancel = function cancel() {
+	      _terminate({ type: 'intent-' + intent._id + ':cancel' });
+	    };
+	
+	    // Prevent unfulfilled client promises when this window unloads for a
+	    // reason or another.
+	    serviceWindow.addEventListener('unload', function () {
+	      if (!terminated) cancel();
+	    });
+	
 	    return listenClientData(intent, serviceWindow).then(function (data) {
-	      var terminated = false;
-	
-	      var terminate = function terminate(doc) {
-	        if (terminated) throw new Error('Intent service has already been terminated');
-	        terminated = true;
-	        serviceWindow.parent.postMessage(doc, intent.attributes.client);
-	      };
-	
 	      return {
 	        getData: function getData() {
 	          return data;
@@ -9024,10 +9053,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        getIntent: function getIntent() {
 	          return intent;
 	        },
-	        terminate: terminate,
-	        cancel: function cancel() {
-	          return terminate(null);
-	        }
+	        terminate: function terminate(doc) {
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':done',
+	            document: doc
+	          });
+	        },
+	        cancel: cancel
 	      };
 	    });
 	  });
