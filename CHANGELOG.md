@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Fixed
-- none yet
+- Safer communication protocol in intents.
 
 ### Added
 - none yet

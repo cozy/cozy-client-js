@@ -142,7 +142,9 @@ describe('Intents', function () {
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
-        data: 'intent:ready',
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
         source: iframeWindowMock
       }
 
@@ -195,7 +197,9 @@ describe('Intents', function () {
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
-        data: 'intent:error',
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:error'
+        },
         source: iframeWindowMock
       }
 
@@ -222,7 +226,9 @@ describe('Intents', function () {
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
-        data: 'intent:ready',
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
         source: iframeWindowMock
       }
 
@@ -232,7 +238,10 @@ describe('Intents', function () {
 
       const resolveEventMessageMock = {
         origin: serviceUrl,
-        data: result,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+          document: result
+        },
         source: iframeWindowMock
       }
 
@@ -273,6 +282,33 @@ describe('Intents', function () {
 
     beforeEach(mock.mockAPI('GetIntent'))
 
+    it('starts handshake', async function () {
+      const windowMock = mockWindow()
+
+      const clientHandshakeEventMessageMock = {
+        origin: expectedIntent.attributes.client,
+        data: { foo: 'bar' }
+      }
+
+      windowMock.parent.postMessage.callsFake(() => {
+        const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+        windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+
+        messageEventListener(clientHandshakeEventMessageMock)
+        windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
+      })
+
+      return cozy.client.intents.createService(expectedIntent._id, windowMock)
+        .then(service => {
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+    })
+
     it('should manage handshake', async function () {
       const windowMock = mockWindow()
 
@@ -282,7 +318,7 @@ describe('Intents', function () {
       }
 
       windowMock.parent.postMessage.callsFake(() => {
-        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+        const messageEventListener = windowMock.addEventListener.secondCall.args[1]
         windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
 
         messageEventListener(clientHandshakeEventMessageMock)
@@ -334,7 +370,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -342,8 +378,13 @@ describe('Intents', function () {
 
           service.terminate(result)
 
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+            document: result
+          })
+
           windowMock.parent.postMessage
-            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
 
         it('should send result document to Client also with no params', async function () {
@@ -359,7 +400,7 @@ describe('Intents', function () {
           }
 
           window.parent.postMessage.callsFake(() => {
-            const messageEventListener = window.addEventListener.firstCall.args[1]
+            const messageEventListener = window.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -367,8 +408,13 @@ describe('Intents', function () {
 
           service.terminate(result)
 
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+            document: result
+          })
+
           window.parent.postMessage
-            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
 
           delete global.window
         })
@@ -386,7 +432,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -410,7 +456,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -418,8 +464,10 @@ describe('Intents', function () {
 
           service.cancel()
 
+          const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:cancel'})
+
           windowMock.parent.postMessage
-            .withArgs(null, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
 
         it('should send null to Client also with no parameters', async function () {
@@ -431,7 +479,7 @@ describe('Intents', function () {
           }
 
           window.parent.postMessage.callsFake(() => {
-            const messageEventListener = window.addEventListener.firstCall.args[1]
+            const messageEventListener = window.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -439,8 +487,10 @@ describe('Intents', function () {
 
           service.cancel()
 
+          const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:cancel'})
+
           window.parent.postMessage
-            .withArgs(null, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
 
           delete global.window
         })
@@ -454,7 +504,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -480,7 +530,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
