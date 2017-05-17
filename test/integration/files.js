@@ -263,6 +263,18 @@ describe('files API', async function () {
       online.attributes.should.have.properties(Object.keys(offline.attributes))
     }).timeout(4 * 1000)
   })
+
+  describe('share', () => {
+    it('should get `sharecode` and `id` to create a share link', async () => {
+      const created = await cozy.client.files.create('foo', {
+        name: 'to be shared',
+        contentType: 'application/json'
+      })
+      const data = await cozy.client.files.getShareLink(created._id)
+
+      data.should.have.properties(['sharecode', 'id'])
+    })
+  })
 })
 
 async function createTrashedDirectory (client, dirname) {
