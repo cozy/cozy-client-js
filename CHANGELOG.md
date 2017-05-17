@@ -19,6 +19,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.3.0] - 2017-05-17
+### Fixed
+- Intents : side effects in postMessage listeners
+- Upload was cancel twice
+
+### Changed
+- Intents are better, safer, stronger
+
+### Added
+- Create a share link from an `id`
+
+
 ## [v0.2.5] - 2017-05-10
 ### Changed
 - Accept an optional wholeResponse query parameter in cozy.data.query
@@ -121,7 +133,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.2.5...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.0...HEAD
+[v0.3.0]: https://github.com/cozy/cozy-client-js/compare/v0.2.5...v0.3.0
 [v0.2.5]: https://github.com/cozy/cozy-client-js/compare/v0.2.4...v0.2.5
 [v0.2.4]: https://github.com/cozy/cozy-client-js/compare/v0.2.3...v0.2.4
 [v0.2.3]: https://github.com/cozy/cozy-client-js/compare/v0.2.2...v0.2.3

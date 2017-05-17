@@ -824,6 +824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getDownloadLinkByPath: files.getDownloadLinkByPath,
 	  getArchiveLink: files.getArchiveLink,
 	  getFilePath: files.getFilePath,
+	  getShareLink: files.getShareLink,
 	  listTrash: files.listTrash,
 	  clearTrash: files.clearTrash,
 	  restoreById: files.restoreById,
@@ -8507,6 +8508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getDownloadLinkByPath = getDownloadLinkByPath;
 	exports.getDownloadLinkById = getDownloadLinkById;
 	exports.getFilePath = getFilePath;
+	exports.getShareLink = getShareLink;
 	exports.getArchiveLink = getArchiveLink;
 	exports.listTrash = listTrash;
 	exports.clearTrash = clearTrash;
@@ -8785,6 +8787,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var folderPath = folder.attributes.path.endsWith('/') ? folder.attributes.path : folder.attributes.path + '/';
 	
 	  return '' + folderPath + file.name;
+	}
+	
+	function getShareLink(cozy, id) {
+	  if (!id) {
+	    return Promise.reject(Error('An id should be provided to create a share link'));
+	  }
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/permissions?codes=email', {
+	    data: {
+	      type: 'io.cozy.permissions',
+	      attributes: {
+	        permissions: {
+	          share: {
+	            type: 'io.cozy.files',
+	            verbs: ['GET'],
+	            values: [id]
+	          }
+	        }
+	      }
+	    }
+	  }).then(function (data) {
+	    return { sharecode: 'sharecode=' + data.attributes.codes.email, id: 'id=' + id };
+	  });
 	}
 	
 	function getArchiveLink(cozy, paths) {
