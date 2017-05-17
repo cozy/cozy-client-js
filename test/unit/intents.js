@@ -238,7 +238,10 @@ describe('Intents', function () {
 
       const resolveEventMessageMock = {
         origin: serviceUrl,
-        data: result,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+          document: result
+        },
         source: iframeWindowMock
       }
 
@@ -348,8 +351,13 @@ describe('Intents', function () {
 
           service.terminate(result)
 
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+            document: result
+          })
+
           windowMock.parent.postMessage
-            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
 
         it('should send result document to Client also with no params', async function () {
@@ -373,8 +381,13 @@ describe('Intents', function () {
 
           service.terminate(result)
 
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+            document: result
+          })
+
           window.parent.postMessage
-            .withArgs(result, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
 
           delete global.window
         })
@@ -424,8 +437,10 @@ describe('Intents', function () {
 
           service.cancel()
 
+          const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:cancel'})
+
           windowMock.parent.postMessage
-            .withArgs(null, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
 
         it('should send null to Client also with no parameters', async function () {
@@ -445,8 +460,10 @@ describe('Intents', function () {
 
           service.cancel()
 
+          const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:cancel'})
+
           window.parent.postMessage
-            .withArgs(null, expectedIntent.attributes.client).calledOnce.should.be.true()
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
 
           delete global.window
         })

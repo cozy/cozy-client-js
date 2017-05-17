@@ -35,9 +35,24 @@ function injectService (url, element, intent, data) {
         return reject(new Error('Intent error'))
       }
 
-      return handshaken
-        ? resolve(event.data)
-        : reject(new Error('Unexpected handshake message from intent service'))
+      if (handshaken && event.data.type === `intent-${intent._id}:cancel`) {
+        return resolve(null)
+      }
+
+      if (handshaken && event.data.type === `intent-${intent._id}:done`) {
+        return resolve(event.data.document)
+      }
+
+      if (!handshaken) {
+        return reject(new Error('Unexpected handshake message from intent service'))
+      }
+
+      // We may be in a state where the messageHandler is still attached to then
+      // window, but will not be needed anymore. For example, the service failed
+      // before adding the `unload` listener, so no `intent:cancel` message has
+      // never been sent.
+      // So we simply ignore other messages, and this listener will stay here,
+      // waiting for a message which will never come, forever (almost).
     }
 
     window.addEventListener('message', messageHandler)
@@ -101,14 +116,14 @@ export function createService (cozy, intentId, serviceWindow) {
     .then(intent => {
       let terminated = false
 
-      const terminate = (doc) => {
+      const terminate = (message) => {
         if (terminated) throw new Error('Intent service has already been terminated')
         terminated = true
-        serviceWindow.parent.postMessage(doc, intent.attributes.client)
+        serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
       const cancel = () => {
-        terminate(null)
+        terminate({type: `intent-${intent._id}:cancel`})
       }
 
       // Prevent unfulfilled client promises when this window unloads for a
@@ -120,7 +135,10 @@ export function createService (cozy, intentId, serviceWindow) {
           return {
             getData: () => data,
             getIntent: () => intent,
-            terminate: terminate,
+            terminate: (doc) => terminate({
+              type: `intent-${intent._id}:done`,
+              document: doc
+            }),
             cancel: cancel
           }
         })
