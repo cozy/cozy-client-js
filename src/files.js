@@ -245,6 +245,26 @@ export function getFilePath (cozy, file = {}, folder) {
   return `${folderPath}${file.name}`
 }
 
+export function getShareLink (cozy, id) {
+  if (!id) {
+    return Promise.reject(Error('An id should be provided to create a share link'))
+  }
+  return cozyFetchJSON(cozy, 'POST', `/permissions?codes=email`, {
+    data: {
+      type: 'io.cozy.permissions',
+      attributes: {
+        permissions: {
+          share: {
+            type: 'io.cozy.files',
+            verbs: ['GET'],
+            values: [id]
+          }
+        }
+      }
+    }
+  }).then(data => ({sharecode: `sharecode=${data.attributes.codes.email}`, id: `id=${id}`}))
+}
+
 export function getArchiveLink (cozy, paths, name = 'files') {
   const archive = {
     type: 'io.cozy.archives',
