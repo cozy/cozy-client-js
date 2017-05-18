@@ -245,7 +245,7 @@ export function getFilePath (cozy, file = {}, folder) {
   return `${folderPath}${file.name}`
 }
 
-export function getShareLink (cozy, id) {
+export function getCollectionShareLink (cozy, id, collectionType) {
   if (!id) {
     return Promise.reject(Error('An id should be provided to create a share link'))
   }
@@ -254,8 +254,14 @@ export function getShareLink (cozy, id) {
       type: 'io.cozy.permissions',
       attributes: {
         permissions: {
-          share: {
+          files: {
             type: 'io.cozy.files',
+            verbs: ['GET'],
+            values: [id],
+            selector: 'referenced_by'
+          },
+          collection: {
+            type: collectionType,
             verbs: ['GET'],
             values: [id]
           }
