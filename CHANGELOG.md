@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.3.2] - 2017-05-19
+### Fixed
+- Not enough permissions for collections sharing
+
+
 ## [v0.3.1] - 2017-05-18
 ### Fixed
 - Missing parts from intents in dist
@@ -138,7 +143,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.2...HEAD
+[v0.3.1]: https://github.com/cozy/cozy-client-js/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/cozy/cozy-client-js/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/cozy/cozy-client-js/compare/v0.2.5...v0.3.0
 [v0.2.5]: https://github.com/cozy/cozy-client-js/compare/v0.2.4...v0.2.5
