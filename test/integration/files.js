@@ -266,11 +266,16 @@ describe('files API', async function () {
 
   describe('share', () => {
     it('should get `sharecode` and `id` to create a share link', async () => {
-      const created = await cozy.client.files.create('foo', {
+      const document = await cozy.client.files.create('foo', {
         name: 'to be shared',
         contentType: 'application/json'
       })
-      const data = await cozy.client.files.getShareLink(created._id)
+      const collection = await cozy.client.data.create('io.cozy.testreferencer', {
+        name: 'foo_' + random()
+      })
+
+      await cozy.client.data.addReferencedFiles(collection, document._id)
+      const data = await cozy.client.files.getCollectionShareLink(document._id, 'io.cozy.testreferencer')
 
       data.should.have.properties(['sharecode', 'id'])
     })
