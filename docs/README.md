@@ -33,6 +33,10 @@ You can `import`/`require` cozy-client-js using npm & webpack
 
 You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
 
+If you are developing a client-side app for Cozy V3, you can import the lib directly from the stack, by using [`{{.CozyClientJS}}`](https://cozy.github.io/cozy-stack/client-app-dev.html#good-practices-for-your-application).
+
+**polyfills** : cozy-client-js uses [fetch](https://fetch.spec.whatwg.org/) and bundle all necessary polyfills (promise, fetch, reGenerator). **TODO:** We should move the polyfills to a separate bundle and require them only if needed.
+
 
 ## Doctypes & Permissions
 
