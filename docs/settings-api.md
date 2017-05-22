@@ -15,7 +15,7 @@ console.log(usage.attributes.used)
 
 ### `cozy.client.settings.changePassphrase(oldPassphrase, newPassphrase)`
 
-`cozy.client.settings.changePassphrase`is used to change the passphrase of the current user. You must supply the currently used passphrase, as well as the new one. It simply returns a promise that will resolve if the change was successful.
+`cozy.client.settings.changePassphrase` is used to change the passphrase of the current user. You must supply the currently used passphrase, as well as the new one. It simply returns a promise that will resolve if the change was successful.
 
 ### `cozy.client.settings.getInstance()`
 

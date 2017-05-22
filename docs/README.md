@@ -23,6 +23,7 @@ Modules API
 - [Authentication](auth-api.md)
 - [Data System](data-api.md)
 - [Files](files-api.md)
+- [Jobs](jobs-api.md)
 - [Intents](intents-api.md)
 - [Settings](settings-api.md)
 - [Sharing](sharing-api.md)
