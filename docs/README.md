@@ -25,3 +25,4 @@ Modules API
 - [Files](files-api.md)
 - [Intents](intents-api.md)
 - [Settings](settings-api.md)
+- [Sharing](sharing-api.md)
