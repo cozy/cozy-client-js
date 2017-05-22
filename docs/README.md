@@ -906,9 +906,10 @@ type Token {
 
 The constructor takes an object with the same fields as a Token object.
 
+
 Future APIs
 -----------
 
 This is the end of what we already have implemented, if you want to do something else (manipulating binary file, sharing, ...), you will have to wait a bit :smile:.
 
-As a teaser, you can go to our [planned API document](./planned.md) to see APIs we plan to add to this library. Feel free to open an issue if you see something missing, or if you disagree with the API design !
+Feel free to open an issue if you see something missing, or if you disagree with the API design !
