@@ -26,4 +26,13 @@ describe('jobs api', async function () {
     const count = await cozy.client.jobs.count('log')
     count.should.equal(0)
   })
+
+  it('enqueues a job', async function () {
+    const created = await cozy.client.jobs.create('log', { foo: 'bar' }, { timeout: 2 })
+    created.should.have.property('_id')
+    created.should.have.property('attributes')
+    const attrs = created.attributes
+    attrs.worker.should.equal('log')
+    attrs.state.should.equal('queued')
+  })
 })

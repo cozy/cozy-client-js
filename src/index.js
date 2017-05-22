@@ -89,6 +89,7 @@ const intentsProto = {
 }
 
 const jobsProto = {
+  create: jobs.create,
   count: jobs.count
 }
 
