@@ -2,7 +2,7 @@
 
 ## Full doctype qualification
 
-Cozy **v3** expects doctypes to be qualified to ensure uniqueness.
+Cozy **v3** expects [doctypes](https://cozy.github.io/cozy-doctypes/) to be qualified to ensure uniqueness.
 
 All doctypes designed by the cozy's team will be prefixed with `io.cozy.`
 

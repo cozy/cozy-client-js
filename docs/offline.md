@@ -1,3 +1,5 @@
+# Offline support
+
 This document describes in more details how to use this library in offline mode.
 
 All applications do not require offline mode, and offline mode needs two dependencies : `pouchdb` and `pouchdb-find`.
