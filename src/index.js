@@ -10,6 +10,7 @@ import * as cozyFetch from './fetch'
 import * as mango from './mango'
 import * as files from './files'
 import * as intents from './intents'
+import * as jobs from './jobs'
 import * as offline from './offline'
 import * as settings from './settings'
 import * as relations from './relations'
@@ -87,6 +88,10 @@ const intentsProto = {
   createService: intents.createService
 }
 
+const jobsProto = {
+  count: jobs.count
+}
+
 const offlineProto = {
   init: offline.init,
   getDoctypes: offline.getDoctypes,
@@ -122,6 +127,7 @@ class Client {
     this.data = {}
     this.files = {}
     this.intents = {}
+    this.jobs = {}
     this.offline = {}
     this.settings = {}
     this.auth = {
@@ -175,6 +181,7 @@ class Client {
     addToProto(this, this.auth, authProto, disablePromises)
     addToProto(this, this.files, filesProto, disablePromises)
     addToProto(this, this.intents, intentsProto, disablePromises)
+    addToProto(this, this.jobs, jobsProto, disablePromises)
     addToProto(this, this.offline, offlineProto, disablePromises)
     addToProto(this, this.settings, settingsProto, disablePromises)
 

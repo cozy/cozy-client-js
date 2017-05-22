@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
-- none yet
+- Add a method to count the number of jobs in a queue
 
 ### Removed
 - none yet

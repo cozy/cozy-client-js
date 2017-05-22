@@ -13,6 +13,14 @@
       "description": "Required for tests of cozy-client-js",
       "type": "io.cozy.files"
     },
+    "jobs": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.jobs"
+    },
+    "queues": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.queues"
+    },
     "testobject": {
       "description": "Required for tests of cozy-client-js",
       "type": "io.cozy.testobject"
