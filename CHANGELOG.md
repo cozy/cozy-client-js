@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- none yet
+- Update documentation
 
 ### Fixed
 - none yet
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Add feature to remove referenced files
-- `cancel()` method on service object returned by `cozy.client.intents.createService()``
+- `cancel()` method on service object returned by `cozy.client.intents.createService()`
 
 
 ## [v0.2.3] - 2017-04-28
