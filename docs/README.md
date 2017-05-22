@@ -623,6 +623,12 @@ const href = await cozy.client.files.getArchiveLink(["/foo/hello.txt"], "secretp
 (see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details)
 
 
+### `cozy.client.data.removeReferencedFiles(doc, fileIds)`
+
+`cozy.client.data.removeReferencedFiles(doc, fileIds)` unbinds the files to the document.
+(see cozy-stack [documentation](https://github.com/cozy/cozy-stack/blob/master/docs/references-docs-in-vfs.md) for more details)
+
+
 ### `cozy.client.data.listReferencedFiles(doc)`
 
 `cozy.client.data.listReferencedFiles(doc)` list the files bound to the document.
