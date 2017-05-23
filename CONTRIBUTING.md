@@ -83,7 +83,7 @@ To run integration tests, you need to communicate with a [cozy-stack](https://gi
 ./cozy-stack serve
 ./cozy-stack instances add --dev --passphrase "cozy" "cozy.tools:8080"
 ./cozy-stack instances client-oauth cozy.tools:8080 http://localhost test-app test-app
-./cozy-stack instances token-oauth cozy.tools:8080 <the client token from previous command> 'io.cozy.files io.cozy.testobject io.cozy.testobject2 datastrings1'
+./cozy-stack instances token-oauth cozy.tools:8080 <the client token from previous command> 'io.cozy.files io.cozy.testobject io.cozy.testobject2 datastrings1 io.cozy.jobs io.cozy.queues'
 ```
 
 It runs the cozy-stack's server, then creates a new instance with the passphrase *"cozy"* accessible on *"cozy.tools:8080"*. `client-oauth` creates a new client app and gives back an application token. Finally `token-oauth` creates an access token with permissions for all listed doctypes.
