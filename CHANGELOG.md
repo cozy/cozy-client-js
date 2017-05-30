@@ -7,22 +7,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- Update documentation
+- none yet
 
 ### Fixed
 - none yet
 
 ### Added
-- Add a method to count the number of jobs in a queue
-- Add a method to enqueue a job in a queue
+- none yet
 
 ### Removed
 - none yet
 
 
+## [v0.3.3] - 2017-05-30
+### Changed
+- Update documentation
+
+
 ## [v0.3.2] - 2017-05-19
 ### Fixed
 - Not enough permissions for collections sharing
+
+### Added
+- Add a method to count the number of jobs in a queue
+- Add a method to enqueue a job in a queue
 
 
 ## [v0.3.1] - 2017-05-18
@@ -144,8 +152,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.2...HEAD
-[v0.3.1]: https://github.com/cozy/cozy-client-js/compare/v0.3.1...v0.3.2
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.3...HEAD
+[v0.3.3]: https://github.com/cozy/cozy-client-js/compare/v0.3.2...v0.3.3
+[v0.3.2]: https://github.com/cozy/cozy-client-js/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/cozy/cozy-client-js/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/cozy/cozy-client-js/compare/v0.2.5...v0.3.0
 [v0.2.5]: https://github.com/cozy/cozy-client-js/compare/v0.2.4...v0.2.5

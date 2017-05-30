@@ -748,15 +748,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _offline = __webpack_require__(203);
+	var _jobs = __webpack_require__(203);
+	
+	var jobs = _interopRequireWildcard(_jobs);
+	
+	var _offline = __webpack_require__(204);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(204);
+	var _settings = __webpack_require__(205);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(205);
+	var _relations = __webpack_require__(206);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -836,6 +840,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  createService: intents.createService
 	};
 	
+	var jobsProto = {
+	  create: jobs.create,
+	  count: jobs.count
+	};
+	
 	var offlineProto = {
 	  init: offline.init,
 	  getDoctypes: offline.getDoctypes,
@@ -873,6 +882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.data = {};
 	    this.files = {};
 	    this.intents = {};
+	    this.jobs = {};
 	    this.offline = {};
 	    this.settings = {};
 	    this.auth = {
@@ -930,6 +940,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      addToProto(this, this.auth, authProto, disablePromises);
 	      addToProto(this, this.files, filesProto, disablePromises);
 	      addToProto(this, this.intents, intentsProto, disablePromises);
+	      addToProto(this, this.jobs, jobsProto, disablePromises);
 	      addToProto(this, this.offline, offlineProto, disablePromises);
 	      addToProto(this, this.settings, settingsProto, disablePromises);
 	
@@ -9080,6 +9091,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.count = count;
+	exports.create = create;
+	
+	var _fetch = __webpack_require__(196);
+	
+	function count(cozy, workerType) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/jobs/queue/' + workerType).then(function (data) {
+	    return data.attributes.count;
+	  });
+	}
+	
+	function create(cozy, workerType, args, options) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/jobs/queue/' + workerType, {
+	    data: {
+	      type: 'io.cozy.jobs',
+	      attributes: {
+	        arguments: args || {},
+	        options: options || {}
+	      }
+	    }
+	  });
+	}
+
+/***/ },
+/* 204 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	exports.replicationOfflineError = undefined;
 	exports.init = init;
 	exports.getDoctypes = getDoctypes;
@@ -9394,7 +9437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 204 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -9439,7 +9482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 205 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
