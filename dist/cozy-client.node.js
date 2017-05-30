@@ -265,15 +265,19 @@
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _offline = __webpack_require__(102);
+	var _jobs = __webpack_require__(102);
+	
+	var jobs = _interopRequireWildcard(_jobs);
+	
+	var _offline = __webpack_require__(103);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(103);
+	var _settings = __webpack_require__(104);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(104);
+	var _relations = __webpack_require__(105);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -353,6 +357,11 @@
 	  createService: intents.createService
 	};
 	
+	var jobsProto = {
+	  create: jobs.create,
+	  count: jobs.count
+	};
+	
 	var offlineProto = {
 	  init: offline.init,
 	  getDoctypes: offline.getDoctypes,
@@ -390,6 +399,7 @@
 	    this.data = {};
 	    this.files = {};
 	    this.intents = {};
+	    this.jobs = {};
 	    this.offline = {};
 	    this.settings = {};
 	    this.auth = {
@@ -447,6 +457,7 @@
 	      addToProto(this, this.auth, authProto, disablePromises);
 	      addToProto(this, this.files, filesProto, disablePromises);
 	      addToProto(this, this.intents, intentsProto, disablePromises);
+	      addToProto(this, this.jobs, jobsProto, disablePromises);
 	      addToProto(this, this.offline, offlineProto, disablePromises);
 	      addToProto(this, this.settings, settingsProto, disablePromises);
 	
@@ -3259,6 +3270,38 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.count = count;
+	exports.create = create;
+	
+	var _fetch = __webpack_require__(94);
+	
+	function count(cozy, workerType) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/jobs/queue/' + workerType).then(function (data) {
+	    return data.attributes.count;
+	  });
+	}
+	
+	function create(cozy, workerType, args, options) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/jobs/queue/' + workerType, {
+	    data: {
+	      type: 'io.cozy.jobs',
+	      attributes: {
+	        arguments: args || {},
+	        options: options || {}
+	      }
+	    }
+	  });
+	}
+
+/***/ },
+/* 103 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	exports.replicationOfflineError = undefined;
 	exports.init = init;
 	exports.getDoctypes = getDoctypes;
@@ -3573,7 +3616,7 @@
 	}
 
 /***/ },
-/* 103 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3618,7 +3661,7 @@
 	}
 
 /***/ },
-/* 104 */
+/* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
