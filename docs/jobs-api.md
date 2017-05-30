@@ -13,4 +13,17 @@ console.log(`There are ${count} mails waiting to be sent`)
 
 `cozy.clients.jobs.create` enqueues a job in the queue for `workerType`.
 
+```javascript
+const job = cozy.client.jobs.create('sendmail', {
+  mode: 'from',
+  to: [
+    { name: 'Support', email: 'contact@cozycloud.cc' }
+  ],
+  subject: 'Ask support for cozy-desktop',
+  parts: [
+    { type: 'text/plain', body: 'Hello, I would like some help' }
+  ]
+})
+```
+
 See [the cozy-stack documentation](https://cozy.github.io/cozy-stack/jobs.html#post-jobsqueueworker-type) for more informations
