@@ -32,7 +32,7 @@ function injectService (url, element, intent, data) {
       iframe.parentNode.removeChild(iframe)
 
       if (event.data.type === `intent-${intent._id}:error`) {
-        return reject(new Error('Intent error'))
+        return reject(event.data.error)
       }
 
       if (handshaken && event.data.type === `intent-${intent._id}:cancel`) {
@@ -142,6 +142,10 @@ export function createService (cozy, intentId, serviceWindow) {
             terminate: (doc) => terminate({
               type: `intent-${intent._id}:done`,
               document: doc
+            }),
+            'throw': error => terminate({
+              type: `intent-${intent._id}:error`,
+              error: error
             }),
             cancel: cancel
           }
