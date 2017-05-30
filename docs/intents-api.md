@@ -27,6 +27,7 @@ It returns a *service* object, which provides the following methods :
  * `getIntent()`: returns the intent
  * `terminate(doc)`: ends the intent process by passing to the client the resulting document `doc`. An intent service may only be terminated once.
  * `cancel()`: ends the intent process by passing a `null` value to the client. This method terminate the intent service the same way that `terminate()`.
+ * `throw(error)`: throw an error to client and causes the intent promise rejection.
 
 #### Example
 ```js
