@@ -158,7 +158,7 @@ It returns a promise for the document of the file or directory moved to trash.
   * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
 
 ```javascript
-const trashed = await cozy.client.files.trash("1234567")
+const trashed = await cozy.client.files.trashById("1234567")
 ```
 
 ### `cozy.client.files.destroyById(id)`
@@ -172,7 +172,7 @@ It returns a promise for completion
 - `id` is a string specifying the identifier of the file or directory
 
 ```javascript
-const trashed = await cozy.client.files.trash("1234567")
+const trashed = await cozy.client.files.trashById("1234567")
 await cozy.client.files.destroyById("1234567")
 ```
 
@@ -185,8 +185,8 @@ It returns a promise for the restored doc. (with updated parent)
 - `id` is a string specifying the identifier of the file or directory
 
 ```javascript
-const trashed = await cozy.client.files.trash("1234567")
-const restored = await cozy.client.files.restore("1234567")
+const trashed = await cozy.client.files.trashById("1234567")
+const restored = await cozy.client.files.restoreById("1234567")
 ```
 
 ### `cozy.client.files.listTrash()`
