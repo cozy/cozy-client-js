@@ -4,31 +4,19 @@ const intentClass = 'coz-intent'
 
 // helper to serialize/deserialize an error for/from postMessage
 const errorSerializer = (() => {
-  const nativeProperties = ['name', 'message']
-  return {
-    serialize: (error) => {
-      const data = Object.assign({}, error)
-      return nativeProperties.reduce((data, property) => {
-        if (error[property]) {
-          data[property] = error[property]
-        }
-        return data
-      }, data)
-    },
-    deserialize: (data) => {
-      let error = new Error(data.message)
-      for (let property in data) {
-        if (data.hasOwnProperty(property)) {
-          error[property] = data[property]
-        }
+  function mapErrorProperties (from, to) {
+    const result = Object.assign(to, from)
+    const nativeProperties = ['name', 'message']
+    return nativeProperties.reduce((result, property) => {
+      if (from[property]) {
+        to[property] = from[property]
       }
-      return nativeProperties.reduce((error, property) => {
-        if (data[property]) {
-          error[property] = data[property]
-        }
-        return error
-      }, error)
-    }
+      return result
+    }, result)
+  }
+  return {
+    serialize: (error) => mapErrorProperties(error, {}),
+    deserialize: (data) => mapErrorProperties(data, new Error(data.message))
   }
 })()
 
