@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
-- none yet
+- Add a `intentService.throw(error)` method to throw an error on client.
 
 ### Removed
 - none yet
