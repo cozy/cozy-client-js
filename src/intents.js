@@ -2,6 +2,36 @@ import {cozyFetchJSON} from './fetch'
 
 const intentClass = 'coz-intent'
 
+// helper to serialize/deserialize an error for/from postMessage
+const errorSerializer = (() => {
+  const nativeProperties = ['name', 'message']
+  return {
+    serialize: (error) => {
+      const data = Object.assign({}, error)
+      return nativeProperties.reduce((data, property) => {
+        if (error[property]) {
+          data[property] = error[property]
+        }
+        return data
+      }, data)
+    },
+    deserialize: (data) => {
+      let error = new Error(data.message)
+      for (let property in data) {
+        if (data.hasOwnProperty(property)) {
+          error[property] = data[property]
+        }
+      }
+      return nativeProperties.reduce((error, property) => {
+        if (data[property]) {
+          error[property] = data[property]
+        }
+        return error
+      }, error)
+    }
+  }
+})()
+
 // inject iframe for service in given element
 function injectService (url, element, intent, data) {
   const document = element.ownerDocument
@@ -32,7 +62,7 @@ function injectService (url, element, intent, data) {
       iframe.parentNode.removeChild(iframe)
 
       if (event.data.type === `intent-${intent._id}:error`) {
-        return reject(event.data.error)
+        return reject(errorSerializer.deserialize(event.data.error))
       }
 
       if (handshaken && event.data.type === `intent-${intent._id}:cancel`) {
@@ -143,9 +173,9 @@ export function createService (cozy, intentId, serviceWindow) {
               type: `intent-${intent._id}:done`,
               document: doc
             }),
-            'throw': error => terminate({
+            throw: error => terminate({
               type: `intent-${intent._id}:error`,
-              error: error
+              error: errorSerializer.serialize(error)
             }),
             cancel: cancel
           }

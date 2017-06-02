@@ -195,13 +195,19 @@ describe('Intents', function () {
       const element = mockElement()
       const {windowMock, iframeWindowMock} = element
 
-      const error = new Error('Intent error')
+      const error = new Error('test error')
+      error.type = 'serviceError'
+      error.status = '409'
 
       const handshakeEventMessageMock = {
         origin: serviceUrl,
         data: {
           type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:error',
-          error: error
+          error: {
+            message: 'test error',
+            type: 'serviceError',
+            status: '409'
+          }
         },
         source: iframeWindowMock
       }
@@ -209,6 +215,13 @@ describe('Intents', function () {
       const call = cozy.client.intents
         .create('PICK', 'io.cozy.files', {key: 'value'})
         .start(element)
+        .catch(error => {
+          error.should.have.property('message').eql('test error')
+          error.should.have.property('type').eql('serviceError')
+          error.should.have.property('status').eql('409')
+
+          throw error
+        })
 
       setTimeout(() => {
         should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
@@ -564,12 +577,18 @@ describe('Intents', function () {
           const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
 
           const error = new Error('test error')
+          error.type = 'testError'
+          error.status = 500
 
           service.throw(error)
 
           const messageMatch = sinon.match({
             type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:error',
-            error: error
+            error: {
+              message: 'test error',
+              type: 'testError',
+              status: 500
+            }
           })
 
           windowMock.parent.postMessage
