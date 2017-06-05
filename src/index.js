@@ -82,6 +82,7 @@ const filesProto = {
   getArchiveLinkByIds: files.getArchiveLinkByIds,
   getFilePath: files.getFilePath,
   getCollectionShareLink: files.getCollectionShareLink,
+  query: mango.queryFiles,
   listTrash: files.listTrash,
   clearTrash: files.clearTrash,
   restoreById: files.restoreById,
