@@ -11,7 +11,7 @@ function injectService (url, element, intent, data) {
   if (!window) throw new Error('Cannot retrieve window object from document')
 
   const iframe = document.createElement('iframe')
-  iframe.setAttribute('src', url)
+  iframe.setAttribute('src', decodeURI(url))
   iframe.classList.add(intentClass)
   element.appendChild(iframe)
 
