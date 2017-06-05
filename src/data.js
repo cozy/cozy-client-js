@@ -10,8 +10,10 @@ export function create (cozy, doctype, attributes) {
     if (isV2) {
       attributes.docType = doctype
     }
-    const path = createPath(cozy, isV2, doctype)
-    return cozyFetchJSON(cozy, 'POST', path, attributes).then((resp) => {
+    const path = createPath(cozy, isV2, doctype, attributes._id)
+    const httpVerb = attributes._id ? 'PUT' : 'POST'
+    delete attributes._id
+    return cozyFetchJSON(cozy, httpVerb, path, attributes).then((resp) => {
       if (isV2) {
         return find(cozy, doctype, resp._id)
       } else {
