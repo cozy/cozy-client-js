@@ -49,6 +49,16 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
 }
 
 export function cozyFetchJSON (cozy, method, path, body, options = {}) {
+  return fetchJSON(cozy, method, path, body, options)
+    .then(handleJSONResponse)
+}
+
+export function cozyFetchRawJSON (cozy, method, path, body, options = {}) {
+  return fetchJSON(cozy, method, path, body, options)
+    .then(response => handleJSONResponse(response, false))
+}
+
+function fetchJSON (cozy, method, path, body, options = {}) {
   options.method = method
 
   const headers = options.headers = options.headers || {}
@@ -65,7 +75,6 @@ export function cozyFetchJSON (cozy, method, path, body, options = {}) {
   }
 
   return cozyFetch(cozy, path, options)
-    .then(handleJSONResponse)
 }
 
 function handleResponse (res) {
@@ -84,7 +93,7 @@ function handleResponse (res) {
   })
 }
 
-function handleJSONResponse (res) {
+function handleJSONResponse (res, processJSONAPI = true) {
   const contentType = res.headers.get('content-type')
   if (!contentType || contentType.indexOf('json') < 0) {
     return res.text((data) => {
@@ -93,7 +102,7 @@ function handleJSONResponse (res) {
   }
 
   const json = res.json()
-  if (contentType.indexOf('application/vnd.api+json') === 0) {
+  if (contentType.indexOf('application/vnd.api+json') === 0 && processJSONAPI) {
     return json.then(jsonapi)
   } else {
     return json

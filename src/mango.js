@@ -1,6 +1,6 @@
 import {warn, createPath} from './utils'
 import {normalizeDoctype} from './doctypes'
-import {cozyFetchJSON} from './fetch'
+import {cozyFetchJSON, cozyFetchRawJSON} from './fetch'
 
 export function defineIndex (cozy, doctype, fields) {
   return cozy.isV2().then((isV2) => {
@@ -31,7 +31,7 @@ export function query (cozy, indexRef, options) {
 
 export function queryFiles (cozy, indexRef, options) {
   const opts = getV3Options(indexRef, options)
-  return cozyFetchJSON(cozy, 'POST', '/files/_find', opts)
+  return cozyFetchRawJSON(cozy, 'POST', '/files/_find', opts)
     .then((response) => options.wholeResponse ? response : response.docs)
 }
 
