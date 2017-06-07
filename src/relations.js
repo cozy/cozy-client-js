@@ -1,5 +1,4 @@
-import { cozyFetchJSON } from './fetch'
-import { encodeQuery } from './utils'
+import { cozyFetchJSON, cozyFetchRawJSON } from './fetch'
 import { DOCTYPE_FILES } from './doctypes'
 
 function updateRelations (verb) {
@@ -16,18 +15,20 @@ function updateRelations (verb) {
 export const addReferencedFiles = updateRelations('POST')
 export const removeReferencedFiles = updateRelations('DELETE')
 
-export function listReferencedFiles (cozy, doc, options) {
+export function listReferencedFiles (cozy, doc) {
   if (!doc) throw new Error('missing doc argument')
-  return cozyFetchJSON(cozy, 'GET', makeReferencesPath(doc, options))
+  return cozyFetchJSON(cozy, 'GET', makeReferencesPath(doc))
     .then((files) => files.map((file) => file._id))
 }
 
-function makeReferencesPath (doc, options) {
+export function fetchReferencedFiles (cozy, doc, options) {
+  if (!doc) throw new Error('missing doc argument')
+  const params = Object.keys(options).map(key => `&page[${key}]=${options[key]}`).join('')
+  return cozyFetchRawJSON(cozy, 'GET', `${makeReferencesPath(doc)}?include=files${params}`)
+}
+
+function makeReferencesPath (doc) {
   const type = encodeURIComponent(doc._type)
   const id = encodeURIComponent(doc._id)
-  let q = encodeQuery(options)
-  if (q !== '') {
-    q = '?' + q
-  }
-  return `/data/${type}/${id}/relationships/references${q}`
+  return `/data/${type}/${id}/relationships/references`
 }

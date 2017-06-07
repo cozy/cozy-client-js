@@ -42,6 +42,7 @@ const dataProto = {
   addReferencedFiles: relations.addReferencedFiles,
   removeReferencedFiles: relations.removeReferencedFiles,
   listReferencedFiles: relations.listReferencedFiles,
+  fetchReferencedFiles: relations.fetchReferencedFiles,
   destroy: function (...args) {
     warn('destroy is deprecated, use cozy.data.delete instead.')
     return data._delete(...args)
