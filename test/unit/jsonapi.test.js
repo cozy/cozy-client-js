@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import jsonapiUnpack from '../../src/jsonapi'
 
 describe('unpacking', function () {
@@ -22,10 +21,10 @@ describe('unpacking', function () {
       }
     })
 
-    result.should.have.property('_id', '42')
-    result.should.have.property('_rev', '1-24')
-    result.should.have.property('attributes')
-    result.attributes.should.have.property('test', 'value')
+    expect(result).toHaveProperty('_id', '42')
+    expect(result).toHaveProperty('_rev', '1-24')
+    expect(result).toHaveProperty('attributes')
+    expect(result.attributes).toHaveProperty('test', 'value')
   })
 
   it('array data', function () {
@@ -48,40 +47,40 @@ describe('unpacking', function () {
       ]
     })
 
-    result.should.be.an.Array()
-    result.should.have.length(2)
-    result[0].should.have.property('_rev', '1-24')
-    result[0].should.have.property('_id', '42')
-    result[0].should.have.property('attributes')
-    result[0].attributes.should.have.property('test', 'value')
+    expect(result).toBeInstanceOf(Array)
+    expect(result).toHaveLength(2)
+    expect(result[0]).toHaveProperty('_rev', '1-24')
+    expect(result[0]).toHaveProperty('_id', '42')
+    expect(result[0]).toHaveProperty('attributes')
+    expect(result[0].attributes).toHaveProperty('test', 'value')
 
-    result[1].should.have.property('_id', '43')
-    result[1].should.have.property('_rev', '1-34')
-    result[1].should.have.property('attributes')
-    result[1].attributes.should.have.property('test', 'value2')
+    expect(result[1]).toHaveProperty('_id', '43')
+    expect(result[1]).toHaveProperty('_rev', '1-34')
+    expect(result[1]).toHaveProperty('attributes')
+    expect(result[1].attributes).toHaveProperty('test', 'value2')
   })
 
   it('included', function () {
     let result = jsonapiUnpack(COMPLEX)
 
-    result.should.have.property('_id', 'top1')
-    result.should.have.property('_rev', '1-a59751f9c66867758a7f2b4ebdd9d05f')
-    result.should.have.property('attributes')
-    result.attributes.should.have.property('test', 'top1')
+    expect(result).toHaveProperty('_id', 'top1')
+    expect(result).toHaveProperty('_rev', '1-a59751f9c66867758a7f2b4ebdd9d05f')
+    expect(result).toHaveProperty('attributes')
+    expect(result.attributes).toHaveProperty('test', 'top1')
 
     let contents = result.relations('contents')
 
-    should(contents).not.be.Undefined()
-    contents.should.be.an.Array()
-    contents.should.have.length(2)
+    expect(contents).toBeDefined()
+    expect(contents).toBeInstanceOf(Array)
+    expect(contents).toHaveLength(2)
 
-    contents[0].should.have.property('_id', 'child1')
-    contents[0].should.have.property('_rev', '1-1ae365a207bb5eb5c2d3cb8417b5885b')
-    contents[0].should.have.property('attributes')
-    contents[0].attributes.should.have.property('test', 'child1')
+    expect(contents[0]).toHaveProperty('_id', 'child1')
+    expect(contents[0]).toHaveProperty('_rev', '1-1ae365a207bb5eb5c2d3cb8417b5885b')
+    expect(contents[0]).toHaveProperty('attributes')
+    expect(contents[0].attributes).toHaveProperty('test', 'child1')
 
     let parent = contents[0].relations('parent')
-    should(parent === result).be.true
+    expect(parent === result).toBe(true)
   })
 })
 

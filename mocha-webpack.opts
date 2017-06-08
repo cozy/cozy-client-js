@@ -1,5 +1,0 @@
---colors
---reporter spec
---include babel-polyfill
---require source-map-support/register
---webpack-config webpack.config.js

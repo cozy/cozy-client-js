@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import 'isomorphic-fetch'
 import {Client} from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
@@ -25,39 +24,26 @@ describe('mango API', function () {
   const cozy = {}
 
   if (COZY_STACK_VERSION === '2') {
-    before(mockTokenRetrieve)
+    beforeAll(mockTokenRetrieve)
   }
 
-  before(function () {
+  beforeAll(async function () {
     cozy.client = new Client({
       cozyURL: COZY_STACK_URL,
       token: COZY_STACK_TOKEN
     })
-  })
-
-  before(async function () {
     for (var i = 0, l = docs.length; i < l; i++) {
       docs[i] = await cozy.client.data.create(DOCTYPE, docs[i])
     }
+    indexOnGroup = await cozy.client.data.defineIndex(DOCTYPE, ['group'])
+    await cozy.client.data.defineIndex(DOCTYPE, ['group'])
+    indexOnGroupAndYear = await cozy.client.data.defineIndex(DOCTYPE, ['group', 'year'])
   })
 
-  after(async function () {
+  afterAll(async function () {
     for (var i = 0, l = docs.length; i < l; i++) {
       await cozy.client.data.delete(DOCTYPE, docs[i])
     }
-  })
-
-  it('Define indexOnGroup', async function () {
-    indexOnGroup = await cozy.client.data.defineIndex(DOCTYPE, ['group'])
-  })
-
-  it('Redefine the same index', async function () {
-    await cozy.client.data.defineIndex(DOCTYPE, ['group'])
-    // should.not.throw
-  })
-
-  it('Define indexOnGroupAndYear', async function () {
-    indexOnGroupAndYear = await cozy.client.data.defineIndex(DOCTYPE, ['group', 'year'])
   })
 
   it('Query indexOnGroup', async function () {
@@ -65,8 +51,8 @@ describe('mango API', function () {
       selector: {group: 'A'}
     })
 
-    results.should.be.an.Array()
-    results.should.have.length(4)
+    expect(Array.isArray(results)).toBe(true)
+    expect(results).toHaveLength(4)
   })
 
   it('Query indexOnGroupAndYear', async function () {
@@ -74,8 +60,8 @@ describe('mango API', function () {
       selector: {group: 'A'}
     })
 
-    results.should.be.an.Array()
-    results.should.have.length(4)
+    expect(Array.isArray(results)).toBe(true)
+    expect(results).toHaveLength(4)
   })
 
   it('Query indexOnGroupAndYear with 2 fields', async function () {
@@ -83,8 +69,8 @@ describe('mango API', function () {
       selector: {group: 'A', year: {$gte: 1900, $lt: 2200}}
     })
 
-    results.should.be.an.Array()
-    results.should.have.length(2)
+    expect(Array.isArray(results)).toBe(true)
+    expect(results).toHaveLength(2)
   })
 
   it('Query indexOnGroupAndYear with 2 fields and sorted', async function () {
@@ -96,8 +82,8 @@ describe('mango API', function () {
       selector: {group: 'A', year: {$gte: 1900, $lt: 2200}}
     })
 
-    sortedResults.should.be.an.Array()
-    sortedResults.should.have.length(2)
-    sortedResults[0].should.deepEqual(nonSortedresults[1])
+    expect(Array.isArray(sortedResults)).toBe(true)
+    expect(sortedResults).toHaveLength(2)
+    expect(sortedResults[0]).toEqual(nonSortedresults[1])
   })
 })

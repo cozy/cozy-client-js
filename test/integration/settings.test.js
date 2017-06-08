@@ -1,7 +1,6 @@
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // eslint-disable-next-line no-unused-vars
-import should from 'should'
 import 'isomorphic-fetch'
 import {Client} from '../../src'
 
@@ -12,19 +11,22 @@ const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 describe('settings api', async function () {
   const cozy = {}
 
-  beforeEach(function () {
+  describe('only v3', () => {
     if (COZY_STACK_VERSION === '2') {
       this.skip()
     }
-    cozy.client = new Client({
-      cozyURL: COZY_STACK_URL,
-      token: COZY_STACK_TOKEN
-    })
-  })
 
-  it('gets the disk usage', async function () {
-    const usage = await cozy.client.settings.diskUsage()
-    usage.should.have.property('attributes')
-    usage.attributes.used.should.be.type('string')
+    beforeEach(function () {
+      cozy.client = new Client({
+        cozyURL: COZY_STACK_URL,
+        token: COZY_STACK_TOKEN
+      })
+    })
+
+    it('gets the disk usage', async function () {
+      const usage = await cozy.client.settings.diskUsage()
+      expect(usage).toHaveProperty('attributes')
+      expect(typeof usage.attributes.used).toBe('string')
+    })
   })
 })
