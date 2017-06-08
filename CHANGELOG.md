@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.3.4] - 2017-06-06
+### Changed
+- Create data with forced ID
+
+### Fixed
+- Documentation about trash/restore
+- Documentation about sending an email
+
+
 ## [v0.3.3] - 2017-05-30
 ### Changed
 - Update documentation
@@ -152,7 +161,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.4...HEAD
+[v0.3.3]: https://github.com/cozy/cozy-client-js/compare/v0.3.3...v0.3.4
 [v0.3.3]: https://github.com/cozy/cozy-client-js/compare/v0.3.2...v0.3.3
 [v0.3.2]: https://github.com/cozy/cozy-client-js/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/cozy/cozy-client-js/compare/v0.3.0...v0.3.1

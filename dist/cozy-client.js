@@ -8038,8 +8038,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (isV2) {
 	      attributes.docType = doctype;
 	    }
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype);
-	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, attributes).then(function (resp) {
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, attributes._id);
+	    var httpVerb = attributes._id ? 'PUT' : 'POST';
+	    delete attributes._id;
+	    return (0, _fetch.cozyFetchJSON)(cozy, httpVerb, path, attributes).then(function (resp) {
 	      if (isV2) {
 	        return find(cozy, doctype, resp._id);
 	      } else {
