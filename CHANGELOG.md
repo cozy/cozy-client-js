@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Add a `intentService.throw(error)` method to throw an error on client.
+- Add a `getArchiveLinkByIds` method to create a zip with files identified by their ids.
 
 ### Removed
 - none yet

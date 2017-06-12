@@ -271,12 +271,24 @@ export function getCollectionShareLink (cozy, id, collectionType) {
   }).then(data => ({sharecode: `sharecode=${data.attributes.codes.email}`, id: `id=${id}`}))
 }
 
-export function getArchiveLink (cozy, paths, name = 'files') {
+export function getArchiveLinkByPaths (cozy, paths, name = 'files') {
   const archive = {
     type: 'io.cozy.archives',
     attributes: {
       name: name,
       files: paths
+    }
+  }
+  return cozyFetchJSON(cozy, 'POST', `/files/archive`, {data: archive})
+  .then(extractResponseLinkRelated)
+}
+
+export function getArchiveLinkByIds (cozy, ids, name = 'files') {
+  const archive = {
+    type: 'io.cozy.archives',
+    attributes: {
+      name: name,
+      ids: ids
     }
   }
   return cozyFetchJSON(cozy, 'POST', `/files/archive`, {data: archive})
