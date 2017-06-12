@@ -46,6 +46,12 @@ function injectService (url, element, intent, data) {
         return event.source.postMessage(data, event.origin)
       }
 
+      if (handshaken && event.data.type === `intent-${intent._id}:size`) {
+        if (event.data.document.width) element.style.width = event.data.document.width
+        if (event.data.document.height) element.style.height = event.data.document.height
+        return true
+      }
+
       window.removeEventListener('message', messageHandler)
       iframe.parentNode.removeChild(iframe)
 
@@ -142,6 +148,11 @@ export function createService (cozy, intentId, serviceWindow) {
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
+      const setSize = (message) => {
+        if (terminated) throw new Error('Intent service has already been terminated')
+        serviceWindow.parent.postMessage(message, intent.attributes.client)
+      }
+
       const cancel = () => {
         terminate({type: `intent-${intent._id}:cancel`})
       }
@@ -164,6 +175,10 @@ export function createService (cozy, intentId, serviceWindow) {
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
               error: errorSerializer.serialize(error)
+            }),
+            setSize: (doc) => setSize({
+              type: `intent-${intent._id}:size`,
+              document: doc
             }),
             cancel: cancel
           }
