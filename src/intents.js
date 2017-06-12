@@ -47,8 +47,9 @@ function injectService (url, element, intent, data) {
       }
 
       if (handshaken && event.data.type === `intent-${intent._id}:size`) {
-        if (event.data.document.width) element.style.width = event.data.document.width
-        if (event.data.document.height) element.style.height = event.data.document.height
+        ['width', 'height', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight'].forEach(prop => {
+          if (event.data.document[prop]) element.style[prop] = event.data.document[prop]
+        })
         return true
       }
 
