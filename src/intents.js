@@ -50,6 +50,7 @@ function injectService (url, element, intent, data) {
         ['width', 'height', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight'].forEach(prop => {
           if (event.data.document[prop]) element.style[prop] = event.data.document[prop]
         })
+
         return true
       }
 
@@ -151,6 +152,14 @@ export function createService (cozy, intentId, serviceWindow) {
 
       const setSize = (message) => {
         if (terminated) throw new Error('Intent service has already been terminated')
+
+        // if a dom element is passed, calculate its size and convert it in css properties
+        if (message.document.dom) {
+          message.document.maxHeight = `${message.document.dom.clientHeight}px`
+          message.document.maxWidth = `${message.document.dom.clientWidth}px`
+          message.document.dom = undefined
+        }
+
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
