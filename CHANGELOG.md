@@ -13,13 +13,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
+- none yet
+
+### Removed
+- none yet
+
+
+## [v0.3.5] - 2017-06-13
+### Added
 - Add a `intentService.throw(error)` method to throw an error on client.
 - Add a `getArchiveLinkByIds` method to create a zip with files identified by their ids.
 - Add a `fetchReferencedFiles` method to fetch the files related to a doc.
 - Add a `cozy.client.files.query` method to fetch files using a mango query
-
-### Removed
-- none yet
 
 
 ## [v0.3.4] - 2017-06-06

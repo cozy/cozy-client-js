@@ -794,6 +794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  addReferencedFiles: relations.addReferencedFiles,
 	  removeReferencedFiles: relations.removeReferencedFiles,
 	  listReferencedFiles: relations.listReferencedFiles,
+	  fetchReferencedFiles: relations.fetchReferencedFiles,
 	  destroy: function destroy() {
 	    (0, _utils.warn)('destroy is deprecated, use cozy.data.delete instead.');
 	    return data._delete.apply(data, arguments);
@@ -826,9 +827,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getDownloadLinkById: files.getDownloadLinkById,
 	  getDownloadLink: files.getDownloadLinkByPath, // DEPRECATED, should be removed very soon
 	  getDownloadLinkByPath: files.getDownloadLinkByPath,
-	  getArchiveLink: files.getArchiveLink,
+	  getArchiveLink: function getArchiveLink() {
+	    (0, _utils.warn)('getArchiveLink is deprecated, use cozy.files.getArchiveLinkByPaths instead.');
+	    return files.getArchiveLink.apply(files, arguments);
+	  },
+	  getArchiveLinkByPaths: files.getArchiveLinkByPaths,
+	  getArchiveLinkByIds: files.getArchiveLinkByIds,
 	  getFilePath: files.getFilePath,
 	  getCollectionShareLink: files.getCollectionShareLink,
+	  query: mango.queryFiles,
 	  listTrash: files.listTrash,
 	  clearTrash: files.clearTrash,
 	  restoreById: files.restoreById,
@@ -7780,6 +7787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.cozyFetch = cozyFetch;
 	exports.cozyFetchJSON = cozyFetchJSON;
+	exports.cozyFetchRawJSON = cozyFetchRawJSON;
 	
 	var _auth_v = __webpack_require__(195);
 	
@@ -7855,6 +7863,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	function cozyFetchJSON(cozy, method, path, body) {
 	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 	
+	  return fetchJSON(cozy, method, path, body, options).then(handleJSONResponse);
+	}
+	
+	function cozyFetchRawJSON(cozy, method, path, body) {
+	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+	
+	  return fetchJSON(cozy, method, path, body, options).then(function (response) {
+	    return handleJSONResponse(response, false);
+	  });
+	}
+	
+	function fetchJSON(cozy, method, path, body) {
+	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+	
 	  options.method = method;
 	
 	  var headers = options.headers = options.headers || {};
@@ -7870,7 +7892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	
-	  return cozyFetch(cozy, path, options).then(handleJSONResponse);
+	  return cozyFetch(cozy, path, options);
 	}
 	
 	function handleResponse(res) {
@@ -7890,6 +7912,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function handleJSONResponse(res) {
+	  var processJSONAPI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	
 	  var contentType = res.headers.get('content-type');
 	  if (!contentType || contentType.indexOf('json') < 0) {
 	    return res.text(function (data) {
@@ -7898,7 +7922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  var json = res.json();
-	  if (contentType.indexOf('application/vnd.api+json') === 0) {
+	  if (contentType.indexOf('application/vnd.api+json') === 0 && processJSONAPI) {
 	    return json.then(_jsonapi2.default);
 	  } else {
 	    return json;
@@ -8218,6 +8242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports.defineIndex = defineIndex;
 	exports.query = query;
+	exports.queryFiles = queryFiles;
 	exports.parseSelector = parseSelector;
 	exports.normalizeSelector = normalizeSelector;
 	exports.makeMapReduceQuery = makeMapReduceQuery;
@@ -8254,6 +8279,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      return queryV3(cozy, indexRef, options);
 	    }
+	  });
+	}
+	
+	function queryFiles(cozy, indexRef, options) {
+	  var opts = getV3Options(indexRef, options);
+	  return (0, _fetch.cozyFetchRawJSON)(cozy, 'POST', '/files/_find', opts).then(function (response) {
+	    return options.wholeResponse ? response : response.docs;
 	  });
 	}
 	
@@ -8314,6 +8346,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// queryV3 is equivalent to query but only works for V3
 	function queryV3(cozy, indexRef, options) {
+	  var opts = getV3Options(indexRef, options);
+	
+	  var path = (0, _utils.createPath)(cozy, false, indexRef.doctype, '_find');
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function (response) {
+	    return options.wholeResponse ? response : response.docs;
+	  });
+	}
+	
+	function getV3Options(indexRef, options) {
 	  if (indexRef.type !== 'mango') {
 	    throw new Error('indexRef should be the return value of defineIndexV3');
 	  }
@@ -8333,10 +8374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	
-	  var path = (0, _utils.createPath)(cozy, false, indexRef.doctype, '_find');
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function (response) {
-	    return options.wholeResponse ? response : response.docs;
-	  });
+	  return opts;
 	}
 	
 	// misc
@@ -8522,7 +8560,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getDownloadLinkById = getDownloadLinkById;
 	exports.getFilePath = getFilePath;
 	exports.getCollectionShareLink = getCollectionShareLink;
-	exports.getArchiveLink = getArchiveLink;
+	exports.getArchiveLinkByPaths = getArchiveLinkByPaths;
+	exports.getArchiveLinkByIds = getArchiveLinkByIds;
 	exports.listTrash = listTrash;
 	exports.clearTrash = clearTrash;
 	exports.restoreById = restoreById;
@@ -8830,7 +8869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 	
-	function getArchiveLink(cozy, paths) {
+	function getArchiveLinkByPaths(cozy, paths) {
 	  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'files';
 	
 	  var archive = {
@@ -8838,6 +8877,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    attributes: {
 	      name: name,
 	      files: paths
+	    }
+	  };
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/archive', { data: archive }).then(extractResponseLinkRelated);
+	}
+	
+	function getArchiveLinkByIds(cozy, ids) {
+	  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'files';
+	
+	  var archive = {
+	    type: 'io.cozy.archives',
+	    attributes: {
+	      name: name,
+	      ids: ids
 	    }
 	  };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/archive', { data: archive }).then(extractResponseLinkRelated);
@@ -8930,6 +8982,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var intentClass = 'coz-intent';
 	
+	// helper to serialize/deserialize an error for/from postMessage
+	var errorSerializer = function () {
+	  function mapErrorProperties(from, to) {
+	    var result = Object.assign(to, from);
+	    var nativeProperties = ['name', 'message'];
+	    return nativeProperties.reduce(function (result, property) {
+	      if (from[property]) {
+	        to[property] = from[property];
+	      }
+	      return result;
+	    }, result);
+	  }
+	  return {
+	    serialize: function serialize(error) {
+	      return mapErrorProperties(error, {});
+	    },
+	    deserialize: function deserialize(data) {
+	      return mapErrorProperties(data, new Error(data.message));
+	    }
+	  };
+	}();
+	
 	// inject iframe for service in given element
 	function injectService(url, element, intent, data) {
 	  var document = element.ownerDocument;
@@ -8960,7 +9034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      iframe.parentNode.removeChild(iframe);
 	
 	      if (event.data.type === 'intent-' + intent._id + ':error') {
-	        return reject(new Error('Intent error'));
+	        return reject(errorSerializer.deserialize(event.data.error));
 	      }
 	
 	      if (handshaken && event.data.type === 'intent-' + intent._id + ':cancel') {
@@ -9076,6 +9150,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return _terminate({
 	            type: 'intent-' + intent._id + ':done',
 	            document: doc
+	          });
+	        },
+	        throw: function _throw(error) {
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':error',
+	            error: errorSerializer.serialize(error)
 	          });
 	        },
 	        cancel: cancel
@@ -9494,6 +9574,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.removeReferencedFiles = exports.addReferencedFiles = undefined;
 	exports.listReferencedFiles = listReferencedFiles;
+	exports.fetchReferencedFiles = fetchReferencedFiles;
 	
 	var _fetch = __webpack_require__(196);
 	
@@ -9522,6 +9603,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return file._id;
 	    });
 	  });
+	}
+	
+	function fetchReferencedFiles(cozy, doc, options) {
+	  if (!doc) throw new Error('missing doc argument');
+	  var params = Object.keys(options).map(function (key) {
+	    return '&page[' + key + ']=' + options[key];
+	  }).join('');
+	  return (0, _fetch.cozyFetchRawJSON)(cozy, 'GET', makeReferencesPath(doc) + '?include=files' + params);
 	}
 	
 	function makeReferencesPath(doc) {
