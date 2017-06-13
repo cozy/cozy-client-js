@@ -1,6 +1,6 @@
 import {warn, createPath} from './utils'
 import {normalizeDoctype} from './doctypes'
-import {cozyFetchJSON} from './fetch'
+import {cozyFetchJSON, cozyFetchRawJSON} from './fetch'
 
 export function defineIndex (cozy, doctype, fields) {
   return cozy.isV2().then((isV2) => {
@@ -27,6 +27,12 @@ export function query (cozy, indexRef, options) {
       return queryV3(cozy, indexRef, options)
     }
   })
+}
+
+export function queryFiles (cozy, indexRef, options) {
+  const opts = getV3Options(indexRef, options)
+  return cozyFetchRawJSON(cozy, 'POST', '/files/_find', opts)
+    .then((response) => options.wholeResponse ? response : response.docs)
 }
 
 // Internals
@@ -81,6 +87,14 @@ function queryV2 (cozy, indexRef, options) {
 
 // queryV3 is equivalent to query but only works for V3
 function queryV3 (cozy, indexRef, options) {
+  const opts = getV3Options(indexRef, options)
+
+  let path = createPath(cozy, false, indexRef.doctype, '_find')
+  return cozyFetchJSON(cozy, 'POST', path, opts)
+    .then((response) => options.wholeResponse ? response : response.docs)
+}
+
+function getV3Options (indexRef, options) {
   if (indexRef.type !== 'mango') {
     throw new Error('indexRef should be the return value of defineIndexV3')
   }
@@ -98,9 +112,7 @@ function queryV3 (cozy, indexRef, options) {
     opts.sort = indexRef.fields.map(f => ({ [f]: 'desc' }))
   }
 
-  let path = createPath(cozy, false, indexRef.doctype, '_find')
-  return cozyFetchJSON(cozy, 'POST', path, opts)
-    .then((response) => options.wholeResponse ? response : response.docs)
+  return opts
 }
 
 // misc

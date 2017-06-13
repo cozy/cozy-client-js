@@ -348,3 +348,30 @@ const href = await cozy.client.files.getArchiveLinkByIds(["1592673"], "secretpro
 (see cozy-stack [documentation](https://cozy.github.io/cozy-stack/references-docs-in-vfs.html) for more details).
 
 It returns a promise for a list of filesIds. Files must then be fetched separately.
+
+### `cozy.client.data.fetchReferencedFiles(doc)`
+
+`cozy.client.data.fetchReferencedFiles(doc)` fetches the files bound to the document.
+(see cozy-stack [documentation](https://cozy.github.io/cozy-stack/references-docs-in-vfs.html) for more details).
+
+It returns a promise for a list of files.
+
+### `cozy.client.files.query(indexReference, query)`
+
+`cozy.client.files.query(indexReference, query)` find files using an index.
+
+It returns a promise with a list of files matching the query. Results will be returned in the order defined for the index.
+
+- `query` is an object with the following fields:
+  * `selector`: a mango selector
+  * `limit`: maximum number of results
+  * `skip`: ignore the first x results (pagination)
+  * `wholeResponse`: when set to true, the whole query response will be returned instead of just the docs. This is useful when paginating, because you'll get the `next` property in the response object.
+
+```javascript
+const results = await cozy.client.files.query(photosByDate, {
+  "selector": {"class": "image"},
+  "limit": 3,
+  "skip": 1
+})
+```
