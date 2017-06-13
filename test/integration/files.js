@@ -231,7 +231,7 @@ describe('files API', async function () {
       '/' + created.attributes.name,
       '/' + created2.attributes.name
     ]
-    let link = await cozy.client.files.getArchiveLink(toDownload, 'foobar')
+    let link = await cozy.client.files.getArchiveLinkByPaths(toDownload, 'foobar')
     let downloaded = await fetch(COZY_STACK_URL + link)
     downloaded.ok.should.be.true
     downloaded.headers.get('Content-Type').should.equal('application/zip')

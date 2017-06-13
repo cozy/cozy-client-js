@@ -278,26 +278,49 @@ document.body.appendChild(link) && link.click()
 - `path` is a string specifying the path of the file
 
 
-### `cozy.client.files.getArchiveLink(paths, name)`
+### `cozy.client.files.getArchiveLinkByPaths(paths, name)`
 
-`cozy.client.files.getArchiveLink(paths, name)` is used to get a download link for a zip file containing all the files identified by the given paths.
+`cozy.client.files.getArchiveLinkByPaths(paths, name)` is used to get a download link for a zip file containing all the files identified by the given paths.
 
 It returns a promise for the download link.
 Download link are only valid for a short while (default 1 hour)
 You can use this link to start a browser download (see code in getDownloadLink)
 
 ```javascript
-const href = await cozy.client.files.getArchiveLink([
+const href = await cozy.client.files.getArchiveLinkByPaths([
   "/foo/hello.txt",
   "/bar/test.txt"
 ])
 // href === "/files/archive/b1c127c25d99f0b37ac2c2a907f36069/files.zip"
 
-const href = await cozy.client.files.getArchiveLink(["/foo/hello.txt"], "secretproject")
+const href = await cozy.client.files.getArchiveLinkByPaths(["/foo/hello.txt"], "secretproject")
 // href === "/files/archive/bc2a901c127c25d99f0b37a36069c27f/secretproject.zip"
 ```
 
 - `paths` is an array of paths
+- `name` is the optional name for the generated archive file (default "files").
+
+
+### `cozy.client.files.getArchiveLinkByIds(ids, name)`
+
+`cozy.client.files.getArchiveLinkByIds(ids, name)` is used to get a download link for a zip file containing all the files identified by the given ids.
+
+It returns a promise for the download link.
+Download link are only valid for a short while (default 1 hour)
+You can use this link to start a browser download (see code in getDownloadLink)
+
+```javascript
+const href = await cozy.client.files.getArchiveLinkByIds([
+  "1234567",
+  "9876543"
+])
+// href === "/files/archive/b1c127c25d99f0b37ac2c2a907f36069/files.zip"
+
+const href = await cozy.client.files.getArchiveLinkByIds(["1592673"], "secretproject")
+// href === "/files/archive/bc2a901c127c25d99f0b37a36069c27f/secretproject.zip"
+```
+
+- `ids` is an array of ids
 - `name` is the optional name for the generated archive file (default "files").
 
 
