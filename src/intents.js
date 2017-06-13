@@ -48,7 +48,7 @@ function injectService (url, element, intent, data) {
 
       if (handshaken && event.data.type === `intent-${intent._id}:size`) {
         ['width', 'height', 'maxWidth', 'maxHeight', 'minWidth', 'minHeight'].forEach(prop => {
-          if (event.data.document[prop]) element.style[prop] = event.data.document[prop]
+          if (event.data.document[prop]) element.style[prop] = `${event.data.document[prop]}px`
         })
 
         return true
@@ -145,19 +145,19 @@ export function createService (cozy, intentId, serviceWindow) {
       let terminated = false
 
       const terminate = (message) => {
-        if (terminated) throw new Error('Intent service has already been terminated')
+        if (terminated) throw new Error('Intent service has been terminated')
         terminated = true
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
-      const setSize = (message) => {
-        if (terminated) throw new Error('Intent service has already been terminated')
+      const resizeClient = (message) => {
+        if (terminated) throw new Error('Intent service has been terminated')
 
         // if a dom element is passed, calculate its size and convert it in css properties
-        if (message.document.dom) {
-          message.document.maxHeight = `${message.document.dom.clientHeight}px`
-          message.document.maxWidth = `${message.document.dom.clientWidth}px`
-          message.document.dom = undefined
+        if (message.dimensions.element) {
+          message.dimensions.maxHeight = message.dimensions.element.clientHeight
+          message.dimensions.maxWidth = message.dimensions.element.clientWidth
+          message.dimensions.element = undefined
         }
 
         serviceWindow.parent.postMessage(message, intent.attributes.client)
@@ -186,9 +186,9 @@ export function createService (cozy, intentId, serviceWindow) {
               type: `intent-${intent._id}:error`,
               error: errorSerializer.serialize(error)
             }),
-            setSize: (doc) => setSize({
+            resizeClient: (dimensions) => resizeClient({
               type: `intent-${intent._id}:size`,
-              document: doc
+              dimensions
             }),
             cancel: cancel
           }
