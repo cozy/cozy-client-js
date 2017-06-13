@@ -25,6 +25,16 @@ If `intentId` and `window` parameters are not provided the method will try to re
 It returns a *service* object, which provides the following methods :
  * `getData()`: returns the data passed to the service by the client.
  * `getIntent()`: returns the intent
+ * `setSize(doc)`: forces the size of the intent modale to a given minWidth, width, maxWidth, minHeight, height, maxHeight, or dimensions of a given dom element.
+ ```javascript
+ service.setSize({
+    maxHeight: '300px'
+ })
+ // or
+ service.setSize({
+    dom: document.querySelector('.class')
+ })
+ ```
  * `terminate(doc)`: ends the intent process by passing to the client the resulting document `doc`. An intent service may only be terminated once.
  * `cancel()`: ends the intent process by passing a `null` value to the client. This method terminate the intent service the same way that `terminate()`.
  * `throw(error)`: throw an error to client and causes the intent promise rejection.
