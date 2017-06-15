@@ -524,7 +524,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.terminate(result)
-          }, /Intent service has been terminated/)
+          }, /Intent service has already been terminated/)
         })
       })
 
@@ -596,7 +596,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.cancel()
-          }, /Intent service has been terminated/)
+          }, /Intent service has already been terminated/)
         })
 
         it('should forbbid further calls to terminate()', async function () {
@@ -622,7 +622,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.terminate(result)
-          }, /Intent service has been terminated/)
+          }, /Intent service has already been terminated/)
         })
       })
 
@@ -680,7 +680,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.cancel()
-          }, /Intent service has been terminated/)
+          }, /Intent service has already been terminated/)
         })
 
         it('should forbbid further calls to terminate()', async function () {
@@ -706,7 +706,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.terminate(result)
-          }, /Intent service has been terminated/)
+          }, /Intent service has already been terminated/)
         })
       })
     })
