@@ -438,6 +438,37 @@ describe('Intents', function () {
           windowMock.parent.postMessage
             .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
+
+        it('should not be called once the service has been terminated', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.terminate(result)
+
+          should.throws(() => {
+            service.resizeClient({
+              element: {
+                clientHeight: 10,
+                clientWidth: 13
+              }
+            })
+          }, /Intent service has been terminated/)
+        })
       })
 
       describe('Terminate', function () {
