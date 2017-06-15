@@ -3211,7 +3211,7 @@
 	
 	      if (handshaken && event.data.type === 'intent-' + intent._id + ':size') {
 	        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
-	          if (event.data.document[prop]) element.style[prop] = event.data.document[prop] + 'px';
+	          if (event.data.dimensions[prop]) element.style[prop] = event.data.document[prop] + 'px';
 	        });
 	
 	        return true;
@@ -3310,7 +3310,7 @@
 	    var terminated = false;
 	
 	    var _terminate = function _terminate(message) {
-	      if (terminated) throw new Error('Intent service has been terminated');
+	      if (terminated) throw new Error('Intent service has already been terminated');
 	      terminated = true;
 	      serviceWindow.parent.postMessage(message, intent.attributes.client);
 	    };
