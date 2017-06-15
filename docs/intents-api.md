@@ -25,7 +25,7 @@ If `intentId` and `window` parameters are not provided the method will try to re
 It returns a *service* object, which provides the following methods :
  * `getData()`: returns the data passed to the service by the client.
  * `getIntent()`: returns the intent
- * `resizeClient(doc)`: forces the size of the intent modale to a given minWidth, width, maxWidth, minHeight, height, maxHeight, or dimensions of a given element.
+ * `resizeClient(doc)`: forces the size of the intent modale to a given width, maxWidth, height, maxHeight, or dimensions of a given element.
  ```js
  // resize the client ot 300 pixels max height
  service.resizeClient({
