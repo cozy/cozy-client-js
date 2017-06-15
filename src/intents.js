@@ -145,7 +145,7 @@ export function createService (cozy, intentId, serviceWindow) {
       let terminated = false
 
       const terminate = (message) => {
-        if (terminated) throw new Error('Intent service has been terminated')
+        if (terminated) throw new Error('Intent service has already been terminated')
         terminated = true
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
