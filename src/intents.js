@@ -46,6 +46,14 @@ function injectService (url, element, intent, data) {
         return event.source.postMessage(data, event.origin)
       }
 
+      if (handshaken && event.data.type === `intent-${intent._id}:size`) {
+        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(prop => {
+          if (event.data.document[prop]) element.style[prop] = `${event.data.document[prop]}px`
+        })
+
+        return true
+      }
+
       window.removeEventListener('message', messageHandler)
       iframe.parentNode.removeChild(iframe)
 
@@ -137,8 +145,21 @@ export function createService (cozy, intentId, serviceWindow) {
       let terminated = false
 
       const terminate = (message) => {
-        if (terminated) throw new Error('Intent service has already been terminated')
+        if (terminated) throw new Error('Intent service has been terminated')
         terminated = true
+        serviceWindow.parent.postMessage(message, intent.attributes.client)
+      }
+
+      const resizeClient = (message) => {
+        if (terminated) throw new Error('Intent service has been terminated')
+
+        // if a dom element is passed, calculate its size and convert it in css properties
+        if (message.dimensions.element) {
+          message.dimensions.maxHeight = message.dimensions.element.clientHeight
+          message.dimensions.maxWidth = message.dimensions.element.clientWidth
+          message.dimensions.element = undefined
+        }
+
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
@@ -164,6 +185,10 @@ export function createService (cozy, intentId, serviceWindow) {
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
               error: errorSerializer.serialize(error)
+            }),
+            resizeClient: (dimensions) => resizeClient({
+              type: `intent-${intent._id}:size`,
+              dimensions
             }),
             cancel: cancel
           }

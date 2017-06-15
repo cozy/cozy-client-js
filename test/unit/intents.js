@@ -372,6 +372,72 @@ describe('Intents', function () {
     })
 
     describe('Service', function () {
+      describe('ResizeClient', function () {
+        it('should send provided sizes to the client', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.resizeClient({
+            width: 100,
+            height: 200
+          })
+
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+            dimensions: {
+              width: 100,
+              height: 200
+            }
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+        it('should calculate width and height from a provided dom element', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.resizeClient({
+            element: {
+              clientHeight: 10,
+              clientWidth: 13
+            }
+          })
+
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+            dimensions: {
+              maxWidth: 13,
+              maxHeight: 10
+            }
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+      })
       describe('Terminate', function () {
         it('should send result document to Client', async function () {
           const windowMock = mockWindow()
@@ -458,7 +524,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.terminate(result)
-          }, /Intent service has already been terminated/)
+          }, /Intent service has been terminated/)
         })
       })
 
@@ -530,7 +596,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.cancel()
-          }, /Intent service has already been terminated/)
+          }, /Intent service has been terminated/)
         })
 
         it('should forbbid further calls to terminate()', async function () {
@@ -556,7 +622,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.terminate(result)
-          }, /Intent service has already been terminated/)
+          }, /Intent service has been terminated/)
         })
       })
 
@@ -614,7 +680,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.cancel()
-          }, /Intent service has already been terminated/)
+          }, /Intent service has been terminated/)
         })
 
         it('should forbbid further calls to terminate()', async function () {
@@ -640,7 +706,7 @@ describe('Intents', function () {
 
           should.throws(() => {
             service.terminate(result)
-          }, /Intent service has already been terminated/)
+          }, /Intent service has been terminated/)
         })
       })
     })
