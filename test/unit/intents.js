@@ -404,6 +404,7 @@ describe('Intents', function () {
           windowMock.parent.postMessage
             .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
+
         it('should calculate width and height from a provided dom element', async function () {
           const windowMock = mockWindow()
 
@@ -438,6 +439,7 @@ describe('Intents', function () {
             .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
       })
+
       describe('Terminate', function () {
         it('should send result document to Client', async function () {
           const windowMock = mockWindow()
