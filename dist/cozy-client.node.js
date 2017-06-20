@@ -3209,6 +3209,14 @@
 	        return event.source.postMessage(data, event.origin);
 	      }
 	
+	      if (handshaken && event.data.type === 'intent-' + intent._id + ':size') {
+	        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
+	          if (event.data.dimensions[prop]) element.style[prop] = event.data.document[prop] + 'px';
+	        });
+	
+	        return true;
+	      }
+	
 	      window.removeEventListener('message', messageHandler);
 	      iframe.parentNode.removeChild(iframe);
 	
@@ -3307,6 +3315,19 @@
 	      serviceWindow.parent.postMessage(message, intent.attributes.client);
 	    };
 	
+	    var _resizeClient = function _resizeClient(message) {
+	      if (terminated) throw new Error('Intent service has been terminated');
+	
+	      // if a dom element is passed, calculate its size and convert it in css properties
+	      if (message.dimensions.element) {
+	        message.dimensions.maxHeight = message.dimensions.element.clientHeight;
+	        message.dimensions.maxWidth = message.dimensions.element.clientWidth;
+	        message.dimensions.element = undefined;
+	      }
+	
+	      serviceWindow.parent.postMessage(message, intent.attributes.client);
+	    };
+	
 	    var cancel = function cancel() {
 	      _terminate({ type: 'intent-' + intent._id + ':cancel' });
 	    };
@@ -3335,6 +3356,12 @@
 	          return _terminate({
 	            type: 'intent-' + intent._id + ':error',
 	            error: errorSerializer.serialize(error)
+	          });
+	        },
+	        resizeClient: function resizeClient(dimensions) {
+	          return _resizeClient({
+	            type: 'intent-' + intent._id + ':size',
+	            dimensions: dimensions
 	          });
 	        },
 	        cancel: cancel
