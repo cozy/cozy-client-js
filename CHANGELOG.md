@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v0.3.6] - 2017-06-15
 ### Added
-- Add a `intentService.setSize()` method to force the size of the intent modale
+- Add a `intentService.resizeClient()` method to force the size of the intent modal
 
 ## [v0.3.5] - 2017-06-13
 ### Added
