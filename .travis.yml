@@ -4,7 +4,6 @@ node_js:
   - "6"
 
 services:
-  - couchdb
   - docker
 
 env:
