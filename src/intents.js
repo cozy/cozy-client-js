@@ -46,7 +46,7 @@ function injectService (url, element, intent, data) {
         return event.source.postMessage(data, event.origin)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:size`) {
+      if (handshaken && event.data.type === `intent-${intent._id}:resize`) {
         ['width', 'height', 'maxWidth', 'maxHeight'].forEach(prop => {
           if (event.data.dimensions[prop]) element.style[prop] = `${event.data.dimensions[prop]}px`
         })
@@ -187,7 +187,7 @@ export function createService (cozy, intentId, serviceWindow) {
               error: errorSerializer.serialize(error)
             }),
             resizeClient: (dimensions) => resizeClient({
-              type: `intent-${intent._id}:size`,
+              type: `intent-${intent._id}:resize`,
               dimensions
             }),
             cancel: cancel

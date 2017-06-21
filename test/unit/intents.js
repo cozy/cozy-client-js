@@ -302,7 +302,7 @@ describe('Intents', function () {
       const resizeEventMessageMock = {
         origin: serviceUrl,
         data: {
-          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
           dimensions
         },
         source: iframeWindowMock
@@ -460,7 +460,7 @@ describe('Intents', function () {
           })
 
           const messageMatch = sinon.match({
-            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
             dimensions: {
               width: 100,
               height: 200
@@ -494,7 +494,7 @@ describe('Intents', function () {
           })
 
           const messageMatch = sinon.match({
-            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
             dimensions: {
               maxWidth: 13,
               maxHeight: 10
