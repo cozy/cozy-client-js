@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
+## [v0.3.7] - 2017-06-21
+### Fixed
+- Fix `service.resizeClient()` in intents.
+
+
 ## [v0.3.6] - 2017-06-15
 ### Added
 - Add a `intentService.resizeClient()` method to force the size of the intent modal
@@ -172,7 +178,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.6...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.7...HEAD
+[v0.3.7]: https://github.com/cozy/cozy-client-js/compare/v0.3.6...v0.3.7
 [v0.3.6]: https://github.com/cozy/cozy-client-js/compare/v0.3.5...v0.3.6
 [v0.3.5]: https://github.com/cozy/cozy-client-js/compare/v0.3.4...v0.3.5
 [v0.3.4]: https://github.com/cozy/cozy-client-js/compare/v0.3.3...v0.3.4
