@@ -295,8 +295,8 @@ describe('Intents', function () {
       }
 
       const dimensions = {
-        width: '400px',
-        height: '280px'
+        width: 400,
+        height: 280
       }
 
       const resizeEventMessageMock = {
