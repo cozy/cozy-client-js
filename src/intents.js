@@ -153,14 +153,17 @@ export function createService (cozy, intentId, serviceWindow) {
       const resizeClient = (message) => {
         if (terminated) throw new Error('Intent service has been terminated')
 
-        // if a dom element is passed, calculate its size and convert it in css properties
-        if (message.dimensions.element) {
-          message.dimensions.maxHeight = message.dimensions.element.clientHeight
-          message.dimensions.maxWidth = message.dimensions.element.clientWidth
-          message.dimensions.element = undefined
-        }
+        // if a dom element is passed, calculate its size
+        const resizeMessage = message.dimensions.element
+          ? Object.assign({}, message, {
+            dimensions: {
+              maxHeight: message.dimensions.element.clientHeight,
+              maxWidth: message.dimensions.element.clientWidth
+            }
+          })
+            : message
 
-        serviceWindow.parent.postMessage(message, intent.attributes.client)
+        serviceWindow.parent.postMessage(resizeMessage, intent.attributes.client)
       }
 
       const cancel = () => {
