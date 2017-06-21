@@ -29,6 +29,7 @@ function mockElement () {
     postMessage: sinon.spy()
   }
   return {
+    style: [],
     ownerDocument: documentMock,
     appendChild: sinon.spy(),
     iframeMock: iframeMock,
@@ -280,6 +281,71 @@ describe('Intents', function () {
 
       return call.should.be.fulfilledWith(result)
     })
+
+    it('should handle intent resize', async function () {
+      const element = mockElement()
+      const {windowMock, iframeWindowMock} = element
+
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
+        source: iframeWindowMock
+      }
+
+      const dimensions = {
+        width: 400,
+        height: 280
+      }
+
+      const resizeEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
+          dimensions
+        },
+        source: iframeWindowMock
+      }
+
+      const result = {
+        id: 'abcde1234'
+      }
+
+      const resolveEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:done',
+          document: result
+        },
+        source: iframeWindowMock
+      }
+
+      const call = cozy.client.intents
+        .create('PICK', 'io.cozy.files', {key: 'value'})
+        .start(element)
+
+      setTimeout(() => {
+        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
+        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+
+        messageEventListener(handshakeEventMessageMock)
+        should(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).be.true()
+
+        messageEventListener(resizeEventMessageMock)
+        element.style['width'].should.exist
+        element.style['width'].should.equal('400px')
+        element.style['height'].should.exist
+        element.style['height'].should.equal('280px')
+
+        messageEventListener(resolveEventMessageMock)
+        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+      }, 10)
+
+      return call.should.be.fulfilledWith(result)
+    })
   })
 
   describe('CreateService', function () {
@@ -394,7 +460,7 @@ describe('Intents', function () {
           })
 
           const messageMatch = sinon.match({
-            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
             dimensions: {
               width: 100,
               height: 200
@@ -428,7 +494,7 @@ describe('Intents', function () {
           })
 
           const messageMatch = sinon.match({
-            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:size',
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
             dimensions: {
               maxWidth: 13,
               maxHeight: 10
