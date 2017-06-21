@@ -150,20 +150,21 @@ export function createService (cozy, intentId, serviceWindow) {
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
-      const resizeClient = (message) => {
+      const resizeClient = (dimensions) => {
         if (terminated) throw new Error('Intent service has been terminated')
 
-        // if a dom element is passed, calculate its size
-        const resizeMessage = message.dimensions.element
-          ? Object.assign({}, message, {
-            dimensions: {
-              maxHeight: message.dimensions.element.clientHeight,
-              maxWidth: message.dimensions.element.clientWidth
-            }
-          })
-            : message
+        const message = {
+          type: `intent-${intent._id}:resize`,
+          // if a dom element is passed, calculate its size
+          dimensions: dimensions.element
+            ? Object.assign({}, dimensions, {
+              maxHeight: dimensions.element.clientHeight,
+              maxWidth: dimensions.element.clientWidth
+            })
+              : dimensions
+        }
 
-        serviceWindow.parent.postMessage(resizeMessage, intent.attributes.client)
+        serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
       const cancel = () => {
@@ -189,10 +190,7 @@ export function createService (cozy, intentId, serviceWindow) {
               type: `intent-${intent._id}:error`,
               error: errorSerializer.serialize(error)
             }),
-            resizeClient: (dimensions) => resizeClient({
-              type: `intent-${intent._id}:resize`,
-              dimensions
-            }),
+            resizeClient: resizeClient,
             cancel: cancel
           }
         })
