@@ -9025,6 +9025,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var messageHandler = function messageHandler(event) {
 	      if (event.origin !== serviceOrigin) return;
 	
+	      if (event.data.type === 'load') {
+	        // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
+	        // making the handshake fails.
+	        console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.');
+	        return;
+	      }
+	
 	      if (event.data.type === 'intent-' + intent._id + ':ready') {
 	        handshaken = true;
 	        return event.source.postMessage(data, event.origin);
@@ -9209,6 +9216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function create(cozy, workerType, args, options) {
+	  console.debug('create', workerType, args, options);
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/jobs/queue/' + workerType, {
 	    data: {
 	      type: 'io.cozy.jobs',
