@@ -284,7 +284,7 @@ document.body.appendChild(link) && link.click()
 
 It returns a promise for the download link.
 Download link are only valid for a short while (default 1 hour)
-You can use this link to start a browser download (see code in getDownloadLink)
+You can use this link to start a browser download (see code in getDownloadLinkById)
 
 ```javascript
 const href = await cozy.client.files.getArchiveLinkByPaths([
@@ -307,7 +307,7 @@ const href = await cozy.client.files.getArchiveLinkByPaths(["/foo/hello.txt"], "
 
 It returns a promise for the download link.
 Download link are only valid for a short while (default 1 hour)
-You can use this link to start a browser download (see code in getDownloadLink)
+You can use this link to start a browser download (see code in getDownloadLinkById)
 
 ```javascript
 const href = await cozy.client.files.getArchiveLinkByIds([
@@ -327,7 +327,7 @@ const href = await cozy.client.files.getArchiveLinkByIds(["1592673"], "secretpro
 ### `cozy.client.files.getFilePath(file, folder)`
 
 `cozy.client.files.getFilePath(file, folder)` is a helper that generates the file path from root directory. It may be used to specify the path parameter for functions like
-`cozy.client.files.downloadByPath`, `cozy.client.files.getDownloadLink` or `cozy.client.files.getArchiveLink`.
+`cozy.client.files.downloadByPath`, `cozy.client.files.getDownloadLinkByPath` or `cozy.client.files.getArchiveLinkByPaths`.
 
 
 ### `cozy.client.data.addReferencedFiles(doc, fileIds)`
