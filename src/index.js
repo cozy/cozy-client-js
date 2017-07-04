@@ -77,7 +77,7 @@ const filesProto = {
   getDownloadLinkByPath: files.getDownloadLinkByPath,
   getArchiveLink: function (...args) {
     warn('getArchiveLink is deprecated, use cozy.files.getArchiveLinkByPaths instead.')
-    return files.getArchiveLink(...args)
+    return files.getArchiveLinkByPaths(...args)
   },
   getArchiveLinkByPaths: files.getArchiveLinkByPaths,
   getArchiveLinkByIds: files.getArchiveLinkByIds,
