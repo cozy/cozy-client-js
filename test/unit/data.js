@@ -51,6 +51,41 @@ describe('data API', function () {
     })
   })
 
+  describe('Fetch multiple documents at once', function () {
+    before(mock.mockAPI('GetManyDocs'))
+
+    it('Call the proper route', async function () {
+      const resultsById = await cozy.client.data.findMany('io.cozy.testobject', ['42', '43'])
+
+      mock.calls('GetManyDocs').should.have.length(1)
+      mock.lastUrl('GetManyDocs').should.equal('http://my.cozy.io/data/io.cozy.testobject/_all_docs?include_docs=true')
+      mock.lastOptions('GetManyDocs').should.have.property('body',
+        '{"keys":["42","43"]}'
+      )
+
+      resultsById.should.have.propertyByPath(['42', 'doc'])
+      resultsById.should.have.propertyByPath(['43', 'error'])
+      resultsById['42'].doc.should.have.properties({
+        _id: '42',
+        _rev: '1-5444878785445',
+        test: 'value'
+      })
+      resultsById['43'].error.should.equal('not_found')
+    })
+
+    it('Resolves with an empty object when ids array is empty', async function () {
+      const resultsById = await cozy.client.data.findMany('io.cozy.testobject', [])
+      should(resultsById).deepEqual({})
+    })
+
+    it('Fails when ids is not an array', async function () {
+      for (const ids of [undefined, null, 'foo', {foo: 'bar'}]) {
+        await should(cozy.client.data.findMany('io.cozy.testobject', ids))
+          .be.rejectedWith(/ids/)
+      }
+    })
+  })
+
   describe('Fetch the changes feed', function () {
     before(mock.mockAPI('ChangesFeed'))
 

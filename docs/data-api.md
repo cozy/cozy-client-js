@@ -43,6 +43,46 @@ console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
 ```
 
 
+### `cozy.client.data.findMany(doctype, [ids])`
+
+`cozy.client.data.findMany(doctype, [ids])` returns the documents associated to the given IDs.
+
+It returns a promise for a map, with the given IDs as keys.
+
+When a document is found, the corresponding value will be an object with a
+single `doc` key containing the document.
+Documents will have the same fields than the returned values of `create`,
+including `_id` and `_rev`.
+
+When a document is missing, the corresponding value will be an object with a
+single `error` key containing the error message.
+Even when some document is missing, the promise will still be fulfilled or the
+callback will be passed the resulting map, so you can still access the other
+documents found and identify the missing ones.
+
+- `doctype` is a string specifying the
+  [doctype](intro.md#doctypes--permissions)
+- `ids` is an array of strings specifying the identifiers of the documents you
+  look for
+
+**Warning**: Not available on **v2**. A fallback implementation could be
+provided at some point, but it would make one request per id anyway, since the
+old data system doesn't provide such an API.
+
+```javascript
+const ids = [createdBookId, ...]
+const resultsById = await cozy.client.data.findMany(myBooksDoctype, ids)
+for (const id of ids) {
+  const {doc, error} = resultsById[id]
+  if (error) {
+    console.error(`Error while fetching book ${id}: ${error}`)
+  } else {
+    console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
+  }
+}
+```
+
+
 ### `cozy.client.data.changesFeed(doctype, options)`
 
 `cozy.client.data.changesFeed(doctype, options)` returns the last changes from CouchDB for the given doctype

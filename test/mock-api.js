@@ -31,6 +31,37 @@ const ROUTES = [
     }
   },
   {
+    name: 'GetManyDocs',
+    method: 'POST',
+    matcher: /\/data\/io.cozy.testobject\/_all_docs/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        'total_rows': 2,
+        'rows': [
+          {
+            'id': '42',
+            'key': '42',
+            'value': {
+              'rev': '1-5444878785445'
+            },
+            'doc': {
+              '_id': '42',
+              '_rev': '1-5444878785445',
+              'test': 'value'
+            }
+          },
+          {
+            'key': '43',
+            'error': 'not_found'
+          }
+        ]
+      }
+    }
+  },
+  {
     name: 'CreateDoc',
     method: 'POST',
     matcher: /\/data\/io.cozy.testobject\/$/,
