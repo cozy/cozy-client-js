@@ -60,14 +60,17 @@ describe('data API', function () {
 
     it('Works when some of the documents exist', async function () {
       const resultsById = await cozy.client.data.findMany('io.cozy.testobject', [docID, missingID])
-      resultsById.should.have.propertyByPath([docID, 'doc'])
-      resultsById.should.have.propertyByPath([missingID, 'error'])
-      resultsById[docID].doc.should.have.properties({
-        _id: docID,
-        _rev: docRev,
-        test: 'value'
+      resultsById.should.have.properties([docID, missingID])
+      resultsById[docID].should.deepEqual({
+        doc: {
+          _id: docID,
+          _rev: docRev,
+          test: 'value'
+        }
       })
-      resultsById[missingID].error.should.equal('not_found')
+      resultsById[missingID].should.deepEqual({
+        error: 'not_found'
+      })
     })
 
     it('Works when the database does not exist yet', async function () {

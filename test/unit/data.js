@@ -63,14 +63,17 @@ describe('data API', function () {
         '{"keys":["42","43"]}'
       )
 
-      resultsById.should.have.propertyByPath(['42', 'doc'])
-      resultsById.should.have.propertyByPath(['43', 'error'])
-      resultsById['42'].doc.should.have.properties({
-        _id: '42',
-        _rev: '1-5444878785445',
-        test: 'value'
+      resultsById.should.have.properties(['42', '43'])
+      resultsById['42'].should.deepEqual({
+        doc: {
+          _id: '42',
+          _rev: '1-5444878785445',
+          test: 'value'
+        }
       })
-      resultsById['43'].error.should.equal('not_found')
+      resultsById['43'].should.deepEqual({
+        error: 'not_found'
+      })
     })
 
     it('Resolves with an empty object when ids array is empty', async function () {

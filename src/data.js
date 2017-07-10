@@ -66,7 +66,7 @@ export function findMany (cozy, doctype, ids) {
 
         for (const row of resp.rows) {
           const {key, doc, error} = row
-          docs[key] = {doc, error}
+          docs[key] = error ? {error} : {doc}
         }
 
         return docs
