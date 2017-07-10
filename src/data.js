@@ -42,6 +42,51 @@ export function find (cozy, doctype, id) {
   })
 }
 
+export function findMany (cozy, doctype, ids) {
+  if (!(ids instanceof Array)) {
+    return Promise.reject(new Error('Parameter ids must be a non-empty array'))
+  }
+  if (ids.length === 0) {
+    // So users don't need to be defensive regarding the array content.
+    // This should not hide issues in user code since the result will be an
+    // empty object anyway.
+    return Promise.resolve({})
+  }
+
+  return cozy.isV2().then((isV2) => {
+    if (isV2) {
+      return Promise.reject(new Error('findMany is not available on v2'))
+    }
+
+    const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
+
+    return cozyFetchJSON(cozy, 'POST', path, {keys: ids})
+      .then((resp) => {
+        const docs = {}
+
+        for (const row of resp.rows) {
+          const {key, doc, error} = row
+          docs[key] = error ? {error} : {doc}
+        }
+
+        return docs
+      })
+      .catch((error) => {
+        if (error.status !== 404) return Promise.reject(error)
+
+        // When no doc was ever created ant the database does not exist yet,
+        // the response will be a 404 error.
+        const docs = {}
+
+        for (const id of ids) {
+          docs[id] = {error}
+        }
+
+        return docs
+      })
+  })
+}
+
 export function changesFeed (cozy, doctype, options) {
   return cozy.isV2().then((isV2) => {
     doctype = normalizeDoctype(cozy, isV2, doctype)

@@ -33,6 +33,7 @@ const defaultClientParams = {
 const dataProto = {
   create: data.create,
   find: data.find,
+  findMany: data.findMany,
   update: data.update,
   delete: data._delete,
   updateAttributes: data.updateAttributes,
