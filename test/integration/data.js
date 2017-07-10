@@ -50,14 +50,15 @@ describe('data API', function () {
   })
 
   describe('Fetch multiple documents', function () {
+    const missingID = 'missing'
+
     beforeEach(function () {
       if (COZY_STACK_VERSION === '2') {
         this.skip()
       }
     })
 
-    it('Works', async function () {
-      const missingID = 'missing'
+    it('Works when some of the documents exist', async function () {
       const resultsById = await cozy.client.data.findMany('io.cozy.testobject', [docID, missingID])
       resultsById.should.have.propertyByPath([docID, 'doc'])
       resultsById.should.have.propertyByPath([missingID, 'error'])
@@ -67,6 +68,11 @@ describe('data API', function () {
         test: 'value'
       })
       resultsById[missingID].error.should.equal('not_found')
+    })
+
+    it('Works when the database does not exist yet', async function () {
+      const resultsById = await cozy.client.data.findMany('io.cozy.jobs', [missingID])
+      resultsById[missingID].error.status.should.equal(404)
     })
   })
 

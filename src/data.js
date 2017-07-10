@@ -60,16 +60,30 @@ export function findMany (cozy, doctype, ids) {
 
     const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
 
-    return cozyFetchJSON(cozy, 'POST', path, {keys: ids}).then((resp) => {
-      const docs = {}
+    return cozyFetchJSON(cozy, 'POST', path, {keys: ids})
+      .then((resp) => {
+        const docs = {}
 
-      for (const row of resp.rows) {
-        const {key, doc, error} = row
-        docs[key] = {doc, error}
-      }
+        for (const row of resp.rows) {
+          const {key, doc, error} = row
+          docs[key] = {doc, error}
+        }
 
-      return docs
-    })
+        return docs
+      })
+      .catch((error) => {
+        if (error.status !== 404) return Promise.reject(error)
+
+        // When no doc was ever created ant the database does not exist yet,
+        // the response will be a 404 error.
+        const docs = {}
+
+        for (const id of ids) {
+          docs[id] = {error}
+        }
+
+        return docs
+      })
   })
 }
 
