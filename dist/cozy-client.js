@@ -785,6 +785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var dataProto = {
 	  create: data.create,
 	  find: data.find,
+	  findMany: data.findMany,
 	  update: data.update,
 	  delete: data._delete,
 	  updateAttributes: data.updateAttributes,
@@ -829,7 +830,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getDownloadLinkByPath: files.getDownloadLinkByPath,
 	  getArchiveLink: function getArchiveLink() {
 	    (0, _utils.warn)('getArchiveLink is deprecated, use cozy.files.getArchiveLinkByPaths instead.');
-	    return files.getArchiveLink.apply(files, arguments);
+	    return files.getArchiveLinkByPaths.apply(files, arguments);
 	  },
 	  getArchiveLinkByPaths: files.getArchiveLinkByPaths,
 	  getArchiveLinkByIds: files.getArchiveLinkByIds,
@@ -8043,6 +8044,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.create = create;
 	exports.find = find;
+	exports.findMany = findMany;
 	exports.changesFeed = changesFeed;
 	exports.update = update;
 	exports.updateAttributes = updateAttributes;
@@ -8090,6 +8092,93 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        return resp;
 	      }
+	    });
+	  });
+	}
+	
+	function findMany(cozy, doctype, ids) {
+	  if (!(ids instanceof Array)) {
+	    return Promise.reject(new Error('Parameter ids must be a non-empty array'));
+	  }
+	  if (ids.length === 0) {
+	    // So users don't need to be defensive regarding the array content.
+	    // This should not hide issues in user code since the result will be an
+	    // empty object anyway.
+	    return Promise.resolve({});
+	  }
+	
+	  return cozy.isV2().then(function (isV2) {
+	    if (isV2) {
+	      return Promise.reject(new Error('findMany is not available on v2'));
+	    }
+	
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
+	
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, { keys: ids }).then(function (resp) {
+	      var docs = {};
+	
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+	
+	      try {
+	        for (var _iterator = resp.rows[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var row = _step.value;
+	          var key = row.key,
+	              doc = row.doc,
+	              error = row.error;
+	
+	          docs[key] = error ? { error: error } : { doc: doc };
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	
+	      return docs;
+	    }).catch(function (error) {
+	      if (error.status !== 404) return Promise.reject(error);
+	
+	      // When no doc was ever created ant the database does not exist yet,
+	      // the response will be a 404 error.
+	      var docs = {};
+	
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
+	
+	      try {
+	        for (var _iterator2 = ids[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var id = _step2.value;
+	
+	          docs[id] = { error: error };
+	        }
+	      } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
+	          }
+	        } finally {
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
+	          }
+	        }
+	      }
+	
+	      return docs;
 	    });
 	  });
 	}
@@ -9216,7 +9305,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function create(cozy, workerType, args, options) {
-	  console.debug('create', workerType, args, options);
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/jobs/queue/' + workerType, {
 	    data: {
 	      type: 'io.cozy.jobs',
