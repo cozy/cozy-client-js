@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.3.9] - 2017-07-10
+### Added
+- Add a `cozy.client.data.findMany` method to fetch multiple docs at once
+
+### Fixed
+- Fix the compatibility shim for `getArchiveLink`
+
+
 ## [v0.3.8] - 2017-06-22
 ### Fixed
 - Fix intent handshake in Safari 9.1
@@ -183,7 +191,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.8...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.9...HEAD
+[v0.3.9]: https://github.com/cozy/cozy-client-js/compare/v0.3.8...v0.3.9
 [v0.3.8]: https://github.com/cozy/cozy-client-js/compare/v0.3.7...v0.3.8
 [v0.3.7]: https://github.com/cozy/cozy-client-js/compare/v0.3.6...v0.3.7
 [v0.3.6]: https://github.com/cozy/cozy-client-js/compare/v0.3.5...v0.3.6
