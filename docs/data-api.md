@@ -66,8 +66,7 @@ documents found and identify the missing ones.
   look for
 
 **Warning**: Not available on **v2**. A fallback implementation could be
-provided at some point, but it would make one request per id anyway, since the
-old data system doesn't provide such an API.
+provided at some point.
 
 ```javascript
 const ids = [createdBookId, ...]
