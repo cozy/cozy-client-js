@@ -21,7 +21,7 @@ const errorSerializer = (() => {
 })()
 
 // inject iframe for service in given element
-function injectService (url, element, intent, data) {
+function injectService (url, element, intent, data, onReadyCallback) {
   const document = element.ownerDocument
   if (!document) throw new Error('Cannot retrieve document object from given element')
 
@@ -29,6 +29,8 @@ function injectService (url, element, intent, data) {
   if (!window) throw new Error('Cannot retrieve window object from document')
 
   const iframe = document.createElement('iframe')
+  // if callback provided for when iframe is loaded
+  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback
   iframe.setAttribute('src', url)
   iframe.classList.add(intentClass)
   element.appendChild(iframe)
@@ -108,7 +110,7 @@ export function create (cozy, action, type, data = {}, permissions = []) {
     }
   })
 
-  createPromise.start = (element) => {
+  createPromise.start = (element, onReadyCallback) => {
     return createPromise.then(intent => {
       let service = intent.attributes.services && intent.attributes.services[0]
 
@@ -116,7 +118,7 @@ export function create (cozy, action, type, data = {}, permissions = []) {
         return Promise.reject(new Error('Unable to find a service'))
       }
 
-      return injectService(service.href, element, intent, data)
+      return injectService(service.href, element, intent, data, onReadyCallback)
     })
   }
 
