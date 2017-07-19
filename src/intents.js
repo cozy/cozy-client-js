@@ -64,7 +64,15 @@ function injectService (url, element, intent, data, onReadyCallback) {
       }
 
       window.removeEventListener('message', messageHandler)
-      iframe.parentNode.removeChild(iframe)
+      const removeIntentFrame = () => {
+        iframe.parentNode.removeChild(iframe)
+      }
+
+      if (handshaken && event.data.type === `intent-${intent._id}:exposeFrameRemoval`) {
+        return resolve({removeIntentFrame, doc: event.data.document})
+      }
+
+      removeIntentFrame()
 
       if (event.data.type === `intent-${intent._id}:error`) {
         return reject(errorSerializer.deserialize(event.data.error))
@@ -194,6 +202,9 @@ export function createService (cozy, intentId, serviceWindow) {
             terminate: (doc) => terminate({
               type: `intent-${intent._id}:done`,
               document: doc
+            }),
+            exposeFrameRemoval: (doc) => terminate({
+              type: `intent-${intent._id}:exposeFrameRemoval`
             }),
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
