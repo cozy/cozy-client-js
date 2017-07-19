@@ -124,12 +124,33 @@ describe('Intents', function () {
       const element = mockElement()
       const {documentMock, iframeMock} = element
 
+      const onReadyCallbackMock = () => {}
+
+      cozy.client.intents
+        .create('PICK', 'io.cozy.files')
+        .start(element, onReadyCallbackMock)
+
+      setTimeout(() => {
+        should(documentMock.createElement.withArgs('iframe').calledOnce).be.true()
+        should(iframeMock.onload).equal(onReadyCallbackMock)
+        should(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).be.true()
+        should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true()
+        should(element.appendChild.withArgs(iframeMock).calledOnce).be.true()
+        done()
+      }, 10)
+    })
+
+    it('should inject iframe (not async) also without onReadyCallback', function (done) {
+      const element = mockElement()
+      const {documentMock, iframeMock} = element
+
       cozy.client.intents
         .create('PICK', 'io.cozy.files')
         .start(element)
 
       setTimeout(() => {
         should(documentMock.createElement.withArgs('iframe').calledOnce).be.true()
+        should(iframeMock.onload).be.undefined()
         should(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).be.true()
         should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true()
         should(element.appendChild.withArgs(iframeMock).calledOnce).be.true()
@@ -345,6 +366,59 @@ describe('Intents', function () {
       }, 10)
 
       return call.should.be.fulfilledWith(result)
+    })
+
+    it('should handle intent exposeFrameRemoval', async function () {
+      const element = mockElement()
+      const {windowMock, iframeMock, iframeWindowMock} = element
+
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
+        source: iframeWindowMock
+      }
+
+      const docMock = {
+        id: 'abcde1234'
+      }
+
+      const resolveexposeFrameRemovalEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:exposeFrameRemoval',
+          document: docMock
+        },
+        source: iframeWindowMock
+      }
+
+      const call = cozy.client.intents
+        .create('PICK', 'io.cozy.files', {key: 'value'})
+        .start(element)
+
+      setTimeout(() => {
+        should(windowMock.addEventListener.withArgs('message').calledOnce).be.true()
+        should(windowMock.removeEventListener.neverCalledWith('message')).be.true()
+
+        const messageEventListener = windowMock.addEventListener.firstCall.args[1]
+
+        messageEventListener(handshakeEventMessageMock)
+        should(iframeWindowMock.postMessage.calledWithMatch({key: 'value'}, serviceUrl)).be.true()
+
+        messageEventListener(resolveexposeFrameRemovalEventMessageMock)
+        should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
+      }, 10)
+
+      return call.then(result => {
+        should(result.doc).equal(docMock)
+        should(result.removeIntentFrame).be.Function()
+
+        // test iframe removing by calling the returned closing method
+        should(iframeMock.parentNode.removeChild.withArgs(iframeMock).calledOnce).be.false()
+        result.removeIntentFrame()
+        should(iframeMock.parentNode.removeChild.withArgs(iframeMock).calledOnce).be.true()
+      })
     })
   })
 
@@ -718,6 +792,111 @@ describe('Intents', function () {
           const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
 
           service.cancel()
+
+          should.throws(() => {
+            service.terminate(result)
+          }, /Intent service has already been terminated/)
+        })
+      })
+
+      describe('exposeFrameRemoval', function () {
+        it('should send closing method to Client with result', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.exposeFrameRemoval(result)
+
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:exposeFrameRemoval',
+            document: result
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+
+        it('should send closing method to Client also with no parameters', async function () {
+          global.window = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          window.parent.postMessage.callsFake(() => {
+            const messageEventListener = window.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, window)
+
+          service.exposeFrameRemoval()
+
+          const messageMatch = sinon.match({type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:exposeFrameRemoval'})
+
+          window.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+
+          delete global.window
+        })
+
+        it('should not be called twice', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.exposeFrameRemoval()
+
+          should.throws(() => {
+            service.exposeFrameRemoval()
+          }, /Intent service has already been terminated/)
+        })
+
+        it('should forbbid further calls to terminate()', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.exposeFrameRemoval()
 
           should.throws(() => {
             service.terminate(result)
