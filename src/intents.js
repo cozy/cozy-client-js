@@ -204,7 +204,8 @@ export function createService (cozy, intentId, serviceWindow) {
               document: doc
             }),
             exposeFrameRemoval: (doc) => terminate({
-              type: `intent-${intent._id}:exposeFrameRemoval`
+              type: `intent-${intent._id}:exposeFrameRemoval`,
+              document: doc
             }),
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
