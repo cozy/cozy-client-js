@@ -28,14 +28,14 @@ cozy.client.intents.create('EDIT', 'io.cozy.photos', {action: 'crop', width: 100
   })
 ```
 
-Example when using `service.exposeFrameRemoval()` method:
+Example to use `removeIntentFrame()` method (by passing the flag `exposeIntentFrameRemoval` flag):
 ```js
-cozy.client.intents.create('EDIT', 'io.cozy.photos', {action: 'crop', width: 100, height: 100})
+cozy.client.intents.create('EDIT', 'io.cozy.photos', {action: 'crop', width: 100, height: 100, exposeIntentFrameRemoval: true})
   .start(document.getElementById('intent-service-wrapper'))
-  .then({removeIntentFrame, doc} => { // after service.exposeFrameRemoval(doc)
+  .then({removeIntentFrame, doc} => { // after service.terminate(doc)
       // Code to be run before removing the terminated intent iframe
       removeIntentFrame()
-      // Other code
+      // Other code, use doc
   })
 ```
 
@@ -60,7 +60,8 @@ It returns a *service* object, which provides the following methods :
  })
  ```
  * `terminate(doc)`: ends the intent process by passing to the client the resulting document `doc`. An intent service may only be terminated once.
- * `exposeFrameRemoval(doc)`: ends the intent process by passing to the client an object with as properties a function named `removeIntentFrame` to remove the iframe DOM node (in order to be run by the client later on) and the resulting document `doc`. The intent service will be terminated as in the `terminate` method. This method could be useful to animate an intent closing and remove the iframe node at the animation ending.
+   > If a boolean `exposeIntentFrameRemoval` is found as `true` in the data sent by the client, the `terminate()` method will return an object with as properties a function named `removeIntentFrame` to remove the iframe DOM node (in order to be run by the client later on) and the resulting document `doc`. This could be useful to animate an intent closing and remove the iframe node at the animation ending.
+
  * `cancel()`: ends the intent process by passing a `null` value to the client. This method terminate the intent service the same way that `terminate()`.
  * `throw(error)`: throw an error to client and causes the intent promise rejection.
 
