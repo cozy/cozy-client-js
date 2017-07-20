@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.3.10] - 2017-07-XX
+### Changed
+- none yet
+
+### Fixed
+- none yet
+
+### Added
+- Add an exposeFrameRemoval method to the service to terminate him without removing the intent DOM node directly but by providing the function to do it to the client.
+- Add an onReadyCallback optional argument to the create method in order to allow providing a callback function to be run when the intent iframe will be loaded (iframe onload listener).
+
+### Removed
+- none yet
+
 
 ## [v0.3.9] - 2017-07-10
 ### Added
