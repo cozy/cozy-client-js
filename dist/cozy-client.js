@@ -9094,7 +9094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	
 	// inject iframe for service in given element
-	function injectService(url, element, intent, data) {
+	function injectService(url, element, intent, data, onReadyCallback) {
 	  var document = element.ownerDocument;
 	  if (!document) throw new Error('Cannot retrieve document object from given element');
 	
@@ -9102,6 +9102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!window) throw new Error('Cannot retrieve window object from document');
 	
 	  var iframe = document.createElement('iframe');
+	  // if callback provided for when iframe is loaded
+	  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback;
 	  iframe.setAttribute('src', url);
 	  iframe.classList.add(intentClass);
 	  element.appendChild(iframe);
@@ -9135,7 +9137,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      window.removeEventListener('message', messageHandler);
-	      iframe.parentNode.removeChild(iframe);
+	      var removeIntentFrame = function removeIntentFrame() {
+	        iframe.parentNode.removeChild(iframe);
+	      };
+	
+	      if (handshaken && event.data.type === 'intent-' + intent._id + ':exposeFrameRemoval') {
+	        return resolve({ removeIntentFrame: removeIntentFrame, doc: event.data.document });
+	      }
+	
+	      removeIntentFrame();
 	
 	      if (event.data.type === 'intent-' + intent._id + ':error') {
 	        return reject(errorSerializer.deserialize(event.data.error));
@@ -9184,7 +9194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	
-	  createPromise.start = function (element) {
+	  createPromise.start = function (element, onReadyCallback) {
 	    return createPromise.then(function (intent) {
 	      var service = intent.attributes.services && intent.attributes.services[0];
 	
@@ -9192,7 +9202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return Promise.reject(new Error('Unable to find a service'));
 	      }
 	
-	      return injectService(service.href, element, intent, data);
+	      return injectService(service.href, element, intent, data, onReadyCallback);
 	    });
 	  };
 	
@@ -9266,10 +9276,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return intent;
 	        },
 	        terminate: function terminate(doc) {
-	          return _terminate({
-	            type: 'intent-' + intent._id + ':done',
-	            document: doc
-	          });
+	          if (data && data.exposeIntentFrameRemoval) {
+	            return _terminate({
+	              type: 'intent-' + intent._id + ':exposeFrameRemoval',
+	              document: doc
+	            });
+	          } else {
+	            return _terminate({
+	              type: 'intent-' + intent._id + ':done',
+	              document: doc
+	            });
+	          }
 	        },
 	        throw: function _throw(error) {
 	          return _terminate({
