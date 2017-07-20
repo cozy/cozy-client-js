@@ -199,14 +199,19 @@ export function createService (cozy, intentId, serviceWindow) {
           return {
             getData: () => data,
             getIntent: () => intent,
-            terminate: (doc) => terminate({
-              type: `intent-${intent._id}:done`,
-              document: doc
-            }),
-            exposeFrameRemoval: (doc) => terminate({
-              type: `intent-${intent._id}:exposeFrameRemoval`,
-              document: doc
-            }),
+            terminate: (doc) => {
+              if (data && data.exposeIntentFrameRemoval) {
+                return terminate({
+                  type: `intent-${intent._id}:exposeFrameRemoval`,
+                  document: doc
+                })
+              } else {
+                return terminate({
+                  type: `intent-${intent._id}:done`,
+                  document: doc
+                })
+              }
+            },
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
               error: errorSerializer.serialize(error)
