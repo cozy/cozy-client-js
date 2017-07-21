@@ -251,7 +251,7 @@ export function refreshToken (cozy, client, token) {
 
 // oauthFlow performs the stateful registration and access granting of an OAuth
 // client.
-export function oauthFlow (cozy, storage, clientParams, onRegistered) {
+export function oauthFlow (cozy, storage, clientParams, onRegistered, ignoreCachedCredentials = false) {
   let tryCount = 0
 
   function clearAndRetry (err) {
@@ -271,10 +271,14 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered) {
       })
   }
 
-  return Promise.all([
-    storage.load(CredsKey),
-    storage.load(StateKey)
-  ])
+  const initialPromise = (ignoreCachedCredentials) ? storage.clear() : Promise.resolve()
+
+  return initialPromise.then(() => {
+    return Promise.all([
+      storage.load(CredsKey),
+      storage.load(StateKey)
+    ])
+  })
   .then(([credentials, storedState]) => {
     // If credentials are cached we re-fetch the registered client with the
     // said token. Fetching the client, if the token is outdated we should try
