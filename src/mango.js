@@ -105,7 +105,8 @@ function getV3Options (indexRef, options) {
     selector: options.selector,
     limit: options.limit,
     skip: options.skip,
-    since: options.since
+    since: options.since,
+    sort: options.sort
   }
 
   if (options.descending) {
