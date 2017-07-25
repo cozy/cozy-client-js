@@ -485,6 +485,8 @@
 	    value: function authorize() {
 	      var _this = this;
 	
+	      var forceTokenRefresh = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	
 	      var state = this._authstate;
 	      if (state === AuthOK || state === AuthRunning) {
 	        return this._authcreds;
@@ -496,7 +498,7 @@
 	          throw new Error('OAuth is not supported on the V2 stack');
 	        }
 	        if (_this._oauth) {
-	          return auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered);
+	          return auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered, forceTokenRefresh);
 	        }
 	        // we expect to be on a client side application running in a browser
 	        // with cookie-based authentication.
@@ -1151,7 +1153,6 @@
 	    }, function (err) {
 	      return cb(err, null);
 	    });
-	    return;
 	  };
 	}
 	
@@ -1785,6 +1786,14 @@
 	// oauthFlow performs the stateful registration and access granting of an OAuth
 	// client.
 	function oauthFlow(cozy, storage, clientParams, onRegistered) {
+	  var ignoreCachedCredentials = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+	
+	  if (ignoreCachedCredentials) {
+	    return storage.clear().then(function () {
+	      return oauthFlow(cozy, storage, clientParams, onRegistered, false);
+	    });
+	  }
+	
 	  var tryCount = 0;
 	
 	  function clearAndRetry(err) {
@@ -2633,7 +2642,8 @@
 	    selector: options.selector,
 	    limit: options.limit,
 	    skip: options.skip,
-	    since: options.since
+	    since: options.since,
+	    sort: options.sort
 	  };
 	
 	  if (options.descending) {

@@ -255,7 +255,7 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered, ignoreCach
   if (ignoreCachedCredentials) {
     return storage.clear().then(() => oauthFlow(cozy, storage, clientParams, onRegistered, false))
   }
-  
+
   let tryCount = 0
 
   function clearAndRetry (err) {
@@ -274,7 +274,7 @@ export function oauthFlow (cozy, storage, clientParams, onRegistered, ignoreCach
         return storage.save(StateKey, {client, url, state})
       })
   }
-  
+
   return Promise.all([
     storage.load(CredsKey),
     storage.load(StateKey)
