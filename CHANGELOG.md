@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.3.11] - 2017-07-25
+### Added
+- Added support for the `sort` query option
+- Added an option to allow bypassing the oath credentials cache
+
 ## [v0.3.10] - 2017-07-20
 ### Added
 - Handle `exposeIntentFrameRemoval` data flag to terminate the service without removing the intent DOM node directly but by providing the removal function to the client.
@@ -196,7 +201,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.9...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...HEAD
+[v0.3.11]: https://github.com/cozy/cozy-client-js/compare/v0.3.10...v0.3.11
+[v0.3.10]: https://github.com/cozy/cozy-client-js/compare/v0.3.9...v0.3.10
 [v0.3.9]: https://github.com/cozy/cozy-client-js/compare/v0.3.8...v0.3.9
 [v0.3.8]: https://github.com/cozy/cozy-client-js/compare/v0.3.7...v0.3.8
 [v0.3.7]: https://github.com/cozy/cozy-client-js/compare/v0.3.6...v0.3.7
