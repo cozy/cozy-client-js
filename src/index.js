@@ -206,7 +206,7 @@ class Client {
     }
   }
 
-  authorize () {
+  authorize (forceTokenRefresh = false) {
     const state = this._authstate
     if (state === AuthOK || state === AuthRunning) {
       return this._authcreds
@@ -222,7 +222,8 @@ class Client {
           this,
           this._storage,
           this._clientParams,
-          this._onRegistered
+          this._onRegistered,
+          forceTokenRefresh
         )
       }
       // we expect to be on a client side application running in a browser
