@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
+## [v.0.3.12] - 2017-08-08
+### Changed
+- Add second optional parameter (`transitionProperty`) to `resizeClient()` function, in order to handle CSS transition
+
+
 ## [v0.3.11] - 2017-07-25
 ### Added
 - Added support for the `sort` query option
@@ -201,7 +207,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...HEAD
+[v0.3.11]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...v0.3.12
 [v0.3.11]: https://github.com/cozy/cozy-client-js/compare/v0.3.10...v0.3.11
 [v0.3.10]: https://github.com/cozy/cozy-client-js/compare/v0.3.9...v0.3.10
 [v0.3.9]: https://github.com/cozy/cozy-client-js/compare/v0.3.8...v0.3.9

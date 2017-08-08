@@ -6988,6 +6988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, function (err) {
 	      return cb(err, null);
 	    });
+	    return;
 	  };
 	}
 	
@@ -9140,6 +9141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      if (handshaken && event.data.type === 'intent-' + intent._id + ':resize') {
 	        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
+	          if (event.data.transition) element.style.transition = event.data.transition;
 	          if (event.data.dimensions[prop]) element.style[prop] = event.data.dimensions[prop] + 'px';
 	        });
 	
@@ -9252,7 +9254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      serviceWindow.parent.postMessage(message, intent.attributes.client);
 	    };
 	
-	    var resizeClient = function resizeClient(dimensions) {
+	    var resizeClient = function resizeClient(dimensions, transitionProperty) {
 	      if (terminated) throw new Error('Intent service has been terminated');
 	
 	      var message = {
@@ -9261,7 +9263,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dimensions: dimensions.element ? Object.assign({}, dimensions, {
 	          maxHeight: dimensions.element.clientHeight,
 	          maxWidth: dimensions.element.clientWidth
-	        }) : dimensions
+	        }) : dimensions,
+	        transition: transitionProperty
 	      };
 	
 	      serviceWindow.parent.postMessage(message, intent.attributes.client);
