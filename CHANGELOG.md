@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
-## [v.0.3.12] - 2017-08-08
+## [v0.3.12] - 2017-08-08
 ### Changed
 - Add second optional parameter (`transitionProperty`) to `resizeClient()` function, in order to handle CSS transition
 
