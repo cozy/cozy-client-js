@@ -324,7 +324,8 @@ describe('Intents', function () {
         origin: serviceUrl,
         data: {
           type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
-          dimensions
+          dimensions,
+          transition: '.2s linear'
         },
         source: iframeWindowMock
       }
@@ -360,6 +361,8 @@ describe('Intents', function () {
         element.style['width'].should.equal('400px')
         element.style['height'].should.exist
         element.style['height'].should.equal('280px')
+        element.style['transition'].should.exist
+        element.style['transition'].should.equal('.2s linear')
 
         messageEventListener(resolveEventMessageMock)
         should(windowMock.removeEventListener.withArgs('message', messageEventListener).calledOnce).be.true()
@@ -513,7 +516,7 @@ describe('Intents', function () {
 
     describe('Service', function () {
       describe('ResizeClient', function () {
-        it('should send provided sizes to the client', async function () {
+        it('should send provided sizes to the client without transition', async function () {
           const windowMock = mockWindow()
 
           const clientHandshakeEventMessageMock = {
@@ -539,6 +542,39 @@ describe('Intents', function () {
               width: 100,
               height: 200
             }
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
+        })
+
+        it('should handle transition optional argument', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(expectedIntent._id, windowMock)
+
+          service.resizeClient({
+            width: 100,
+            height: 200
+          }, '.3s ease-in')
+
+          const messageMatch = sinon.match({
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:resize',
+            dimensions: {
+              width: 100,
+              height: 200
+            },
+            transition: '.3s ease-in'
           })
 
           windowMock.parent.postMessage

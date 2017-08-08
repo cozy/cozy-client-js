@@ -57,6 +57,7 @@ function injectService (url, element, intent, data, onReadyCallback) {
 
       if (handshaken && event.data.type === `intent-${intent._id}:resize`) {
         ['width', 'height', 'maxWidth', 'maxHeight'].forEach(prop => {
+          if (event.data.transition) element.style.transition = event.data.transition
           if (event.data.dimensions[prop]) element.style[prop] = `${event.data.dimensions[prop]}px`
         })
 
@@ -167,7 +168,7 @@ export function createService (cozy, intentId, serviceWindow) {
         serviceWindow.parent.postMessage(message, intent.attributes.client)
       }
 
-      const resizeClient = (dimensions) => {
+      const resizeClient = (dimensions, transitionProperty) => {
         if (terminated) throw new Error('Intent service has been terminated')
 
         const message = {
@@ -178,7 +179,8 @@ export function createService (cozy, intentId, serviceWindow) {
               maxHeight: dimensions.element.clientHeight,
               maxWidth: dimensions.element.clientWidth
             })
-              : dimensions
+              : dimensions,
+          transition: transitionProperty
         }
 
         serviceWindow.parent.postMessage(message, intent.attributes.client)
