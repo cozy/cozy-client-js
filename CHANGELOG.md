@@ -208,7 +208,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 [Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...HEAD
-[v0.3.11]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...v0.3.12
+[v0.3.12]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...v0.3.12
 [v0.3.11]: https://github.com/cozy/cozy-client-js/compare/v0.3.10...v0.3.11
 [v0.3.10]: https://github.com/cozy/cozy-client-js/compare/v0.3.9...v0.3.10
 [v0.3.9]: https://github.com/cozy/cozy-client-js/compare/v0.3.8...v0.3.9
