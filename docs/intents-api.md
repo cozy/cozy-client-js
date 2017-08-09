@@ -68,7 +68,7 @@ It returns a *service* object, which provides the following methods :
 #### Example
 ```js
 cozy.client.intents.createService('77bcc42c-0fd8-11e7-ac95-8f605f6e8338', window)
-  .then(service => {
+  .then(intentService => {
     const data = intentService.getData()
 
     // [...]
