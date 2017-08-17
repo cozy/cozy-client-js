@@ -205,6 +205,9 @@ describe('files API', async function () {
     })
     await cozy.client.files.trashById(created._id)
     await cozy.client.files.destroyById(created._id, {ifMatch: 'badbeef'})
+      .then(
+        () => { throw new Error('should reject') },
+        (err) => { err.should.be.an.Error })
     let trashed = await cozy.client.files.listTrash()
     trashed.should.be.an.Array()
     trashed.should.have.length(1)
