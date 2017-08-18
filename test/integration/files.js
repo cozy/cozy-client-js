@@ -196,7 +196,7 @@ describe('files API', async function () {
     trashed.should.have.length(0)
   })
 
-  it('does not destroy a trashed file or directory with wrong sum', async function () {
+  it('does not destroy a trashed file or directory with wrong rev', async function () {
     await cozy.client.files.clearTrash()
     const created = await cozy.client.files.create('datastring2', {
       name: 'foo_' + random(),
@@ -208,7 +208,7 @@ describe('files API', async function () {
       .then(
         () => { throw new Error('should reject') },
         (err) => { err.should.be.an.Error })
-    let trashed = await cozy.client.files.listTrash()
+    const trashed = await cozy.client.files.listTrash()
     trashed.should.be.an.Array()
     trashed.should.have.length(1)
     await cozy.client.files.clearTrash()
