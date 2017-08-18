@@ -307,10 +307,11 @@ export function restoreById (cozy, id) {
   return cozyFetchJSON(cozy, 'POST', `/files/trash/${encodeURIComponent(id)}`)
 }
 
-export function destroyById (cozy, id, opts) {
+export function destroyById (cozy, id, options) {
+  const {ifMatch} = options || {}
   return cozyFetchJSON(cozy, 'DELETE', `/files/trash/${encodeURIComponent(id)}`, undefined, {
     headers: {
-      'If-Match': (opts && opts.ifMatch) ? opts.ifMatch : ''
+      'If-Match': ifMatch || ''
     }
   })
 }
