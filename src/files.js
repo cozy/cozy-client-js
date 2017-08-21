@@ -307,8 +307,13 @@ export function restoreById (cozy, id) {
   return cozyFetchJSON(cozy, 'POST', `/files/trash/${encodeURIComponent(id)}`)
 }
 
-export function destroyById (cozy, id) {
-  return cozyFetchJSON(cozy, 'DELETE', `/files/trash/${encodeURIComponent(id)}`)
+export function destroyById (cozy, id, options) {
+  const {ifMatch} = options || {}
+  return cozyFetchJSON(cozy, 'DELETE', `/files/trash/${encodeURIComponent(id)}`, undefined, {
+    headers: {
+      'If-Match': ifMatch || ''
+    }
+  })
 }
 
 function addIsDir (obj) {
