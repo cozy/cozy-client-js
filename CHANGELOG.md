@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.3.13] - 2017-08-22
+### Changed
+- Add second optional parameter (`options`) to `files.destroyById` function, matching other functions from same package.
+
 
 ## [v0.3.12] - 2017-08-08
 ### Changed
@@ -207,7 +211,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.13...HEAD
+[v0.3.13]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...v0.3.13
 [v0.3.12]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...v0.3.12
 [v0.3.11]: https://github.com/cozy/cozy-client-js/compare/v0.3.10...v0.3.11
 [v0.3.10]: https://github.com/cozy/cozy-client-js/compare/v0.3.9...v0.3.10

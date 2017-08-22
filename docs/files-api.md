@@ -161,15 +161,18 @@ It returns a promise for the document of the file or directory moved to trash.
 const trashed = await cozy.client.files.trashById("1234567")
 ```
 
-### `cozy.client.files.destroyById(id)`
+### `cozy.client.files.destroyById(id, options)`
 
-`cozy.client.files.destroyById(id)` is used to shred (destroy definitively) a file or directory identified by the given id.
+`cozy.client.files.destroyById(id, options)` is used to shred (destroy definitively) a file or directory identified by the given id.
 
 The file must be in the trash folder first.
 
 It returns a promise for completion
 
 - `id` is a string specifying the identifier of the file or directory
+- `options` is an object with the following fields:
+  * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
+
 
 ```javascript
 const trashed = await cozy.client.files.trashById("1234567")
