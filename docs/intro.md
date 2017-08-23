@@ -1,3 +1,5 @@
+{% raw %}
+
 # Introduction to cozy-client-js
 
 ## Reminder about cozy architectures
@@ -20,15 +22,17 @@ If you already have an application using `cozy-browser-sdk`, you can see what wi
 
 ## Include the library in your application
 
-You can `import`/`require` cozy-client-js using npm & webpack
-**TODO** test if `cozy-client-js` compatible with browserify, rollup, ect.
+You can `import`/`require` cozy-client-js using npm & webpack.
 
-You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with  `<script src="./cozy-client.js">`.
+You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with `<script src="./cozy-client.js">`.
 
 If you are developing a client-side app for Cozy V3, you can import the lib directly from the stack, by using [`{{.CozyClientJS}}`](https://cozy.github.io/cozy-stack/client-app-dev.html#good-practices-for-your-application).
 
-**polyfills** : cozy-client-js uses [fetch](https://fetch.spec.whatwg.org/) and bundle all necessary polyfills (promise, fetch, reGenerator). **TODO:** We should move the polyfills to a separate bundle and require them only if needed.
+If you are developing a nodejs app, you will need some polyfills. You can add them to your project with this command:
 
+```sh
+$ yarn add isomorphic-fetch core-js regenerator-runtime btoa
+```
 
 ## Doctypes & Permissions
 
@@ -137,3 +141,4 @@ This is the end of what we already have implemented, if you want to do something
 
 Feel free to open an issue if you see something missing, or if you disagree with the API design !
 
+{% endraw %}
