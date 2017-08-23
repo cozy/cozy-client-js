@@ -9007,8 +9007,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/trash/' + encodeURIComponent(id));
 	}
 	
-	function destroyById(cozy, id) {
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/trash/' + encodeURIComponent(id));
+	function destroyById(cozy, id, options) {
+	  var _ref8 = options || {},
+	      ifMatch = _ref8.ifMatch;
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/trash/' + encodeURIComponent(id), undefined, {
+	    headers: {
+	      'If-Match': ifMatch || ''
+	    }
+	  });
 	}
 	
 	function addIsDir(obj) {

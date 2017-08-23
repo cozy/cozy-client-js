@@ -1,6 +1,6 @@
 {
   "name": "cozy-client-js",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "description": "Javascript library to interact with a cozy",
   "main": "dist/cozy-client.node.js",
   "browser": "dist/cozy-client.js",
@@ -21,7 +21,6 @@
     "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
     "clean": "rm -r dist .tmp",
     "shasum": "shasum -a 256 dist/cozy-client.min.js && shasum -a 256 dist/cozy-client.min.js.map"
-
   },
   "repository": {
     "type": "git",
