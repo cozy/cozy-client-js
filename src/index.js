@@ -200,7 +200,6 @@ class Client {
 
     // Exposing cozyFetchJSON to make some development easier. Should be temporary.
     this.fetchJSON = function _fetchJSON () {
-      console.warn && console.warn('cozy.client.fetchJSON is a temporary method for development purpose, you should avoid using it.')
       const args = [this].concat(Array.prototype.slice.call(arguments))
       return cozyFetch.cozyFetchJSON.apply(this, args)
     }
