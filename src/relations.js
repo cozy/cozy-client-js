@@ -24,7 +24,8 @@ export function listReferencedFiles (cozy, doc) {
 export function fetchReferencedFiles (cozy, doc, options) {
   if (!doc) throw new Error('missing doc argument')
   const params = Object.keys(options).map(key => `&page[${key}]=${options[key]}`).join('')
-  return cozyFetchRawJSON(cozy, 'GET', `${makeReferencesPath(doc)}?include=files${params}`)
+  // As datetime is the only sort option available, I see no reason to not have it by default
+  return cozyFetchRawJSON(cozy, 'GET', `${makeReferencesPath(doc)}?include=files&sort=datetime${params}`)
 }
 
 function makeReferencesPath (doc) {
