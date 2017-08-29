@@ -74,7 +74,7 @@ export function findMany (cozy, doctype, ids) {
       .catch((error) => {
         if (error.status !== 404) return Promise.reject(error)
 
-        // When no doc was ever created ant the database does not exist yet,
+        // When no doc was ever created and the database does not exist yet,
         // the response will be a 404 error.
         const docs = {}
 
@@ -118,7 +118,7 @@ export function findAll (cozy, doctype, skip, limit) {
     .catch((error) => {
       if (error.status !== 404) return Promise.reject(error)
 
-      // When no doc was ever created ant the database does not exist yet,
+      // When no doc was ever created and the database does not exist yet,
       // the response will be a 404 error.
 
       const result = {}
