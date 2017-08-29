@@ -89,6 +89,27 @@ describe('data API', function () {
     })
   })
 
+  describe('Fetch all documents', function () {
+    before(mock.mockAPI('GetAllDocs'))
+
+    it('Call the proper route with options', async function () {
+      const result = await cozy.client.data.findAll('io.cozy.testobject', 1, 10)
+
+      mock.calls('GetAllDocs').should.have.length(1)
+      mock.lastUrl('GetAllDocs').should.equal('http://my.cozy.io/data/io.cozy.testobject/_all_docs?include_docs=true')
+      mock.lastOptions('GetAllDocs').should.have.property('body',
+        '{"skip":1,"limit":10}'
+      )
+
+      result.docs.should.have.properties(['43'])
+      result.docs['43'].should.deepEqual({
+        _id: '43',
+        _rev: '1-5444878785446',
+        test: 'value2'
+      })
+    })
+  })
+
   describe('Fetch the changes feed', function () {
     before(mock.mockAPI('ChangesFeed'))
 

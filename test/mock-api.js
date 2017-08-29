@@ -62,6 +62,45 @@ const ROUTES = [
     }
   },
   {
+    name: 'GetAllDocs',
+    method: 'POST',
+    matcher: /\/data\/io.cozy.testobject\/_all_docs/,
+    response: {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: {
+        'total_rows': 2,
+        'rows': [
+          {
+            'id': '42',
+            'key': '42',
+            'value': {
+              'rev': '1-5444878785445'
+            },
+            'doc': {
+              '_id': '42',
+              '_rev': '1-5444878785445',
+              'test': 'value'
+            }
+          },
+          {
+            'id': '43',
+            'key': '43',
+            'value': {
+              'rev': '1-5444878785446'
+            },
+            'doc': {
+              '_id': '43',
+              '_rev': '1-5444878785446',
+              'test': 'value2'
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
     name: 'CreateDoc',
     method: 'POST',
     matcher: /\/data\/io.cozy.testobject\/$/,

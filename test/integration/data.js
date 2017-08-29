@@ -79,6 +79,41 @@ describe('data API', function () {
     })
   })
 
+  describe('Fetch all documents', function () {
+    beforeEach(function () {
+      if (COZY_STACK_VERSION === '2') {
+        this.skip()
+      }
+    })
+
+    it('Works correctly without skip and limit', async function () {
+      const result = await cozy.client.data.findAll('io.cozy.testobject')
+      result.docs.should.have.properties([docID])
+      result.keys.should.deepEqual([docID])
+      result.docs[docID].should.deepEqual({
+        doc: {
+          _id: docID,
+          _rev: docRev,
+          test: 'value'
+        }
+      })
+      should(result.totalDocs).equal(1)
+    })
+
+    it('Works correctly with skip and limit', async function () {
+      const result = await cozy.client.data.findAll('io.cozy.testobject', 1, 10)
+      // there is only one doc so that should be empty
+      should(result.docs).deepEqual({})
+      should(result.keys).deepEqual([])
+      should(result.totalDocs).equal(1)
+    })
+
+    it('Works when the database does not exist yet', async function () {
+      const resultsById = await cozy.client.data.findAll('io.cozy.jobs')
+      resultsById.error.status.should.equal(404)
+    })
+  })
+
   describe('Update document', function () {
     it('Works', async function () {
       const changes = {
