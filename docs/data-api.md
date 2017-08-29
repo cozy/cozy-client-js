@@ -170,7 +170,7 @@ It returns a promise for an **indexReference**, which can be passed to `cozy.dat
 - `doctype` is a string specifying the [doctype](intro.md#doctypes--permissions)
 - `fields` is an array of the fields name to index
 
-**Warning**: when used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries. Because of this, more complex queries are not (yet) supported with **v2**.
+**Warning**: when used on **v2**, a map-reduce view is created internally, when used on **v3**, we use couchdb built-in mango queries.
 
 ```javascript
 const booksByYearRef = await cozy.client.data.defineIndex(myType, ['year', 'rating'])
@@ -189,7 +189,7 @@ It returns a promise with a list of documents matching the query. Results will b
   * `skip`: ignore the first x results (pagination)
   * `wholeResponse`: when set to true, the whole query response will be returned instead of just the docs. This is useful when paginating, because you'll get the `next` property in the response object.
 
-**Warning**: complex mango queries are not, and may never be compatible with **v2**
+**Warning**: complex mango queries are not compatible with **v2**
 
 ```javascript
 const results = await cozy.client.data.query(booksByYearRef, {
