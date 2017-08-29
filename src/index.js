@@ -34,6 +34,7 @@ const dataProto = {
   create: data.create,
   find: data.find,
   findMany: data.findMany,
+  findAll: data.findAll,
   update: data.update,
   delete: data._delete,
   updateAttributes: data.updateAttributes,

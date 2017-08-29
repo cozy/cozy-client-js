@@ -87,6 +87,48 @@ export function findMany (cozy, doctype, ids) {
   })
 }
 
+export function findAll (cozy, doctype, skip, limit) {
+  return cozy.isV2().then((isV2) => {
+    if (isV2) {
+      return Promise.reject(new Error('findAll is not available on v2'))
+    }
+
+    const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
+
+    const options = Object.assign(
+      {},
+      skip ? { skip } : {},
+      limit ? { limit } : {}
+    )
+    return cozyFetchJSON(cozy, 'POST', path, options)
+    .then((resp) => {
+      const result = {}
+      result.docs = {}
+      result.keys = []
+
+      for (const row of resp.rows) {
+        const {key, doc} = row
+        result.keys.push[key]
+        result.docs[key] = doc
+      }
+
+      result.totalDocs = resp.total_rows
+      return result
+    })
+    .catch((error) => {
+      if (error.status !== 404) return Promise.reject(error)
+
+      // When no doc was ever created ant the database does not exist yet,
+      // the response will be a 404 error.
+
+      const result = {}
+      result.error = error
+
+      return result
+    })
+  })
+}
+
 export function changesFeed (cozy, doctype, options) {
   return cozy.isV2().then((isV2) => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
