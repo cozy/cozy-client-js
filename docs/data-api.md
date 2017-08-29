@@ -81,6 +81,38 @@ for (const id of ids) {
 }
 ```
 
+### `cozy.client.data.findAll(doctype)`
+
+`cozy.client.data.findAll(doctype)` returns the all documents associated to the given doctype.
+
+It returns a promise for a map, with the given IDs as keys.
+
+When a document is found, the corresponding value will be an object with a
+single `doc` key containing the document.
+Documents will have the same fields than the returned values of `create`,
+including `_id` and `_rev`.
+
+- `doctype` is a string specifying the
+  [doctype](intro.md#doctypes--permissions)
+- `skip` (Optional) is a number specifying the number of documents to skip (used for pagination)
+  look for
+- `limit` (Optional) is a number specifying the maximum number of documents to be returned (used for pagination)
+
+
+**Warning**: Not available on **v2**. A fallback implementation could be
+provided at some point.
+
+```javascript
+const result = await cozy.client.data.findAll(myBooksDoctype)
+if (result.error) {
+    console.error('Error while fetching books')
+}
+for (const id of result.keys) {
+    const doc = result.docs[id]
+    console.log(doc._id, doc._rev, doc.title, doc.author, doc.isbn)
+}
+```
+
 
 ### `cozy.client.data.changesFeed(doctype, options)`
 
