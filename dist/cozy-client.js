@@ -786,6 +786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  create: data.create,
 	  find: data.find,
 	  findMany: data.findMany,
+	  findAll: data.findAll,
 	  update: data.update,
 	  delete: data._delete,
 	  updateAttributes: data.updateAttributes,
@@ -8054,6 +8055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.create = create;
 	exports.find = find;
 	exports.findMany = findMany;
+	exports.findAll = findAll;
 	exports.changesFeed = changesFeed;
 	exports.update = update;
 	exports.updateAttributes = updateAttributes;
@@ -8158,7 +8160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).catch(function (error) {
 	      if (error.status !== 404) return Promise.reject(error);
 	
-	      // When no doc was ever created ant the database does not exist yet,
+	      // When no doc was ever created and the database does not exist yet,
 	      // the response will be a 404 error.
 	      var docs = {};
 	
@@ -8188,6 +8190,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      return docs;
+	    });
+	  });
+	}
+	
+	function findAll(cozy, doctype) {
+	  return cozy.isV2().then(function (isV2) {
+	    if (isV2) {
+	      return Promise.reject(new Error('findAll is not available on v2'));
+	    }
+	
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
+	
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, {}).then(function (resp) {
+	      var result = {};
+	      result.docs = [];
+	
+	      var _iteratorNormalCompletion3 = true;
+	      var _didIteratorError3 = false;
+	      var _iteratorError3 = undefined;
+	
+	      try {
+	        for (var _iterator3 = resp.rows[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	          var row = _step3.value;
+	          var doc = row.doc;
+	
+	          result.docs.push(doc);
+	        }
+	      } catch (err) {
+	        _didIteratorError3 = true;
+	        _iteratorError3 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	            _iterator3.return();
+	          }
+	        } finally {
+	          if (_didIteratorError3) {
+	            throw _iteratorError3;
+	          }
+	        }
+	      }
+	
+	      return result;
+	    }).catch(function (error) {
+	      if (error.status !== 404) return Promise.reject(error);
+	
+	      // When no doc was ever created and the database does not exist yet,
+	      // the response will be a 404 error.
+	
+	      var result = {};
+	      result.error = error;
+	
+	      return result;
 	    });
 	  });
 	}
@@ -8419,7 +8474,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var path = (0, _utils.createPath)(cozy, false, doctype, '_index');
 	  var indexDefinition = { 'index': { fields: fields } };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, indexDefinition).then(function (response) {
-	    return { doctype: doctype, type: 'mango', name: response.id, fields: fields };
+	    var indexResult = { doctype: doctype, type: 'mango', name: response.id, fields: fields };
+	    var opts = getV3Options(indexResult, { 'selector': { _id: { '$gt': null } } });
+	    var path = (0, _utils.createPath)(cozy, false, indexResult.doctype, '_find');
+	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function () {
+	      return indexResult;
+	    }).catch(function () {
+	      // one retry
+	      return (0, _utils.sleep)(1000).then(function () {
+	        return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts);
+	      }).then(function () {
+	        return indexResult;
+	      }).catch(function () {
+	        return (0, _utils.sleep)(500).then(function () {
+	          return indexResult;
+	        });
+	      });
+	    });
 	  });
 	}
 	

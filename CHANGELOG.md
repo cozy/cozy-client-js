@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
+## [v0.3.15] - 2017-08-31
+### Changed
+- Add a retry on `data.defineIndex` to avoid stack error for index not ready yet
+
+### Added
+- Add `data.findAll(doctype)` to get all documents of a provided doctype without using index
+
+
 ## [v0.3.14] - 2017-08-30
 ### Changed
 - Use sort=datetime when fetching referenced files
@@ -216,7 +225,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.14...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...HEAD
+[v0.3.15]: https://github.com/cozy/cozy-client-js/compare/v0.3.14...v0.3.15
 [v0.3.14]: https://github.com/cozy/cozy-client-js/compare/v0.3.13...v0.3.14
 [v0.3.13]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...v0.3.13
 [v0.3.12]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...v0.3.12
