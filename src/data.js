@@ -87,7 +87,7 @@ export function findMany (cozy, doctype, ids) {
   })
 }
 
-export function findAll (cozy, doctype, skip, limit) {
+export function findAll (cozy, doctype) {
   return cozy.isV2().then((isV2) => {
     if (isV2) {
       return Promise.reject(new Error('findAll is not available on v2'))
@@ -95,12 +95,7 @@ export function findAll (cozy, doctype, skip, limit) {
 
     const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
 
-    const options = Object.assign(
-      {},
-      skip ? { skip } : {},
-      limit ? { limit } : {}
-    )
-    return cozyFetchJSON(cozy, 'POST', path, options)
+    return cozyFetchJSON(cozy, 'POST', path)
     .then((resp) => {
       const result = {}
       result.docs = {}
@@ -108,7 +103,7 @@ export function findAll (cozy, doctype, skip, limit) {
 
       for (const row of resp.rows) {
         const {key, doc} = row
-        result.keys.push[key]
+        result.keys.push(key)
         result.docs[key] = doc
       }
 

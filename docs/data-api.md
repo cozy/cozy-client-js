@@ -94,10 +94,7 @@ including `_id` and `_rev`.
 
 - `doctype` is a string specifying the
   [doctype](intro.md#doctypes--permissions)
-- `skip` (Optional) is a number specifying the number of documents to skip (used for pagination)
   look for
-- `limit` (Optional) is a number specifying the maximum number of documents to be returned (used for pagination)
-
 
 **Warning**: Not available on **v2**. A fallback implementation could be
 provided at some point.
