@@ -1,4 +1,4 @@
-import {warn, createPath} from './utils'
+import {warn, createPath, sleep} from './utils'
 import {normalizeDoctype} from './doctypes'
 import {cozyFetchJSON, cozyFetchRawJSON} from './fetch'
 
@@ -66,7 +66,21 @@ function defineIndexV3 (cozy, doctype, fields) {
   let path = createPath(cozy, false, doctype, '_index')
   let indexDefinition = {'index': {fields}}
   return cozyFetchJSON(cozy, 'POST', path, indexDefinition)
-    .then((response) => ({ doctype: doctype, type: 'mango', name: response.id, fields: fields }))
+    .then((response) => {
+      const indexResult = { doctype: doctype, type: 'mango', name: response.id, fields }
+      const opts = getV3Options(indexResult, {'selector': {_id: {'$gt': null}}})
+      let path = createPath(cozy, false, indexResult.doctype, '_find')
+      return cozyFetchJSON(cozy, 'POST', path, opts)
+      .then(() => indexResult)
+      .catch(() => { // one retry
+        return sleep(1000)
+        .then(() => cozyFetchJSON(cozy, 'POST', path, opts))
+        .then(() => indexResult)
+        .catch(() => {
+          return sleep(500).then(() => indexResult)
+        })
+      })
+    })
 }
 
 // queryV2 is equivalent to query but only works for V2.
