@@ -74,7 +74,7 @@ export function findMany (cozy, doctype, ids) {
       .catch((error) => {
         if (error.status !== 404) return Promise.reject(error)
 
-        // When no doc was ever created ant the database does not exist yet,
+        // When no doc was ever created and the database does not exist yet,
         // the response will be a 404 error.
         const docs = {}
 
@@ -84,6 +84,39 @@ export function findMany (cozy, doctype, ids) {
 
         return docs
       })
+  })
+}
+
+export function findAll (cozy, doctype) {
+  return cozy.isV2().then((isV2) => {
+    if (isV2) {
+      return Promise.reject(new Error('findAll is not available on v2'))
+    }
+
+    const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
+
+    return cozyFetchJSON(cozy, 'POST', path, {})
+    .then((resp) => {
+      const result = {}
+      result.docs = []
+
+      for (const row of resp.rows) {
+        const { doc } = row
+        result.docs.push(doc)
+      }
+      return result
+    })
+    .catch((error) => {
+      if (error.status !== 404) return Promise.reject(error)
+
+      // When no doc was ever created and the database does not exist yet,
+      // the response will be a 404 error.
+
+      const result = {}
+      result.error = error
+
+      return result
+    })
   })
 }
 
