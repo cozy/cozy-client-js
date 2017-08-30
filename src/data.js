@@ -95,19 +95,15 @@ export function findAll (cozy, doctype) {
 
     const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
 
-    return cozyFetchJSON(cozy, 'POST', path)
+    return cozyFetchJSON(cozy, 'POST', path, {})
     .then((resp) => {
       const result = {}
-      result.docs = {}
-      result.keys = []
+      result.docs = []
 
       for (const row of resp.rows) {
-        const {key, doc} = row
-        result.keys.push(key)
-        result.docs[key] = doc
+        const { doc } = row
+        result.docs.push(doc)
       }
-
-      result.totalDocs = resp.total_rows
       return result
     })
     .catch((error) => {

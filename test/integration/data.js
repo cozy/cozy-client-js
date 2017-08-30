@@ -88,16 +88,12 @@ describe('data API', function () {
 
     it('Works correctly', async function () {
       const result = await cozy.client.data.findAll('io.cozy.testobject')
-      result.docs.should.have.properties([docID])
-      result.keys.should.deepEqual([docID])
-      result.docs[docID].should.deepEqual({
-        doc: {
-          _id: docID,
-          _rev: docRev,
-          test: 'value'
-        }
+      should(result.docs.length).equal(1)
+      result.docs[0].should.deepEqual({
+        _id: docID,
+        _rev: docRev,
+        test: 'value'
       })
-      should(result.totalDocs).equal(1)
     })
 
     it('Works when the database does not exist yet', async function () {
