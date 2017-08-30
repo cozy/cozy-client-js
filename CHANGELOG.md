@@ -216,7 +216,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.13...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.14...HEAD
 [v0.3.14]: https://github.com/cozy/cozy-client-js/compare/v0.3.13...v0.3.14
 [v0.3.13]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...v0.3.13
 [v0.3.12]: https://github.com/cozy/cozy-client-js/compare/v0.3.11...v0.3.12
