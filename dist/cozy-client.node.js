@@ -475,7 +475,6 @@
 	
 	      // Exposing cozyFetchJSON to make some development easier. Should be temporary.
 	      this.fetchJSON = function _fetchJSON() {
-	        console.warn && console.warn('cozy.client.fetchJSON is a temporary method for development purpose, you should avoid using it.');
 	        var args = [this].concat(Array.prototype.slice.call(arguments));
 	        return cozyFetch.cozyFetchJSON.apply(this, args);
 	      };
@@ -3946,7 +3945,8 @@
 	  var params = Object.keys(options).map(function (key) {
 	    return '&page[' + key + ']=' + options[key];
 	  }).join('');
-	  return (0, _fetch.cozyFetchRawJSON)(cozy, 'GET', makeReferencesPath(doc) + '?include=files' + params);
+	  // As datetime is the only sort option available, I see no reason to not have it by default
+	  return (0, _fetch.cozyFetchRawJSON)(cozy, 'GET', makeReferencesPath(doc) + '?include=files&sort=datetime' + params);
 	}
 	
 	function makeReferencesPath(doc) {
