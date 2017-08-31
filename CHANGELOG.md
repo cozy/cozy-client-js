@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.3.16] - 2017-08-31
+### Fixed
+- Return directly an array of docs for `data.findAll()`
+- Do not include CouchDB indexes in `data.findAll()`
+
+
 ## [v0.3.15] - 2017-08-31
 ### Changed
 - Add a retry on `data.defineIndex` to avoid stack error for index not ready yet
@@ -226,6 +232,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 [Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...HEAD
+[v0.3.16]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...v0.3.16
 [v0.3.15]: https://github.com/cozy/cozy-client-js/compare/v0.3.14...v0.3.15
 [v0.3.14]: https://github.com/cozy/cozy-client-js/compare/v0.3.13...v0.3.14
 [v0.3.13]: https://github.com/cozy/cozy-client-js/compare/v0.3.12...v0.3.13
