@@ -97,25 +97,13 @@ export function findAll (cozy, doctype) {
 
     return cozyFetchJSON(cozy, 'POST', path, {})
     .then((resp) => {
-      const result = {}
-      result.docs = []
+      const docs = []
 
       for (const row of resp.rows) {
         const { doc } = row
-        result.docs.push(doc)
+        docs.push(doc)
       }
-      return result
-    })
-    .catch((error) => {
-      if (error.status !== 404) return Promise.reject(error)
-
-      // When no doc was ever created and the database does not exist yet,
-      // the response will be a 404 error.
-
-      const result = {}
-      result.error = error
-
-      return result
+      return docs
     })
   })
 }

@@ -87,18 +87,13 @@ describe('data API', function () {
     })
 
     it('Works correctly', async function () {
-      const result = await cozy.client.data.findAll('io.cozy.testobject')
-      should(result.docs.length).equal(1)
-      result.docs[0].should.deepEqual({
+      const docs = await cozy.client.data.findAll('io.cozy.testobject')
+      should(docs.length).equal(1)
+      docs[0].should.deepEqual({
         _id: docID,
         _rev: docRev,
         test: 'value'
       })
-    })
-
-    it('Works when the database does not exist yet', async function () {
-      const resultsById = await cozy.client.data.findAll('io.cozy.jobs')
-      resultsById.error.status.should.equal(404)
     })
   })
 
