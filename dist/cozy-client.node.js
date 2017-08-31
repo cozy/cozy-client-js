@@ -2382,8 +2382,7 @@
 	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
 	
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, {}).then(function (resp) {
-	      var result = {};
-	      result.docs = [];
+	      var docs = [];
 	
 	      var _iteratorNormalCompletion3 = true;
 	      var _didIteratorError3 = false;
@@ -2393,8 +2392,9 @@
 	        for (var _iterator3 = resp.rows[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 	          var row = _step3.value;
 	          var doc = row.doc;
+	          // if not couchDB indexes
 	
-	          result.docs.push(doc);
+	          if (!doc._id.match(/_design\//)) docs.push(doc);
 	        }
 	      } catch (err) {
 	        _didIteratorError3 = true;
@@ -2411,17 +2411,7 @@
 	        }
 	      }
 	
-	      return result;
-	    }).catch(function (error) {
-	      if (error.status !== 404) return Promise.reject(error);
-	
-	      // When no doc was ever created and the database does not exist yet,
-	      // the response will be a 404 error.
-	
-	      var result = {};
-	      result.error = error;
-	
-	      return result;
+	      return docs;
 	    });
 	  });
 	}
