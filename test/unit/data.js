@@ -93,7 +93,7 @@ describe('data API', function () {
     before(mock.mockAPI('GetAllDocs'))
 
     it('Call the proper route with options', async function () {
-      const result = await cozy.client.data.findAll('io.cozy.testobject')
+      const docs = await cozy.client.data.findAll('io.cozy.testobject')
 
       mock.calls('GetAllDocs').should.have.length(1)
       mock.lastUrl('GetAllDocs').should.equal('http://my.cozy.io/data/io.cozy.testobject/_all_docs?include_docs=true')
@@ -101,8 +101,8 @@ describe('data API', function () {
         '{}'
       )
 
-      should(result.docs.length).equal(2)
-      result.docs[1].should.deepEqual({
+      should(docs.length).equal(2)
+      docs[1].should.deepEqual({
         _id: '43',
         _rev: '1-5444878785446',
         test: 'value2'
