@@ -101,7 +101,8 @@ export function findAll (cozy, doctype) {
 
       for (const row of resp.rows) {
         const { doc } = row
-        docs.push(doc)
+        // if not couchDB indexes
+        if (!doc._id.match(/_design\//)) docs.push(doc)
       }
       return docs
     })
