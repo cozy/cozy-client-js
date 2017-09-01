@@ -95,6 +95,11 @@ describe('data API', function () {
         test: 'value'
       })
     })
+
+    it('Returns an empty array when the database does not exist yet', async function () {
+      const docs = await cozy.client.data.findAll('io.cozy.jobs')
+      should(docs.length).equal(0)
+    })
   })
 
   describe('Update document', function () {
