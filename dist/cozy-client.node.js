@@ -2412,6 +2412,11 @@
 	      }
 	
 	      return docs;
+	    }).catch(function (error) {
+	      // the _all_docs endpoint returns a 404 error if no document with the given
+	      // doctype exists.
+	      if (error.status === 404) return [];
+	      throw error;
 	    });
 	  });
 	}

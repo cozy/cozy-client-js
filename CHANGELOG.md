@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.3.17] - 2017-09-01
+### Fixed
+- Returns an empty array from `data.findAll()` when documents not found (instead of 404 error)
+
+
 ## [v0.3.16] - 2017-08-31
 ### Fixed
 - Return directly an array of docs for `data.findAll()`
@@ -231,7 +236,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.17...HEAD
+[v0.3.17]: https://github.com/cozy/cozy-client-js/compare/v0.3.16...v0.3.17
 [v0.3.16]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...v0.3.16
 [v0.3.15]: https://github.com/cozy/cozy-client-js/compare/v0.3.14...v0.3.15
 [v0.3.14]: https://github.com/cozy/cozy-client-js/compare/v0.3.13...v0.3.14
