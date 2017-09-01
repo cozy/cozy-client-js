@@ -92,7 +92,7 @@ describe('data API', function () {
   describe('Fetch all documents', function () {
     before(mock.mockAPI('GetAllDocs'))
 
-    it('Call the proper route with options', async function () {
+    it('Call the proper route', async function () {
       const docs = await cozy.client.data.findAll('io.cozy.testobject')
 
       mock.calls('GetAllDocs').should.have.length(1)
