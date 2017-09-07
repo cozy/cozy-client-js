@@ -16,7 +16,6 @@ export function unpromiser (fn) {
       (res) => cb(null, res),
       (err) => cb(err, null)
     )
-    return
   }
 }
 

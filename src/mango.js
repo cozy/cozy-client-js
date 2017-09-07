@@ -60,15 +60,20 @@ function defineIndexV2 (cozy, doctype, fields) {
     .then(() => ({ doctype: doctype, type: 'mapreduce', name: indexName, fields: fields }))
 }
 
-// defineIndexV2 is equivalent to defineIndex but only works for V2.
-// It transforms the index fields into a map reduce view.
 function defineIndexV3 (cozy, doctype, fields) {
   let path = createPath(cozy, false, doctype, '_index')
   let indexDefinition = {'index': {fields}}
   return cozyFetchJSON(cozy, 'POST', path, indexDefinition)
     .then((response) => {
       const indexResult = { doctype: doctype, type: 'mango', name: response.id, fields }
-      const opts = getV3Options(indexResult, {'selector': {_id: {'$gt': null}}})
+
+      if (response.result === 'exists') return indexResult
+
+      // indexes might not be usable right after being created; so we delay the resolving until they are
+      const selector = {}
+      selector[fields[0]] = {'$gt': null}
+
+      const opts = getV3Options(indexResult, {'selector': selector})
       let path = createPath(cozy, false, indexResult.doctype, '_find')
       return cozyFetchJSON(cozy, 'POST', path, opts)
       .then(() => indexResult)
