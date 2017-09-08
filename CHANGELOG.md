@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- none yet
+- Optimised checking for index availability right after they are created
 
 ### Fixed
 - none yet
