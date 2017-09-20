@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Changed
 - Optimised checking for index availability right after they are created
+- When clients request to regenerate their token, redirect them to a page with more explanations then the default login page.
 
 ### Fixed
 - none yet

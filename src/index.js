@@ -1,4 +1,4 @@
-/* global fetch */
+/* global fetch URL */
 import 'babel-polyfill'
 
 import {unpromiser, retry, warn} from './utils'
@@ -218,6 +218,11 @@ class Client {
         throw new Error('OAuth is not supported on the V2 stack')
       }
       if (this._oauth) {
+        if (forceTokenRefresh && this._clientParams.redirectURI) {
+          const url = new URL(this._clientParams.redirectURI)
+          if (!url.searchParams.has('reconnect')) url.searchParams.append('reconnect', 1)
+          this._clientParams.redirectURI = url.toString()
+        }
         return auth.oauthFlow(
           this,
           this._storage,
