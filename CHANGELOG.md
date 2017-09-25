@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Changed
-- Optimised checking for index availability right after they are created
-- When clients request to regenerate their token, redirect them to a page with more explanations then the default login page.
+- none yet
 
 ### Fixed
 - none yet
@@ -19,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.3.18] - 2017-09-25
+### Changed
+- Optimised checking for index availability right after they are created
+- When clients request to regenerate their token, redirect them to a page with more explanations then the default login page.
 
 ## [v0.3.17] - 2017-09-01
 ### Fixed
@@ -237,7 +240,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.17...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.18...HEAD
+[v0.3.18]: https://github.com/cozy/cozy-client-js/compare/v0.3.17...v0.3.18
 [v0.3.17]: https://github.com/cozy/cozy-client-js/compare/v0.3.16...v0.3.17
 [v0.3.16]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...v0.3.16
 [v0.3.15]: https://github.com/cozy/cozy-client-js/compare/v0.3.14...v0.3.15

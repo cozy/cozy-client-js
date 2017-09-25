@@ -60,7 +60,7 @@
 
 	'use strict';
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch */
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch URL */
 	
 	
 	__webpack_require__(3);
@@ -498,6 +498,11 @@
 	          throw new Error('OAuth is not supported on the V2 stack');
 	        }
 	        if (_this._oauth) {
+	          if (forceTokenRefresh && _this._clientParams.redirectURI) {
+	            var url = new URL(_this._clientParams.redirectURI);
+	            if (!url.searchParams.has('reconnect')) url.searchParams.append('reconnect', 1);
+	            _this._clientParams.redirectURI = url.toString();
+	          }
 	          return auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered, forceTokenRefresh);
 	        }
 	        // we expect to be on a client side application running in a browser
@@ -1153,7 +1158,6 @@
 	    }, function (err) {
 	      return cb(err, null);
 	    });
-	    return;
 	  };
 	}
 	
@@ -2642,14 +2646,19 @@
 	  });
 	}
 	
-	// defineIndexV2 is equivalent to defineIndex but only works for V2.
-	// It transforms the index fields into a map reduce view.
 	function defineIndexV3(cozy, doctype, fields) {
 	  var path = (0, _utils.createPath)(cozy, false, doctype, '_index');
 	  var indexDefinition = { 'index': { fields: fields } };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, indexDefinition).then(function (response) {
 	    var indexResult = { doctype: doctype, type: 'mango', name: response.id, fields: fields };
-	    var opts = getV3Options(indexResult, { 'selector': { _id: { '$gt': null } } });
+	
+	    if (response.result === 'exists') return indexResult;
+	
+	    // indexes might not be usable right after being created; so we delay the resolving until they are
+	    var selector = {};
+	    selector[fields[0]] = { '$gt': null };
+	
+	    var opts = getV3Options(indexResult, { 'selector': selector });
 	    var path = (0, _utils.createPath)(cozy, false, indexResult.doctype, '_find');
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function () {
 	      return indexResult;

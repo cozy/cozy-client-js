@@ -1,6 +1,6 @@
 {
   "name": "cozy-client-js",
-  "version": "0.3.17",
+  "version": "0.3.18",
   "description": "Javascript library to interact with a cozy",
   "main": "dist/cozy-client.node.js",
   "browser": "dist/cozy-client.js",
