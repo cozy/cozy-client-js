@@ -26,3 +26,7 @@ export function getClients (cozy) {
 export function deleteClientById (cozy, id) {
   return cozyFetchJSON(cozy, 'DELETE', `/settings/clients/${id}`)
 }
+
+export function updateLastSync (cozy) {
+  return cozyFetchJSON(cozy, 'POST', '/settings/synchronized')
+}

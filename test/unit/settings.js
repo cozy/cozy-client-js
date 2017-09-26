@@ -95,4 +95,12 @@ describe('settings', function () {
       await cozy.client.settings.deleteClientById('123')
     })
   })
+
+  describe('call the synchronisation route', function () {
+    before(mock.mockAPI('SyncedClient'))
+
+    it('should work', async function () {
+      await cozy.client.settings.updateLastSync()
+    })
+  })
 })
