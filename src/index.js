@@ -129,7 +129,8 @@ const settingsProto = {
   getInstance: settings.getInstance,
   updateInstance: settings.updateInstance,
   getClients: settings.getClients,
-  deleteClientById: settings.deleteClientById
+  deleteClientById: settings.deleteClientById,
+  updateLastSync: settings.updateLastSync
 }
 
 class Client {

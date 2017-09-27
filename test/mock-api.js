@@ -654,6 +654,12 @@ const ROUTES = [
     response: { body: '' }
   },
   {
+    name: 'SyncedClient',
+    method: 'POST',
+    matcher: /settings\/synchronized/,
+    response: { body: '' }
+  },
+  {
     name: 'CreateIntent',
     method: 'POST',
     matcher: /intents/,
