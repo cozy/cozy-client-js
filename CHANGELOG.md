@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.3.19] - 2017-09-27
+### Added
+- Added a function to call `/settings/synchronized`
+
 ## [v0.3.18] - 2017-09-25
 ### Changed
 - Optimised checking for index availability right after they are created
@@ -240,7 +244,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.18...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.19...HEAD
+[v0.3.19]: https://github.com/cozy/cozy-client-js/compare/v0.3.18...v0.3.19
 [v0.3.18]: https://github.com/cozy/cozy-client-js/compare/v0.3.17...v0.3.18
 [v0.3.17]: https://github.com/cozy/cozy-client-js/compare/v0.3.16...v0.3.17
 [v0.3.16]: https://github.com/cozy/cozy-client-js/compare/v0.3.15...v0.3.16

@@ -881,7 +881,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getInstance: settings.getInstance,
 	  updateInstance: settings.updateInstance,
 	  getClients: settings.getClients,
-	  deleteClientById: settings.deleteClientById
+	  deleteClientById: settings.deleteClientById,
+	  updateLastSync: settings.updateLastSync
 	};
 	
 	var Client = function () {
@@ -9764,6 +9765,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.updateInstance = updateInstance;
 	exports.getClients = getClients;
 	exports.deleteClientById = deleteClientById;
+	exports.updateLastSync = updateLastSync;
 	
 	var _fetch = __webpack_require__(196);
 	
@@ -9792,6 +9794,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function deleteClientById(cozy, id) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/settings/clients/' + id);
+	}
+	
+	function updateLastSync(cozy) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/settings/synchronized');
 	}
 
 /***/ },
