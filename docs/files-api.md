@@ -10,7 +10,7 @@ It returns a promise for the document of the file created.
 - `options` is an object with the following fields:
   * `name`: specify the name of the file. optional for a data of type `File`, type, mandatory otherwise.
   * `dirID`: specify identifier of the file's directory. if empty, it is the root directory.
-  * `contentType`: specify the content type of the uploaded data. For a `File` type, it is be handled automatically. default: `application/octet-stream`.
+  * `contentType`: specify the content type of the uploaded data. For a `File` type, it is handled automatically in browsers (default: `application/octet-stream`). For nodejs, you can rely on an external module like [mime](https://github.com/broofa/node-mime)
   * `checksum`: the base64-encoded (with padding) MD5 digest of the file (optional).
   * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
 
