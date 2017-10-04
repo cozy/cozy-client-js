@@ -27,3 +27,13 @@ module.exports = {
 ```
 
 This same configuration has to be added in file `wepback.config.prod.js`, to make the build possible.
+
+In prod, since `cozy-client-js` is injected by the stack, it has not been processed by `wepback` and the `ProvidePlugin`. Thus you need to bind `PouchDB` to `window`.
+
+```
+/* global PouchDB, pouchdbFind */
+// Bind PouchDB to window for cozy-client-js to find it
+// PouchDB is provided by webpack through ProvidedPlugin
+window.PouchDB = PouchDB
+window.pouchdbFind = pouchdbFind
+```
