@@ -99,7 +99,8 @@ const intentsProto = {
 
 const jobsProto = {
   create: jobs.create,
-  count: jobs.count
+  count: jobs.count,
+  queued: jobs.queued
 }
 
 const offlineProto = {
