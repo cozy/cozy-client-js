@@ -74,7 +74,7 @@ describe('data API', function () {
     })
 
     it('Works when the database does not exist yet', async function () {
-      const resultsById = await cozy.client.data.findMany('io.cozy.jobs', [missingID])
+      const resultsById = await cozy.client.data.findMany('io.cozy.idonotexist', [missingID])
       resultsById[missingID].error.status.should.equal(404)
     })
   })
@@ -97,7 +97,7 @@ describe('data API', function () {
     })
 
     it('Returns an empty array when the database does not exist yet', async function () {
-      const docs = await cozy.client.data.findAll('io.cozy.jobs')
+      const docs = await cozy.client.data.findAll('io.cozy.idonotexist')
       should(docs.length).equal(0)
     })
   })

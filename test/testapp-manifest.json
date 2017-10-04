@@ -29,6 +29,10 @@
       "description": "Required for tests of cozy-client-js",
       "type": "io.cozy.testobject2"
     },
+    "idonotexist": {
+      "description": "Required for tests of cozy-client-js",
+      "type": "io.cozy.idonotexist"
+    },
     "testreferencer": {
       "description": "Required for tests of cozy-client-js",
       "type": "io.cozy.testreferencer"
