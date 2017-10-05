@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.3.20] - XXXX-XX-XX
+### Fixed
+- Check for parentNode existing before removing intent iframe (avoid error in console)
+
 ## [v0.3.19] - 2017-09-27
 ### Added
 - Added a function to call `/settings/synchronized`
