@@ -66,7 +66,8 @@ function injectService (url, element, intent, data, onReadyCallback) {
 
       window.removeEventListener('message', messageHandler)
       const removeIntentFrame = () => {
-        iframe.parentNode.removeChild(iframe)
+        // check if the parent node has not been already removed from the DOM
+        iframe.parentNode && iframe.parentNode.removeChild(iframe)
       }
 
       if (handshaken && event.data.type === `intent-${intent._id}:exposeFrameRemoval`) {
