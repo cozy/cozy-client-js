@@ -19,7 +19,8 @@ function mockElement () {
     },
     classList: {
       add: sinon.spy()
-    }
+    },
+    focus: sinon.spy()
   }
   const documentMock = {
     defaultView: windowMock,
@@ -136,6 +137,7 @@ describe('Intents', function () {
         should(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).be.true()
         should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true()
         should(element.appendChild.withArgs(iframeMock).calledOnce).be.true()
+        should(iframeMock.focus.withArgs().calledOnce).be.true()
         done()
       }, 10)
     })
@@ -154,6 +156,7 @@ describe('Intents', function () {
         should(iframeMock.setAttribute.withArgs('src', expectedIntent.attributes.services[0].href).calledOnce).be.true()
         should(iframeMock.classList.add.withArgs('coz-intent').calledOnce).be.true()
         should(element.appendChild.withArgs(iframeMock).calledOnce).be.true()
+        should(iframeMock.focus.withArgs().calledOnce).be.true()
         done()
       }, 10)
     })
