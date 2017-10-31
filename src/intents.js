@@ -31,9 +31,11 @@ function injectService (url, element, intent, data, onReadyCallback) {
   const iframe = document.createElement('iframe')
   // if callback provided for when iframe is loaded
   if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback
+  // TODO: implement 'title' attribute
   iframe.setAttribute('src', url)
   iframe.classList.add(intentClass)
   element.appendChild(iframe)
+  iframe.focus()
 
   // Keeps only http://domain:port/
   const serviceOrigin = url.split('/', 3).join('/')
