@@ -851,7 +851,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var jobsProto = {
 	  create: jobs.create,
-	  count: jobs.count
+	  count: jobs.count,
+	  queued: jobs.queued
 	};
 	
 	var offlineProto = {
@@ -9232,7 +9233,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      window.removeEventListener('message', messageHandler);
 	      var removeIntentFrame = function removeIntentFrame() {
-	        iframe.parentNode.removeChild(iframe);
+	        // check if the parent node has not been already removed from the DOM
+	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
 	      };
 	
 	      if (handshaken && event.data.type === 'intent-' + intent._id + ':exposeFrameRemoval') {
@@ -9406,14 +9408,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 	exports.count = count;
+	exports.queued = queued;
 	exports.create = create;
 	
 	var _fetch = __webpack_require__(196);
 	
 	function count(cozy, workerType) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/jobs/queue/' + workerType).then(function (data) {
-	    return data.attributes.count;
+	    return data.length;
 	  });
+	}
+	
+	function queued(cozy, workerType) {
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/jobs/queue/' + workerType);
 	}
 	
 	function create(cozy, workerType, args, options) {
