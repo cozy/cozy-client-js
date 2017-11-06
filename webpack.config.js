@@ -30,10 +30,6 @@ var config = {
   devtool: 'source-map',
   target: NODE_TARGET,
   output: output,
-  externals: {
-    pouchdb: 'pouchdb',
-    'pouchdb-find': 'pouchdb-find'
-  },
   resolve: {
     root: path.resolve('./src'),
     extensions: ['', '.js']
