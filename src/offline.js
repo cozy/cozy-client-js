@@ -1,7 +1,8 @@
-/* global PouchDB, pouchdbFind */
 import {DOCTYPE_FILES} from './doctypes'
 import {refreshToken} from './auth_v3'
 import {isOffline} from './utils'
+import PouchDB from 'pouchdb'
+import pouchdbFind from 'pouchdb-find'
 
 export const replicationOfflineError = 'Replication abort, your device is actually offline.'
 
@@ -18,8 +19,6 @@ let pluginLoaded = false
 */
 
 export function init (cozy, { options = {}, doctypes = [] }) {
-  if (typeof PouchDB === 'undefined') throw new Error('Missing pouchdb dependency for offline mode. Please run "yarn add pouchdb" and provide PouchDB as a webpack plugin.')
-  if (typeof pouchdbFind === 'undefined') throw new Error('Missing pouchdb-find dependency for offline mode. Please run "yarn add pouchdb-find" and provide pouchdbFind as webpack plugin.')
   for (let doctype of doctypes) {
     createDatabase(cozy, doctype, options)
   }
