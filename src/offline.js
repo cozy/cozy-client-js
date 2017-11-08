@@ -1,3 +1,4 @@
+/* global pouchdbAdapterCordovaSqlite */
 import {DOCTYPE_FILES} from './doctypes'
 import {refreshToken} from './auth_v3'
 import {isOffline} from './utils'
@@ -57,6 +58,7 @@ export function setDatabase (cozy, doctype, database) {
 export function createDatabase (cozy, doctype, options = {}) {
   if (!pluginLoaded) {
     PouchDB.plugin(pouchdbFind)
+    if (typeof pouchdbAdapterCordovaSqlite !== 'undefined') PouchDB.plugin(pouchdbAdapterCordovaSqlite)
     pluginLoaded = true
   }
 
