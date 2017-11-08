@@ -73,7 +73,7 @@ describe('mango API', function () {
     let results = await cozy.client.data.query(indexOnGroupAndYear, {
       selector: {
         group: 'A',
-        year: {$exists: true}
+        year: {$gt: 0}
       }
     })
 

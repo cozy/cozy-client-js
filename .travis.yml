@@ -19,7 +19,7 @@ cache:
 
 before_script:
   # start couchdb 2 (docker)
-  - docker run -d -p 5984:5984 --name couch klaemo/couchdb:2.0.0
+  - docker run -d -p 5984:5984 --name couch apache/couchdb:2.1
   # go 1.8
   - eval "$(gimme 1.8)"
   - mkdir $GOPATH
