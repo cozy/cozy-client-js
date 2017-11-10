@@ -3659,7 +3659,8 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var replicationOfflineError = exports.replicationOfflineError = 'Replication abort, your device is actually offline.';
+	var replicationOfflineError = exports.replicationOfflineError = 'Replication abort, your device is actually offline.'; /* global pouchdbAdapterCordovaSqlite */
+	
 	
 	var pluginLoaded = false;
 	
@@ -3739,6 +3740,7 @@
 	
 	  if (!pluginLoaded) {
 	    _pouchdb2.default.plugin(_pouchdbFind2.default);
+	    if (typeof pouchdbAdapterCordovaSqlite !== 'undefined') _pouchdb2.default.plugin(pouchdbAdapterCordovaSqlite);
 	    pluginLoaded = true;
 	  }
 	
