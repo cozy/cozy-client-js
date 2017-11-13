@@ -49,8 +49,9 @@ function cozyFetchWithAuth (cozy, fullpath, options, credentials) {
 }
 
 export function cozyFetchJSON (cozy, method, path, body, options = {}) {
+  const processJSONAPI = typeof options.processJSONAPI === 'undefined' || options.processJSONAPI
   return fetchJSON(cozy, method, path, body, options)
-    .then(handleJSONResponse)
+    .then(response => handleJSONResponse(response, processJSONAPI))
 }
 
 export function cozyFetchRawJSON (cozy, method, path, body, options = {}) {
