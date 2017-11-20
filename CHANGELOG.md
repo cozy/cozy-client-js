@@ -18,9 +18,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
+## [v0.4.2] - 2017-11-14
+### Added
+- `processJSONAPI` option can now be passed to `fetchJSON`
+
+
 ## [v0.4.1] - 2017-11-10
 ### Added
 - Ability to use sqlite as a pouch adapter, if provided by the host app.
+
 
 ## [v0.4.0] - 2017-11-07
 ### Added
@@ -260,7 +267,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.2...HEAD
+[v0.4.2]: https://github.com/cozy/cozy-client-js/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/cozy/cozy-client-js/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/cozy/cozy-client-js/compare/v0.3.20...v0.4.0
 [v0.3.20]: https://github.com/cozy/cozy-client-js/compare/v0.3.19...v0.3.20

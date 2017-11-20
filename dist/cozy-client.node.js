@@ -2053,7 +2053,10 @@
 	function cozyFetchJSON(cozy, method, path, body) {
 	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 	
-	  return fetchJSON(cozy, method, path, body, options).then(handleJSONResponse);
+	  var processJSONAPI = typeof options.processJSONAPI === 'undefined' || options.processJSONAPI;
+	  return fetchJSON(cozy, method, path, body, options).then(function (response) {
+	    return handleJSONResponse(response, processJSONAPI);
+	  });
 	}
 	
 	function cozyFetchRawJSON(cozy, method, path, body) {
