@@ -9,6 +9,10 @@ export const TRASH_DIR_ID = 'io.cozy.files.trash-dir'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
+function sanitizeFileName (name) {
+  return name && name.trim()
+}
+
 function doUpload (cozy, data, method, path, options) {
   if (!data) {
     throw new Error('missing data argument')
@@ -79,6 +83,8 @@ export function create (cozy, data, options) {
     name = data.name
   }
 
+  name = sanitizeFileName(name)
+
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
   }
@@ -94,6 +100,8 @@ export function create (cozy, data, options) {
 
 export function createDirectory (cozy, options) {
   let {name, dirID, lastModifiedDate} = options || {}
+
+  name = sanitizeFileName(name)
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
@@ -114,6 +122,8 @@ export function createDirectory (cozy, options) {
 
 function getDirectoryOrCreate (cozy, name, parentDirectory) {
   if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory')
+
+  name = sanitizeFileName(name)
 
   const path = `${parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path}/${name}`
 
@@ -155,7 +165,15 @@ function doUpdateAttributes (cozy, attrs, path, options) {
   }
 
   const {ifMatch} = options || {}
-  const body = { data: { attributes: attrs } }
+  const body = {
+    data: {
+      attributes: Object.assign(
+        {},
+        attrs,
+        { name: sanitizeFileName(attrs.name) }
+      )
+    }
+  }
   return cozyFetchJSON(cozy, 'PATCH', path, body, {
     headers: {
       'If-Match': ifMatch || ''
