@@ -545,49 +545,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch URL */
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
-	var _auth_storage = __webpack_require__(193);
+	var _auth_storage = __webpack_require__(5);
 	
-	var _auth_v = __webpack_require__(194);
+	var _auth_v = __webpack_require__(6);
 	
-	var _auth_v2 = __webpack_require__(195);
+	var _auth_v2 = __webpack_require__(7);
 	
 	var auth = _interopRequireWildcard(_auth_v2);
 	
-	var _data = __webpack_require__(198);
+	var _data = __webpack_require__(10);
 	
 	var data = _interopRequireWildcard(_data);
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	var cozyFetch = _interopRequireWildcard(_fetch);
 	
-	var _mango = __webpack_require__(200);
+	var _mango = __webpack_require__(12);
 	
 	var mango = _interopRequireWildcard(_mango);
 	
-	var _files = __webpack_require__(201);
+	var _files = __webpack_require__(13);
 	
 	var files = _interopRequireWildcard(_files);
 	
-	var _intents = __webpack_require__(202);
+	var _intents = __webpack_require__(14);
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _jobs = __webpack_require__(203);
+	var _jobs = __webpack_require__(15);
 	
 	var jobs = _interopRequireWildcard(_jobs);
 	
-	var _offline = __webpack_require__(204);
+	var _offline = __webpack_require__(16);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(246);
+	var _settings = __webpack_require__(59);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(247);
+	var _relations = __webpack_require__(60);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -911,380 +911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.assign(module.exports, { Client: Client, LocalStorage: _auth_storage.LocalStorage, MemoryStorage: _auth_storage.MemoryStorage });
 
 /***/ },
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */,
-/* 35 */,
-/* 36 */,
-/* 37 */,
-/* 38 */,
-/* 39 */,
-/* 40 */,
-/* 41 */,
-/* 42 */,
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */,
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */,
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */,
-/* 88 */,
-/* 89 */,
-/* 90 */,
-/* 91 */,
-/* 92 */,
-/* 93 */,
-/* 94 */,
-/* 95 */,
-/* 96 */,
-/* 97 */,
-/* 98 */,
-/* 99 */,
-/* 100 */,
-/* 101 */,
-/* 102 */,
-/* 103 */,
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */,
-/* 110 */,
-/* 111 */,
-/* 112 */,
-/* 113 */,
-/* 114 */,
-/* 115 */,
-/* 116 */,
-/* 117 */,
-/* 118 */,
-/* 119 */,
-/* 120 */,
-/* 121 */,
-/* 122 */,
-/* 123 */,
-/* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */,
-/* 140 */,
-/* 141 */,
-/* 142 */,
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */,
-/* 153 */,
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */
-/***/ function(module, exports) {
-
-	// shim for using process in browser
-	var process = module.exports = {};
-	
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-	
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-	
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-	
-	
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-	
-	
-	
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-	
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-	
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-	
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-	
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-	
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-	
-	function noop() {}
-	
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-	
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-	
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 192 */
+/* 4 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1457,7 +1084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 193 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1571,7 +1198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 /***/ },
-/* 194 */
+/* 6 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1643,7 +1270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 /***/ },
-/* 195 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1668,9 +1295,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.refreshToken = refreshToken;
 	exports.oauthFlow = oauthFlow;
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -2121,7 +1748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 196 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2138,11 +1765,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.cozyFetchJSON = cozyFetchJSON;
 	exports.cozyFetchRawJSON = cozyFetchRawJSON;
 	
-	var _auth_v = __webpack_require__(195);
+	var _auth_v = __webpack_require__(7);
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
-	var _jsonapi = __webpack_require__(197);
+	var _jsonapi = __webpack_require__(9);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
 	
@@ -2319,7 +1946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 197 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2385,7 +2012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = handleTopLevel;
 
 /***/ },
-/* 198 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2402,11 +2029,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.updateAttributes = updateAttributes;
 	exports._delete = _delete;
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
-	var _doctypes = __webpack_require__(199);
+	var _doctypes = __webpack_require__(11);
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	var NOREV = 'stack-v2-no-rev';
 	
@@ -2668,7 +2295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 199 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2679,7 +2306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DOCTYPE_FILES = undefined;
 	exports.normalizeDoctype = normalizeDoctype;
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
 	var DOCTYPE_FILES = exports.DOCTYPE_FILES = 'io.cozy.files';
 	
@@ -2716,7 +2343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 200 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2736,11 +2363,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.normalizeSelector = normalizeSelector;
 	exports.makeMapReduceQuery = makeMapReduceQuery;
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
-	var _doctypes = __webpack_require__(199);
+	var _doctypes = __webpack_require__(11);
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
@@ -3041,7 +2668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 201 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3078,13 +2705,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.restoreById = restoreById;
 	exports.destroyById = destroyById;
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
-	var _jsonapi = __webpack_require__(197);
+	var _jsonapi = __webpack_require__(9);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
 	
-	var _doctypes = __webpack_require__(199);
+	var _doctypes = __webpack_require__(11);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -3093,6 +2720,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TRASH_DIR_ID = exports.TRASH_DIR_ID = 'io.cozy.files.trash-dir';
 	
 	var contentTypeOctetStream = 'application/octet-stream';
+	
+	function sanitizeFileName(name) {
+	  return name && name.trim();
+	}
 	
 	function doUpload(cozy, data, method, path, options) {
 	  if (!data) {
@@ -3175,6 +2806,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    name = data.name;
 	  }
 	
+	  name = sanitizeFileName(name);
+	
 	  if (typeof name !== 'string' || name === '') {
 	    throw new Error('missing name argument');
 	  }
@@ -3193,6 +2826,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      name = _ref3.name,
 	      dirID = _ref3.dirID,
 	      lastModifiedDate = _ref3.lastModifiedDate;
+	
+	  name = sanitizeFileName(name);
 	
 	  if (typeof name !== 'string' || name === '') {
 	    throw new Error('missing name argument');
@@ -3213,6 +2848,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function getDirectoryOrCreate(cozy, name, parentDirectory) {
 	  if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory');
+	
+	  name = sanitizeFileName(name);
 	
 	  var path = (parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path) + '/' + name;
 	
@@ -3256,7 +2893,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var _ref4 = options || {},
 	      ifMatch = _ref4.ifMatch;
 	
-	  var body = { data: { attributes: attrs } };
+	  var body = {
+	    data: {
+	      attributes: Object.assign({}, attrs, { name: sanitizeFileName(attrs.name) })
+	    }
+	  };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'PATCH', path, body, {
 	    headers: {
 	      'If-Match': ifMatch || ''
@@ -3485,7 +3126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 202 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3496,7 +3137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.create = create;
 	exports.createService = createService;
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	var intentClass = 'coz-intent';
 	
@@ -3736,7 +3377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 203 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3748,7 +3389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.queued = queued;
 	exports.create = create;
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	function count(cozy, workerType) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/jobs/queue/' + workerType).then(function (data) {
@@ -3773,7 +3414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 204 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3799,17 +3440,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.stopRepeatedReplication = stopRepeatedReplication;
 	exports.stopAllRepeatedReplication = stopAllRepeatedReplication;
 	
-	var _doctypes = __webpack_require__(199);
+	var _doctypes = __webpack_require__(11);
 	
-	var _auth_v = __webpack_require__(195);
+	var _auth_v = __webpack_require__(7);
 	
-	var _utils = __webpack_require__(192);
+	var _utils = __webpack_require__(4);
 	
-	var _pouchdb = __webpack_require__(205);
+	var _pouchdb = __webpack_require__(17);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(217);
+	var _pouchdbFind = __webpack_require__(30);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -4103,22 +3744,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 205 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 	
-	var lie = _interopDefault(__webpack_require__(206));
-	var getArguments = _interopDefault(__webpack_require__(208));
-	var debug = _interopDefault(__webpack_require__(209));
-	var events = __webpack_require__(212);
-	var inherits = _interopDefault(__webpack_require__(213));
-	var nextTick = _interopDefault(__webpack_require__(207));
-	var scopedEval = _interopDefault(__webpack_require__(214));
-	var Md5 = _interopDefault(__webpack_require__(215));
-	var vuvuzela = _interopDefault(__webpack_require__(216));
+	var lie = _interopDefault(__webpack_require__(18));
+	var getArguments = _interopDefault(__webpack_require__(20));
+	var debug = _interopDefault(__webpack_require__(21));
+	var events = __webpack_require__(25);
+	var inherits = _interopDefault(__webpack_require__(26));
+	var nextTick = _interopDefault(__webpack_require__(19));
+	var scopedEval = _interopDefault(__webpack_require__(27));
+	var Md5 = _interopDefault(__webpack_require__(28));
+	var vuvuzela = _interopDefault(__webpack_require__(29));
 	
 	/* istanbul ignore next */
 	var PouchPromise$1 = typeof Promise === 'function' ? Promise : lie;
@@ -15444,11 +15085,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 206 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var immediate = __webpack_require__(207);
+	var immediate = __webpack_require__(19);
 	
 	/* istanbul ignore next */
 	function INTERNAL() {}
@@ -15703,7 +15344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 207 */
+/* 19 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -15779,7 +15420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 208 */
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -15803,7 +15444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 209 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -15812,7 +15453,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Expose `debug()` as the module.
 	 */
 	
-	exports = module.exports = __webpack_require__(210);
+	exports = module.exports = __webpack_require__(23);
 	exports.log = log;
 	exports.formatArgs = formatArgs;
 	exports.save = save;
@@ -15989,10 +15630,196 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } catch (e) {}
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(191)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ },
-/* 210 */
+/* 22 */
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = runTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    runClearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        runTimeout(drainQueue);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -16008,7 +15835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.disable = disable;
 	exports.enable = enable;
 	exports.enabled = enabled;
-	exports.humanize = __webpack_require__(211);
+	exports.humanize = __webpack_require__(24);
 	
 	/**
 	 * The currently active debug mode names, and names to skip.
@@ -16197,7 +16024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 211 */
+/* 24 */
 /***/ function(module, exports) {
 
 	/**
@@ -16352,7 +16179,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 212 */
+/* 25 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -16660,7 +16487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 213 */
+/* 26 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -16689,7 +16516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 214 */
+/* 27 */
 /***/ function(module, exports) {
 
 	// Generated by CoffeeScript 1.9.2
@@ -16717,7 +16544,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 215 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (factory) {
@@ -17474,7 +17301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 216 */
+/* 29 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17653,15 +17480,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 217 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	
-	var httpIndexes = __webpack_require__(224);
-	var localIndexes = __webpack_require__(226);
+	var httpIndexes = __webpack_require__(37);
+	var localIndexes = __webpack_require__(39);
 	
 	var plugin = {};
 	plugin.createIndex = utils.toPromise(function (requestDef, callback) {
@@ -17718,12 +17545,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 218 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var Promise = __webpack_require__(219);
+	var Promise = __webpack_require__(32);
 	
 	/* istanbul ignore next */
 	exports.once = function (fun) {
@@ -17797,14 +17624,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	};
 	
-	exports.inherits = __webpack_require__(213);
+	exports.inherits = __webpack_require__(26);
 	exports.Promise = Promise;
 	
 	exports.clone = function (obj) {
 	  return exports.extend(true, {}, obj);
 	};
 	
-	exports.extend = __webpack_require__(221);
+	exports.extend = __webpack_require__(34);
 	
 	exports.callbackify = function (fun) {
 	  return exports.getArguments(function (args) {
@@ -17828,8 +17655,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return promise;
 	};
 	
-	var crypto = __webpack_require__(222);
-	var Md5 = __webpack_require__(223);
+	var crypto = __webpack_require__(35);
+	var Md5 = __webpack_require__(36);
 	
 	exports.MD5 = function (string) {
 	  /* istanbul ignore else */
@@ -18007,19 +17834,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	};
 	
-	exports.log = __webpack_require__(209)('pouchdb:find');
+	exports.log = __webpack_require__(21)('pouchdb:find');
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(191)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ },
-/* 219 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 	
-	var lie = _interopDefault(__webpack_require__(220));
+	var lie = _interopDefault(__webpack_require__(33));
 	
 	/* istanbul ignore next */
 	var PouchPromise = typeof Promise === 'function' ? Promise : lie;
@@ -18027,11 +17854,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = PouchPromise;
 
 /***/ },
-/* 220 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	var immediate = __webpack_require__(207);
+	var immediate = __webpack_require__(19);
 	
 	/* istanbul ignore next */
 	function INTERNAL() {}
@@ -18309,10 +18136,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(191)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ },
-/* 221 */
+/* 34 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -18497,13 +18324,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 222 */
+/* 35 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 223 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*jshint bitwise:false*/
@@ -19108,12 +18935,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 224 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var massageCreateIndexRequest = __webpack_require__(225);
+	var massageCreateIndexRequest = __webpack_require__(38);
 	
 	function createIndex(db, requestDef, callback) {
 	  requestDef = massageCreateIndexRequest(requestDef);
@@ -19169,12 +18996,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.deleteIndex = deleteIndex;
 
 /***/ },
-/* 225 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	var clone = utils.clone;
 	
 	// we restucture the supplied JSON considerably, because the official
@@ -19207,34 +19034,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 226 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	var callbackify = utils.callbackify;
 	
-	exports.createIndex = callbackify(__webpack_require__(227));
-	exports.find = callbackify(__webpack_require__(240));
-	exports.getIndexes = callbackify(__webpack_require__(241));
-	exports.deleteIndex = callbackify(__webpack_require__(245));
+	exports.createIndex = callbackify(__webpack_require__(40));
+	exports.find = callbackify(__webpack_require__(53));
+	exports.getIndexes = callbackify(__webpack_require__(54));
+	exports.deleteIndex = callbackify(__webpack_require__(58));
 
 /***/ },
-/* 227 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	var log = utils.log;
 	
-	var pouchUpsert = __webpack_require__(228);
-	var abstractMapper = __webpack_require__(230);
-	var localUtils = __webpack_require__(231);
+	var pouchUpsert = __webpack_require__(41);
+	var abstractMapper = __webpack_require__(43);
+	var localUtils = __webpack_require__(44);
 	var validateIndex = localUtils.validateIndex;
 	var massageIndexDef = localUtils.massageIndexDef;
-	var massageCreateIndexRequest = __webpack_require__(225);
+	var massageCreateIndexRequest = __webpack_require__(38);
 	
 	function upsert(db, docId, diffFun) {
 	  return pouchUpsert.upsert.call(db, docId, diffFun);
@@ -19313,12 +19140,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 228 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var PouchPromise = __webpack_require__(229);
+	var PouchPromise = __webpack_require__(42);
 	
 	// this is essentially the "update sugar" function from daleharvey/pouchdb#1388
 	// the diffFun tells us what delta to apply to the doc.  it either returns
@@ -19412,14 +19239,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 229 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 	
-	var lie = _interopDefault(__webpack_require__(220));
+	var lie = _interopDefault(__webpack_require__(33));
 	
 	/* istanbul ignore next */
 	var PouchPromise = typeof Promise === 'function' ? Promise : lie;
@@ -19427,13 +19254,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = PouchPromise;
 
 /***/ },
-/* 230 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var localUtils = __webpack_require__(231);
-	var abstractMapReduce = __webpack_require__(234);
+	var localUtils = __webpack_require__(44);
+	var abstractMapReduce = __webpack_require__(47);
 	var parseField = localUtils.parseField;
 	
 	//
@@ -19564,13 +19391,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = abstractMapper;
 
 /***/ },
-/* 231 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
-	var collate = __webpack_require__(232);
+	var utils = __webpack_require__(31);
+	var collate = __webpack_require__(45);
 	
 	function getKey(obj) {
 	  return Object.keys(obj)[0];
@@ -19947,7 +19774,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 232 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19956,7 +19783,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var MAGNITUDE_DIGITS = 3; // ditto
 	var SEP = ''; // set to '_' for easier debugging 
 	
-	var utils = __webpack_require__(233);
+	var utils = __webpack_require__(46);
 	
 	exports.collate = function (a, b) {
 	
@@ -20306,7 +20133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 233 */
+/* 46 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -20381,17 +20208,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 234 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var pouchCollate = __webpack_require__(232);
-	var TaskQueue = __webpack_require__(235);
+	var pouchCollate = __webpack_require__(45);
+	var TaskQueue = __webpack_require__(48);
 	var collate = pouchCollate.collate;
 	var toIndexableString = pouchCollate.toIndexableString;
 	var normalizeKey = pouchCollate.normalizeKey;
-	var createView = __webpack_require__(238);
+	var createView = __webpack_require__(51);
 	var log;
 	/* istanbul ignore else */
 	if ((typeof console !== 'undefined') && (typeof console.log === 'function')) {
@@ -20399,7 +20226,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	} else {
 	  log = function () {};
 	}
-	var utils = __webpack_require__(236);
+	var utils = __webpack_require__(49);
 	var Promise = utils.Promise;
 	var persistentQueues = {};
 	var tempViewQueue = new TaskQueue();
@@ -21081,10 +20908,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	module.exports = createIndexer;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(191)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ },
-/* 235 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21092,7 +20919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Simple task queue to sequentialize actions. Assumes callbacks will eventually fire (once).
 	 */
 	
-	var Promise = __webpack_require__(236).Promise;
+	var Promise = __webpack_require__(49).Promise;
 	
 	function TaskQueue() {
 	  this.promise = new Promise(function (fulfill) {fulfill(); });
@@ -21113,16 +20940,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 236 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	/* istanbul ignore if */
-	exports.Promise = __webpack_require__(219);
+	exports.Promise = __webpack_require__(32);
 	
-	exports.inherits = __webpack_require__(213);
-	exports.extend = __webpack_require__(221);
-	var argsarray = __webpack_require__(208);
+	exports.inherits = __webpack_require__(26);
+	exports.extend = __webpack_require__(34);
+	var argsarray = __webpack_require__(20);
 	
 	/* istanbul ignore next */
 	exports.promisedCallback = function (promise, callback) {
@@ -21210,8 +21037,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return output;
 	};
 	
-	var crypto = __webpack_require__(237);
-	var Md5 = __webpack_require__(223);
+	var crypto = __webpack_require__(50);
+	var Md5 = __webpack_require__(36);
 	
 	exports.MD5 = function (string) {
 	  /* istanbul ignore else */
@@ -21221,22 +21048,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Md5.hash(string);
 	  }
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(191)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ },
-/* 237 */
+/* 50 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 238 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var upsert = __webpack_require__(239);
-	var utils = __webpack_require__(236);
+	var upsert = __webpack_require__(52);
+	var utils = __webpack_require__(49);
 	var Promise = utils.Promise;
 	
 	function stringify(input) {
@@ -21333,31 +21160,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 239 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var upsert = __webpack_require__(228).upsert;
+	var upsert = __webpack_require__(41).upsert;
 	
 	module.exports = function (db, doc, diffFun) {
 	  return upsert.apply(db, [doc, diffFun]);
 	};
 
 /***/ },
-/* 240 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	var clone = utils.clone;
-	var getIndexes = __webpack_require__(241);
-	var collate = __webpack_require__(232).collate;
-	var abstractMapper = __webpack_require__(230);
-	var planQuery = __webpack_require__(242);
-	var localUtils = __webpack_require__(231);
-	var filterInMemoryFields = __webpack_require__(243);
+	var getIndexes = __webpack_require__(54);
+	var collate = __webpack_require__(45).collate;
+	var abstractMapper = __webpack_require__(43);
+	var planQuery = __webpack_require__(55);
+	var localUtils = __webpack_require__(44);
+	var filterInMemoryFields = __webpack_require__(56);
 	var massageSelector = localUtils.massageSelector;
 	var massageSort = localUtils.massageSort;
 	var getValue = localUtils.getValue;
@@ -21494,14 +21321,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 241 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	
-	var localUtils = __webpack_require__(231);
+	var localUtils = __webpack_require__(44);
 	var massageIndexDef = localUtils.massageIndexDef;
 	
 	function getIndexes(db) {
@@ -21552,14 +21379,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 242 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	var log = utils.log;
-	var localUtils = __webpack_require__(231);
+	var localUtils = __webpack_require__(44);
 	var getKey = localUtils.getKey;
 	var getUserFields = localUtils.getUserFields;
 	
@@ -21997,7 +21824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 243 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22009,14 +21836,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	// "bar".
 	//
 	
-	var isArray = __webpack_require__(244);
-	var collate = __webpack_require__(232).collate;
-	var localUtils = __webpack_require__(231);
+	var isArray = __webpack_require__(57);
+	var collate = __webpack_require__(45).collate;
+	var localUtils = __webpack_require__(44);
 	var isCombinationalField = localUtils.isCombinationalField;
 	var getKey = localUtils.getKey;
 	var getValue = localUtils.getValue;
 	var parseField = localUtils.parseField;
-	var utils = __webpack_require__(218);
+	var utils = __webpack_require__(31);
 	var getFieldFromDoc = utils.getFieldFromDoc;
 	
 	// create a comparator based on the sort object
@@ -22287,7 +22114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 244 */
+/* 57 */
 /***/ function(module, exports) {
 
 	
@@ -22326,13 +22153,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 245 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var abstractMapper = __webpack_require__(230);
-	var upsert = __webpack_require__(239);
+	var abstractMapper = __webpack_require__(43);
+	var upsert = __webpack_require__(52);
 	
 	function deleteIndex(db, index) {
 	
@@ -22367,7 +22194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = deleteIndex;
 
 /***/ },
-/* 246 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22383,7 +22210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.deleteClientById = deleteClientById;
 	exports.updateLastSync = updateLastSync;
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
 	function diskUsage(cozy) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/disk-usage');
@@ -22417,7 +22244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 247 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22429,9 +22256,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.listReferencedFiles = listReferencedFiles;
 	exports.fetchReferencedFiles = fetchReferencedFiles;
 	
-	var _fetch = __webpack_require__(196);
+	var _fetch = __webpack_require__(8);
 	
-	var _doctypes = __webpack_require__(199);
+	var _doctypes = __webpack_require__(11);
 	
 	function updateRelations(verb) {
 	  return function (cozy, doc, ids) {
