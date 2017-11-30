@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.4.3] - 2017-11-30
+### Changed
+- `babel-polyfill` is not included anymore https://github.com/cozy/cozy-client-js/commit/b12fb52da002742c83bfc87632a3bc6440d1a8c0
 
 ## [v0.4.2] - 2017-11-14
 ### Added
@@ -267,7 +270,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.3...HEAD
+[v0.4.3]: https://github.com/cozy/cozy-client-js/compare/v0.4.2...v0.4.3
 [v0.4.2]: https://github.com/cozy/cozy-client-js/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/cozy/cozy-client-js/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/cozy/cozy-client-js/compare/v0.3.20...v0.4.0
