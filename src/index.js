@@ -133,6 +133,18 @@ const settingsProto = {
   updateLastSync: settings.updateLastSync
 }
 
+const ensureHasReconnectParam = _url => {
+  const url = new URL(_url)
+  if (url.searchParams && !url.searchParams.has('reconnect')) {
+    url.searchParams.append('reconnect', 1)
+  } else if (!url.search || url.search.indexOf('reconnect') === -1) {
+    // Some old navigators do not have the searchParams API
+    // and it is not polyfilled by babel-polyfill
+    url.search = url.search + '&reconnect=1'
+  }
+  return url.toString()
+}
+
 class Client {
   constructor (options) {
     this.data = {}
@@ -220,9 +232,7 @@ class Client {
       }
       if (this._oauth) {
         if (forceTokenRefresh && this._clientParams.redirectURI) {
-          const url = new URL(this._clientParams.redirectURI)
-          if (!url.searchParams.has('reconnect')) url.searchParams.append('reconnect', 1)
-          this._clientParams.redirectURI = url.toString()
+          this._clientParams.redirectURI = ensureHasReconnectParam(this._clientParams.redirectURI)
         }
         return auth.oauthFlow(
           this,
