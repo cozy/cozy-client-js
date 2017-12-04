@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.4.4] - 2017-12-12
+
+### Fixed
+- Auth was broken on older browsers (notably iOS9) #237
+
+
 ## [v0.4.3] - 2017-11-30
 ### Changed
 - `babel-polyfill` is not included anymore https://github.com/cozy/cozy-client-js/commit/b12fb52da002742c83bfc87632a3bc6440d1a8c0

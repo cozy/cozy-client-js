@@ -230,6 +230,18 @@
 	  updateLastSync: settings.updateLastSync
 	};
 	
+	var ensureHasReconnectParam = function ensureHasReconnectParam(_url) {
+	  var url = new URL(_url);
+	  if (url.searchParams && !url.searchParams.has('reconnect')) {
+	    url.searchParams.append('reconnect', 1);
+	  } else if (!url.search || url.search.indexOf('reconnect') === -1) {
+	    // Some old navigators do not have the searchParams API
+	    // and it is not polyfilled by babel-polyfill
+	    url.search = url.search + '&reconnect=1';
+	  }
+	  return url.toString();
+	};
+	
 	var Client = function () {
 	  function Client(options) {
 	    _classCallCheck(this, Client);
@@ -328,9 +340,7 @@
 	        }
 	        if (_this._oauth) {
 	          if (forceTokenRefresh && _this._clientParams.redirectURI) {
-	            var url = new URL(_this._clientParams.redirectURI);
-	            if (!url.searchParams.has('reconnect')) url.searchParams.append('reconnect', 1);
-	            _this._clientParams.redirectURI = url.toString();
+	            _this._clientParams.redirectURI = ensureHasReconnectParam(_this._clientParams.redirectURI);
 	          }
 	          return auth.oauthFlow(_this, _this._storage, _this._clientParams, _this._onRegistered, forceTokenRefresh);
 	        }
