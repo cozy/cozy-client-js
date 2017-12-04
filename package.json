@@ -43,6 +43,7 @@
     "babel-loader": "^6.4.0",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-preset-env": "^1.2.1",
+    "babel-polyfill": "^6.26.0",
     "btoa": "1.1.2",
     "chai": "3.5.0",
     "cozy-data-system": "2.5.14",
@@ -76,5 +77,8 @@
     "pouchdb": "6.1.1",
     "pouchdb-adapter-cordova-sqlite": "https://github.com/SnceGroup/pouchdb-adapter-cordova-sqlite.git#f3ee23009b70209c611435d57491aa77fb88802a",
     "pouchdb-find": "0.10.4"
+  },
+  "peerDependencies": {
+    "babel-polyfill": "^6.26.0"
   }
 }
