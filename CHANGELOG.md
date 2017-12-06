@@ -19,7 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ## [v0.4.4] - 2017-12-12
-
 ### Fixed
 - Auth was broken on older browsers (notably iOS9) #237
 
