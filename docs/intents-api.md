@@ -59,6 +59,10 @@ It returns a *service* object, which provides the following methods :
     element: document.querySelector('.class')
  })
  ```
+
+> __On intent size:__ If an intent is used by multiple applications, we don't use resizeClient(), since each application can have his own layout. You have to define the size of the intent in your application
+
+
  * `terminate(doc)`: ends the intent process by passing to the client the resulting document `doc`. An intent service may only be terminated once.
    > If a boolean `exposeIntentFrameRemoval` is found as `true` in the data sent by the client, the `terminate()` method will return an object with as properties a function named `removeIntentFrame` to remove the iframe DOM node (in order to be run by the client later on) and the resulting document `doc`. This could be useful to animate an intent closing and remove the iframe node at the animation ending.
 
