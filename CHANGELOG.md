@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
 ## [v0.4.4] - 2017-12-12
 ### Fixed
 - Auth was broken on older browsers (notably iOS9) #237
@@ -275,15 +276,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-<<<<<<< HEAD
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.4...HEAD
+[v0.4.4]: https://github.com/cozy/cozy-client-js/compare/v0.4.3...v0.4.4
 [v0.4.3]: https://github.com/cozy/cozy-client-js/compare/v0.4.2...v0.4.3
 [v0.4.2]: https://github.com/cozy/cozy-client-js/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/cozy/cozy-client-js/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/cozy/cozy-client-js/compare/v0.3.20...v0.4.0
-=======
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.3.20...HEAD
->>>>>>> chore: release v0.3.20
 [v0.3.20]: https://github.com/cozy/cozy-client-js/compare/v0.3.19...v0.3.20
 [v0.3.19]: https://github.com/cozy/cozy-client-js/compare/v0.3.18...v0.3.19
 [v0.3.18]: https://github.com/cozy/cozy-client-js/compare/v0.3.17...v0.3.18
