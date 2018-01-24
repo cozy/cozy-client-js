@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.5.0] - 2017-01-24
+### Added
+- Added an option to create a directory without using pouch #241
 
 ## [v0.4.4] - 2017-12-12
 ### Fixed
@@ -276,7 +279,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.5.0...HEAD
+[v0.5.0]: https://github.com/cozy/cozy-client-js/compare/v0.4.4...v0.5.0
 [v0.4.4]: https://github.com/cozy/cozy-client-js/compare/v0.4.3...v0.4.4
 [v0.4.3]: https://github.com/cozy/cozy-client-js/compare/v0.4.2...v0.4.3
 [v0.4.2]: https://github.com/cozy/cozy-client-js/compare/v0.4.1...v0.4.2
