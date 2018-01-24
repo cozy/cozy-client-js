@@ -142,10 +142,10 @@ function getDirectoryOrCreate (cozy, name, parentDirectory) {
     })
 }
 
-export function createDirectoryByPath (cozy, path) {
+export function createDirectoryByPath (cozy, path, offline) {
   const parts = path.split('/').filter(part => part !== '')
 
-  const rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID)
+  const rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID, offline)
 
   return parts.length
     ? parts.reduce((parentDirectoryPromise, part) => {
