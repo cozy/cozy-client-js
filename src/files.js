@@ -13,6 +13,12 @@ function sanitizeFileName (name) {
   return name && name.trim()
 }
 
+function getFileTypeFromName (name) {
+  if (/\.heic$/.test(name)) return 'image/heic'
+  else if (/\.heif$/.test(name)) return 'image/heif'
+  else return null
+}
+
 function doUpload (cozy, data, method, path, options) {
   if (!data) {
     throw new Error('missing data argument')
@@ -38,7 +44,7 @@ function doUpload (cozy, data, method, path, options) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
     } else if (isFile) {
-      contentType = data.type || contentTypeOctetStream
+      contentType = data.type || getFileTypeFromName(data.name) || contentTypeOctetStream
       if (!lastModifiedDate) {
         lastModifiedDate = data.lastModifiedDate
       }
