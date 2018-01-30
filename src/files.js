@@ -14,8 +14,8 @@ function sanitizeFileName (name) {
 }
 
 function getFileTypeFromName (name) {
-  if (/\.heic$/.test(name)) return 'image/heic'
-  else if (/\.heif$/.test(name)) return 'image/heif'
+  if (/\.heic$/i.test(name)) return 'image/heic'
+  else if (/\.heif$/i.test(name)) return 'image/heif'
   else return null
 }
 
@@ -44,7 +44,7 @@ function doUpload (cozy, data, method, path, options) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
     } else if (isFile) {
-      contentType = data.type || getFileTypeFromName(data.name) || contentTypeOctetStream
+      contentType = data.type || getFileTypeFromName(data.name.toLowerCase()) || contentTypeOctetStream
       if (!lastModifiedDate) {
         lastModifiedDate = data.lastModifiedDate
       }
