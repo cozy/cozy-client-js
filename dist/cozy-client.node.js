@@ -2266,6 +2266,10 @@
 	  return name && name.trim();
 	}
 	
+	function getFileTypeFromName(name) {
+	  if (/\.heic$/i.test(name)) return 'image/heic';else if (/\.heif$/i.test(name)) return 'image/heif';else return null;
+	}
+	
 	function doUpload(cozy, data, method, path, options) {
 	  if (!data) {
 	    throw new Error('missing data argument');
@@ -2296,7 +2300,7 @@
 	    if (isBuffer) {
 	      contentType = contentTypeOctetStream;
 	    } else if (isFile) {
-	      contentType = data.type || contentTypeOctetStream;
+	      contentType = data.type || getFileTypeFromName(data.name.toLowerCase()) || contentTypeOctetStream;
 	      if (!lastModifiedDate) {
 	        lastModifiedDate = data.lastModifiedDate;
 	      }
@@ -2408,12 +2412,12 @@
 	  });
 	}
 	
-	function createDirectoryByPath(cozy, path) {
+	function createDirectoryByPath(cozy, path, offline) {
 	  var parts = path.split('/').filter(function (part) {
 	    return part !== '';
 	  });
 	
-	  var rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID);
+	  var rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID, offline);
 	
 	  return parts.length ? parts.reduce(function (parentDirectoryPromise, part) {
 	    return parentDirectoryPromise.then(function (parentDirectory) {
