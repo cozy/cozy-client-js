@@ -65,4 +65,4 @@ cozy-client-js is developed by Cozy Cloud and distributed under the [MIT][MIT].
 [freenode]: http://webchat.freenode.net/?randomnick=1&channels=%23cozycloud&uio=d4
 [forum]: https://forum.cozy.io/
 [github]: https://github.com/cozy/
-[twitter]: https://twitter.com/mycozycloud
+[twitter]: https://twitter.com/cozycloud
