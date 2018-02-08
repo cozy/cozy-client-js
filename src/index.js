@@ -199,6 +199,8 @@ class Client {
 
     this._url = url
 
+    this._invalidTokenErrorHandler = options.onInvalidTokenError !== undefined ? options.onInvalidTokenError : cozyFetch.handleInvalidTokenError
+
     const disablePromises = !!options.disablePromises
     addToProto(this, this.data, dataProto, disablePromises)
     addToProto(this, this.auth, authProto, disablePromises)
