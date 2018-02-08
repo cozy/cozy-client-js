@@ -1,6 +1,6 @@
 /* global fetch */
 import {refreshToken, AccessToken} from './auth_v3'
-import {retry} from './utils'
+import {retry, encodeQuery} from './utils'
 import jsonapi from './jsonapi'
 
 export function cozyFetch (cozy, path, options = {}) {
@@ -14,7 +14,7 @@ export function cozyFetch (cozy, path, options = {}) {
       resp = cozy.authorize().then((credentials) =>
         cozyFetchWithAuth(cozy, fullpath, options, credentials))
     }
-    return resp.then(handleResponse)
+    return resp.then(res => handleResponse(res, cozy._invalidTokenErrorHandler))
   })
 }
 
@@ -78,7 +78,7 @@ function fetchJSON (cozy, method, path, body, options = {}) {
   return cozyFetch(cozy, path, options)
 }
 
-function handleResponse (res) {
+function handleResponse (res, invalidTokenErrorHandler) {
   if (res.ok) {
     return res
   }
@@ -90,7 +90,11 @@ function handleResponse (res) {
     data = res.text()
   }
   return data.then(err => {
-    throw new FetchError(res, err)
+    const error = new FetchError(res, err)
+    if (FetchError.isInvalidToken(error) && invalidTokenErrorHandler) {
+      invalidTokenErrorHandler(error)
+    }
+    throw error
   })
 }
 
@@ -107,6 +111,20 @@ function handleJSONResponse (res, processJSONAPI = true) {
     return json.then(jsonapi)
   } else {
     return json
+  }
+}
+
+export function handleInvalidTokenError (error) {
+  try {
+    const currentOrigin = window.location.origin
+    const requestUrl = error.url
+
+    if (requestUrl.indexOf(currentOrigin.replace(/^(https?:\/\/\w+)-\w+\./, '$1.')) === 0) {
+      const redirectURL = `${currentOrigin}?${encodeQuery({ 'disconnect': 1 })}`
+      window.location = redirectURL
+    }
+  } catch (e) {
+    console.warn('Unable to handle invalid token error', e, error)
   }
 }
 
@@ -138,4 +156,9 @@ FetchError.isUnauthorized = function (err) {
 FetchError.isNotFound = function (err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
   return err.name === 'FetchError' && err.status === 404
+}
+
+FetchError.isInvalidToken = function (err) {
+  // XXX We can't use err instanceof FetchError because of the caveats of babel
+  return err.name === 'FetchError' && err.status === 400 && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token')
 }
