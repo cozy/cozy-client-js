@@ -302,6 +302,8 @@
 	
 	      this._url = url;
 	
+	      this._invalidTokenErrorHandler = options.onInvalidTokenError !== undefined ? options.onInvalidTokenError : cozyFetch.handleInvalidTokenError;
+	
 	      var disablePromises = !!options.disablePromises;
 	      addToProto(this, this.data, dataProto, disablePromises);
 	      addToProto(this, this.auth, authProto, disablePromises);
@@ -1299,6 +1301,7 @@
 	exports.cozyFetch = cozyFetch;
 	exports.cozyFetchJSON = cozyFetchJSON;
 	exports.cozyFetchRawJSON = cozyFetchRawJSON;
+	exports.handleInvalidTokenError = handleInvalidTokenError;
 	
 	var _auth_v = __webpack_require__(7);
 	
@@ -1330,7 +1333,9 @@
 	        return cozyFetchWithAuth(cozy, fullpath, options, credentials);
 	      });
 	    }
-	    return resp.then(handleResponse);
+	    return resp.then(function (res) {
+	      return handleResponse(res, cozy._invalidTokenErrorHandler);
+	    });
 	  });
 	}
 	
@@ -1409,7 +1414,7 @@
 	  return cozyFetch(cozy, path, options);
 	}
 	
-	function handleResponse(res) {
+	function handleResponse(res, invalidTokenErrorHandler) {
 	  if (res.ok) {
 	    return res;
 	  }
@@ -1421,7 +1426,11 @@
 	    data = res.text();
 	  }
 	  return data.then(function (err) {
-	    throw new FetchError(res, err);
+	    var error = new FetchError(res, err);
+	    if (FetchError.isInvalidToken(error) && invalidTokenErrorHandler) {
+	      invalidTokenErrorHandler(error);
+	    }
+	    throw error;
 	  });
 	}
 	
@@ -1440,6 +1449,20 @@
 	    return json.then(_jsonapi2.default);
 	  } else {
 	    return json;
+	  }
+	}
+	
+	function handleInvalidTokenError(error) {
+	  try {
+	    var currentOrigin = window.location.origin;
+	    var requestUrl = error.url;
+	
+	    if (requestUrl.indexOf(currentOrigin.replace(/^(https?:\/\/\w+)-\w+\./, '$1.')) === 0) {
+	      var redirectURL = currentOrigin + '?' + (0, _utils.encodeQuery)({ 'disconnect': 1 });
+	      window.location = redirectURL;
+	    }
+	  } catch (e) {
+	    console.warn('Unable to handle invalid token error', e, error);
 	  }
 	}
 	
@@ -1478,6 +1501,11 @@
 	FetchError.isNotFound = function (err) {
 	  // XXX We can't use err instanceof FetchError because of the caveats of babel
 	  return err.name === 'FetchError' && err.status === 404;
+	};
+	
+	FetchError.isInvalidToken = function (err) {
+	  // XXX We can't use err instanceof FetchError because of the caveats of babel
+	  return err.name === 'FetchError' && err.status === 400 && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token');
 	};
 
 /***/ },
