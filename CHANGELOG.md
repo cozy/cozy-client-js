@@ -18,19 +18,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
-## [v0.6.2] - 2017-01-30
+## [v0.7.0] - 2018-02-12
+### Changed
+- **Breaking** If the token used to call the stack is expired or invalid on an app's page, the page is reloaded. The error is still thrown. [See here](https://github.com/cozy/cozy-client-js/pull/247) for more informations.
+
+## [v0.6.2] - 2018-01-30
 ### Fixed
 - Fixed a faulty build
 
-## [v0.6.1] - 2017-01-30
+## [v0.6.1] - 2018-01-30
 ### Fixed
 - Case-insensitive detection on mime-types
 
-## [v0.6.0] - 2017-01-29
+## [v0.6.0] - 2018-01-29
 ### Added
 - Added detection for `HEIC` mime-types
 
-## [v0.5.0] - 2017-01-24
+## [v0.5.0] - 2018-01-24
 ### Added
 - Added an option to create a directory without using pouch #241
 
@@ -291,7 +295,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.7.0...HEAD
+[v0.7.0]: https://github.com/cozy/cozy-client-js/compare/v0.6.2...v0.7.0
 [v0.6.2]: https://github.com/cozy/cozy-client-js/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/cozy/cozy-client-js/compare/v0.6.0...v0.6.1
 [v0.6.0]: https://github.com/cozy/cozy-client-js/compare/v0.5.0...v0.6.0
