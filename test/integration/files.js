@@ -13,6 +13,7 @@ const COZY_STACK_VERSION = process.env && process.env.COZY_STACK_VERSION
 const COZY_STACK_TOKEN = process.env && process.env.COZY_STACK_TOKEN
 
 describe('files API', async function () {
+  this.timeout(5000)
   let random
   const cozy = {}
 
@@ -57,6 +58,46 @@ describe('files API', async function () {
 
     created.should.have.property('attributes')
     created.attributes.md5sum.should.equal('7Zfd8PaeeXsm5WJesf/KJw==')
+  })
+
+  it('fails if the contentLength is too small', async function () {
+    const filename = 'foo_' + random()
+    const stream = new Readable()
+
+    stream.push('datastring1')
+    stream.push(null)
+
+    const created = await cozy.client.files.create(stream, {
+      name: filename,
+      contentType: 'application/json',
+      contentLength: 4
+    })
+
+    created.should.have.property('attributes')
+    created.attributes.md5sum.should.equal('jXd/OF09/siBXSD3SWAm3A==') // md5 "data"
+  })
+
+  it('fails if the contentLength is too big', async function () {
+    const filename = 'foo_' + random()
+    const stream = new Readable()
+    this.timeout(5000)
+
+    stream.push('datastring1')
+    stream.push(null)
+    // stream.timeout = 2000
+
+    const oldFetch = global.fetch
+    global.fetch = (url, opts) => {
+      if (opts) opts.timeout = 500
+      return oldFetch(url, opts)
+    }
+    after(() => { global.fetch = oldFetch })
+
+    await cozy.client.files.create(stream, {
+      name: filename,
+      contentType: 'application/json',
+      contentLength: 20
+    }).should.be.rejected()
   })
 
   it('updates a file', async function () {
