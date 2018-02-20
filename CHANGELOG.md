@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.7.1] - 2018-02-20
+### Changed
+- Allow to pass a `contentLength` option to files.create. This prevent the stack from saving uncomplete upload.
+
 ## [v0.7.0] - 2018-02-12
 ### Changed
 - **Breaking** If the token used to call the stack is expired or invalid on an app's page, the page is reloaded. The error is still thrown. [See here](https://github.com/cozy/cozy-client-js/pull/247) for more informations.
@@ -295,7 +299,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.7.1...HEAD
+[v0.7.1]: https://github.com/cozy/cozy-client-js/compare/v0.7.0...v0.7.1
 [v0.7.0]: https://github.com/cozy/cozy-client-js/compare/v0.6.2...v0.7.0
 [v0.6.2]: https://github.com/cozy/cozy-client-js/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/cozy/cozy-client-js/compare/v0.6.0...v0.6.1
