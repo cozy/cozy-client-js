@@ -39,7 +39,7 @@ function doUpload (cozy, data, method, path, options) {
     throw new Error('invalid data type')
   }
 
-  let {contentType, checksum, lastModifiedDate, ifMatch} = options || {}
+  let {contentType, contentLength, checksum, lastModifiedDate, ifMatch} = options || {}
   if (!contentType) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
@@ -61,14 +61,17 @@ function doUpload (cozy, data, method, path, options) {
     lastModifiedDate = new Date(lastModifiedDate)
   }
 
+  const headers = {
+    'Content-Type': contentType
+  }
+  if (contentLength) headers['Content-Length'] = String(contentLength)
+  if (checksum) headers['Content-MD5'] = checksum
+  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString()
+  if (ifMatch) headers['If-Match'] = ifMatch
+
   return cozyFetch(cozy, path, {
     method: method,
-    headers: {
-      'Content-Type': contentType,
-      'Content-MD5': checksum || '',
-      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : '',
-      'If-Match': ifMatch || ''
-    },
+    headers: headers,
     body: data
   })
     .then((res) => {

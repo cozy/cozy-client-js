@@ -2320,6 +2320,7 @@
 	
 	  var _ref = options || {},
 	      contentType = _ref.contentType,
+	      contentLength = _ref.contentLength,
 	      checksum = _ref.checksum,
 	      lastModifiedDate = _ref.lastModifiedDate,
 	      ifMatch = _ref.ifMatch;
@@ -2345,14 +2346,17 @@
 	    lastModifiedDate = new Date(lastModifiedDate);
 	  }
 	
+	  var headers = {
+	    'Content-Type': contentType
+	  };
+	  if (contentLength) headers['Content-Length'] = String(contentLength);
+	  if (checksum) headers['Content-MD5'] = checksum;
+	  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString();
+	  if (ifMatch) headers['If-Match'] = ifMatch;
+	
 	  return (0, _fetch.cozyFetch)(cozy, path, {
 	    method: method,
-	    headers: {
-	      'Content-Type': contentType,
-	      'Content-MD5': checksum || '',
-	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : '',
-	      'If-Match': ifMatch || ''
-	    },
+	    headers: headers,
 	    body: data
 	  }).then(function (res) {
 	    var json = res.json();
