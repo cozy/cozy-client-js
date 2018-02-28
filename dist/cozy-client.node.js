@@ -62,49 +62,52 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch URL */
 	
-	var _utils = __webpack_require__(3);
 	
-	var _auth_storage = __webpack_require__(4);
+	__webpack_require__(3);
 	
-	var _auth_v = __webpack_require__(5);
+	var _utils = __webpack_require__(4);
 	
-	var _auth_v2 = __webpack_require__(7);
+	var _auth_storage = __webpack_require__(5);
+	
+	var _auth_v = __webpack_require__(6);
+	
+	var _auth_v2 = __webpack_require__(8);
 	
 	var auth = _interopRequireWildcard(_auth_v2);
 	
-	var _data = __webpack_require__(11);
+	var _data = __webpack_require__(12);
 	
 	var data = _interopRequireWildcard(_data);
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	var cozyFetch = _interopRequireWildcard(_fetch);
 	
-	var _mango = __webpack_require__(13);
+	var _mango = __webpack_require__(14);
 	
 	var mango = _interopRequireWildcard(_mango);
 	
-	var _files = __webpack_require__(14);
+	var _files = __webpack_require__(15);
 	
 	var files = _interopRequireWildcard(_files);
 	
-	var _intents = __webpack_require__(15);
+	var _intents = __webpack_require__(16);
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _jobs = __webpack_require__(16);
+	var _jobs = __webpack_require__(17);
 	
 	var jobs = _interopRequireWildcard(_jobs);
 	
-	var _offline = __webpack_require__(17);
+	var _offline = __webpack_require__(18);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(20);
+	var _settings = __webpack_require__(21);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(21);
+	var _relations = __webpack_require__(22);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -443,6 +446,12 @@
 /* 3 */
 /***/ function(module, exports) {
 
+	module.exports = require("core-js/modules/es6.object.assign");
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -613,7 +622,7 @@
 	}
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -727,7 +736,7 @@
 	}();
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(btoa) {'use strict';
@@ -797,16 +806,16 @@
 
 	  return AppToken;
 	}();
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	module.exports = require("btoa");
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(btoa) {'use strict';
@@ -831,9 +840,9 @@
 	exports.refreshToken = refreshToken;
 	exports.oauthFlow = oauthFlow;
 	
-	var _utils = __webpack_require__(3);
+	var _utils = __webpack_require__(4);
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -1271,7 +1280,7 @@
 	    window.crypto.getRandomValues(buffer);
 	  } else {
 	    try {
-	      buffer = __webpack_require__(10).randomBytes(StateSize);
+	      buffer = __webpack_require__(11).randomBytes(StateSize);
 	    } catch (e) {}
 	  }
 	  if (!buffer) {
@@ -1282,10 +1291,10 @@
 	  }
 	  return btoa(String.fromCharCode.apply(null, buffer)).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
 	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1303,11 +1312,11 @@
 	exports.cozyFetchRawJSON = cozyFetchRawJSON;
 	exports.handleInvalidTokenError = handleInvalidTokenError;
 	
-	var _auth_v = __webpack_require__(7);
+	var _auth_v = __webpack_require__(8);
 	
-	var _utils = __webpack_require__(3);
+	var _utils = __webpack_require__(4);
 	
-	var _jsonapi = __webpack_require__(9);
+	var _jsonapi = __webpack_require__(10);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
 	
@@ -1509,7 +1518,7 @@
 	};
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1575,13 +1584,13 @@
 	exports.default = handleTopLevel;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = require("crypto");
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1598,11 +1607,11 @@
 	exports.updateAttributes = updateAttributes;
 	exports._delete = _delete;
 	
-	var _utils = __webpack_require__(3);
+	var _utils = __webpack_require__(4);
 	
-	var _doctypes = __webpack_require__(12);
+	var _doctypes = __webpack_require__(13);
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	var NOREV = 'stack-v2-no-rev';
 	
@@ -1864,7 +1873,7 @@
 	}
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1875,7 +1884,7 @@
 	exports.DOCTYPE_FILES = undefined;
 	exports.normalizeDoctype = normalizeDoctype;
 	
-	var _utils = __webpack_require__(3);
+	var _utils = __webpack_require__(4);
 	
 	var DOCTYPE_FILES = exports.DOCTYPE_FILES = 'io.cozy.files';
 	
@@ -1912,7 +1921,7 @@
 	}
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1932,11 +1941,11 @@
 	exports.normalizeSelector = normalizeSelector;
 	exports.makeMapReduceQuery = makeMapReduceQuery;
 	
-	var _utils = __webpack_require__(3);
+	var _utils = __webpack_require__(4);
 	
-	var _doctypes = __webpack_require__(12);
+	var _doctypes = __webpack_require__(13);
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
@@ -2237,7 +2246,7 @@
 	}
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2274,13 +2283,13 @@
 	exports.restoreById = restoreById;
 	exports.destroyById = destroyById;
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
-	var _jsonapi = __webpack_require__(9);
+	var _jsonapi = __webpack_require__(10);
 	
 	var _jsonapi2 = _interopRequireDefault(_jsonapi);
 	
-	var _doctypes = __webpack_require__(12);
+	var _doctypes = __webpack_require__(13);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -2703,7 +2712,7 @@
 	}
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2714,7 +2723,7 @@
 	exports.create = create;
 	exports.createService = createService;
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	var intentClass = 'coz-intent';
 	
@@ -2954,7 +2963,7 @@
 	}
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2966,7 +2975,7 @@
 	exports.queued = queued;
 	exports.create = create;
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	function count(cozy, workerType) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/jobs/queue/' + workerType).then(function (data) {
@@ -2991,7 +3000,7 @@
 	}
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3017,17 +3026,17 @@
 	exports.stopRepeatedReplication = stopRepeatedReplication;
 	exports.stopAllRepeatedReplication = stopAllRepeatedReplication;
 	
-	var _doctypes = __webpack_require__(12);
+	var _doctypes = __webpack_require__(13);
 	
-	var _auth_v = __webpack_require__(7);
+	var _auth_v = __webpack_require__(8);
 	
-	var _utils = __webpack_require__(3);
+	var _utils = __webpack_require__(4);
 	
-	var _pouchdb = __webpack_require__(18);
+	var _pouchdb = __webpack_require__(19);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(19);
+	var _pouchdbFind = __webpack_require__(20);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -3321,19 +3330,19 @@
 	}
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb");
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb-find");
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3349,7 +3358,7 @@
 	exports.deleteClientById = deleteClientById;
 	exports.updateLastSync = updateLastSync;
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
 	function diskUsage(cozy) {
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/settings/disk-usage');
@@ -3383,7 +3392,7 @@
 	}
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3395,9 +3404,9 @@
 	exports.listReferencedFiles = listReferencedFiles;
 	exports.fetchReferencedFiles = fetchReferencedFiles;
 	
-	var _fetch = __webpack_require__(8);
+	var _fetch = __webpack_require__(9);
 	
-	var _doctypes = __webpack_require__(12);
+	var _doctypes = __webpack_require__(13);
 	
 	function updateRelations(verb) {
 	  return function (cozy, doc, ids) {
