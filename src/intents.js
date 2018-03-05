@@ -45,19 +45,20 @@ function injectService (url, element, intent, data, onReadyCallback) {
     const messageHandler = (event) => {
       if (event.origin !== serviceOrigin) return
 
-      if (event.data.type === 'load') {
+      const eventType = event.data.type
+      if (eventType === 'load') {
         // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
         // making the handshake fails.
         console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.')
         return
       }
 
-      if (event.data.type === `intent-${intent._id}:ready`) {
+      if (eventType === `intent-${intent._id}:ready`) {
         handshaken = true
         return event.source.postMessage(data, event.origin)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:resize`) {
+      if (handshaken && eventType === `intent-${intent._id}:resize`) {
         ['width', 'height', 'maxWidth', 'maxHeight'].forEach(prop => {
           if (event.data.transition) element.style.transition = event.data.transition
           if (event.data.dimensions[prop]) element.style[prop] = `${event.data.dimensions[prop]}px`
@@ -72,21 +73,21 @@ function injectService (url, element, intent, data, onReadyCallback) {
         iframe.parentNode && iframe.parentNode.removeChild(iframe)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:exposeFrameRemoval`) {
+      if (handshaken && eventType === `intent-${intent._id}:exposeFrameRemoval`) {
         return resolve({removeIntentFrame, doc: event.data.document})
       }
 
       removeIntentFrame()
 
-      if (event.data.type === `intent-${intent._id}:error`) {
+      if (eventType === `intent-${intent._id}:error`) {
         return reject(errorSerializer.deserialize(event.data.error))
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:cancel`) {
+      if (handshaken && eventType === `intent-${intent._id}:cancel`) {
         return resolve(null)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:done`) {
+      if (handshaken && eventType === `intent-${intent._id}:done`) {
         return resolve(event.data.document)
       }
 
