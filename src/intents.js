@@ -206,17 +206,13 @@ export function createService (cozy, intentId, serviceWindow) {
             getData: () => data,
             getIntent: () => intent,
             terminate: (doc) => {
-              if (data && data.exposeIntentFrameRemoval) {
-                return terminate({
-                  type: `intent-${intent._id}:exposeFrameRemoval`,
-                  document: doc
-                })
-              } else {
-                return terminate({
-                  type: `intent-${intent._id}:done`,
-                  document: doc
-                })
-              }
+              const eventName = (data && data.exposeIntentFrameRemoval
+                ? 'exposeFrameRemoval' : 'done'
+              )
+              return terminate({
+                type: `intent-${intent._id}:${eventName}`,
+                document: doc
+              })
             },
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
