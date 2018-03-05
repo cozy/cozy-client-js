@@ -107,6 +107,22 @@ describe('Intents', function () {
 
   describe('Intent.start', function () {
     beforeEach(mock.mockAPI('CreateIntent'))
+    describe('Filtering', () => {
+      it('should filter intents', () => {
+        cozy.client.intents
+          .create('EDIT', 'io.cozy.files', {
+            filterServices: x => x.slug == 'files'
+          })
+          .should.not.be.rejectedWith(/Unable to find a service/)
+      })
+      it('should filter intents', () => {
+        cozy.client.intents
+          .create('EDIT', 'io.cozy.files', {
+            filterServices: x => x.slug == 'files2'
+          })
+          .should.be.rejectedWith(/Unable to find a service/)
+      })
+    })
 
     describe('No Service', function () {
       before(mock.mockAPI('CreateIntentWithNoService'))

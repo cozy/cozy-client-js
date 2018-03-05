@@ -107,6 +107,8 @@ function injectService (url, element, intent, data, onReadyCallback) {
   })
 }
 
+const first = arr => arr && arr[0]
+
 export function create (cozy, action, type, data = {}, permissions = []) {
   if (!action) throw new Error(`Misformed intent, "action" property must be provided`)
   if (!type) throw new Error(`Misformed intent, "type" property must be provided`)
@@ -125,13 +127,21 @@ export function create (cozy, action, type, data = {}, permissions = []) {
 
   createPromise.start = (element, onReadyCallback) => {
     return createPromise.then(intent => {
-      let service = intent.attributes.services && intent.attributes.services[0]
+      const filterServices = data.filterServices
+      const restData = Object.assign({}, data)
+      delete restData.filterServices
+
+      const services = intent.attributes.services
+      const filteredServices = filterServices
+        ? (services || []).filter(filterServices)
+        : services
+      const service = first(filteredServices)
 
       if (!service) {
         return Promise.reject(new Error('Unable to find a service'))
       }
 
-      return injectService(service.href, element, intent, data, onReadyCallback)
+      return injectService(service.href, element, intent, restData, onReadyCallback)
     })
   }
 
