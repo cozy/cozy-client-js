@@ -45,19 +45,20 @@ function injectService (url, element, intent, data, onReadyCallback) {
     const messageHandler = (event) => {
       if (event.origin !== serviceOrigin) return
 
-      if (event.data.type === 'load') {
+      const eventType = event.data.type
+      if (eventType === 'load') {
         // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
         // making the handshake fails.
         console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.')
         return
       }
 
-      if (event.data.type === `intent-${intent._id}:ready`) {
+      if (eventType === `intent-${intent._id}:ready`) {
         handshaken = true
         return event.source.postMessage(data, event.origin)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:resize`) {
+      if (handshaken && eventType === `intent-${intent._id}:resize`) {
         ['width', 'height', 'maxWidth', 'maxHeight'].forEach(prop => {
           if (event.data.transition) element.style.transition = event.data.transition
           if (event.data.dimensions[prop]) element.style[prop] = `${event.data.dimensions[prop]}px`
@@ -72,21 +73,21 @@ function injectService (url, element, intent, data, onReadyCallback) {
         iframe.parentNode && iframe.parentNode.removeChild(iframe)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:exposeFrameRemoval`) {
+      if (handshaken && eventType === `intent-${intent._id}:exposeFrameRemoval`) {
         return resolve({removeIntentFrame, doc: event.data.document})
       }
 
       removeIntentFrame()
 
-      if (event.data.type === `intent-${intent._id}:error`) {
+      if (eventType === `intent-${intent._id}:error`) {
         return reject(errorSerializer.deserialize(event.data.error))
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:cancel`) {
+      if (handshaken && eventType === `intent-${intent._id}:cancel`) {
         return resolve(null)
       }
 
-      if (handshaken && event.data.type === `intent-${intent._id}:done`) {
+      if (handshaken && eventType === `intent-${intent._id}:done`) {
         return resolve(event.data.document)
       }
 
@@ -106,6 +107,8 @@ function injectService (url, element, intent, data, onReadyCallback) {
   })
 }
 
+const first = arr => arr && arr[0]
+
 export function create (cozy, action, type, data = {}, permissions = []) {
   if (!action) throw new Error(`Misformed intent, "action" property must be provided`)
   if (!type) throw new Error(`Misformed intent, "type" property must be provided`)
@@ -124,13 +127,21 @@ export function create (cozy, action, type, data = {}, permissions = []) {
 
   createPromise.start = (element, onReadyCallback) => {
     return createPromise.then(intent => {
-      let service = intent.attributes.services && intent.attributes.services[0]
+      const filterServices = data.filterServices
+      const restData = Object.assign({}, data)
+      delete restData.filterServices
+
+      const services = intent.attributes.services
+      const filteredServices = filterServices
+        ? (services || []).filter(filterServices)
+        : services
+      const service = first(filteredServices)
 
       if (!service) {
         return Promise.reject(new Error('Unable to find a service'))
       }
 
-      return injectService(service.href, element, intent, data, onReadyCallback)
+      return injectService(service.href, element, intent, restData, onReadyCallback)
     })
   }
 
@@ -205,17 +216,13 @@ export function createService (cozy, intentId, serviceWindow) {
             getData: () => data,
             getIntent: () => intent,
             terminate: (doc) => {
-              if (data && data.exposeIntentFrameRemoval) {
-                return terminate({
-                  type: `intent-${intent._id}:exposeFrameRemoval`,
-                  document: doc
-                })
-              } else {
-                return terminate({
-                  type: `intent-${intent._id}:done`,
-                  document: doc
-                })
-              }
+              const eventName = (data && data.exposeIntentFrameRemoval
+                ? 'exposeFrameRemoval' : 'done'
+              )
+              return terminate({
+                type: `intent-${intent._id}:${eventName}`,
+                document: doc
+              })
             },
             throw: error => terminate({
               type: `intent-${intent._id}:error`,
