@@ -28,6 +28,9 @@ export class Client {
     this.logoURI = opts.logoURI || opts.logo_uri || ''
     this.policyURI = opts.policyURI || opts.policy_uri || ''
 
+    this.notificationPlatform = opts.notificationPlatform || opts.notification_platform || ''
+    this.notificationDeviceToken = opts.notificationDeviceToken || opts.notification_device_token || ''
+
     if (!this.registrationAccessToken) {
       if (this.redirectURI === '') {
         throw new Error('Missing redirectURI field')
@@ -54,7 +57,9 @@ export class Client {
       client_kind: this.clientKind,
       client_uri: this.clientURI,
       logo_uri: this.logoURI,
-      policy_uri: this.policyURI
+      policy_uri: this.policyURI,
+      notification_platform: this.notificationPlatform,
+      notification_device_token: this.notificationDeviceToken
     }
   }
 
