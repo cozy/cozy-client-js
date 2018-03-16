@@ -13,10 +13,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 ### Added
-- Now trim file name before any creation or update.
+- none yet
 
 ### Removed
 - none yet
+
+## [v0.8.0] - 2018-03-16
+### Added
+- Now trim file name before any creation or update.
+- Added push notifications related options on OAuth client (notificationPlatform and notificationDeviceToken)
 
 ## [v0.7.2] - 2018-02-28
 ### Fixed
@@ -303,7 +308,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.7.2...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.8.0...HEAD
+[v0.8.0]: https://github.com/cozy/cozy-client-js/compare/v0.7.2...v0.8.0
 [v0.7.2]: https://github.com/cozy/cozy-client-js/compare/v0.7.1...v0.7.2
 [v0.7.1]: https://github.com/cozy/cozy-client-js/compare/v0.7.0...v0.7.1
 [v0.7.0]: https://github.com/cozy/cozy-client-js/compare/v0.6.2...v0.7.0
