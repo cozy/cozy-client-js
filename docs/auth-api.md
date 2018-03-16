@@ -149,6 +149,8 @@ type Client {
   clientURI: string;
   logoURI: string;
   policyURI: string;
+  notificationPlatform: string;
+  notificationDeviceToken: string;
 }
 ```
 
