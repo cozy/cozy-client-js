@@ -874,6 +874,9 @@
 	    this.logoURI = opts.logoURI || opts.logo_uri || '';
 	    this.policyURI = opts.policyURI || opts.policy_uri || '';
 	
+	    this.notificationPlatform = opts.notificationPlatform || opts.notification_platform || '';
+	    this.notificationDeviceToken = opts.notificationDeviceToken || opts.notification_device_token || '';
+	
 	    if (!this.registrationAccessToken) {
 	      if (this.redirectURI === '') {
 	        throw new Error('Missing redirectURI field');
@@ -903,7 +906,9 @@
 	        client_kind: this.clientKind,
 	        client_uri: this.clientURI,
 	        logo_uri: this.logoURI,
-	        policy_uri: this.policyURI
+	        policy_uri: this.policyURI,
+	        notification_platform: this.notificationPlatform,
+	        notification_device_token: this.notificationDeviceToken
 	      };
 	    }
 	  }, {
@@ -2774,19 +2779,20 @@
 	    var messageHandler = function messageHandler(event) {
 	      if (event.origin !== serviceOrigin) return;
 	
-	      if (event.data.type === 'load') {
+	      var eventType = event.data.type;
+	      if (eventType === 'load') {
 	        // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
 	        // making the handshake fails.
 	        console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.');
 	        return;
 	      }
 	
-	      if (event.data.type === 'intent-' + intent._id + ':ready') {
+	      if (eventType === 'intent-' + intent._id + ':ready') {
 	        handshaken = true;
 	        return event.source.postMessage(data, event.origin);
 	      }
 	
-	      if (handshaken && event.data.type === 'intent-' + intent._id + ':resize') {
+	      if (handshaken && eventType === 'intent-' + intent._id + ':resize') {
 	        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
 	          if (event.data.transition) element.style.transition = event.data.transition;
 	          if (event.data.dimensions[prop]) element.style[prop] = event.data.dimensions[prop] + 'px';
@@ -2801,21 +2807,21 @@
 	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
 	      };
 	
-	      if (handshaken && event.data.type === 'intent-' + intent._id + ':exposeFrameRemoval') {
+	      if (handshaken && eventType === 'intent-' + intent._id + ':exposeFrameRemoval') {
 	        return resolve({ removeIntentFrame: removeIntentFrame, doc: event.data.document });
 	      }
 	
 	      removeIntentFrame();
 	
-	      if (event.data.type === 'intent-' + intent._id + ':error') {
+	      if (eventType === 'intent-' + intent._id + ':error') {
 	        return reject(errorSerializer.deserialize(event.data.error));
 	      }
 	
-	      if (handshaken && event.data.type === 'intent-' + intent._id + ':cancel') {
+	      if (handshaken && eventType === 'intent-' + intent._id + ':cancel') {
 	        return resolve(null);
 	      }
 	
-	      if (handshaken && event.data.type === 'intent-' + intent._id + ':done') {
+	      if (handshaken && eventType === 'intent-' + intent._id + ':done') {
 	        return resolve(event.data.document);
 	      }
 	
@@ -2834,6 +2840,10 @@
 	    window.addEventListener('message', messageHandler);
 	  });
 	}
+	
+	var first = function first(arr) {
+	  return arr && arr[0];
+	};
 	
 	function create(cozy, action, type) {
 	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -2856,13 +2866,19 @@
 	
 	  createPromise.start = function (element, onReadyCallback) {
 	    return createPromise.then(function (intent) {
-	      var service = intent.attributes.services && intent.attributes.services[0];
+	      var filterServices = data.filterServices;
+	      var restData = Object.assign({}, data);
+	      delete restData.filterServices;
+	
+	      var services = intent.attributes.services;
+	      var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
+	      var service = first(filteredServices);
 	
 	      if (!service) {
 	        return Promise.reject(new Error('Unable to find a service'));
 	      }
 	
-	      return injectService(service.href, element, intent, data, onReadyCallback);
+	      return injectService(service.href, element, intent, restData, onReadyCallback);
 	    });
 	  };
 	
@@ -2937,17 +2953,11 @@
 	          return intent;
 	        },
 	        terminate: function terminate(doc) {
-	          if (data && data.exposeIntentFrameRemoval) {
-	            return _terminate({
-	              type: 'intent-' + intent._id + ':exposeFrameRemoval',
-	              document: doc
-	            });
-	          } else {
-	            return _terminate({
-	              type: 'intent-' + intent._id + ':done',
-	              document: doc
-	            });
-	          }
+	          var eventName = data && data.exposeIntentFrameRemoval ? 'exposeFrameRemoval' : 'done';
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':' + eventName,
+	            document: doc
+	          });
 	        },
 	        throw: function _throw(error) {
 	          return _terminate({
