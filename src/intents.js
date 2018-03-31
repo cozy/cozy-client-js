@@ -108,6 +108,16 @@ function injectService (url, element, intent, data, onReadyCallback) {
 }
 
 const first = arr => arr && arr[0]
+// In a far future, the user will have to pick the desired service from a list.
+// For now it's our job, an easy job as we arbitrary pick the first service of
+// the list.
+function pickService (intent, filterServices) {
+  const services = intent.attributes.services
+  const filteredServices = filterServices
+    ? (services || []).filter(filterServices)
+    : services
+  return first(filteredServices)
+}
 
 export function create (cozy, action, type, data = {}, permissions = []) {
   if (!action) throw new Error(`Misformed intent, "action" property must be provided`)
@@ -127,15 +137,9 @@ export function create (cozy, action, type, data = {}, permissions = []) {
 
   createPromise.start = (element, onReadyCallback) => {
     return createPromise.then(intent => {
-      const filterServices = data.filterServices
+      const service = pickService(intent, data.filterServices)
       const restData = Object.assign({}, data)
       delete restData.filterServices
-
-      const services = intent.attributes.services
-      const filteredServices = filterServices
-        ? (services || []).filter(filterServices)
-        : services
-      const service = first(filteredServices)
 
       if (!service) {
         return Promise.reject(new Error('Unable to find a service'))
