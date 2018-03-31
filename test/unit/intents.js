@@ -111,14 +111,14 @@ describe('Intents', function () {
       it('should filter intents', () => {
         cozy.client.intents
           .create('EDIT', 'io.cozy.files', {
-            filterServices: x => x.slug == 'files'
+            filterServices: x => x.slug === 'files'
           })
           .should.not.be.rejectedWith(/Unable to find a service/)
       })
       it('should filter intents', () => {
         cozy.client.intents
           .create('EDIT', 'io.cozy.files', {
-            filterServices: x => x.slug == 'files2'
+            filterServices: x => x.slug === 'files2'
           })
           .should.be.rejectedWith(/Unable to find a service/)
       })
@@ -968,6 +968,35 @@ describe('Intents', function () {
             service.terminate(result)
           }, /Intent service has already been terminated/)
         })
+      })
+    })
+  })
+
+  describe('getRedirectionURL', () => {
+    describe('to doctype', () => {
+      beforeEach(mock.mockAPI('CreateIntentToRedirect'))
+
+      it('returns expected URL for doctype', async () => {
+        return cozy.client.intents.getRedirectionURL('io.cozy.files')
+          .then(url => {
+            should.equal(url, 'https://drive.cozy.example.net/#/files/')
+          })
+      })
+
+      it('returns expected URL for document', async () => {
+        const data = {
+          id: 'da20344a-e37f-440a-a98f-7efa73671b95',
+          folder: 'a093723b-0e70-4050-9121-10394b53b966',
+          ignoredFunction: (foo) => `${foo}bar`,
+          ignoredObject: {
+            attribute: 'value'
+          },
+          ignoredArray: ['value1', 'value2']
+        }
+        return cozy.client.intents.getRedirectionURL('io.cozy.files', data)
+          .then(url => {
+            should.equal(url, 'https://drive.cozy.example.net/#/files/?id=da20344a-e37f-440a-a98f-7efa73671b95&folder=a093723b-0e70-4050-9121-10394b53b966')
+          })
       })
     })
   })

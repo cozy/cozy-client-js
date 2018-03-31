@@ -93,7 +93,9 @@ const filesProto = {
 
 const intentsProto = {
   create: intents.create,
-  createService: intents.createService
+  createService: intents.createService,
+  getRedirectionURL: intents.getRedirectionURL,
+  redirect: intents.redirect
 }
 
 const jobsProto = {
