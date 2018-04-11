@@ -23,10 +23,10 @@ const errorSerializer = (() => {
 // inject iframe for service in given element
 function injectService (url, element, intent, data, onReadyCallback) {
   const document = element.ownerDocument
-  if (!document) throw new Error('Cannot retrieve document object from given element')
+  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'))
 
   const window = document.defaultView
-  if (!window) throw new Error('Cannot retrieve window object from document')
+  if (!window) return Promise.reject(new Error('Cannot retrieve window object from document'))
 
   const iframe = document.createElement('iframe')
   // if callback provided for when iframe is loaded
@@ -171,10 +171,10 @@ function listenClientData (intent, window) {
 // returns a service to communicate with intent client
 export function createService (cozy, intentId, serviceWindow) {
   serviceWindow = serviceWindow || typeof window !== 'undefined' && window
-  if (!serviceWindow) throw new Error('Intent service should be used in browser')
+  if (!serviceWindow) return Promise.reject(new Error('Intent service should be used in browser'))
 
   intentId = intentId || serviceWindow.location.search.split('=')[1]
-  if (!intentId) throw new Error('Cannot retrieve intent from URL')
+  if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'))
 
   return cozyFetchJSON(cozy, 'GET', `/intents/${intentId}`)
     .then(intent => {
