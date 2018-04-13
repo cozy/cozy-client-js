@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.8.1] - 2018-04-13
+### Added
+- Add new intents method `REDIRECT` and `getRedirectionURL` ([PR #256](https://github.com/cozy/cozy-client-js/pull/256))
+
 ## [v0.8.0] - 2018-03-16
 ### Added
 - Now trim file name before any creation or update.
@@ -308,7 +312,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.8.1...HEAD
+[v0.8.1]: https://github.com/cozy/cozy-client-js/compare/v0.8.0...v0.8.1
 [v0.8.0]: https://github.com/cozy/cozy-client-js/compare/v0.7.2...v0.8.0
 [v0.7.2]: https://github.com/cozy/cozy-client-js/compare/v0.7.1...v0.7.2
 [v0.7.1]: https://github.com/cozy/cozy-client-js/compare/v0.7.0...v0.7.1
