@@ -88,3 +88,21 @@ cozy.client.intents.createService('77bcc42c-0fd8-11e7-ac95-8f605f6e8338', window
     intentService.terminate(resultingDoc)
   })
 ```
+
+### `cozy.client.intents.getRedirectionURL()`
+
+`cozy.client.intents.getRedirectionURL(doctype, data)` retrieves a redirection URL for a given doctype, with specified data. It relies internally on a regular intent mechanism, which creates an intent for the `REDIRECT` action. It then build the redirection URL from URL sent by the stack and returns it. This URL can be used as link `href` for example, to show the doctype or the document in an application able to handle it.
+
+#### Example
+```jsx
+  const myFolder = {
+    folder: '4bce4649-e7b7-4226-d82e-6b87dbb684e7'
+  }
+
+  const url = await cozy.client.getRedirectionURL('io.cozy.files', myFolder)
+  // url is http://domain-app.cozy.rocks/#/files?folder=4bce4649-e7b7-4226-d82e-6b87dbb684e7
+```
+
+### `cozy.client.intents.redirect()`
+
+`cozy.client.intents.redirect(doctype, data)` is based on `cozy.client.intents.getRedirectionURL()` and it redirects the browser to the retrieved URL.

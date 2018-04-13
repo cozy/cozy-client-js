@@ -108,6 +108,16 @@ function injectService (url, element, intent, data, onReadyCallback) {
 }
 
 const first = arr => arr && arr[0]
+// In a far future, the user will have to pick the desired service from a list.
+// For now it's our job, an easy job as we arbitrary pick the first service of
+// the list.
+function pickService (intent, filterServices) {
+  const services = intent.attributes.services
+  const filteredServices = filterServices
+    ? (services || []).filter(filterServices)
+    : services
+  return first(filteredServices)
+}
 
 export function create (cozy, action, type, data = {}, permissions = []) {
   if (!action) throw new Error(`Misformed intent, "action" property must be provided`)
@@ -127,15 +137,9 @@ export function create (cozy, action, type, data = {}, permissions = []) {
 
   createPromise.start = (element, onReadyCallback) => {
     return createPromise.then(intent => {
-      const filterServices = data.filterServices
+      const service = pickService(intent, data.filterServices)
       const restData = Object.assign({}, data)
       delete restData.filterServices
-
-      const services = intent.attributes.services
-      const filteredServices = filterServices
-        ? (services || []).filter(filterServices)
-        : services
-      const service = first(filteredServices)
 
       if (!service) {
         return Promise.reject(new Error('Unable to find a service'))
@@ -233,4 +237,44 @@ export function createService (cozy, intentId, serviceWindow) {
           }
         })
     })
+}
+
+// Redirect to an app able to handle the doctype
+// Redirections are more or less a hack of the intent API to retrieve an URL for
+// accessing a given doctype or a given document.
+// It needs to use a special action `REDIRECT`
+export async function getRedirectionURL (cozy, type, data) {
+  if (!type && !data) throw new Error(`Cannot retrieve redirection, at least type or doc must be provided`)
+
+  const intent = await create(cozy, 'REDIRECT', type, data)
+
+  const service = pickService(intent)
+  if (!service) throw new Error('Unable to find a service')
+
+  // Intents cannot be deleted now
+  // await deleteIntent(cozy, intent)
+
+  // ignore query string and intent id
+  const baseURL = service.href.split('?')[0]
+  // FIXME: Handle the fact that the stack encode the '#' character in the URL
+  const sanitizedURL = baseURL.replace('%23', '#')
+  return data ? buildRedirectionURL(sanitizedURL, data) : sanitizedURL
+}
+
+function isSerializable (value) {
+  return !['object', 'function'].includes(typeof value)
+}
+
+function buildRedirectionURL (url, data) {
+  const parameterStrings = Object.keys(data)
+    .filter(key => isSerializable(data[key]))
+    .map(key => `${key}=${data[key]}`)
+
+  return parameterStrings.length ? `${url}?${parameterStrings.join('&')}` : url
+}
+
+export async function redirect (cozy, type, doc) {
+  if (!window) throw new Error('redirect() method can only be called in a browser')
+  const redirectionURL = await getRedirectionURL(cozy, type, doc)
+  window.location.href = redirectionURL
 }
