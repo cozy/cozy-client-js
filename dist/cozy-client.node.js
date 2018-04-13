@@ -193,7 +193,9 @@
 	
 	var intentsProto = {
 	  create: intents.create,
-	  createService: intents.createService
+	  createService: intents.createService,
+	  getRedirectionURL: intents.getRedirectionURL,
+	  redirect: intents.redirect
 	};
 	
 	var jobsProto = {
@@ -2725,10 +2727,110 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.redirect = exports.getRedirectionURL = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
+	// Redirect to an app able to handle the doctype
+	// Redirections are more or less a hack of the intent API to retrieve an URL for
+	// accessing a given doctype or a given document.
+	// It needs to use a special action `REDIRECT`
+	var getRedirectionURL = exports.getRedirectionURL = function () {
+	  var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(cozy, type, data) {
+	    var intent, service, baseURL, sanitizedURL;
+	    return regeneratorRuntime.wrap(function _callee$(_context) {
+	      while (1) {
+	        switch (_context.prev = _context.next) {
+	          case 0:
+	            if (!(!type && !data)) {
+	              _context.next = 2;
+	              break;
+	            }
+	
+	            throw new Error('Cannot retrieve redirection, at least type or doc must be provided');
+	
+	          case 2:
+	            _context.next = 4;
+	            return create(cozy, 'REDIRECT', type, data);
+	
+	          case 4:
+	            intent = _context.sent;
+	            service = pickService(intent);
+	
+	            if (service) {
+	              _context.next = 8;
+	              break;
+	            }
+	
+	            throw new Error('Unable to find a service');
+	
+	          case 8:
+	
+	            // Intents cannot be deleted now
+	            // await deleteIntent(cozy, intent)
+	
+	            // ignore query string and intent id
+	            baseURL = service.href.split('?')[0];
+	            // FIXME: Handle the fact that the stack encode the '#' character in the URL
+	
+	            sanitizedURL = baseURL.replace('%23', '#');
+	            return _context.abrupt('return', data ? buildRedirectionURL(sanitizedURL, data) : sanitizedURL);
+	
+	          case 11:
+	          case 'end':
+	            return _context.stop();
+	        }
+	      }
+	    }, _callee, this);
+	  }));
+	
+	  return function getRedirectionURL(_x3, _x4, _x5) {
+	    return _ref.apply(this, arguments);
+	  };
+	}();
+	
+	var redirect = exports.redirect = function () {
+	  var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(cozy, type, doc) {
+	    var redirectionURL;
+	    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	      while (1) {
+	        switch (_context2.prev = _context2.next) {
+	          case 0:
+	            if (window) {
+	              _context2.next = 2;
+	              break;
+	            }
+	
+	            throw new Error('redirect() method can only be called in a browser');
+	
+	          case 2:
+	            _context2.next = 4;
+	            return getRedirectionURL(cozy, type, doc);
+	
+	          case 4:
+	            redirectionURL = _context2.sent;
+	
+	            window.location.href = redirectionURL;
+	
+	          case 6:
+	          case 'end':
+	            return _context2.stop();
+	        }
+	      }
+	    }, _callee2, this);
+	  }));
+	
+	  return function redirect(_x6, _x7, _x8) {
+	    return _ref2.apply(this, arguments);
+	  };
+	}();
+	
 	exports.create = create;
 	exports.createService = createService;
 	
 	var _fetch = __webpack_require__(9);
+	
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
 	var intentClass = 'coz-intent';
 	
@@ -2844,6 +2946,14 @@
 	var first = function first(arr) {
 	  return arr && arr[0];
 	};
+	// In a far future, the user will have to pick the desired service from a list.
+	// For now it's our job, an easy job as we arbitrary pick the first service of
+	// the list.
+	function pickService(intent, filterServices) {
+	  var services = intent.attributes.services;
+	  var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
+	  return first(filteredServices);
+	}
 	
 	function create(cozy, action, type) {
 	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -2866,13 +2976,9 @@
 	
 	  createPromise.start = function (element, onReadyCallback) {
 	    return createPromise.then(function (intent) {
-	      var filterServices = data.filterServices;
+	      var service = pickService(intent, data.filterServices);
 	      var restData = Object.assign({}, data);
 	      delete restData.filterServices;
-	
-	      var services = intent.attributes.services;
-	      var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
-	      var service = first(filteredServices);
 	
 	      if (!service) {
 	        return Promise.reject(new Error('Unable to find a service'));
@@ -2970,6 +3076,20 @@
 	      };
 	    });
 	  });
+	}
+	
+	function isSerializable(value) {
+	  return !['object', 'function'].includes(typeof value === 'undefined' ? 'undefined' : _typeof(value));
+	}
+	
+	function buildRedirectionURL(url, data) {
+	  var parameterStrings = Object.keys(data).filter(function (key) {
+	    return isSerializable(data[key]);
+	  }).map(function (key) {
+	    return key + '=' + data[key];
+	  });
+	
+	  return parameterStrings.length ? url + '?' + parameterStrings.join('&') : url;
 	}
 
 /***/ },
