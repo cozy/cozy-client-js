@@ -95,19 +95,19 @@
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _jobs = __webpack_require__(17);
+	var _jobs = __webpack_require__(18);
 	
 	var jobs = _interopRequireWildcard(_jobs);
 	
-	var _offline = __webpack_require__(18);
+	var _offline = __webpack_require__(19);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(21);
+	var _settings = __webpack_require__(22);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(22);
+	var _relations = __webpack_require__(23);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -2729,6 +2729,10 @@
 	});
 	exports.redirect = exports.getRedirectionURL = undefined;
 	
+	var _regenerator = __webpack_require__(17);
+	
+	var _regenerator2 = _interopRequireDefault(_regenerator);
+	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	// Redirect to an app able to handle the doctype
@@ -2736,9 +2740,9 @@
 	// accessing a given doctype or a given document.
 	// It needs to use a special action `REDIRECT`
 	var getRedirectionURL = exports.getRedirectionURL = function () {
-	  var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(cozy, type, data) {
+	  var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, type, data) {
 	    var intent, service, baseURL, sanitizedURL;
-	    return regeneratorRuntime.wrap(function _callee$(_context) {
+	    return _regenerator2.default.wrap(function _callee$(_context) {
 	      while (1) {
 	        switch (_context.prev = _context.next) {
 	          case 0:
@@ -2790,9 +2794,9 @@
 	}();
 	
 	var redirect = exports.redirect = function () {
-	  var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(cozy, type, doc) {
+	  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(cozy, type, doc) {
 	    var redirectionURL;
-	    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	    return _regenerator2.default.wrap(function _callee2$(_context2) {
 	      while (1) {
 	        switch (_context2.prev = _context2.next) {
 	          case 0:
@@ -2829,6 +2833,8 @@
 	exports.createService = createService;
 	
 	var _fetch = __webpack_require__(9);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 	
@@ -3094,6 +3100,12 @@
 
 /***/ },
 /* 17 */
+/***/ function(module, exports) {
+
+	module.exports = require("babel-runtime/regenerator");
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3130,7 +3142,7 @@
 	}
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3162,11 +3174,11 @@
 	
 	var _utils = __webpack_require__(4);
 	
-	var _pouchdb = __webpack_require__(19);
+	var _pouchdb = __webpack_require__(20);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(20);
+	var _pouchdbFind = __webpack_require__(21);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -3460,19 +3472,19 @@
 	}
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb");
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb-find");
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3522,7 +3534,7 @@
 	}
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
