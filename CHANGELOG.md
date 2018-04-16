@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [v0.8.2] - 2018-04-16
+### Fixed
+- Fix a polyfill issue about async/await usage and use [`babel-preset-cozy-app`](https://github.com/CPatchane/create-cozy-app/tree/master/packages/babel-preset-cozy-app)
+
 ## [v0.8.1] - 2018-04-13
 ### Added
 - Add new intents method `REDIRECT` and `getRedirectionURL` ([PR #256](https://github.com/cozy/cozy-client-js/pull/256))
