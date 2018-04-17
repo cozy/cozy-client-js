@@ -447,6 +447,14 @@ describe('Intents', function () {
   describe('CreateService', function () {
     function mockWindow (props) {
       return Object.assign({
+        document: {
+          documentElement: {
+            style: {}
+          },
+          body: {
+            style: {}
+          }
+        },
         addEventListener: sinon.spy(),
         removeEventListener: sinon.spy(),
         parent: {
@@ -469,7 +477,7 @@ describe('Intents', function () {
       }
 
       windowMock.parent.postMessage.callsFake(() => {
-        const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+        const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
         windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
 
         messageEventListener(clientHandshakeEventMessageMock)
@@ -496,7 +504,7 @@ describe('Intents', function () {
       }
 
       windowMock.parent.postMessage.callsFake(() => {
-        const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+        const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
         windowMock.addEventListener.withArgs('message', messageEventListener).calledOnce.should.be.true()
 
         messageEventListener(clientHandshakeEventMessageMock)
@@ -542,7 +550,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -574,7 +582,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -607,7 +615,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -632,6 +640,29 @@ describe('Intents', function () {
             .withArgs(messageMatch, expectedIntent.attributes.client).calledOnce.should.be.true()
         })
 
+        it('should maximize the iframe document', async function () {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          return cozy.client.intents.createService(expectedIntent._id, windowMock)
+            .then(() => {
+              const loadEventListener = windowMock.addEventListener.firstCall.args[1]
+              loadEventListener()
+
+              windowMock.document.documentElement.style.height.should.be.equal('100%')
+              windowMock.document.body.style.height.should.be.equal('100%')
+            })
+        })
+
         it('should not be called once the service has been terminated', async function () {
           const windowMock = mockWindow()
 
@@ -645,7 +676,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -678,7 +709,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -708,7 +739,7 @@ describe('Intents', function () {
           }
 
           window.parent.postMessage.callsFake(() => {
-            const messageEventListener = window.addEventListener.secondCall.args[1]
+            const messageEventListener = window.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -740,7 +771,7 @@ describe('Intents', function () {
           }
 
           window.parent.postMessage.callsFake(() => {
-            const messageEventListener = window.addEventListener.secondCall.args[1]
+            const messageEventListener = window.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -772,7 +803,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -796,7 +827,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -819,7 +850,7 @@ describe('Intents', function () {
           }
 
           window.parent.postMessage.callsFake(() => {
-            const messageEventListener = window.addEventListener.secondCall.args[1]
+            const messageEventListener = window.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -844,7 +875,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -870,7 +901,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -894,7 +925,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -928,7 +959,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
@@ -954,7 +985,7 @@ describe('Intents', function () {
           }
 
           windowMock.parent.postMessage.callsFake(() => {
-            const messageEventListener = windowMock.addEventListener.secondCall.args[1]
+            const messageEventListener = windowMock.addEventListener.thirdCall.args[1]
             messageEventListener(clientHandshakeEventMessageMock)
           })
 
