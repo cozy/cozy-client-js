@@ -168,10 +168,26 @@ function listenClientData (intent, window) {
   })
 }
 
+// maximize the height of an element
+function maximize (element) {
+  if (element && element.style) {
+    element.style.height = '100%'
+  }
+}
+
 // returns a service to communicate with intent client
 export function createService (cozy, intentId, serviceWindow) {
   serviceWindow = serviceWindow || typeof window !== 'undefined' && window
-  if (!serviceWindow) return Promise.reject(new Error('Intent service should be used in browser'))
+  if (!serviceWindow || !serviceWindow.document) {
+    return Promise.reject(new Error('Intent service should be used in browser'))
+  }
+
+  // Maximize document, the whole iframe is handled by intents, clients and
+  // services
+  serviceWindow.addEventListener('load', () => {
+    const { document } = serviceWindow
+    ;[document.documentElement, document.body].forEach(maximize)
+  })
 
   intentId = intentId || serviceWindow.location.search.split('=')[1]
   if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'))
