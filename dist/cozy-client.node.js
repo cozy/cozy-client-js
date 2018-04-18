@@ -2865,10 +2865,10 @@
 	// inject iframe for service in given element
 	function injectService(url, element, intent, data, onReadyCallback) {
 	  var document = element.ownerDocument;
-	  if (!document) throw new Error('Cannot retrieve document object from given element');
+	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
 	
 	  var window = document.defaultView;
-	  if (!window) throw new Error('Cannot retrieve window object from document');
+	  if (!window) return Promise.reject(new Error('Cannot retrieve window object from document'));
 	
 	  var iframe = document.createElement('iframe');
 	  // if callback provided for when iframe is loaded
@@ -3013,13 +3013,30 @@
 	  });
 	}
 	
+	// maximize the height of an element
+	function maximize(element) {
+	  if (element && element.style) {
+	    element.style.height = '100%';
+	  }
+	}
+	
 	// returns a service to communicate with intent client
 	function createService(cozy, intentId, serviceWindow) {
 	  serviceWindow = serviceWindow || typeof window !== 'undefined' && window;
-	  if (!serviceWindow) throw new Error('Intent service should be used in browser');
+	  if (!serviceWindow || !serviceWindow.document) {
+	    return Promise.reject(new Error('Intent service should be used in browser'));
+	  }
+	
+	  // Maximize document, the whole iframe is handled by intents, clients and
+	  // services
+	  serviceWindow.addEventListener('load', function () {
+	    var _serviceWindow = serviceWindow,
+	        document = _serviceWindow.document;
+	    [document.documentElement, document.body].forEach(maximize);
+	  });
 	
 	  intentId = intentId || serviceWindow.location.search.split('=')[1];
-	  if (!intentId) throw new Error('Cannot retrieve intent from URL');
+	  if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'));
 	
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
 	    var terminated = false;
