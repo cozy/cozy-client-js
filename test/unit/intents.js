@@ -514,8 +514,7 @@ describe('Intents', function () {
     })
 
     it('should throw error when not in a browser context', () => {
-      should.throws(
-        () => cozy.client.intents.createService(),
+      cozy.client.intents.createService().should.be.rejectedWith(
         /Intent service should be used in browser/
       )
     })
@@ -525,8 +524,7 @@ describe('Intents', function () {
         location: {search: ''}
       })
 
-      should.throws(
-        () => cozy.client.intents.createService(),
+      cozy.client.intents.createService().should.be.rejectedWith(
         /Cannot retrieve intent from URL/
       )
 
