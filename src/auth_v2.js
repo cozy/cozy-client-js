@@ -1,8 +1,8 @@
 /* global btoa */
 const V2TOKEN_ABORT_TIMEOUT = 3000
 
-export function getAppToken () {
-  return new Promise(function (resolve, reject) {
+export function getAppToken() {
+  return new Promise(function(resolve, reject) {
     if (typeof window === 'undefined') {
       return reject(new Error('getV2Token should be used in browser'))
     } else if (!window.parent) {
@@ -11,9 +11,9 @@ export function getAppToken () {
       return reject(new Error('getV2Token should be used in modern browser'))
     }
     const origin = window.location.origin
-    const intent = {action: 'getToken'}
+    const intent = { action: 'getToken' }
     let timeout = null
-    const receiver = function (event) {
+    const receiver = function(event) {
       let token
       try {
         token = new AppToken({
@@ -37,12 +37,12 @@ export function getAppToken () {
 }
 
 export class AppToken {
-  constructor (opts) {
+  constructor(opts) {
     this.appName = opts.appName || ''
     this.token = opts.token || ''
   }
 
-  toAuthHeader () {
+  toAuthHeader() {
     return 'Basic ' + btoa(`${this.appName}:${this.token}`)
   }
 }

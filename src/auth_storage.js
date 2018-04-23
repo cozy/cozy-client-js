@@ -1,5 +1,5 @@
 export class LocalStorage {
-  constructor (storage, prefix) {
+  constructor(storage, prefix) {
     if (!storage && typeof window !== 'undefined') {
       storage = window.localStorage
     }
@@ -7,14 +7,14 @@ export class LocalStorage {
     this.prefix = prefix || 'cozy:oauth:'
   }
 
-  save (key, value) {
+  save(key, value) {
     return new Promise(resolve => {
       this.storage.setItem(this.prefix + key, JSON.stringify(value))
       resolve(value)
     })
   }
 
-  load (key) {
+  load(key) {
     return new Promise(resolve => {
       const item = this.storage.getItem(this.prefix + key)
       if (!item) {
@@ -25,12 +25,13 @@ export class LocalStorage {
     })
   }
 
-  delete (key) {
-    return new Promise(resolve => resolve(
-      this.storage.removeItem(this.prefix + key)))
+  delete(key) {
+    return new Promise(resolve =>
+      resolve(this.storage.removeItem(this.prefix + key))
+    )
   }
 
-  clear () {
+  clear() {
     return new Promise(resolve => {
       const storage = this.storage
       for (let i = 0; i < storage.length; i++) {
@@ -45,25 +46,25 @@ export class LocalStorage {
 }
 
 export class MemoryStorage {
-  constructor () {
+  constructor() {
     this.hash = Object.create(null)
   }
 
-  save (key, value) {
+  save(key, value) {
     this.hash[key] = value
     return Promise.resolve(value)
   }
 
-  load (key) {
+  load(key) {
     return Promise.resolve(this.hash[key])
   }
 
-  delete (key) {
+  delete(key) {
     const deleted = delete this.hash[key]
     return Promise.resolve(deleted)
   }
 
-  clear () {
+  clear() {
     this.hash = Object.create(null)
     return Promise.resolve()
   }

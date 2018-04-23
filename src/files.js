@@ -9,17 +9,17 @@ export const TRASH_DIR_ID = 'io.cozy.files.trash-dir'
 
 const contentTypeOctetStream = 'application/octet-stream'
 
-function sanitizeFileName (name) {
+function sanitizeFileName(name) {
   return name && name.trim()
 }
 
-function getFileTypeFromName (name) {
+function getFileTypeFromName(name) {
   if (/\.heic$/i.test(name)) return 'image/heic'
   else if (/\.heif$/i.test(name)) return 'image/heif'
   else return null
 }
 
-function doUpload (cozy, data, method, path, options) {
+function doUpload(cozy, data, method, path, options) {
   if (!data) {
     throw new Error('missing data argument')
   }
@@ -29,22 +29,27 @@ function doUpload (cozy, data, method, path, options) {
     data = data.buffer
   }
 
-  const isBuffer = (typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer)
-  const isFile = (typeof File !== 'undefined' && data instanceof File)
-  const isBlob = (typeof Blob !== 'undefined' && data instanceof Blob)
-  const isStream = (data.readable === true && typeof data.pipe === 'function')
-  const isString = (typeof data === 'string')
+  const isBuffer =
+    typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer
+  const isFile = typeof File !== 'undefined' && data instanceof File
+  const isBlob = typeof Blob !== 'undefined' && data instanceof Blob
+  const isStream = data.readable === true && typeof data.pipe === 'function'
+  const isString = typeof data === 'string'
 
   if (!isBuffer && !isFile && !isBlob && !isStream && !isString) {
     throw new Error('invalid data type')
   }
 
-  let {contentType, contentLength, checksum, lastModifiedDate, ifMatch} = options || {}
+  let { contentType, contentLength, checksum, lastModifiedDate, ifMatch } =
+    options || {}
   if (!contentType) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
     } else if (isFile) {
-      contentType = data.type || getFileTypeFromName(data.name.toLowerCase()) || contentTypeOctetStream
+      contentType =
+        data.type ||
+        getFileTypeFromName(data.name.toLowerCase()) ||
+        contentTypeOctetStream
       if (!lastModifiedDate) {
         lastModifiedDate = data.lastModifiedDate
       }
@@ -73,19 +78,20 @@ function doUpload (cozy, data, method, path, options) {
     method: method,
     headers: headers,
     body: data
+  }).then(res => {
+    const json = res.json()
+    if (!res.ok) {
+      return json.then(err => {
+        throw err
+      })
+    } else {
+      return json.then(jsonapi)
+    }
   })
-    .then((res) => {
-      const json = res.json()
-      if (!res.ok) {
-        return json.then(err => { throw err })
-      } else {
-        return json.then(jsonapi)
-      }
-    })
 }
 
-export function create (cozy, data, options) {
-  let {name, dirID, executable} = options || {}
+export function create(cozy, data, options) {
+  let { name, dirID, executable } = options || {}
 
   // handle case where data is a file and contains the name
   if (!name && typeof data.name === 'string') {
@@ -103,12 +109,14 @@ export function create (cozy, data, options) {
   }
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
-  const query = `?Name=${encodeURIComponent(name)}&Type=file&Executable=${executable}`
+  const query = `?Name=${encodeURIComponent(
+    name
+  )}&Type=file&Executable=${executable}`
   return doUpload(cozy, data, 'POST', `${path}${query}`, options)
 }
 
-export function createDirectory (cozy, options) {
-  let {name, dirID, lastModifiedDate} = options || {}
+export function createDirectory(cozy, options) {
+  let { name, dirID, lastModifiedDate } = options || {}
 
   name = sanitizeFileName(name)
 
@@ -124,63 +132,70 @@ export function createDirectory (cozy, options) {
   const query = `?Name=${encodeURIComponent(name)}&Type=directory`
   return cozyFetchJSON(cozy, 'POST', `${path}${query}`, undefined, {
     headers: {
-      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+      Date: lastModifiedDate ? lastModifiedDate.toGMTString() : ''
     }
   })
 }
 
-function getDirectoryOrCreate (cozy, name, parentDirectory) {
-  if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory')
+function getDirectoryOrCreate(cozy, name, parentDirectory) {
+  if (parentDirectory && !parentDirectory.attributes)
+    throw new Error('Malformed parent directory')
 
   name = sanitizeFileName(name)
 
-  const path = `${parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path}/${name}`
+  const path = `${
+    parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path
+  }/${name}`
 
-  return cozy.files.statByPath(path || '/')
-    .catch(error => {
-      const parsedError = JSON.parse(error.message)
-      const errors = parsedError.errors
-      if (errors && errors.length && errors[0].status === '404') {
-        return cozy.files.createDirectory({
-          name: name,
-          dirID: parentDirectory && parentDirectory._id
-        })
-      }
+  return cozy.files.statByPath(path || '/').catch(error => {
+    const parsedError = JSON.parse(error.message)
+    const errors = parsedError.errors
+    if (errors && errors.length && errors[0].status === '404') {
+      return cozy.files.createDirectory({
+        name: name,
+        dirID: parentDirectory && parentDirectory._id
+      })
+    }
 
-      throw errors
-    })
+    throw errors
+  })
 }
 
-export function createDirectoryByPath (cozy, path, offline) {
+export function createDirectoryByPath(cozy, path, offline) {
   const parts = path.split('/').filter(part => part !== '')
 
   const rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID, offline)
 
   return parts.length
     ? parts.reduce((parentDirectoryPromise, part) => {
-      return parentDirectoryPromise
-        .then(parentDirectory => getDirectoryOrCreate(cozy, part, parentDirectory))
-    }, rootDirectoryPromise)
-      : rootDirectoryPromise
+        return parentDirectoryPromise.then(parentDirectory =>
+          getDirectoryOrCreate(cozy, part, parentDirectory)
+        )
+      }, rootDirectoryPromise)
+    : rootDirectoryPromise
 }
 
-export function updateById (cozy, id, data, options) {
-  return doUpload(cozy, data, 'PUT', `/files/${encodeURIComponent(id)}`, options)
+export function updateById(cozy, id, data, options) {
+  return doUpload(
+    cozy,
+    data,
+    'PUT',
+    `/files/${encodeURIComponent(id)}`,
+    options
+  )
 }
 
-function doUpdateAttributes (cozy, attrs, path, options) {
+function doUpdateAttributes(cozy, attrs, path, options) {
   if (!attrs || typeof attrs !== 'object') {
     throw new Error('missing attrs argument')
   }
 
-  const {ifMatch} = options || {}
+  const { ifMatch } = options || {}
   const body = {
     data: {
-      attributes: Object.assign(
-        {},
-        attrs,
-        { name: sanitizeFileName(attrs.name) }
-      )
+      attributes: Object.assign({}, attrs, {
+        name: sanitizeFileName(attrs.name)
+      })
     }
   }
   return cozyFetchJSON(cozy, 'PATCH', path, body, {
@@ -190,91 +205,122 @@ function doUpdateAttributes (cozy, attrs, path, options) {
   })
 }
 
-export function updateAttributesById (cozy, id, attrs, options) {
-  return doUpdateAttributes(cozy, attrs,
-    `/files/${encodeURIComponent(id)}`, options)
+export function updateAttributesById(cozy, id, attrs, options) {
+  return doUpdateAttributes(
+    cozy,
+    attrs,
+    `/files/${encodeURIComponent(id)}`,
+    options
+  )
 }
 
-export function updateAttributesByPath (cozy, path, attrs, options) {
-  return doUpdateAttributes(cozy, attrs,
-    `/files/metadata?Path=${encodeURIComponent(path)}`, options)
+export function updateAttributesByPath(cozy, path, attrs, options) {
+  return doUpdateAttributes(
+    cozy,
+    attrs,
+    `/files/metadata?Path=${encodeURIComponent(path)}`,
+    options
+  )
 }
 
-export function trashById (cozy, id, options) {
+export function trashById(cozy, id, options) {
   if (typeof id !== 'string' || id === '') {
     throw new Error('missing id argument')
   }
-  const {ifMatch} = options || {}
-  return cozyFetchJSON(cozy, 'DELETE', `/files/${encodeURIComponent(id)}`, undefined, {
-    headers: {
-      'If-Match': ifMatch || ''
+  const { ifMatch } = options || {}
+  return cozyFetchJSON(
+    cozy,
+    'DELETE',
+    `/files/${encodeURIComponent(id)}`,
+    undefined,
+    {
+      headers: {
+        'If-Match': ifMatch || ''
+      }
     }
-  })
+  )
 }
 
-export function statById (cozy, id, offline = true, options = {}) {
+export function statById(cozy, id, offline = true, options = {}) {
   if (offline && cozy.offline.hasDatabase(DOCTYPE_FILES)) {
     let db = cozy.offline.getDatabase(DOCTYPE_FILES)
     return Promise.all([
       db.get(id),
-      db.find(Object.assign({ selector: { 'dir_id': id } }, options))
+      db.find(Object.assign({ selector: { dir_id: id } }, options))
     ]).then(([doc, children]) => {
       if (id === ROOT_DIR_ID) {
         children.docs = children.docs.filter(doc => doc._id !== TRASH_DIR_ID)
       }
-      children = sortFiles(children.docs.map(doc => addIsDir(toJsonApi(cozy, doc))))
+      children = sortFiles(
+        children.docs.map(doc => addIsDir(toJsonApi(cozy, doc)))
+      )
       return addIsDir(toJsonApi(cozy, doc, children))
     })
   }
-  const query = Object.keys(options).length === 0 ? '' : `?${encodePageOptions(options)}`
-  return cozyFetchJSON(cozy, 'GET', `/files/${encodeURIComponent(id)}${query}`)
-    .then(addIsDir)
+  const query =
+    Object.keys(options).length === 0 ? '' : `?${encodePageOptions(options)}`
+  return cozyFetchJSON(
+    cozy,
+    'GET',
+    `/files/${encodeURIComponent(id)}${query}`
+  ).then(addIsDir)
 }
 
-export function statByPath (cozy, path) {
-  return cozyFetchJSON(cozy, 'GET', `/files/metadata?Path=${encodeURIComponent(path)}`)
-    .then(addIsDir)
+export function statByPath(cozy, path) {
+  return cozyFetchJSON(
+    cozy,
+    'GET',
+    `/files/metadata?Path=${encodeURIComponent(path)}`
+  ).then(addIsDir)
 }
 
-export function downloadById (cozy, id) {
+export function downloadById(cozy, id) {
   return cozyFetch(cozy, `/files/download/${encodeURIComponent(id)}`)
 }
 
-export function downloadByPath (cozy, path) {
+export function downloadByPath(cozy, path) {
   return cozyFetch(cozy, `/files/download?Path=${encodeURIComponent(path)}`)
 }
 
-function extractResponseLinkRelated (res) {
+function extractResponseLinkRelated(res) {
   let href = res.links && res.links.related
   if (!href) throw new Error('No related link in server response')
   return href
 }
 
-export function getDownloadLinkByPath (cozy, path) {
-  return cozyFetchJSON(cozy, 'POST', `/files/downloads?Path=${encodeURIComponent(path)}`)
-    .then(extractResponseLinkRelated)
+export function getDownloadLinkByPath(cozy, path) {
+  return cozyFetchJSON(
+    cozy,
+    'POST',
+    `/files/downloads?Path=${encodeURIComponent(path)}`
+  ).then(extractResponseLinkRelated)
 }
 
-export function getDownloadLinkById (cozy, id) {
-  return cozyFetchJSON(cozy, 'POST', `/files/downloads?Id=${encodeURIComponent(id)}`)
-    .then(extractResponseLinkRelated)
+export function getDownloadLinkById(cozy, id) {
+  return cozyFetchJSON(
+    cozy,
+    'POST',
+    `/files/downloads?Id=${encodeURIComponent(id)}`
+  ).then(extractResponseLinkRelated)
 }
 
-export function getFilePath (cozy, file = {}, folder) {
+export function getFilePath(cozy, file = {}, folder) {
   if (!folder || !folder.attributes) {
     throw Error('Folder should be valid with an attributes.path property')
   }
 
   const folderPath = folder.attributes.path.endsWith('/')
     ? folder.attributes.path
-      : `${folder.attributes.path}/`
+    : `${folder.attributes.path}/`
 
   return `${folderPath}${file.name}`
 }
 
-export function getCollectionShareLink (cozy, id, collectionType) {
+export function getCollectionShareLink(cozy, id, collectionType) {
   if (!id) {
-    return Promise.reject(Error('An id should be provided to create a share link'))
+    return Promise.reject(
+      Error('An id should be provided to create a share link')
+    )
   }
   return cozyFetchJSON(cozy, 'POST', `/permissions?codes=email`, {
     data: {
@@ -295,10 +341,13 @@ export function getCollectionShareLink (cozy, id, collectionType) {
         }
       }
     }
-  }).then(data => ({sharecode: `sharecode=${data.attributes.codes.email}`, id: `id=${id}`}))
+  }).then(data => ({
+    sharecode: `sharecode=${data.attributes.codes.email}`,
+    id: `id=${id}`
+  }))
 }
 
-export function getArchiveLinkByPaths (cozy, paths, name = 'files') {
+export function getArchiveLinkByPaths(cozy, paths, name = 'files') {
   const archive = {
     type: 'io.cozy.archives',
     attributes: {
@@ -306,11 +355,12 @@ export function getArchiveLinkByPaths (cozy, paths, name = 'files') {
       files: paths
     }
   }
-  return cozyFetchJSON(cozy, 'POST', `/files/archive`, {data: archive})
-  .then(extractResponseLinkRelated)
+  return cozyFetchJSON(cozy, 'POST', `/files/archive`, { data: archive }).then(
+    extractResponseLinkRelated
+  )
 }
 
-export function getArchiveLinkByIds (cozy, ids, name = 'files') {
+export function getArchiveLinkByIds(cozy, ids, name = 'files') {
   const archive = {
     type: 'io.cozy.archives',
     attributes: {
@@ -318,45 +368,54 @@ export function getArchiveLinkByIds (cozy, ids, name = 'files') {
       ids: ids
     }
   }
-  return cozyFetchJSON(cozy, 'POST', `/files/archive`, {data: archive})
-  .then(extractResponseLinkRelated)
+  return cozyFetchJSON(cozy, 'POST', `/files/archive`, { data: archive }).then(
+    extractResponseLinkRelated
+  )
 }
 
-export function listTrash (cozy) {
+export function listTrash(cozy) {
   return cozyFetchJSON(cozy, 'GET', `/files/trash`)
 }
 
-export function clearTrash (cozy) {
+export function clearTrash(cozy) {
   return cozyFetchJSON(cozy, 'DELETE', `/files/trash`)
 }
 
-export function restoreById (cozy, id) {
+export function restoreById(cozy, id) {
   return cozyFetchJSON(cozy, 'POST', `/files/trash/${encodeURIComponent(id)}`)
 }
 
-export function destroyById (cozy, id, options) {
-  const {ifMatch} = options || {}
-  return cozyFetchJSON(cozy, 'DELETE', `/files/trash/${encodeURIComponent(id)}`, undefined, {
-    headers: {
-      'If-Match': ifMatch || ''
+export function destroyById(cozy, id, options) {
+  const { ifMatch } = options || {}
+  return cozyFetchJSON(
+    cozy,
+    'DELETE',
+    `/files/trash/${encodeURIComponent(id)}`,
+    undefined,
+    {
+      headers: {
+        'If-Match': ifMatch || ''
+      }
     }
-  })
+  )
 }
 
-function addIsDir (obj) {
+function addIsDir(obj) {
   obj.isDir = obj.attributes.type === 'directory'
   return obj
 }
 
-function encodePageOptions (options) {
+function encodePageOptions(options) {
   let opts = []
   for (const name in options) {
-    opts.push(`page[${encodeURIComponent(name)}]=${encodeURIComponent(options[name])}`)
+    opts.push(
+      `page[${encodeURIComponent(name)}]=${encodeURIComponent(options[name])}`
+    )
   }
   return opts.join('&')
 }
 
-function toJsonApi (cozy, doc, contents = []) {
+function toJsonApi(cozy, doc, contents = []) {
   let clone = JSON.parse(JSON.stringify(doc))
   delete clone._id
   delete clone._rev
@@ -373,7 +432,7 @@ function toJsonApi (cozy, doc, contents = []) {
         }
       }
     },
-    relations: (name) => {
+    relations: name => {
       if (name === 'contents') {
         return contents
       }
@@ -381,9 +440,10 @@ function toJsonApi (cozy, doc, contents = []) {
   }
 }
 
-function sortFiles (allFiles) {
+function sortFiles(allFiles) {
   const folders = allFiles.filter(f => f.attributes.type === 'directory')
   const files = allFiles.filter(f => f.attributes.type !== 'directory')
-  const sort = files => files.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
+  const sort = files =>
+    files.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
   return sort(folders).concat(sort(files))
 }

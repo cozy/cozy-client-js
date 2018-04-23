@@ -1,6 +1,6 @@
 /* global btoa */
-import {encodeQuery, decodeQuery, isOffline} from './utils'
-import {cozyFetchJSON, FetchError} from './fetch'
+import { encodeQuery, decodeQuery, isOffline } from './utils'
+import { cozyFetchJSON, FetchError } from './fetch'
 
 const StateSize = 16
 
@@ -8,10 +8,11 @@ export const CredsKey = 'creds'
 export const StateKey = 'state'
 
 export class Client {
-  constructor (opts) {
+  constructor(opts) {
     this.clientID = opts.clientID || opts.client_id || ''
     this.clientSecret = opts.clientSecret || opts.client_secret || ''
-    this.registrationAccessToken = opts.registrationAccessToken || opts.registration_access_token || ''
+    this.registrationAccessToken =
+      opts.registrationAccessToken || opts.registration_access_token || ''
 
     if (opts.redirect_uris) {
       this.redirectURI = opts.redirect_uris[0] || ''
@@ -28,8 +29,10 @@ export class Client {
     this.logoURI = opts.logoURI || opts.logo_uri || ''
     this.policyURI = opts.policyURI || opts.policy_uri || ''
 
-    this.notificationPlatform = opts.notificationPlatform || opts.notification_platform || ''
-    this.notificationDeviceToken = opts.notificationDeviceToken || opts.notification_device_token || ''
+    this.notificationPlatform =
+      opts.notificationPlatform || opts.notification_platform || ''
+    this.notificationDeviceToken =
+      opts.notificationDeviceToken || opts.notification_device_token || ''
 
     if (!this.registrationAccessToken) {
       if (this.redirectURI === '') {
@@ -44,11 +47,11 @@ export class Client {
     }
   }
 
-  isRegistered () {
+  isRegistered() {
     return this.clientID !== ''
   }
 
-  toRegisterJSON () {
+  toRegisterJSON() {
     return {
       redirect_uris: [this.redirectURI],
       software_id: this.softwareID,
@@ -63,43 +66,43 @@ export class Client {
     }
   }
 
-  toAuthHeader () {
+  toAuthHeader() {
     return 'Bearer ' + this.registrationAccessToken
   }
 }
 
 export class AccessToken {
-  constructor (opts) {
+  constructor(opts) {
     this.tokenType = opts.tokenType || opts.token_type
     this.accessToken = opts.accessToken || opts.access_token
     this.refreshToken = opts.refreshToken || opts.refresh_token
     this.scope = opts.scope
   }
 
-  toAuthHeader () {
+  toAuthHeader() {
     return 'Bearer ' + this.accessToken
   }
 
-  toBasicAuth () {
+  toBasicAuth() {
     return `user:${this.accessToken}@`
   }
 }
 
 export class AppToken {
-  constructor (opts) {
+  constructor(opts) {
     this.token = opts.token || ''
   }
 
-  toAuthHeader () {
+  toAuthHeader() {
     return 'Bearer ' + this.token
   }
 
-  toBasicAuth () {
+  toBasicAuth() {
     return `user:${this.token}@`
   }
 }
 
-export function client (cozy, clientParams) {
+export function client(cozy, clientParams) {
   if (!clientParams) {
     clientParams = cozy._clientParams
   }
@@ -109,18 +112,17 @@ export function client (cozy, clientParams) {
   return new Client(clientParams)
 }
 
-export function registerClient (cozy, clientParams) {
+export function registerClient(cozy, clientParams) {
   const cli = client(cozy, clientParams)
   if (cli.isRegistered()) {
     return Promise.reject(new Error('Client already registered'))
   }
   return cozyFetchJSON(cozy, 'POST', '/auth/register', cli.toRegisterJSON(), {
     disableAuth: true
-  })
-    .then((data) => new Client(data))
+  }).then(data => new Client(data))
 }
 
-export function updateClient (cozy, clientParams, resetSecret = false) {
+export function updateClient(cozy, clientParams, resetSecret = false) {
   const cli = client(cozy, clientParams)
   if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
@@ -133,10 +135,10 @@ export function updateClient (cozy, clientParams, resetSecret = false) {
     manualAuthCredentials: {
       token: cli
     }
-  }).then((data) => createClient(data, cli))
+  }).then(data => createClient(data, cli))
 }
 
-export function unregisterClient (cozy, clientParams) {
+export function unregisterClient(cozy, clientParams) {
   const cli = client(cozy, clientParams)
   if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
@@ -149,7 +151,7 @@ export function unregisterClient (cozy, clientParams) {
 }
 
 // getClient will retrive the registered client informations from the server.
-export function getClient (cozy, clientParams) {
+export function getClient(cozy, clientParams) {
   const cli = client(cozy, clientParams)
   if (!cli.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
@@ -157,14 +159,13 @@ export function getClient (cozy, clientParams) {
   if (isOffline()) {
     return Promise.resolve(cli)
   }
-  return cozyFetchJSON(cozy, 'GET', `/auth/register/${cli.clientID}`, null,
-    {
-      manualAuthCredentials: {
-        token: cli
-      }
-    })
-    .then((data) => createClient(data, cli))
-    .catch((err) => {
+  return cozyFetchJSON(cozy, 'GET', `/auth/register/${cli.clientID}`, null, {
+    manualAuthCredentials: {
+      token: cli
+    }
+  })
+    .then(data => createClient(data, cli))
+    .catch(err => {
       // If we fall into an error while fetching the client (because of a
       // bad connectivity for instance), we do not bail the whole process
       // since the client should be able to continue with the persisted
@@ -181,16 +182,15 @@ export function getClient (cozy, clientParams) {
 
 // createClient returns a new Client instance given on object containing the
 // data of the client, from the API, and an old instance of the client.
-function createClient (data, oldClient) {
+function createClient(data, oldClient) {
   const newClient = new Client(data)
   // we need to keep track of the registrationAccessToken since it is send
   // only on registration. The GET /auth/register/:client-id endpoint does
   // not return this token.
-  const shouldPassRegistration = (
+  const shouldPassRegistration =
     !!oldClient &&
     oldClient.registrationAccessToken !== '' &&
     newClient.registrationAccessToken === ''
-  )
   if (shouldPassRegistration) {
     newClient.registrationAccessToken = oldClient.registrationAccessToken
   }
@@ -200,7 +200,7 @@ function createClient (data, oldClient) {
 // getAuthCodeURL returns a pair {authURL,state} given a registered client. The
 // state should be stored in order to be checked against on the user validation
 // phase.
-export function getAuthCodeURL (cozy, client, scopes = []) {
+export function getAuthCodeURL(cozy, client, scopes = []) {
   if (!(client instanceof Client)) {
     client = new Client(client)
   }
@@ -209,11 +209,11 @@ export function getAuthCodeURL (cozy, client, scopes = []) {
   }
   const state = generateRandomState()
   const query = {
-    'client_id': client.clientID,
-    'redirect_uri': client.redirectURI,
-    'state': state,
-    'response_type': 'code',
-    'scope': scopes.join(' ')
+    client_id: client.clientID,
+    redirect_uri: client.redirectURI,
+    state: state,
+    response_type: 'code',
+    scope: scopes.join(' ')
   }
   return {
     url: cozy._url + `/auth/authorize?${encodeQuery(query)}`,
@@ -228,7 +228,7 @@ export function getAuthCodeURL (cozy, client, scopes = []) {
 // This method extracts the access code and state from the given URL. By
 // default it uses window.location.href. Also, it checks the given state with
 // the one specified in the URL query parameter to prevent CSRF attacks.
-export function getAccessToken (cozy, client, state, pageURL = '') {
+export function getAccessToken(cozy, client, state, pageURL = '') {
   if (!state) {
     return Promise.reject(new Error('Missing state value'))
   }
@@ -237,143 +237,157 @@ export function getAccessToken (cozy, client, state, pageURL = '') {
     return Promise.reject(new Error('Missing states from current URL'))
   }
   if (state !== grantQueries.state) {
-    return Promise.reject(new Error('Given state does not match url query state'))
+    return Promise.reject(
+      new Error('Given state does not match url query state')
+    )
   }
   return retrieveToken(cozy, client, null, {
-    'grant_type': 'authorization_code',
-    'code': grantQueries.code
+    grant_type: 'authorization_code',
+    code: grantQueries.code
   })
 }
 
 // refreshToken perform a request on the access_token entrypoint with the
 // refresh_token grant type in order to refresh the given token.
-export function refreshToken (cozy, client, token) {
+export function refreshToken(cozy, client, token) {
   return retrieveToken(cozy, client, token, {
-    'grant_type': 'refresh_token',
-    'refresh_token': token.refreshToken
+    grant_type: 'refresh_token',
+    refresh_token: token.refreshToken
   })
 }
 
 // oauthFlow performs the stateful registration and access granting of an OAuth
 // client.
-export function oauthFlow (cozy, storage, clientParams, onRegistered, ignoreCachedCredentials = false) {
+export function oauthFlow(
+  cozy,
+  storage,
+  clientParams,
+  onRegistered,
+  ignoreCachedCredentials = false
+) {
   if (ignoreCachedCredentials) {
-    return storage.clear().then(() => oauthFlow(cozy, storage, clientParams, onRegistered, false))
+    return storage
+      .clear()
+      .then(() => oauthFlow(cozy, storage, clientParams, onRegistered, false))
   }
 
   let tryCount = 0
 
-  function clearAndRetry (err) {
+  function clearAndRetry(err) {
     if (tryCount++ > 0) {
       throw err
     }
-    return storage.clear().then(() =>
-      oauthFlow(cozy, storage, clientParams, onRegistered))
+    return storage
+      .clear()
+      .then(() => oauthFlow(cozy, storage, clientParams, onRegistered))
   }
 
-  function registerNewClient () {
-    return storage.clear()
+  function registerNewClient() {
+    return storage
+      .clear()
       .then(() => registerClient(cozy, clientParams))
-      .then((client) => {
-        const {url, state} = getAuthCodeURL(cozy, client, clientParams.scopes)
-        return storage.save(StateKey, {client, url, state})
+      .then(client => {
+        const { url, state } = getAuthCodeURL(cozy, client, clientParams.scopes)
+        return storage.save(StateKey, { client, url, state })
       })
   }
 
-  return Promise.all([
-    storage.load(CredsKey),
-    storage.load(StateKey)
-  ]).then(([credentials, storedState]) => {
-    // If credentials are cached we re-fetch the registered client with the
-    // said token. Fetching the client, if the token is outdated we should try
-    // the token is refreshed.
-    if (credentials) {
-      let oldClient, token
-      try {
-        oldClient = new Client(credentials.client)
-        token = new AccessToken(credentials.token)
-      } catch (err) {
-        // bad cache, we should clear and retry the process
-        return clearAndRetry(err)
+  return Promise.all([storage.load(CredsKey), storage.load(StateKey)])
+    .then(([credentials, storedState]) => {
+      // If credentials are cached we re-fetch the registered client with the
+      // said token. Fetching the client, if the token is outdated we should try
+      // the token is refreshed.
+      if (credentials) {
+        let oldClient, token
+        try {
+          oldClient = new Client(credentials.client)
+          token = new AccessToken(credentials.token)
+        } catch (err) {
+          // bad cache, we should clear and retry the process
+          return clearAndRetry(err)
+        }
+        return getClient(cozy, oldClient)
+          .then(client => ({ client, token }))
+          .catch(err => {
+            // If we fall into an error while fetching the client (because of a
+            // bad connectivity for instance), we do not bail the whole process
+            // since the client should be able to continue with the persisted
+            // client and token.
+            //
+            // If it is an explicit Unauthorized error though, we bail, clear th
+            // cache and retry.
+            if (FetchError.isUnauthorized(err) || FetchError.isNotFound(err)) {
+              throw new Error('Client has been revoked')
+            }
+            return { client: oldClient, token }
+          })
       }
-      return getClient(cozy, oldClient)
-        .then((client) => ({client, token}))
-        .catch((err) => {
-          // If we fall into an error while fetching the client (because of a
-          // bad connectivity for instance), we do not bail the whole process
-          // since the client should be able to continue with the persisted
-          // client and token.
-          //
-          // If it is an explicit Unauthorized error though, we bail, clear th
-          // cache and retry.
-          if (FetchError.isUnauthorized(err) || FetchError.isNotFound(err)) {
-            throw new Error('Client has been revoked')
-          }
-          return { client: oldClient, token }
-        })
-    }
 
-    // Otherwise register a new client if necessary (ie. no client is stored)
-    // and call the onRegistered callback to wait for the user to grant the
-    // access. Finally fetches to access token on success.
-    let statePromise
-    if (!storedState) {
-      statePromise = registerNewClient()
-    } else {
-      statePromise = Promise.resolve(storedState)
-    }
-
-    let client, state, token
-    return statePromise
-      .then((data) => {
-        client = data.client
-        state = data.state
-        return Promise.resolve(onRegistered(client, data.url))
-      })
-      .then((pageURL) => getAccessToken(cozy, client, state, pageURL))
-      .then((t) => { token = t })
-      .then(() => storage.delete(StateKey))
-      .then(() => ({client, token}))
-  })
-  .then(
-    (creds) => storage.save(CredsKey, creds),
-    (err) => {
-      if (FetchError.isUnauthorized(err)) {
-        return clearAndRetry(err)
+      // Otherwise register a new client if necessary (ie. no client is stored)
+      // and call the onRegistered callback to wait for the user to grant the
+      // access. Finally fetches to access token on success.
+      let statePromise
+      if (!storedState) {
+        statePromise = registerNewClient()
       } else {
-        throw err
+        statePromise = Promise.resolve(storedState)
       }
+
+      let client, state, token
+      return statePromise
+        .then(data => {
+          client = data.client
+          state = data.state
+          return Promise.resolve(onRegistered(client, data.url))
+        })
+        .then(pageURL => getAccessToken(cozy, client, state, pageURL))
+        .then(t => {
+          token = t
+        })
+        .then(() => storage.delete(StateKey))
+        .then(() => ({ client, token }))
     })
+    .then(
+      creds => storage.save(CredsKey, creds),
+      err => {
+        if (FetchError.isUnauthorized(err)) {
+          return clearAndRetry(err)
+        } else {
+          throw err
+        }
+      }
+    )
 }
 
 // retrieveToken perform a request on the access_token entrypoint in order to
 // fetch a token.
-function retrieveToken (cozy, client, token, query) {
+function retrieveToken(cozy, client, token, query) {
   if (!(client instanceof Client)) {
     client = new Client(client)
   }
   if (!client.isRegistered()) {
     return Promise.reject(new Error('Client not registered'))
   }
-  const body = encodeQuery(Object.assign({}, query, {
-    'client_id': client.clientID,
-    'client_secret': client.clientSecret
-  }))
+  const body = encodeQuery(
+    Object.assign({}, query, {
+      client_id: client.clientID,
+      client_secret: client.clientSecret
+    })
+  )
   return cozyFetchJSON(cozy, 'POST', '/auth/access_token', body, {
-    disableAuth: (token === null),
+    disableAuth: token === null,
     dontRetry: true,
     manualAuthCredentials: { client, token },
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  }).then(data => {
+    data.refreshToken = data.refreshToken || query.refresh_token
+    return new AccessToken(data)
   })
-    .then((data) => {
-      data.refreshToken = data.refreshToken || query.refresh_token
-      return new AccessToken(data)
-    })
 }
 
 // getGrantCodeFromPageURL extract the state and access_code query parameters
 // from the given url
-function getGrantCodeFromPageURL (pageURL = '') {
+function getGrantCodeFromPageURL(pageURL = '') {
   if (pageURL === '' && typeof window !== 'undefined') {
     pageURL = window.location.href
   }
@@ -390,22 +404,26 @@ function getGrantCodeFromPageURL (pageURL = '') {
 // generateRandomState will try to generate a 128bits random value from a secure
 // pseudo random generator. It will fallback on Math.random if it cannot find
 // such generator.
-function generateRandomState () {
+function generateRandomState() {
   let buffer
-  if (typeof window !== 'undefined' &&
-      typeof window.crypto !== 'undefined' &&
-      typeof window.crypto.getRandomValues === 'function') {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.crypto !== 'undefined' &&
+    typeof window.crypto.getRandomValues === 'function'
+  ) {
     buffer = new Uint8Array(StateSize)
     window.crypto.getRandomValues(buffer)
   } else {
     try {
       buffer = require('crypto').randomBytes(StateSize)
-    } catch (e) {}
+    } catch (e) {
+      buffer = null
+    }
   }
   if (!buffer) {
     buffer = new Array(StateSize)
     for (let i = 0; i < buffer.length; i++) {
-      buffer[i] = Math.floor((Math.random() * 255))
+      buffer[i] = Math.floor(Math.random() * 255)
     }
   }
   return btoa(String.fromCharCode.apply(null, buffer))
