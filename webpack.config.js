@@ -40,11 +40,6 @@ var config = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /(node_modules|bower_components)/
-      },
-      {
-        test: /\.js$/,
-        loader: 'standard-loader',
-        exclude: /node_modules|.tmp\/mocha-webpack/
       }
     ]
   },

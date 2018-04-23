@@ -47,7 +47,7 @@ cozy-client-js is written in ES7 and built using webpack and babel, you can run 
 
 ### Lint
 
-cozy-client-js is linted using [standard](http://standardjs.com/). Lint will run when building `cozy-client-js` but you can also run it manually with `npm run lint`.
+cozy-client-js is linted using [ESLint](https://eslint.org) and [config-eslint-cozy-app](https://www.npmjs.com/package/eslint-config-cozy-app). Lint will run when building `cozy-client-js` but you can also run it manually with `npm run lint`.
 
 ### Test
 
