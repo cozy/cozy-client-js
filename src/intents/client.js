@@ -2,8 +2,32 @@ import { errorSerializer, pickService } from './helpers'
 
 const intentClass = 'coz-intent'
 
+function buildIntentIframe(element, url) {
+  const document = element.ownerDocument
+  if (!document)
+    return Promise.reject(
+      new Error('Cannot retrieve document object from given element')
+    )
+
+  const iframe = document.createElement('iframe')
+  // TODO: implement 'title' attribute
+  iframe.setAttribute('src', url)
+  iframe.classList.add(intentClass)
+  return iframe
+}
+
+function injectIntentIframe(element, url, options) {
+  const { onReadyCallback } = options
+  const iframe = buildIntentIframe(element, url, options.onReadyCallback)
+  // if callback provided for when iframe is loaded
+  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback
+  element.appendChild(iframe)
+  iframe.focus()
+  return iframe
+}
+
 // inject iframe for service in given element
-function injectService(url, element, intent, data, onReadyCallback) {
+function connectIntentIframe(iframe, element, intent, data) {
   const document = element.ownerDocument
   if (!document)
     return Promise.reject(
@@ -16,17 +40,8 @@ function injectService(url, element, intent, data, onReadyCallback) {
       new Error('Cannot retrieve window object from document')
     )
 
-  const iframe = document.createElement('iframe')
-  // if callback provided for when iframe is loaded
-  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback
-  // TODO: implement 'title' attribute
-  iframe.setAttribute('src', url)
-  iframe.classList.add(intentClass)
-  element.appendChild(iframe)
-  iframe.focus()
-
   // Keeps only http://domain:port/
-  const serviceOrigin = url.split('/', 3).join('/')
+  const serviceOrigin = iframe.src.split('/', 3).join('/')
 
   return new Promise((resolve, reject) => {
     let handshaken = false
@@ -109,11 +124,13 @@ export function start(intent, element, data = {}, options = {}) {
   const service = pickService(intent, options.filterServices)
 
   if (!service) {
-    return Promise.reject(new Error('Unable to find a service'))
+    throw new Error('Unable to find a service')
   }
 
-  return injectService(
-    service.href,
+  const iframe = injectIntentIframe(element, service.href, options)
+
+  return connectIntentIframe(
+    iframe,
     element,
     intent,
     data,

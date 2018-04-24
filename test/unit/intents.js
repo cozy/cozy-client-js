@@ -6,6 +6,8 @@ import sinon from 'sinon'
 import { Client } from '../../src'
 import mock from '../mock-api'
 
+const serviceMockHref = 'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+
 function mockElement() {
   const windowMock = {
     postMessage: sinon.spy(),
@@ -14,6 +16,7 @@ function mockElement() {
   }
   const iframeMock = {
     setAttribute: sinon.spy(),
+    src: serviceMockHref,
     parentNode: {
       removeChild: sinon.stub().returns(iframeMock)
     },
@@ -55,8 +58,7 @@ describe('Intents', function() {
       services: [
         {
           slug: 'files',
-          href:
-            'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+          href: serviceMockHref
         }
       ]
     },
