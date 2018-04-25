@@ -2,7 +2,7 @@ import { errorSerializer, pickService } from './helpers'
 
 const intentClass = 'coz-intent'
 
-function buildIntentIframe(element, url) {
+function buildIntentIframe(intent, element, url) {
   const document = element.ownerDocument
   if (!document)
     return Promise.reject(
@@ -11,14 +11,20 @@ function buildIntentIframe(element, url) {
 
   const iframe = document.createElement('iframe')
   // TODO: implement 'title' attribute
+  iframe.setAttribute('id', `intent-${intent._id}`)
   iframe.setAttribute('src', url)
   iframe.classList.add(intentClass)
   return iframe
 }
 
-function injectIntentIframe(element, url, options) {
+function injectIntentIframe(intent, element, url, options) {
   const { onReadyCallback } = options
-  const iframe = buildIntentIframe(element, url, options.onReadyCallback)
+  const iframe = buildIntentIframe(
+    intent,
+    element,
+    url,
+    options.onReadyCallback
+  )
   // if callback provided for when iframe is loaded
   if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback
   element.appendChild(iframe)
@@ -127,7 +133,7 @@ export function start(intent, element, data = {}, options = {}) {
     throw new Error('Unable to find a service')
   }
 
-  const iframe = injectIntentIframe(element, service.href, options)
+  const iframe = injectIntentIframe(intent, element, service.href, options)
 
   return connectIntentIframe(
     iframe,
