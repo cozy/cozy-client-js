@@ -1,9 +1,9 @@
-import {warn, createPath, sleep} from './utils'
-import {normalizeDoctype} from './doctypes'
-import {cozyFetchJSON, cozyFetchRawJSON} from './fetch'
+import { warn, createPath, sleep } from './utils'
+import { normalizeDoctype } from './doctypes'
+import { cozyFetchJSON, cozyFetchRawJSON } from './fetch'
 
-export function defineIndex (cozy, doctype, fields) {
-  return cozy.isV2().then((isV2) => {
+export function defineIndex(cozy, doctype, fields) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
     if (!Array.isArray(fields) || fields.length === 0) {
       throw new Error('defineIndex fields should be a non-empty array')
@@ -16,8 +16,8 @@ export function defineIndex (cozy, doctype, fields) {
   })
 }
 
-export function query (cozy, indexRef, options) {
-  return cozy.isV2().then((isV2) => {
+export function query(cozy, indexRef, options) {
+  return cozy.isV2().then(isV2 => {
     if (!indexRef) {
       throw new Error('query should be passed the indexRef')
     }
@@ -29,10 +29,11 @@ export function query (cozy, indexRef, options) {
   })
 }
 
-export function queryFiles (cozy, indexRef, options) {
+export function queryFiles(cozy, indexRef, options) {
   const opts = getV3Options(indexRef, options)
-  return cozyFetchRawJSON(cozy, 'POST', '/files/_find', opts)
-    .then((response) => options.wholeResponse ? response : response.docs)
+  return cozyFetchRawJSON(cozy, 'POST', '/files/_find', opts).then(
+    response => (options.wholeResponse ? response : response.docs)
+  )
 }
 
 // Internals
@@ -41,58 +42,75 @@ const VALUEOPERATORS = ['$eq', '$gt', '$gte', '$lt', '$lte']
 const LOGICOPERATORS = ['$or', '$and', '$not']
 
 /* eslint-disable */
-const MAP_TEMPLATE = (function (doc) {
-  if (doc.docType.toLowerCase() === 'DOCTYPEPLACEHOLDER'){
+const MAP_TEMPLATE = function(doc) {
+  if (doc.docType.toLowerCase() === 'DOCTYPEPLACEHOLDER') {
     emit(FIELDSPLACEHOLDER, doc)
   }
-}).toString().replace(/ /g, '').replace(/\n/g, '')
-const COUCHDB_INFINITY = {"\uFFFF": "\uFFFF"}
+}
+  .toString()
+  .replace(/ /g, '')
+  .replace(/\n/g, '')
+const COUCHDB_INFINITY = { '\uFFFF': '\uFFFF' }
 const COUCHDB_LOWEST = null
 /* eslint-enable */
 
 // defineIndexV2 is equivalent to defineIndex but only works for V2.
 // It transforms the index fields into a map reduce view.
-function defineIndexV2 (cozy, doctype, fields) {
+function defineIndexV2(cozy, doctype, fields) {
   let indexName = 'by' + fields.map(capitalize).join('')
-  let indexDefinition = { map: makeMapFunction(doctype, fields), reduce: '_count' }
+  let indexDefinition = {
+    map: makeMapFunction(doctype, fields),
+    reduce: '_count'
+  }
   let path = `/request/${doctype}/${indexName}/`
-  return cozyFetchJSON(cozy, 'PUT', path, indexDefinition)
-    .then(() => ({ doctype: doctype, type: 'mapreduce', name: indexName, fields: fields }))
+  return cozyFetchJSON(cozy, 'PUT', path, indexDefinition).then(() => ({
+    doctype: doctype,
+    type: 'mapreduce',
+    name: indexName,
+    fields: fields
+  }))
 }
 
-function defineIndexV3 (cozy, doctype, fields) {
+function defineIndexV3(cozy, doctype, fields) {
   let path = createPath(cozy, false, doctype, '_index')
-  let indexDefinition = {'index': {fields}}
-  return cozyFetchJSON(cozy, 'POST', path, indexDefinition)
-    .then((response) => {
-      const indexResult = { doctype: doctype, type: 'mango', name: response.id, fields }
+  let indexDefinition = { index: { fields } }
+  return cozyFetchJSON(cozy, 'POST', path, indexDefinition).then(response => {
+    const indexResult = {
+      doctype: doctype,
+      type: 'mango',
+      name: response.id,
+      fields
+    }
 
-      if (response.result === 'exists') return indexResult
+    if (response.result === 'exists') return indexResult
 
-      // indexes might not be usable right after being created; so we delay the resolving until they are
-      const selector = {}
-      selector[fields[0]] = {'$gt': null}
+    // indexes might not be usable right after being created; so we delay the resolving until they are
+    const selector = {}
+    selector[fields[0]] = { $gt: null }
 
-      const opts = getV3Options(indexResult, {'selector': selector})
-      let path = createPath(cozy, false, indexResult.doctype, '_find')
-      return cozyFetchJSON(cozy, 'POST', path, opts)
+    const opts = getV3Options(indexResult, { selector: selector })
+    let path = createPath(cozy, false, indexResult.doctype, '_find')
+    return cozyFetchJSON(cozy, 'POST', path, opts)
       .then(() => indexResult)
-      .catch(() => { // one retry
+      .catch(() => {
+        // one retry
         return sleep(1000)
-        .then(() => cozyFetchJSON(cozy, 'POST', path, opts))
-        .then(() => indexResult)
-        .catch(() => {
-          return sleep(500).then(() => indexResult)
-        })
+          .then(() => cozyFetchJSON(cozy, 'POST', path, opts))
+          .then(() => indexResult)
+          .catch(() => {
+            return sleep(500).then(() => indexResult)
+          })
       })
-    })
+  })
 }
 
 // queryV2 is equivalent to query but only works for V2.
 // It transforms the query into a _views call using makeMapReduceQuery
-function queryV2 (cozy, indexRef, options) {
+function queryV2(cozy, indexRef, options) {
   if (indexRef.type !== 'mapreduce') {
-    throw new Error('query indexRef should be the return value of defineIndexV2')
+    throw new Error(
+      'query indexRef should be the return value of defineIndexV2'
+    )
   }
   if (options.fields) {
     warn('query fields will be ignored on v2')
@@ -100,20 +118,22 @@ function queryV2 (cozy, indexRef, options) {
 
   let path = `/request/${indexRef.doctype}/${indexRef.name}/`
   let opts = makeMapReduceQuery(indexRef, options)
-  return cozyFetchJSON(cozy, 'POST', path, opts)
-    .then((response) => response.map(r => r.value))
+  return cozyFetchJSON(cozy, 'POST', path, opts).then(response =>
+    response.map(r => r.value)
+  )
 }
 
 // queryV3 is equivalent to query but only works for V3
-function queryV3 (cozy, indexRef, options) {
+function queryV3(cozy, indexRef, options) {
   const opts = getV3Options(indexRef, options)
 
   let path = createPath(cozy, false, indexRef.doctype, '_find')
-  return cozyFetchJSON(cozy, 'POST', path, opts)
-    .then((response) => options.wholeResponse ? response : response.docs)
+  return cozyFetchJSON(cozy, 'POST', path, opts).then(
+    response => (options.wholeResponse ? response : response.docs)
+  )
 }
 
-function getV3Options (indexRef, options) {
+function getV3Options(indexRef, options) {
   if (indexRef.type !== 'mango') {
     throw new Error('indexRef should be the return value of defineIndexV3')
   }
@@ -136,15 +156,17 @@ function getV3Options (indexRef, options) {
 }
 
 // misc
-function capitalize (name) {
+function capitalize(name) {
   return name.charAt(0).toUpperCase() + name.slice(1)
 }
 
-function makeMapFunction (doctype, fields) {
+function makeMapFunction(doctype, fields) {
   fields = '[' + fields.map(name => 'doc.' + name).join(',') + ']'
 
-  return MAP_TEMPLATE.replace('DOCTYPEPLACEHOLDER', doctype.toLowerCase())
-                     .replace('FIELDSPLACEHOLDER', fields)
+  return MAP_TEMPLATE.replace(
+    'DOCTYPEPLACEHOLDER',
+    doctype.toLowerCase()
+  ).replace('FIELDSPLACEHOLDER', fields)
 }
 
 // parseSelector takes a mango selector and returns it as an array of filter
@@ -154,8 +176,8 @@ function makeMapFunction (doctype, fields) {
 // Example :
 // parseSelector({"test":{"deep": {"$gt": 3}}})
 // [[['test', 'deep'], '$gt', 3 ]]
-export function parseSelector (selector, path = [], operator = '$eq') {
-  if ((typeof selector) !== 'object') {
+export function parseSelector(selector, path = [], operator = '$eq') {
+  if (typeof selector !== 'object') {
     return [[path, operator, selector]]
   }
 
@@ -163,7 +185,7 @@ export function parseSelector (selector, path = [], operator = '$eq') {
   if (keys.length === 0) {
     throw new Error('empty selector')
   } else {
-    return keys.reduce(function (acc, k) {
+    return keys.reduce(function(acc, k) {
       if (LOGICOPERATORS.indexOf(k) !== -1) {
         throw new Error('cozy-client-js does not support mango logic ops')
       } else if (VALUEOPERATORS.indexOf(k) !== -1) {
@@ -181,9 +203,9 @@ export function parseSelector (selector, path = [], operator = '$eq') {
 // Example :
 // parseSelector({"test":{"deep": {"$gt": 3}}})
 // {"test.deep": {"$gt": 3}}
-export function normalizeSelector (selector) {
+export function normalizeSelector(selector) {
   var filters = parseSelector(selector)
-  return filters.reduce(function (acc, filter) {
+  return filters.reduce(function(acc, filter) {
     let [path, op, value] = filter
     let field = path.join('.')
     acc[field] = acc[field] || {}
@@ -194,7 +216,7 @@ export function normalizeSelector (selector) {
 
 // applySelector takes the normalized selector for the current field
 // and append the proper values to opts.startkey, opts.endkey
-function applySelector (selector, opts) {
+function applySelector(selector, opts) {
   let value = selector['$eq']
   let lower = COUCHDB_LOWEST
   let upper = COUCHDB_INFINITY
@@ -236,7 +258,7 @@ function applySelector (selector, opts) {
 
 // makeMapReduceQuery takes a mango query and generate _views call parameters
 // to obtain same results depending on fields in the passed indexRef.
-export function makeMapReduceQuery (indexRef, query) {
+export function makeMapReduceQuery(indexRef, query) {
   let mrquery = {
     startkey: [],
     endkey: [],
@@ -245,11 +267,17 @@ export function makeMapReduceQuery (indexRef, query) {
   let firstFreeValueField = null
   let normalizedSelector = normalizeSelector(query.selector)
 
-  indexRef.fields.forEach(function (field) {
+  indexRef.fields.forEach(function(field) {
     let selector = normalizedSelector[field]
 
     if (selector && firstFreeValueField != null) {
-      throw new Error('Selector on field ' + field + ', but not on ' + firstFreeValueField + ' which is higher in index fields.')
+      throw new Error(
+        'Selector on field ' +
+          field +
+          ', but not on ' +
+          firstFreeValueField +
+          ' which is higher in index fields.'
+      )
     } else if (selector) {
       selector.used = true
       let isFreeValue = applySelector(selector, mrquery)
@@ -260,9 +288,11 @@ export function makeMapReduceQuery (indexRef, query) {
     }
   })
 
-  Object.keys(normalizedSelector).forEach(function (field) {
+  Object.keys(normalizedSelector).forEach(function(field) {
     if (!normalizedSelector[field].used) {
-      throw new Error('Cant apply selector on ' + field + ', it is not in index')
+      throw new Error(
+        'Cant apply selector on ' + field + ', it is not in index'
+      )
     }
   })
 

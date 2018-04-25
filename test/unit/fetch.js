@@ -3,22 +3,28 @@
 import should from 'should'
 import { FetchError } from '../../src/fetch'
 
-describe('FetchError', function () {
-  const response = {url: 'whatever'}
+describe('FetchError', function() {
+  const response = { url: 'whatever' }
   let error, reason
 
-  beforeEach(() => { error = new FetchError(response, reason) })
+  beforeEach(() => {
+    error = new FetchError(response, reason)
+  })
 
   context('when reason is a proper error with message', () => {
-    before(() => { reason = new Error('some error') })
+    before(() => {
+      reason = new Error('some error')
+    })
 
-    it('has the same message', async function () {
+    it('has the same message', async function() {
       should(error.toString()).equal(`FetchError: ${reason.message}`)
     })
   })
 
   context('when reason is a String (e.g. a text error response)', () => {
-    before(() => { reason = 'some error string' })
+    before(() => {
+      reason = 'some error string'
+    })
 
     it('has the String as an error message', () => {
       should(error.toString()).equal(`FetchError: some error string`)
@@ -26,10 +32,14 @@ describe('FetchError', function () {
   })
 
   context('when reason is an object (e.g. a JSON error response)', () => {
-    before(() => { reason = {error: 'not_found', status: 404} })
+    before(() => {
+      reason = { error: 'not_found', status: 404 }
+    })
 
     it('has the string representation of the object as an error message', () => {
-      should(error.toString()).equal('FetchError: {"error":"not_found","status":404}')
+      should(error.toString()).equal(
+        'FetchError: {"error":"not_found","status":404}'
+      )
     })
   })
 })

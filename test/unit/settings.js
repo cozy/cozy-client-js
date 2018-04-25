@@ -2,10 +2,10 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import {Client} from '../../src'
+import { Client } from '../../src'
 import mock from '../mock-api'
 
-describe('settings', function () {
+describe('settings', function() {
   const cozy = {}
 
   beforeEach(() => {
@@ -16,10 +16,10 @@ describe('settings', function () {
   })
   afterEach(() => mock.restore())
 
-  describe('Disk usage', function () {
+  describe('Disk usage', function() {
     before(mock.mockAPI('DiskUsage'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       const usage = await cozy.client.settings.diskUsage()
       usage._id.should.equal('io.cozy.settings.disk-usage')
       usage._type.should.equal('io.cozy.settings')
@@ -27,18 +27,18 @@ describe('settings', function () {
     })
   })
 
-  describe('Changing the passphrase', function () {
+  describe('Changing the passphrase', function() {
     before(mock.mockAPI('Passphrase'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       await cozy.client.settings.changePassphrase('current', 'new')
     })
   })
 
-  describe('Get instance', function () {
+  describe('Get instance', function() {
     before(mock.mockAPI('GetInstance'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       const instance = await cozy.client.settings.getInstance()
       instance._id.should.equal('io.cozy.settings.instance')
       instance._type.should.equal('io.cozy.settings')
@@ -48,11 +48,11 @@ describe('settings', function () {
     })
   })
 
-  describe('Update instance', function () {
+  describe('Update instance', function() {
     before(mock.mockAPI('GetInstance'))
     before(mock.mockAPI('UpdateInstance'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       const newLocale = 'en'
       let oldInstance = await cozy.client.settings.getInstance()
       oldInstance.attributes.locale = newLocale
@@ -65,10 +65,10 @@ describe('settings', function () {
     })
   })
 
-  describe('Get clients', function () {
+  describe('Get clients', function() {
     before(mock.mockAPI('GetClients'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       const clients = await cozy.client.settings.getClients()
       clients.should.be.instanceOf(Array)
       clients.should.have.a.lengthOf(1)
@@ -88,18 +88,18 @@ describe('settings', function () {
     })
   })
 
-  describe('Delete a client by id', function () {
+  describe('Delete a client by id', function() {
     before(mock.mockAPI('DeleteClient'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       await cozy.client.settings.deleteClientById('123')
     })
   })
 
-  describe('call the synchronisation route', function () {
+  describe('call the synchronisation route', function() {
     before(mock.mockAPI('SyncedClient'))
 
-    it('should work', async function () {
+    it('should work', async function() {
       await cozy.client.settings.updateLastSync()
     })
   })

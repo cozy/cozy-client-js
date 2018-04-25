@@ -1,11 +1,11 @@
-import {createPath} from './utils'
-import {normalizeDoctype} from './doctypes'
-import {cozyFetchJSON} from './fetch'
+import { createPath } from './utils'
+import { normalizeDoctype } from './doctypes'
+import { cozyFetchJSON } from './fetch'
 
 const NOREV = 'stack-v2-no-rev'
 
-export function create (cozy, doctype, attributes) {
-  return cozy.isV2().then((isV2) => {
+export function create(cozy, doctype, attributes) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
     if (isV2) {
       attributes.docType = doctype
@@ -13,7 +13,7 @@ export function create (cozy, doctype, attributes) {
     const path = createPath(cozy, isV2, doctype, attributes._id)
     const httpVerb = attributes._id ? 'PUT' : 'POST'
     delete attributes._id
-    return cozyFetchJSON(cozy, httpVerb, path, attributes).then((resp) => {
+    return cozyFetchJSON(cozy, httpVerb, path, attributes).then(resp => {
       if (isV2) {
         return find(cozy, doctype, resp._id)
       } else {
@@ -23,8 +23,8 @@ export function create (cozy, doctype, attributes) {
   })
 }
 
-export function find (cozy, doctype, id) {
-  return cozy.isV2().then((isV2) => {
+export function find(cozy, doctype, id) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
 
     if (!id) {
@@ -32,9 +32,9 @@ export function find (cozy, doctype, id) {
     }
 
     const path = createPath(cozy, isV2, doctype, id)
-    return cozyFetchJSON(cozy, 'GET', path).then((resp) => {
+    return cozyFetchJSON(cozy, 'GET', path).then(resp => {
       if (isV2) {
-        return Object.assign(resp, {_rev: NOREV})
+        return Object.assign(resp, { _rev: NOREV })
       } else {
         return resp
       }
@@ -42,7 +42,7 @@ export function find (cozy, doctype, id) {
   })
 }
 
-export function findMany (cozy, doctype, ids) {
+export function findMany(cozy, doctype, ids) {
   if (!(ids instanceof Array)) {
     return Promise.reject(new Error('Parameter ids must be a non-empty array'))
   }
@@ -53,25 +53,27 @@ export function findMany (cozy, doctype, ids) {
     return Promise.resolve({})
   }
 
-  return cozy.isV2().then((isV2) => {
+  return cozy.isV2().then(isV2 => {
     if (isV2) {
       return Promise.reject(new Error('findMany is not available on v2'))
     }
 
-    const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
+    const path = createPath(cozy, isV2, doctype, '_all_docs', {
+      include_docs: true
+    })
 
-    return cozyFetchJSON(cozy, 'POST', path, {keys: ids})
-      .then((resp) => {
+    return cozyFetchJSON(cozy, 'POST', path, { keys: ids })
+      .then(resp => {
         const docs = {}
 
         for (const row of resp.rows) {
-          const {key, doc, error} = row
-          docs[key] = error ? {error} : {doc}
+          const { key, doc, error } = row
+          docs[key] = error ? { error } : { doc }
         }
 
         return docs
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.status !== 404) return Promise.reject(error)
 
         // When no doc was ever created and the database does not exist yet,
@@ -79,7 +81,7 @@ export function findMany (cozy, doctype, ids) {
         const docs = {}
 
         for (const id of ids) {
-          docs[id] = {error}
+          docs[id] = { error }
         }
 
         return docs
@@ -87,46 +89,48 @@ export function findMany (cozy, doctype, ids) {
   })
 }
 
-export function findAll (cozy, doctype) {
-  return cozy.isV2().then((isV2) => {
+export function findAll(cozy, doctype) {
+  return cozy.isV2().then(isV2 => {
     if (isV2) {
       return Promise.reject(new Error('findAll is not available on v2'))
     }
 
-    const path = createPath(cozy, isV2, doctype, '_all_docs', {include_docs: true})
+    const path = createPath(cozy, isV2, doctype, '_all_docs', {
+      include_docs: true
+    })
 
     return cozyFetchJSON(cozy, 'POST', path, {})
-    .then((resp) => {
-      const docs = []
+      .then(resp => {
+        const docs = []
 
-      for (const row of resp.rows) {
-        const { doc } = row
-        // if not couchDB indexes
-        if (!doc._id.match(/_design\//)) docs.push(doc)
-      }
-      return docs
-    })
-    .catch(error => {
-      // the _all_docs endpoint returns a 404 error if no document with the given
-      // doctype exists.
-      if (error.status === 404) return []
-      throw error
-    })
+        for (const row of resp.rows) {
+          const { doc } = row
+          // if not couchDB indexes
+          if (!doc._id.match(/_design\//)) docs.push(doc)
+        }
+        return docs
+      })
+      .catch(error => {
+        // the _all_docs endpoint returns a 404 error if no document with the given
+        // doctype exists.
+        if (error.status === 404) return []
+        throw error
+      })
   })
 }
 
-export function changesFeed (cozy, doctype, options) {
-  return cozy.isV2().then((isV2) => {
+export function changesFeed(cozy, doctype, options) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
     const path = createPath(cozy, isV2, doctype, '_changes', options)
     return cozyFetchJSON(cozy, 'GET', path)
   })
 }
 
-export function update (cozy, doctype, doc, changes) {
-  return cozy.isV2().then((isV2) => {
+export function update(cozy, doctype, doc, changes) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
-    const {_id, _rev} = doc
+    const { _id, _rev } = doc
 
     if (!_id) {
       return Promise.reject(new Error('Missing _id field in passed document'))
@@ -143,7 +147,7 @@ export function update (cozy, doctype, doc, changes) {
     }
 
     const path = createPath(cozy, isV2, doctype, _id)
-    return cozyFetchJSON(cozy, 'PUT', path, changes).then((resp) => {
+    return cozyFetchJSON(cozy, 'PUT', path, changes).then(resp => {
       if (isV2) {
         return find(cozy, doctype, _id)
       } else {
@@ -153,14 +157,14 @@ export function update (cozy, doctype, doc, changes) {
   })
 }
 
-export function updateAttributes (cozy, doctype, _id, changes, tries = 3) {
-  return cozy.isV2().then((isV2) => {
+export function updateAttributes(cozy, doctype, _id, changes, tries = 3) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
     return find(cozy, doctype, _id)
-      .then((doc) => {
+      .then(doc => {
         return update(cozy, doctype, doc, Object.assign({ _id }, doc, changes))
       })
-      .catch((err) => {
+      .catch(err => {
         if (tries > 0) {
           return updateAttributes(cozy, doctype, _id, changes, tries - 1)
         } else {
@@ -170,10 +174,10 @@ export function updateAttributes (cozy, doctype, _id, changes, tries = 3) {
   })
 }
 
-export function _delete (cozy, doctype, doc) {
-  return cozy.isV2().then((isV2) => {
+export function _delete(cozy, doctype, doc) {
+  return cozy.isV2().then(isV2 => {
     doctype = normalizeDoctype(cozy, isV2, doctype)
-    const {_id, _rev} = doc
+    const { _id, _rev } = doc
 
     if (!_id) {
       return Promise.reject(new Error('Missing _id field in passed document'))
@@ -185,9 +189,9 @@ export function _delete (cozy, doctype, doc) {
 
     const query = isV2 ? null : { rev: _rev }
     const path = createPath(cozy, isV2, doctype, _id, query)
-    return cozyFetchJSON(cozy, 'DELETE', path).then((resp) => {
+    return cozyFetchJSON(cozy, 'DELETE', path).then(resp => {
       if (isV2) {
-        return {id: _id, rev: NOREV}
+        return { id: _id, rev: NOREV }
       } else {
         return resp
       }

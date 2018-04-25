@@ -1,8 +1,8 @@
 /* global fetch URL */
 import 'core-js/modules/es6.object.assign'
-import {unpromiser, retry, warn} from './utils'
-import {LocalStorage, MemoryStorage} from './auth_storage'
-import {AppToken as AppTokenV2, getAppToken as getAppTokenV2} from './auth_v2'
+import { unpromiser, retry, warn } from './utils'
+import { LocalStorage, MemoryStorage } from './auth_storage'
+import { AppToken as AppTokenV2, getAppToken as getAppTokenV2 } from './auth_v2'
 import * as auth from './auth_v3'
 import * as data from './data'
 import * as cozyFetch from './fetch'
@@ -44,7 +44,7 @@ const dataProto = {
   removeReferencedFiles: relations.removeReferencedFiles,
   listReferencedFiles: relations.listReferencedFiles,
   fetchReferencedFiles: relations.fetchReferencedFiles,
-  destroy: function (...args) {
+  destroy: function(...args) {
     warn('destroy is deprecated, use cozy.data.delete instead.')
     return data._delete(...args)
   }
@@ -76,8 +76,10 @@ const filesProto = {
   getDownloadLinkById: files.getDownloadLinkById,
   getDownloadLink: files.getDownloadLinkByPath, // DEPRECATED, should be removed very soon
   getDownloadLinkByPath: files.getDownloadLinkByPath,
-  getArchiveLink: function (...args) {
-    warn('getArchiveLink is deprecated, use cozy.files.getArchiveLinkByPaths instead.')
+  getArchiveLink: function(...args) {
+    warn(
+      'getArchiveLink is deprecated, use cozy.files.getArchiveLinkByPaths instead.'
+    )
     return files.getArchiveLinkByPaths(...args)
   },
   getArchiveLinkByPaths: files.getArchiveLinkByPaths,
@@ -148,7 +150,7 @@ const ensureHasReconnectParam = _url => {
 }
 
 class Client {
-  constructor (options) {
+  constructor(options) {
     this.data = {}
     this.files = {}
     this.intents = {}
@@ -169,10 +171,10 @@ class Client {
     }
   }
 
-  init (options = {}) {
+  init(options = {}) {
     this._inited = true
     this._oauth = false // is oauth activated or not
-    this._token = null  // application token
+    this._token = null // application token
     this._authstate = AuthNone
     this._authcreds = null
     this._storage = null
@@ -182,7 +184,9 @@ class Client {
     const token = options.token
     const oauth = options.oauth
     if (token && oauth) {
-      throw new Error('Cannot specify an application token with a oauth activated')
+      throw new Error(
+        'Cannot specify an application token with a oauth activated'
+      )
     }
 
     if (token) {
@@ -190,7 +194,11 @@ class Client {
     } else if (oauth) {
       this._oauth = true
       this._storage = oauth.storage
-      this._clientParams = Object.assign({}, defaultClientParams, oauth.clientParams)
+      this._clientParams = Object.assign(
+        {},
+        defaultClientParams,
+        oauth.clientParams
+      )
       this._onRegistered = oauth.onRegistered || nopOnRegistered
     }
 
@@ -201,7 +209,10 @@ class Client {
 
     this._url = url
 
-    this._invalidTokenErrorHandler = options.onInvalidTokenError !== undefined ? options.onInvalidTokenError : cozyFetch.handleInvalidTokenError
+    this._invalidTokenErrorHandler =
+      options.onInvalidTokenError !== undefined
+        ? options.onInvalidTokenError
+        : cozyFetch.handleInvalidTokenError
 
     const disablePromises = !!options.disablePromises
     addToProto(this, this.data, dataProto, disablePromises)
@@ -217,26 +228,28 @@ class Client {
     }
 
     // Exposing cozyFetchJSON to make some development easier. Should be temporary.
-    this.fetchJSON = function _fetchJSON () {
+    this.fetchJSON = function _fetchJSON() {
       const args = [this].concat(Array.prototype.slice.call(arguments))
       return cozyFetch.cozyFetchJSON.apply(this, args)
     }
   }
 
-  authorize (forceTokenRefresh = false) {
+  authorize(forceTokenRefresh = false) {
     const state = this._authstate
     if (state === AuthOK || state === AuthRunning) {
       return this._authcreds
     }
 
     this._authstate = AuthRunning
-    this._authcreds = this.isV2().then((isV2) => {
+    this._authcreds = this.isV2().then(isV2 => {
       if (isV2 && this._oauth) {
         throw new Error('OAuth is not supported on the V2 stack')
       }
       if (this._oauth) {
         if (forceTokenRefresh && this._clientParams.redirectURI) {
-          this._clientParams.redirectURI = ensureHasReconnectParam(this._clientParams.redirectURI)
+          this._clientParams.redirectURI = ensureHasReconnectParam(
+            this._clientParams.redirectURI
+          )
         }
         return auth.oauthFlow(
           this,
@@ -251,21 +264,26 @@ class Client {
       if (isV2) {
         return getAppTokenV2()
       } else if (this._token) {
-        return Promise.resolve({client: null, token: this._token})
+        return Promise.resolve({ client: null, token: this._token })
       } else {
         throw new Error('Missing application token')
       }
     })
 
     this._authcreds.then(
-      () => { this._authstate = AuthOK },
-      () => { this._authstate = AuthError })
+      () => {
+        this._authstate = AuthOK
+      },
+      () => {
+        this._authstate = AuthError
+      }
+    )
 
     return this._authcreds
   }
 
-  saveCredentials (client, token) {
-    const creds = {client, token}
+  saveCredentials(client, token) {
+    const creds = { client, token }
     if (!this._storage || this._authstate === AuthRunning) {
       return Promise.resolve(creds)
     }
@@ -274,24 +292,24 @@ class Client {
     return this._authcreds
   }
 
-  fullpath (path) {
-    return this.isV2().then((isV2) => {
+  fullpath(path) {
+    return this.isV2().then(isV2 => {
       const pathprefix = isV2 ? '/ds-api' : ''
       return this._url + pathprefix + path
     })
   }
 
-  isV2 () {
+  isV2() {
     if (!this._version) {
       return retry(() => fetch(`${this._url}/status/`), 3)()
-        .then((res) => {
+        .then(res => {
           if (!res.ok) {
             throw new Error('Could not fetch cozy status')
           } else {
             return res.json()
           }
         })
-        .then((status) => {
+        .then(status => {
           this._version = status.datasystem !== undefined ? 2 : 3
           return this.isV2()
         })
@@ -300,17 +318,17 @@ class Client {
   }
 }
 
-function nopOnRegistered () {
+function nopOnRegistered() {
   throw new Error('Missing onRegistered callback')
 }
 
-function protoify (context, fn) {
-  return function prototyped (...args) {
+function protoify(context, fn) {
+  return function prototyped(...args) {
     return fn(context, ...args)
   }
 }
 
-function addToProto (ctx, obj, proto, disablePromises) {
+function addToProto(ctx, obj, proto, disablePromises) {
   for (const attr in proto) {
     let fn = protoify(ctx, proto[attr])
     if (disablePromises) {
@@ -321,4 +339,4 @@ function addToProto (ctx, obj, proto, disablePromises) {
 }
 
 module.exports = new Client()
-Object.assign(module.exports, {Client, LocalStorage, MemoryStorage})
+Object.assign(module.exports, { Client, LocalStorage, MemoryStorage })

@@ -2,10 +2,10 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import {Client} from '../../src'
+import { Client } from '../../src'
 import mock from '../mock-api'
 
-describe('mango API', function () {
+describe('mango API', function() {
   let indexRef
   const cozy = {}
 
@@ -18,18 +18,26 @@ describe('mango API', function () {
 
   afterEach(() => mock.restore())
 
-  describe('Create index', function () {
+  describe('Create index', function() {
     before(mock.mockAPI('CreateIndex'))
 
-    it('Call the proper route', async function () {
+    it('Call the proper route', async function() {
       const testIndex = ['field1', 'field2']
-      indexRef = await cozy.client.data.defineIndex('io.cozy.testobject', testIndex)
+      indexRef = await cozy.client.data.defineIndex(
+        'io.cozy.testobject',
+        testIndex
+      )
 
       mock.calls('CreateIndex').should.have.length(1)
-      mock.lastUrl('CreateIndex').should.equal('http://my.cozy.io/data/io.cozy.testobject/_index')
-      mock.lastOptions('CreateIndex').should.have.property('body',
-        '{"index":{"fields":["field1","field2"]}}'
-      )
+      mock
+        .lastUrl('CreateIndex')
+        .should.equal('http://my.cozy.io/data/io.cozy.testobject/_index')
+      mock
+        .lastOptions('CreateIndex')
+        .should.have.property(
+          'body',
+          '{"index":{"fields":["field1","field2"]}}'
+        )
 
       indexRef.should.have.property('type', 'mango')
       indexRef.should.have.property('doctype', 'io.cozy.testobject')
@@ -39,19 +47,24 @@ describe('mango API', function () {
     })
   })
 
-  describe('Find documents', function () {
+  describe('Find documents', function() {
     before(mock.mockAPI('FindDocuments'))
 
-    it('Call the proper route', async function () {
+    it('Call the proper route', async function() {
       let fetched = await cozy.client.data.query(indexRef, {
-        selector: {field1: 'value'}
+        selector: { field1: 'value' }
       })
 
       mock.calls('FindDocuments').should.have.length(1)
-      mock.lastUrl('FindDocuments').should.equal('http://my.cozy.io/data/io.cozy.testobject/_find')
-      mock.lastOptions('FindDocuments').should.have.property('body',
-        '{"use_index":"_design/generatedindexname","selector":{"field1":"value"}}'
-      )
+      mock
+        .lastUrl('FindDocuments')
+        .should.equal('http://my.cozy.io/data/io.cozy.testobject/_find')
+      mock
+        .lastOptions('FindDocuments')
+        .should.have.property(
+          'body',
+          '{"use_index":"_design/generatedindexname","selector":{"field1":"value"}}'
+        )
 
       fetched.should.be.an.Array()
       fetched.should.have.length(2)

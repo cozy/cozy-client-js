@@ -9,7 +9,7 @@ const statusRoute = {
       'content-type': 'application/json'
     },
     body: {
-      'couchdb': 'ok'
+      couchdb: 'ok'
     }
   }
 }
@@ -24,9 +24,9 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        '_id': '42',
-        '_rev': '1-5444878785445',
-        'test': 'value'
+        _id: '42',
+        _rev: '1-5444878785445',
+        test: 'value'
       }
     }
   },
@@ -39,23 +39,23 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        'total_rows': 2,
-        'rows': [
+        total_rows: 2,
+        rows: [
           {
-            'id': '42',
-            'key': '42',
-            'value': {
-              'rev': '1-5444878785445'
+            id: '42',
+            key: '42',
+            value: {
+              rev: '1-5444878785445'
             },
-            'doc': {
-              '_id': '42',
-              '_rev': '1-5444878785445',
-              'test': 'value'
+            doc: {
+              _id: '42',
+              _rev: '1-5444878785445',
+              test: 'value'
             }
           },
           {
-            'key': '43',
-            'error': 'not_found'
+            key: '43',
+            error: 'not_found'
           }
         ]
       }
@@ -70,30 +70,30 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        'total_rows': 2,
-        'rows': [
+        total_rows: 2,
+        rows: [
           {
-            'id': '42',
-            'key': '42',
-            'value': {
-              'rev': '1-5444878785445'
+            id: '42',
+            key: '42',
+            value: {
+              rev: '1-5444878785445'
             },
-            'doc': {
-              '_id': '42',
-              '_rev': '1-5444878785445',
-              'test': 'value'
+            doc: {
+              _id: '42',
+              _rev: '1-5444878785445',
+              test: 'value'
             }
           },
           {
-            'id': '43',
-            'key': '43',
-            'value': {
-              'rev': '1-5444878785446'
+            id: '43',
+            key: '43',
+            value: {
+              rev: '1-5444878785446'
             },
-            'doc': {
-              '_id': '43',
-              '_rev': '1-5444878785446',
-              'test': 'value2'
+            doc: {
+              _id: '43',
+              _rev: '1-5444878785446',
+              test: 'value2'
             }
           }
         ]
@@ -109,12 +109,12 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        '_id': '42',
-        '_rev': '1-5444878785445',
-        'data': {
-          '_id': '42',
-          '_rev': '1-5444878785445',
-          'test': 'value'
+        _id: '42',
+        _rev: '1-5444878785445',
+        data: {
+          _id: '42',
+          _rev: '1-5444878785445',
+          test: 'value'
         }
       }
     }
@@ -150,12 +150,12 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        '_id': '42',
-        '_rev': '2-5444878785445',
-        'data': {
-          '_id': '42',
-          '_rev': '2-5444878785445',
-          'test': 'value2'
+        _id: '42',
+        _rev: '2-5444878785445',
+        data: {
+          _id: '42',
+          _rev: '2-5444878785445',
+          test: 'value2'
         }
       }
     }
@@ -169,8 +169,8 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        'id': '42',
-        'rev': '1-5444878785445'
+        id: '42',
+        rev: '1-5444878785445'
       }
     }
   },
@@ -183,9 +183,9 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        'id': '_design/generatedindexname',
-        'name': 'generatedindexname',
-        'result': 'created'
+        id: '_design/generatedindexname',
+        name: 'generatedindexname',
+        result: 'created'
       }
     }
   },
@@ -198,10 +198,7 @@ const ROUTES = [
         'content-type': 'application/json'
       },
       body: {
-        'docs': [
-          {'_id': '42', 'test': 'value'},
-          {'_id': '43', 'test': 'value'}
-        ]
+        docs: [{ _id: '42', test: 'value' }, { _id: '43', test: 'value' }]
       }
     }
   },
@@ -213,26 +210,28 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
-        attributes: {
-          type: 'file',
-          name: 'hospi.pdf',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          size: '0',
-          md5sum: '1B2M2Y8AsgTpgAmY7PhCfg==',
-          mime: 'application/pdf',
-          class: 'application',
-          executable: false,
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+          attributes: {
+            type: 'file',
+            name: 'hospi.pdf',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            size: '0',
+            md5sum: '1B2M2Y8AsgTpgAmY7PhCfg==',
+            mime: 'application/pdf',
+            class: 'application',
+            executable: false,
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -243,26 +242,28 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
-        attributes: {
-          type: 'file',
-          name: 'hospi.pdf',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          size: '0',
-          md5sum: '1B2M2Y8AsgTpgAmY7PhCfg==',
-          mime: 'application/pdf',
-          class: 'application',
-          executable: false,
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+          attributes: {
+            type: 'file',
+            name: 'hospi.pdf',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            size: '0',
+            md5sum: '1B2M2Y8AsgTpgAmY7PhCfg==',
+            mime: 'application/pdf',
+            class: 'application',
+            executable: false,
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -273,21 +274,23 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
-        attributes: {
-          type: 'directory',
-          name: 'hospi.pdf',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+          attributes: {
+            type: 'directory',
+            name: 'hospi.pdf',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -298,21 +301,23 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
-        attributes: {
-          type: 'directory',
-          name: 'hospi.pdf',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+          attributes: {
+            type: 'directory',
+            name: 'hospi.pdf',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -323,21 +328,23 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
-        attributes: {
-          type: 'directory',
-          name: 'hospi.pdf',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+          attributes: {
+            type: 'directory',
+            name: 'hospi.pdf',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -348,21 +355,23 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'cb1c159a8db1ee7aeb9441c3ff001753',
-        attributes: {
-          type: 'file',
-          name: 'hospi.pdf',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'cb1c159a8db1ee7aeb9441c3ff001753',
+          attributes: {
+            type: 'file',
+            name: 'hospi.pdf',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -373,21 +382,23 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.files',
-        id: 'id42',
-        attributes: {
-          type: 'directory',
-          name: 'bills',
-          dir_id: 'io.cozy.files.root-dir',
-          created_at: '2016-11-25T16:07:45.398867198+01:00',
-          updated_at: '2016-11-25T16:07:45.398867198+01:00',
-          tags: []
-        },
-        meta: {},
-        links: {},
-        relationships: {}
-      } }
+      body: {
+        data: {
+          type: 'io.cozy.files',
+          id: 'id42',
+          attributes: {
+            type: 'directory',
+            name: 'bills',
+            dir_id: 'io.cozy.files.root-dir',
+            created_at: '2016-11-25T16:07:45.398867198+01:00',
+            updated_at: '2016-11-25T16:07:45.398867198+01:00',
+            tags: []
+          },
+          meta: {},
+          links: {},
+          relationships: {}
+        }
+      }
     }
   },
   {
@@ -454,7 +465,7 @@ const ROUTES = [
     name: 'AuthGetClient',
     method: 'GET',
     matcher: /\/auth\/register\/123$/,
-    response: (url, opts) => {
+    response: () => {
       const body = {
         client_id: '123',
         client_secret: '456',
@@ -551,17 +562,19 @@ const ROUTES = [
       headers: {
         'content-type': 'application/vnd.api+json'
       },
-      body: { data: {
-        type: 'io.cozy.settings',
-        id: 'io.cozy.settings.disk-usage',
-        attributes: {
-          used: '123'
-        },
-        meta: {},
-        links: {
-          self: '/settings/disk-usage'
+      body: {
+        data: {
+          type: 'io.cozy.settings',
+          id: 'io.cozy.settings.disk-usage',
+          attributes: {
+            used: '123'
+          },
+          meta: {},
+          links: {
+            self: '/settings/disk-usage'
+          }
         }
-      } }
+      }
     }
   },
   {
@@ -627,23 +640,25 @@ const ROUTES = [
         'content-type': 'application/vnd.api+json'
       },
       body: {
-        data: [{
-          type: 'io.cozy.oauth.clients',
-          id: '30e84c10-e6cf-11e6-9bfd-a7106972de51',
-          attributes: {
-            redirect_uris: ['http://localhost:4000/oauth/callback'],
-            client_name: 'Cozy-Desktop on my-new-laptop',
-            client_kind: 'desktop',
-            client_uri: 'https://docs.cozy.io/en/mobile/desktop.html',
-            logo_uri: 'https://docs.cozy.io/assets/images/cozy-logo-docs.svg',
-            policy_uri: 'https://cozy.io/policy',
-            software_id: '/github.com/cozy-labs/cozy-desktop',
-            software_version: '0.16.0'
-          },
-          links: {
-            self: '/settings/clients/30e84c10-e6cf-11e6-9bfd-a7106972de51'
+        data: [
+          {
+            type: 'io.cozy.oauth.clients',
+            id: '30e84c10-e6cf-11e6-9bfd-a7106972de51',
+            attributes: {
+              redirect_uris: ['http://localhost:4000/oauth/callback'],
+              client_name: 'Cozy-Desktop on my-new-laptop',
+              client_kind: 'desktop',
+              client_uri: 'https://docs.cozy.io/en/mobile/desktop.html',
+              logo_uri: 'https://docs.cozy.io/assets/images/cozy-logo-docs.svg',
+              policy_uri: 'https://cozy.io/policy',
+              software_id: '/github.com/cozy-labs/cozy-desktop',
+              software_version: '0.16.0'
+            },
+            links: {
+              self: '/settings/clients/30e84c10-e6cf-11e6-9bfd-a7106972de51'
+            }
           }
-        }]
+        ]
       }
     }
   },
@@ -679,7 +694,8 @@ const ROUTES = [
             services: [
               {
                 slug: 'files',
-                href: 'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+                href:
+                  'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
               }
             ]
           },
@@ -690,7 +706,8 @@ const ROUTES = [
         }
       }
     }
-  }, {
+  },
+  {
     name: 'CreateIntentWithNoService',
     method: 'POST',
     matcher: /intents/,
@@ -716,7 +733,8 @@ const ROUTES = [
         }
       }
     }
-  }, {
+  },
+  {
     name: 'CreateIntentToRedirect',
     method: 'POST',
     matcher: /intents/,
@@ -736,7 +754,8 @@ const ROUTES = [
             services: [
               {
                 slug: 'store',
-                href: 'https://drive.cozy.example.net/%23/files/?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+                href:
+                  'https://drive.cozy.example.net/%23/files/?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
               }
             ]
           },
@@ -747,7 +766,8 @@ const ROUTES = [
         }
       }
     }
-  }, {
+  },
+  {
     name: 'GetIntent',
     method: 'GET',
     matcher: /intents/,
@@ -767,7 +787,8 @@ const ROUTES = [
             services: [
               {
                 slug: 'files',
-                href: 'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+                href:
+                  'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
               }
             ]
           },
@@ -781,10 +802,12 @@ const ROUTES = [
   }
 ]
 
-fetchMock.mockAPI = (name) => function () {
-  fetchMock.mock(statusRoute)
-  ROUTES.filter(route => route.name === name)
-        .forEach(route => fetchMock.mock(route))
-}
+fetchMock.mockAPI = name =>
+  function() {
+    fetchMock.mock(statusRoute)
+    ROUTES.filter(route => route.name === name).forEach(route =>
+      fetchMock.mock(route)
+    )
+  }
 
 export default fetchMock
