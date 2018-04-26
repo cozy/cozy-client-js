@@ -30,7 +30,7 @@ export function create(cozy, action, type, data = {}, permissions = []) {
     delete data.filteredServices
 
     return createPromise.then(intent =>
-      client.start(intent, element, data, options)
+      client.start(cozy, intent, element, data, options)
     )
   }
 

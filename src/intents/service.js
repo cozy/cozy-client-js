@@ -47,17 +47,39 @@ export function start(cozy, intentId, serviceWindow) {
   return cozyFetchJSON(cozy, 'GET', `/intents/${intentId}`).then(intent => {
     let terminated = false
 
-    const terminate = message => {
+    const sendMessage = message => {
       if (terminated)
         throw new Error('Intent service has already been terminated')
-      terminated = true
       serviceWindow.parent.postMessage(message, intent.attributes.client)
+    }
+
+    const compose = (action, doctype, data) =>
+      new Promise(resolve => {
+        const composeEventListener = event => {
+          if (event.origin !== intent.attributes.client) return
+          serviceWindow.removeEventListener('message', composeEventListener)
+          return resolve(event.data)
+        }
+
+        serviceWindow.addEventListener('message', composeEventListener)
+
+        sendMessage({
+          type: `intent-${intent._id}:compose`,
+          action,
+          doctype,
+          data
+        })
+      })
+
+    const terminate = message => {
+      sendMessage(message)
+      terminated = true
     }
 
     const resizeClient = (dimensions, transitionProperty) => {
       if (terminated) throw new Error('Intent service has been terminated')
 
-      const message = {
+      sendMessage({
         type: `intent-${intent._id}:resize`,
         // if a dom element is passed, calculate its size
         dimensions: dimensions.element
@@ -67,9 +89,7 @@ export function start(cozy, intentId, serviceWindow) {
             })
           : dimensions,
         transition: transitionProperty
-      }
-
-      serviceWindow.parent.postMessage(message, intent.attributes.client)
+      })
     }
 
     const cancel = () => {
@@ -84,6 +104,7 @@ export function start(cozy, intentId, serviceWindow) {
 
     return listenClientData(intent, serviceWindow).then(data => {
       return {
+        compose: compose,
         getData: () => data,
         getIntent: () => intent,
         terminate: doc => {

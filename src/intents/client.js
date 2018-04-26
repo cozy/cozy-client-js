@@ -1,6 +1,15 @@
 import { errorSerializer, pickService } from './helpers'
+import { create as createIntent } from './'
 
 const intentClass = 'coz-intent'
+
+function hideIntentIframe(iframe) {
+  iframe.style.display = 'none'
+}
+
+function showIntentFrame(iframe) {
+  iframe.style.display = 'block'
+}
 
 function buildIntentIframe(intent, element, url) {
   const document = element.ownerDocument
@@ -33,7 +42,7 @@ function injectIntentIframe(intent, element, url, options) {
 }
 
 // inject iframe for service in given element
-function connectIntentIframe(iframe, element, intent, data) {
+function connectIntentIframe(cozy, iframe, element, intent, data) {
   const document = element.ownerDocument
   if (!document)
     return Promise.reject(
@@ -49,9 +58,20 @@ function connectIntentIframe(iframe, element, intent, data) {
   // Keeps only http://domain:port/
   const serviceOrigin = iframe.src.split('/', 3).join('/')
 
+  async function compose(cozy, action, doctype, data) {
+    const intent = await createIntent(cozy, action, doctype, data)
+    hideIntentIframe(iframe)
+    const doc = await start(cozy, intent, element, {
+      ...data,
+      exposeIntentFrameRemoval: false
+    })
+    showIntentFrame(iframe)
+    return doc
+  }
+
   return new Promise((resolve, reject) => {
     let handshaken = false
-    const messageHandler = event => {
+    const messageHandler = async event => {
       if (event.origin !== serviceOrigin) return
 
       const eventType = event.data.type
@@ -79,6 +99,13 @@ function connectIntentIframe(iframe, element, intent, data) {
         })
 
         return true
+      }
+
+      if (handshaken && eventType === `intent-${intent._id}:compose`) {
+        // Let start to name `type` as `doctype`, as `event.data` already have a `type` attribute.
+        const { action, doctype, data } = event.data
+        const doc = await compose(cozy, action, doctype, data)
+        return event.source.postMessage(doc, event.origin)
       }
 
       window.removeEventListener('message', messageHandler)
@@ -126,7 +153,7 @@ function connectIntentIframe(iframe, element, intent, data) {
   })
 }
 
-export function start(intent, element, data = {}, options = {}) {
+export function start(cozy, intent, element, data = {}, options = {}) {
   const service = pickService(intent, options.filterServices)
 
   if (!service) {
@@ -136,6 +163,7 @@ export function start(intent, element, data = {}, options = {}) {
   const iframe = injectIntentIframe(intent, element, service.href, options)
 
   return connectIntentIframe(
+    cozy,
     iframe,
     element,
     intent,
