@@ -578,19 +578,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _jobs = __webpack_require__(55);
+	var _jobs = __webpack_require__(58);
 	
 	var jobs = _interopRequireWildcard(_jobs);
 	
-	var _offline = __webpack_require__(56);
+	var _offline = __webpack_require__(59);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(98);
+	var _settings = __webpack_require__(101);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(99);
+	var _relations = __webpack_require__(102);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -2104,11 +2104,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  var state = generateRandomState();
 	  var query = {
-	    'client_id': client.clientID,
-	    'redirect_uri': client.redirectURI,
-	    'state': state,
-	    'response_type': 'code',
-	    'scope': scopes.join(' ')
+	    client_id: client.clientID,
+	    redirect_uri: client.redirectURI,
+	    state: state,
+	    response_type: 'code',
+	    scope: scopes.join(' ')
 	  };
 	  return {
 	    url: cozy._url + ('/auth/authorize?' + (0, _utils.encodeQuery)(query)),
@@ -2137,8 +2137,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Promise.reject(new Error('Given state does not match url query state'));
 	  }
 	  return retrieveToken(cozy, client, null, {
-	    'grant_type': 'authorization_code',
-	    'code': grantQueries.code
+	    grant_type: 'authorization_code',
+	    code: grantQueries.code
 	  });
 	}
 	
@@ -2146,8 +2146,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	// refresh_token grant type in order to refresh the given token.
 	function refreshToken(cozy, client, token) {
 	  return retrieveToken(cozy, client, token, {
-	    'grant_type': 'refresh_token',
-	    'refresh_token': token.refreshToken
+	    grant_type: 'refresh_token',
+	    refresh_token: token.refreshToken
 	  });
 	}
 	
@@ -2267,8 +2267,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Promise.reject(new Error('Client not registered'));
 	  }
 	  var body = (0, _utils.encodeQuery)(Object.assign({}, query, {
-	    'client_id': client.clientID,
-	    'client_secret': client.clientSecret
+	    client_id: client.clientID,
+	    client_secret: client.clientSecret
 	  }));
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/auth/access_token', body, {
 	    disableAuth: token === null,
@@ -2310,7 +2310,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    try {
 	      buffer = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"crypto\""); e.code = 'MODULE_NOT_FOUND'; throw e; }())).randomBytes(StateSize);
-	    } catch (e) {}
+	    } catch (e) {
+	      buffer = null;
+	    }
 	  }
 	  if (!buffer) {
 	    buffer = new Array(StateSize);
@@ -2495,7 +2497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var requestUrl = error.url;
 	
 	    if (requestUrl.indexOf(currentOrigin.replace(/^(https?:\/\/\w+)-\w+\./, '$1.')) === 0) {
-	      var redirectURL = currentOrigin + '?' + (0, _utils.encodeQuery)({ 'disconnect': 1 });
+	      var redirectURL = currentOrigin + '?' + (0, _utils.encodeQuery)({ disconnect: 1 });
 	      window.location = redirectURL;
 	    }
 	  } catch (e) {
@@ -2691,7 +2693,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return Promise.reject(new Error('findMany is not available on v2'));
 	    }
 	
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', {
+	      include_docs: true
+	    });
 	
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, { keys: ids }).then(function (resp) {
 	      var docs = {};
@@ -2768,7 +2772,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return Promise.reject(new Error('findAll is not available on v2'));
 	    }
 	
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', {
+	      include_docs: true
+	    });
 	
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, {}).then(function (resp) {
 	      var docs = [];
@@ -2911,12 +2917,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DOCTYPE_FILES = exports.DOCTYPE_FILES = 'io.cozy.files';
 	
 	var KNOWN_DOCTYPES = {
-	  'files': DOCTYPE_FILES,
-	  'folder': DOCTYPE_FILES,
-	  'contact': 'io.cozy.contacts',
-	  'event': 'io.cozy.events',
-	  'track': 'io.cozy.labs.music.track',
-	  'playlist': 'io.cozy.labs.music.playlist'
+	  files: DOCTYPE_FILES,
+	  folder: DOCTYPE_FILES,
+	  contact: 'io.cozy.contacts',
+	  event: 'io.cozy.events',
+	  track: 'io.cozy.labs.music.track',
+	  playlist: 'io.cozy.labs.music.playlist'
 	};
 	
 	var REVERSE_KNOWN = {};
@@ -3024,26 +3030,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	// It transforms the index fields into a map reduce view.
 	function defineIndexV2(cozy, doctype, fields) {
 	  var indexName = 'by' + fields.map(capitalize).join('');
-	  var indexDefinition = { map: makeMapFunction(doctype, fields), reduce: '_count' };
+	  var indexDefinition = {
+	    map: makeMapFunction(doctype, fields),
+	    reduce: '_count'
+	  };
 	  var path = '/request/' + doctype + '/' + indexName + '/';
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', path, indexDefinition).then(function () {
-	    return { doctype: doctype, type: 'mapreduce', name: indexName, fields: fields };
+	    return {
+	      doctype: doctype,
+	      type: 'mapreduce',
+	      name: indexName,
+	      fields: fields
+	    };
 	  });
 	}
 	
 	function defineIndexV3(cozy, doctype, fields) {
 	  var path = (0, _utils.createPath)(cozy, false, doctype, '_index');
-	  var indexDefinition = { 'index': { fields: fields } };
+	  var indexDefinition = { index: { fields: fields } };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, indexDefinition).then(function (response) {
-	    var indexResult = { doctype: doctype, type: 'mango', name: response.id, fields: fields };
+	    var indexResult = {
+	      doctype: doctype,
+	      type: 'mango',
+	      name: response.id,
+	      fields: fields
+	    };
 	
 	    if (response.result === 'exists') return indexResult;
 	
 	    // indexes might not be usable right after being created; so we delay the resolving until they are
 	    var selector = {};
-	    selector[fields[0]] = { '$gt': null };
+	    selector[fields[0]] = { $gt: null };
 	
-	    var opts = getV3Options(indexResult, { 'selector': selector });
+	    var opts = getV3Options(indexResult, { selector: selector });
 	    var path = (0, _utils.createPath)(cozy, false, indexResult.doctype, '_find');
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function () {
 	      return indexResult;
@@ -3449,7 +3468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '' + path + query, undefined, {
 	    headers: {
-	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+	      Date: lastModifiedDate ? lastModifiedDate.toGMTString() : ''
 	    }
 	  });
 	}
@@ -3503,7 +3522,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var body = {
 	    data: {
-	      attributes: Object.assign({}, attrs, { name: sanitizeFileName(attrs.name) })
+	      attributes: Object.assign({}, attrs, {
+	        name: sanitizeFileName(attrs.name)
+	      })
 	    }
 	  };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'PATCH', path, body, {
@@ -3542,7 +3563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
 	    var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-	    return Promise.all([db.get(id), db.find(Object.assign({ selector: { 'dir_id': id } }, options))]).then(function (_ref6) {
+	    return Promise.all([db.get(id), db.find(Object.assign({ selector: { dir_id: id } }, options))]).then(function (_ref6) {
 	      var _ref7 = _slicedToArray(_ref6, 2),
 	          doc = _ref7[0],
 	          children = _ref7[1];
@@ -3625,7 +3646,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }).then(function (data) {
-	    return { sharecode: 'sharecode=' + data.attributes.codes.email, id: 'id=' + id };
+	    return {
+	      sharecode: 'sharecode=' + data.attributes.codes.email,
+	      id: 'id=' + id
+	    };
 	  });
 	}
 	
@@ -3774,7 +3798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          case 4:
 	            intent = _context.sent;
-	            service = pickService(intent);
+	            service = (0, _helpers.pickService)(intent);
 	
 	            if (service) {
 	              _context.next = 8;
@@ -3849,132 +3873,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _fetch = __webpack_require__(44);
 	
+	var _helpers = __webpack_require__(55);
+	
+	var _client = __webpack_require__(56);
+	
+	var client = _interopRequireWildcard(_client);
+	
+	var _service = __webpack_require__(57);
+	
+	var service = _interopRequireWildcard(_service);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-	
-	var intentClass = 'coz-intent';
-	
-	// helper to serialize/deserialize an error for/from postMessage
-	var errorSerializer = function () {
-	  function mapErrorProperties(from, to) {
-	    var result = Object.assign(to, from);
-	    var nativeProperties = ['name', 'message'];
-	    return nativeProperties.reduce(function (result, property) {
-	      if (from[property]) {
-	        to[property] = from[property];
-	      }
-	      return result;
-	    }, result);
-	  }
-	  return {
-	    serialize: function serialize(error) {
-	      return mapErrorProperties(error, {});
-	    },
-	    deserialize: function deserialize(data) {
-	      return mapErrorProperties(data, new Error(data.message));
-	    }
-	  };
-	}();
-	
-	// inject iframe for service in given element
-	function injectService(url, element, intent, data, onReadyCallback) {
-	  var document = element.ownerDocument;
-	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
-	
-	  var window = document.defaultView;
-	  if (!window) return Promise.reject(new Error('Cannot retrieve window object from document'));
-	
-	  var iframe = document.createElement('iframe');
-	  // if callback provided for when iframe is loaded
-	  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback;
-	  // TODO: implement 'title' attribute
-	  iframe.setAttribute('src', url);
-	  iframe.classList.add(intentClass);
-	  element.appendChild(iframe);
-	  iframe.focus();
-	
-	  // Keeps only http://domain:port/
-	  var serviceOrigin = url.split('/', 3).join('/');
-	
-	  return new Promise(function (resolve, reject) {
-	    var handshaken = false;
-	    var messageHandler = function messageHandler(event) {
-	      if (event.origin !== serviceOrigin) return;
-	
-	      var eventType = event.data.type;
-	      if (eventType === 'load') {
-	        // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
-	        // making the handshake fails.
-	        console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.');
-	        return;
-	      }
-	
-	      if (eventType === 'intent-' + intent._id + ':ready') {
-	        handshaken = true;
-	        return event.source.postMessage(data, event.origin);
-	      }
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':resize') {
-	        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
-	          if (event.data.transition) element.style.transition = event.data.transition;
-	          if (event.data.dimensions[prop]) element.style[prop] = event.data.dimensions[prop] + 'px';
-	        });
-	
-	        return true;
-	      }
-	
-	      window.removeEventListener('message', messageHandler);
-	      var removeIntentFrame = function removeIntentFrame() {
-	        // check if the parent node has not been already removed from the DOM
-	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
-	      };
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':exposeFrameRemoval') {
-	        return resolve({ removeIntentFrame: removeIntentFrame, doc: event.data.document });
-	      }
-	
-	      removeIntentFrame();
-	
-	      if (eventType === 'intent-' + intent._id + ':error') {
-	        return reject(errorSerializer.deserialize(event.data.error));
-	      }
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':cancel') {
-	        return resolve(null);
-	      }
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':done') {
-	        return resolve(event.data.document);
-	      }
-	
-	      if (!handshaken) {
-	        return reject(new Error('Unexpected handshake message from intent service'));
-	      }
-	
-	      // We may be in a state where the messageHandler is still attached to then
-	      // window, but will not be needed anymore. For example, the service failed
-	      // before adding the `unload` listener, so no `intent:cancel` message has
-	      // never been sent.
-	      // So we simply ignore other messages, and this listener will stay here,
-	      // waiting for a message which will never come, forever (almost).
-	    };
-	
-	    window.addEventListener('message', messageHandler);
-	  });
-	}
-	
-	var first = function first(arr) {
-	  return arr && arr[0];
-	};
-	// In a far future, the user will have to pick the desired service from a list.
-	// For now it's our job, an easy job as we arbitrary pick the first service of
-	// the list.
-	function pickService(intent, filterServices) {
-	  var services = intent.attributes.services;
-	  var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
-	  return first(filteredServices);
-	}
 	
 	function create(cozy, action, type) {
 	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -3996,124 +3909,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	
 	  createPromise.start = function (element, onReadyCallback) {
+	    var options = {
+	      filteredServices: data.filteredServices,
+	      onReadyCallback: onReadyCallback
+	    };
+	
+	    delete data.filteredServices;
+	
 	    return createPromise.then(function (intent) {
-	      var service = pickService(intent, data.filterServices);
-	      var restData = Object.assign({}, data);
-	      delete restData.filterServices;
-	
-	      if (!service) {
-	        return Promise.reject(new Error('Unable to find a service'));
-	      }
-	
-	      return injectService(service.href, element, intent, restData, onReadyCallback);
+	      return client.start(cozy, intent, element, data, options);
 	    });
 	  };
 	
 	  return createPromise;
 	}
 	
-	function listenClientData(intent, window) {
-	  return new Promise(function (resolve, reject) {
-	    var messageEventListener = function messageEventListener(event) {
-	      if (event.origin !== intent.attributes.client) return;
-	
-	      window.removeEventListener('message', messageEventListener);
-	      resolve(event.data);
-	    };
-	
-	    window.addEventListener('message', messageEventListener);
-	    window.parent.postMessage({
-	      type: 'intent-' + intent._id + ':ready'
-	    }, intent.attributes.client);
-	  });
-	}
-	
-	// maximize the height of an element
-	function maximize(element) {
-	  if (element && element.style) {
-	    element.style.height = '100%';
-	  }
-	}
-	
 	// returns a service to communicate with intent client
 	function createService(cozy, intentId, serviceWindow) {
-	  serviceWindow = serviceWindow || typeof window !== 'undefined' && window;
-	  if (!serviceWindow || !serviceWindow.document) {
-	    return Promise.reject(new Error('Intent service should be used in browser'));
-	  }
-	
-	  // Maximize document, the whole iframe is handled by intents, clients and
-	  // services
-	  serviceWindow.addEventListener('load', function () {
-	    var _serviceWindow = serviceWindow,
-	        document = _serviceWindow.document;
-	    [document.documentElement, document.body].forEach(maximize);
-	  });
-	
-	  intentId = intentId || serviceWindow.location.search.split('=')[1];
-	  if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'));
-	
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
-	    var terminated = false;
-	
-	    var _terminate = function _terminate(message) {
-	      if (terminated) throw new Error('Intent service has already been terminated');
-	      terminated = true;
-	      serviceWindow.parent.postMessage(message, intent.attributes.client);
-	    };
-	
-	    var resizeClient = function resizeClient(dimensions, transitionProperty) {
-	      if (terminated) throw new Error('Intent service has been terminated');
-	
-	      var message = {
-	        type: 'intent-' + intent._id + ':resize',
-	        // if a dom element is passed, calculate its size
-	        dimensions: dimensions.element ? Object.assign({}, dimensions, {
-	          maxHeight: dimensions.element.clientHeight,
-	          maxWidth: dimensions.element.clientWidth
-	        }) : dimensions,
-	        transition: transitionProperty
-	      };
-	
-	      serviceWindow.parent.postMessage(message, intent.attributes.client);
-	    };
-	
-	    var cancel = function cancel() {
-	      _terminate({ type: 'intent-' + intent._id + ':cancel' });
-	    };
-	
-	    // Prevent unfulfilled client promises when this window unloads for a
-	    // reason or another.
-	    serviceWindow.addEventListener('unload', function () {
-	      if (!terminated) cancel();
-	    });
-	
-	    return listenClientData(intent, serviceWindow).then(function (data) {
-	      return {
-	        getData: function getData() {
-	          return data;
-	        },
-	        getIntent: function getIntent() {
-	          return intent;
-	        },
-	        terminate: function terminate(doc) {
-	          var eventName = data && data.exposeIntentFrameRemoval ? 'exposeFrameRemoval' : 'done';
-	          return _terminate({
-	            type: 'intent-' + intent._id + ':' + eventName,
-	            document: doc
-	          });
-	        },
-	        throw: function _throw(error) {
-	          return _terminate({
-	            type: 'intent-' + intent._id + ':error',
-	            error: errorSerializer.serialize(error)
-	          });
-	        },
-	        resizeClient: resizeClient,
-	        cancel: cancel
-	      };
-	    });
-	  });
+	  return service.start(cozy, intentId, serviceWindow);
 	}
 	
 	function isSerializable(value) {
@@ -5093,6 +4906,450 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 55 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.pickService = pickService;
+	// helper to serialize/deserialize an error for/from postMessage
+	var errorSerializer = exports.errorSerializer = function () {
+	  function mapErrorProperties(from, to) {
+	    var result = Object.assign(to, from);
+	    var nativeProperties = ['name', 'message'];
+	    return nativeProperties.reduce(function (result, property) {
+	      if (from[property]) {
+	        to[property] = from[property];
+	      }
+	      return result;
+	    }, result);
+	  }
+	  return {
+	    serialize: function serialize(error) {
+	      return mapErrorProperties(error, {});
+	    },
+	    deserialize: function deserialize(data) {
+	      return mapErrorProperties(data, new Error(data.message));
+	    }
+	  };
+	}();
+	
+	var first = function first(arr) {
+	  return arr && arr[0];
+	};
+	// In a far future, the user will have to pick the desired service from a list.
+	// For now it's our job, an easy job as we arbitrary pick the first service of
+	// the list.
+	function pickService(intent, filterServices) {
+	  var services = intent.attributes.services;
+	  var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
+	  return first(filteredServices);
+	}
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _regenerator = __webpack_require__(51);
+	
+	var _regenerator2 = _interopRequireDefault(_regenerator);
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	exports.start = start;
+	
+	var _helpers = __webpack_require__(55);
+	
+	var _ = __webpack_require__(50);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+	
+	var intentClass = 'coz-intent';
+	
+	function hideIntentIframe(iframe) {
+	  iframe.style.display = 'none';
+	}
+	
+	function showIntentFrame(iframe) {
+	  iframe.style.display = 'block';
+	}
+	
+	function buildIntentIframe(intent, element, url) {
+	  var document = element.ownerDocument;
+	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
+	
+	  var iframe = document.createElement('iframe');
+	  // TODO: implement 'title' attribute
+	  iframe.setAttribute('id', 'intent-' + intent._id);
+	  iframe.setAttribute('src', url);
+	  iframe.classList.add(intentClass);
+	  return iframe;
+	}
+	
+	function injectIntentIframe(intent, element, url, options) {
+	  var onReadyCallback = options.onReadyCallback;
+	
+	  var iframe = buildIntentIframe(intent, element, url, options.onReadyCallback);
+	  // if callback provided for when iframe is loaded
+	  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback;
+	  element.appendChild(iframe);
+	  iframe.focus();
+	  return iframe;
+	}
+	
+	// inject iframe for service in given element
+	function connectIntentIframe(cozy, iframe, element, intent, data) {
+	  var _this = this;
+	
+	  var compose = function () {
+	    var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, action, doctype, data) {
+	      var intent, doc;
+	      return _regenerator2.default.wrap(function _callee$(_context) {
+	        while (1) {
+	          switch (_context.prev = _context.next) {
+	            case 0:
+	              _context.next = 2;
+	              return (0, _.create)(cozy, action, doctype, data);
+	
+	            case 2:
+	              intent = _context.sent;
+	
+	              hideIntentIframe(iframe);
+	              _context.next = 6;
+	              return start(cozy, intent, element, _extends({}, data, {
+	                exposeIntentFrameRemoval: false
+	              }));
+	
+	            case 6:
+	              doc = _context.sent;
+	
+	              showIntentFrame(iframe);
+	              return _context.abrupt('return', doc);
+	
+	            case 9:
+	            case 'end':
+	              return _context.stop();
+	          }
+	        }
+	      }, _callee, this);
+	    }));
+	
+	    return function compose(_x, _x2, _x3, _x4) {
+	      return _ref.apply(this, arguments);
+	    };
+	  }();
+	
+	  var document = element.ownerDocument;
+	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
+	
+	  var window = document.defaultView;
+	  if (!window) return Promise.reject(new Error('Cannot retrieve window object from document'));
+	
+	  // Keeps only http://domain:port/
+	  var serviceOrigin = iframe.src.split('/', 3).join('/');
+	
+	  return new Promise(function (resolve, reject) {
+	    var handshaken = false;
+	    var messageHandler = function () {
+	      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(event) {
+	        var eventType, _event$data, action, doctype, _data, doc, removeIntentFrame;
+	
+	        return _regenerator2.default.wrap(function _callee2$(_context2) {
+	          while (1) {
+	            switch (_context2.prev = _context2.next) {
+	              case 0:
+	                if (!(event.origin !== serviceOrigin)) {
+	                  _context2.next = 2;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return');
+	
+	              case 2:
+	                eventType = event.data.type;
+	
+	                if (!(eventType === 'load')) {
+	                  _context2.next = 6;
+	                  break;
+	                }
+	
+	                // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
+	                // making the handshake fails.
+	                console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.');
+	                return _context2.abrupt('return');
+	
+	              case 6:
+	                if (!(eventType === 'intent-' + intent._id + ':ready')) {
+	                  _context2.next = 9;
+	                  break;
+	                }
+	
+	                handshaken = true;
+	                return _context2.abrupt('return', event.source.postMessage(data, event.origin));
+	
+	              case 9:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':resize')) {
+	                  _context2.next = 13;
+	                  break;
+	                }
+	
+	                ;['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
+	                  if (event.data.transition) element.style.transition = event.data.transition;
+	                  if (event.data.dimensions[prop]) element.style[prop] = event.data.dimensions[prop] + 'px';
+	                });
+	
+	                return _context2.abrupt('return', true);
+	
+	              case 13:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':compose')) {
+	                  _context2.next = 19;
+	                  break;
+	                }
+	
+	                // Let start to name `type` as `doctype`, as `event.data` already have a `type` attribute.
+	                _event$data = event.data, action = _event$data.action, doctype = _event$data.doctype, _data = _event$data.data;
+	                _context2.next = 17;
+	                return compose(cozy, action, doctype, _data);
+	
+	              case 17:
+	                doc = _context2.sent;
+	                return _context2.abrupt('return', event.source.postMessage(doc, event.origin));
+	
+	              case 19:
+	
+	                window.removeEventListener('message', messageHandler);
+	
+	                removeIntentFrame = function removeIntentFrame() {
+	                  // check if the parent node has not been already removed from the DOM
+	                  iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	                };
+	
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':exposeFrameRemoval')) {
+	                  _context2.next = 23;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', resolve({ removeIntentFrame: removeIntentFrame, doc: event.data.document }));
+	
+	              case 23:
+	
+	                removeIntentFrame();
+	
+	                if (!(eventType === 'intent-' + intent._id + ':error')) {
+	                  _context2.next = 26;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', reject(_helpers.errorSerializer.deserialize(event.data.error)));
+	
+	              case 26:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':cancel')) {
+	                  _context2.next = 28;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', resolve(null));
+	
+	              case 28:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':done')) {
+	                  _context2.next = 30;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', resolve(event.data.document));
+	
+	              case 30:
+	                if (handshaken) {
+	                  _context2.next = 32;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', reject(new Error('Unexpected handshake message from intent service')));
+	
+	              case 32:
+	              case 'end':
+	                return _context2.stop();
+	            }
+	          }
+	        }, _callee2, _this);
+	      }));
+	
+	      return function messageHandler(_x5) {
+	        return _ref2.apply(this, arguments);
+	      };
+	    }();
+	
+	    window.addEventListener('message', messageHandler);
+	  });
+	}
+	
+	function start(cozy, intent, element) {
+	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+	
+	  var service = (0, _helpers.pickService)(intent, options.filterServices);
+	
+	  if (!service) {
+	    throw new Error('Unable to find a service');
+	  }
+	
+	  var iframe = injectIntentIframe(intent, element, service.href, options);
+	
+	  return connectIntentIframe(cozy, iframe, element, intent, data, options.onReadyCallback);
+	}
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.start = start;
+	
+	var _fetch = __webpack_require__(44);
+	
+	var _helpers = __webpack_require__(55);
+	
+	function listenClientData(intent, window) {
+	  return new Promise(function (resolve) {
+	    var messageEventListener = function messageEventListener(event) {
+	      if (event.origin !== intent.attributes.client) return;
+	
+	      window.removeEventListener('message', messageEventListener);
+	      resolve(event.data);
+	    };
+	
+	    window.addEventListener('message', messageEventListener);
+	    window.parent.postMessage({
+	      type: 'intent-' + intent._id + ':ready'
+	    }, intent.attributes.client);
+	  });
+	}
+	
+	// maximize the height of an element
+	function maximize(element) {
+	  if (element && element.style) {
+	    element.style.height = '100%';
+	  }
+	}
+	
+	function start(cozy, intentId, serviceWindow) {
+	  serviceWindow = serviceWindow || typeof window !== 'undefined' && window;
+	  if (!serviceWindow || !serviceWindow.document) {
+	    return Promise.reject(new Error('Intent service should be used in browser'));
+	  }
+	
+	  // Maximize document, the whole iframe is handled by intents, clients and
+	  // services
+	  serviceWindow.addEventListener('load', function () {
+	    var _serviceWindow = serviceWindow,
+	        document = _serviceWindow.document;
+	    [document.documentElement, document.body].forEach(maximize);
+	  });
+	
+	  intentId = intentId || serviceWindow.location.search.split('=')[1];
+	  if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'));
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
+	    var terminated = false;
+	
+	    var sendMessage = function sendMessage(message) {
+	      if (terminated) throw new Error('Intent service has already been terminated');
+	      serviceWindow.parent.postMessage(message, intent.attributes.client);
+	    };
+	
+	    var compose = function compose(action, doctype, data) {
+	      return new Promise(function (resolve) {
+	        var composeEventListener = function composeEventListener(event) {
+	          if (event.origin !== intent.attributes.client) return;
+	          serviceWindow.removeEventListener('message', composeEventListener);
+	          return resolve(event.data);
+	        };
+	
+	        serviceWindow.addEventListener('message', composeEventListener);
+	
+	        sendMessage({
+	          type: 'intent-' + intent._id + ':compose',
+	          action: action,
+	          doctype: doctype,
+	          data: data
+	        });
+	      });
+	    };
+	
+	    var _terminate = function _terminate(message) {
+	      sendMessage(message);
+	      terminated = true;
+	    };
+	
+	    var resizeClient = function resizeClient(dimensions, transitionProperty) {
+	      if (terminated) throw new Error('Intent service has been terminated');
+	
+	      sendMessage({
+	        type: 'intent-' + intent._id + ':resize',
+	        // if a dom element is passed, calculate its size
+	        dimensions: dimensions.element ? Object.assign({}, dimensions, {
+	          maxHeight: dimensions.element.clientHeight,
+	          maxWidth: dimensions.element.clientWidth
+	        }) : dimensions,
+	        transition: transitionProperty
+	      });
+	    };
+	
+	    var cancel = function cancel() {
+	      _terminate({ type: 'intent-' + intent._id + ':cancel' });
+	    };
+	
+	    // Prevent unfulfilled client promises when this window unloads for a
+	    // reason or another.
+	    serviceWindow.addEventListener('unload', function () {
+	      if (!terminated) cancel();
+	    });
+	
+	    return listenClientData(intent, serviceWindow).then(function (data) {
+	      return {
+	        compose: compose,
+	        getData: function getData() {
+	          return data;
+	        },
+	        getIntent: function getIntent() {
+	          return intent;
+	        },
+	        terminate: function terminate(doc) {
+	          var eventName = data && data.exposeIntentFrameRemoval ? 'exposeFrameRemoval' : 'done';
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':' + eventName,
+	            document: doc
+	          });
+	        },
+	        throw: function _throw(error) {
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':error',
+	            error: _helpers.errorSerializer.serialize(error)
+	          });
+	        },
+	        resizeClient: resizeClient,
+	        cancel: cancel
+	      };
+	    });
+	  });
+	}
+
+/***/ },
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5129,7 +5386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 56 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5161,11 +5418,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(40);
 	
-	var _pouchdb = __webpack_require__(57);
+	var _pouchdb = __webpack_require__(60);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(69);
+	var _pouchdbFind = __webpack_require__(72);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -5291,7 +5548,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function createIndexes(cozy, doctype) {
 	  if (doctype === _doctypes.DOCTYPE_FILES) {
-	    return getDatabase(cozy, doctype).createIndex({ index: { fields: ['dir_id'] } });
+	    return getDatabase(cozy, doctype).createIndex({
+	      index: { fields: ['dir_id'] }
+	    });
 	  }
 	  return Promise.resolve();
 	}
@@ -5337,7 +5596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      createDatabase(cozy, doctype);
 	    }
 	    if (options.live === true) {
-	      return reject(new Error('You can\'t use `live` option with Cozy couchdb.'));
+	      return reject(new Error("You can't use `live` option with Cozy couchdb."));
 	    }
 	
 	    if ((0, _utils.isOffline)()) {
@@ -5359,7 +5618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            (0, _auth_v.refreshToken)(cozy, client, token).then(function (newToken) {
 	              return cozy.saveCredentials(client, newToken);
-	            }).then(function (credentials) {
+	            }).then(function () {
 	              return replicateFromCozy(cozy, doctype, options);
 	            });
 	          });
@@ -5459,22 +5718,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 57 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 	
-	var lie = _interopDefault(__webpack_require__(58));
-	var getArguments = _interopDefault(__webpack_require__(60));
-	var debug = _interopDefault(__webpack_require__(61));
-	var events = __webpack_require__(64);
-	var inherits = _interopDefault(__webpack_require__(65));
-	var nextTick = _interopDefault(__webpack_require__(59));
-	var scopedEval = _interopDefault(__webpack_require__(66));
-	var Md5 = _interopDefault(__webpack_require__(67));
-	var vuvuzela = _interopDefault(__webpack_require__(68));
+	var lie = _interopDefault(__webpack_require__(61));
+	var getArguments = _interopDefault(__webpack_require__(63));
+	var debug = _interopDefault(__webpack_require__(64));
+	var events = __webpack_require__(67);
+	var inherits = _interopDefault(__webpack_require__(68));
+	var nextTick = _interopDefault(__webpack_require__(62));
+	var scopedEval = _interopDefault(__webpack_require__(69));
+	var Md5 = _interopDefault(__webpack_require__(70));
+	var vuvuzela = _interopDefault(__webpack_require__(71));
 	
 	/* istanbul ignore next */
 	var PouchPromise$1 = typeof Promise === 'function' ? Promise : lie;
@@ -16800,11 +17059,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 58 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var immediate = __webpack_require__(59);
+	var immediate = __webpack_require__(62);
 	
 	/* istanbul ignore next */
 	function INTERNAL() {}
@@ -17059,7 +17318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 59 */
+/* 62 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -17135,7 +17394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 60 */
+/* 63 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17159,7 +17418,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 61 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -17168,7 +17427,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Expose `debug()` as the module.
 	 */
 	
-	exports = module.exports = __webpack_require__(62);
+	exports = module.exports = __webpack_require__(65);
 	exports.log = log;
 	exports.formatArgs = formatArgs;
 	exports.save = save;
@@ -17348,7 +17607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(54)))
 
 /***/ },
-/* 62 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -17364,7 +17623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.disable = disable;
 	exports.enable = enable;
 	exports.enabled = enabled;
-	exports.humanize = __webpack_require__(63);
+	exports.humanize = __webpack_require__(66);
 	
 	/**
 	 * The currently active debug mode names, and names to skip.
@@ -17553,7 +17812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 66 */
 /***/ function(module, exports) {
 
 	/**
@@ -17708,7 +17967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 64 */
+/* 67 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -18016,7 +18275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 65 */
+/* 68 */
 /***/ function(module, exports) {
 
 	if (typeof Object.create === 'function') {
@@ -18045,7 +18304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 66 */
+/* 69 */
 /***/ function(module, exports) {
 
 	// Generated by CoffeeScript 1.9.2
@@ -18073,7 +18332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 67 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (factory) {
@@ -18830,7 +19089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 68 */
+/* 71 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -19009,15 +19268,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 69 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	
-	var httpIndexes = __webpack_require__(76);
-	var localIndexes = __webpack_require__(78);
+	var httpIndexes = __webpack_require__(79);
+	var localIndexes = __webpack_require__(81);
 	
 	var plugin = {};
 	plugin.createIndex = utils.toPromise(function (requestDef, callback) {
@@ -19074,12 +19333,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 70 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var Promise = __webpack_require__(71);
+	var Promise = __webpack_require__(74);
 	
 	/* istanbul ignore next */
 	exports.once = function (fun) {
@@ -19153,14 +19412,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	};
 	
-	exports.inherits = __webpack_require__(65);
+	exports.inherits = __webpack_require__(68);
 	exports.Promise = Promise;
 	
 	exports.clone = function (obj) {
 	  return exports.extend(true, {}, obj);
 	};
 	
-	exports.extend = __webpack_require__(73);
+	exports.extend = __webpack_require__(76);
 	
 	exports.callbackify = function (fun) {
 	  return exports.getArguments(function (args) {
@@ -19184,8 +19443,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return promise;
 	};
 	
-	var crypto = __webpack_require__(74);
-	var Md5 = __webpack_require__(75);
+	var crypto = __webpack_require__(77);
+	var Md5 = __webpack_require__(78);
 	
 	exports.MD5 = function (string) {
 	  /* istanbul ignore else */
@@ -19363,19 +19622,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	};
 	
-	exports.log = __webpack_require__(61)('pouchdb:find');
+	exports.log = __webpack_require__(64)('pouchdb:find');
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(54)))
 
 /***/ },
-/* 71 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 	
-	var lie = _interopDefault(__webpack_require__(72));
+	var lie = _interopDefault(__webpack_require__(75));
 	
 	/* istanbul ignore next */
 	var PouchPromise = typeof Promise === 'function' ? Promise : lie;
@@ -19383,11 +19642,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = PouchPromise;
 
 /***/ },
-/* 72 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	var immediate = __webpack_require__(59);
+	var immediate = __webpack_require__(62);
 	
 	/* istanbul ignore next */
 	function INTERNAL() {}
@@ -19668,7 +19927,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(54)))
 
 /***/ },
-/* 73 */
+/* 76 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -19853,13 +20112,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 74 */
+/* 77 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 75 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*jshint bitwise:false*/
@@ -20464,12 +20723,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 76 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var massageCreateIndexRequest = __webpack_require__(77);
+	var massageCreateIndexRequest = __webpack_require__(80);
 	
 	function createIndex(db, requestDef, callback) {
 	  requestDef = massageCreateIndexRequest(requestDef);
@@ -20525,12 +20784,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.deleteIndex = deleteIndex;
 
 /***/ },
-/* 77 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	var clone = utils.clone;
 	
 	// we restucture the supplied JSON considerably, because the official
@@ -20563,34 +20822,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 78 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	var callbackify = utils.callbackify;
 	
-	exports.createIndex = callbackify(__webpack_require__(79));
-	exports.find = callbackify(__webpack_require__(92));
-	exports.getIndexes = callbackify(__webpack_require__(93));
-	exports.deleteIndex = callbackify(__webpack_require__(97));
+	exports.createIndex = callbackify(__webpack_require__(82));
+	exports.find = callbackify(__webpack_require__(95));
+	exports.getIndexes = callbackify(__webpack_require__(96));
+	exports.deleteIndex = callbackify(__webpack_require__(100));
 
 /***/ },
-/* 79 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	var log = utils.log;
 	
-	var pouchUpsert = __webpack_require__(80);
-	var abstractMapper = __webpack_require__(82);
-	var localUtils = __webpack_require__(83);
+	var pouchUpsert = __webpack_require__(83);
+	var abstractMapper = __webpack_require__(85);
+	var localUtils = __webpack_require__(86);
 	var validateIndex = localUtils.validateIndex;
 	var massageIndexDef = localUtils.massageIndexDef;
-	var massageCreateIndexRequest = __webpack_require__(77);
+	var massageCreateIndexRequest = __webpack_require__(80);
 	
 	function upsert(db, docId, diffFun) {
 	  return pouchUpsert.upsert.call(db, docId, diffFun);
@@ -20669,12 +20928,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 80 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var PouchPromise = __webpack_require__(81);
+	var PouchPromise = __webpack_require__(84);
 	
 	// this is essentially the "update sugar" function from daleharvey/pouchdb#1388
 	// the diffFun tells us what delta to apply to the doc.  it either returns
@@ -20768,14 +21027,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 81 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 	
-	var lie = _interopDefault(__webpack_require__(72));
+	var lie = _interopDefault(__webpack_require__(75));
 	
 	/* istanbul ignore next */
 	var PouchPromise = typeof Promise === 'function' ? Promise : lie;
@@ -20783,13 +21042,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = PouchPromise;
 
 /***/ },
-/* 82 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var localUtils = __webpack_require__(83);
-	var abstractMapReduce = __webpack_require__(86);
+	var localUtils = __webpack_require__(86);
+	var abstractMapReduce = __webpack_require__(89);
 	var parseField = localUtils.parseField;
 	
 	//
@@ -20920,13 +21179,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = abstractMapper;
 
 /***/ },
-/* 83 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
-	var collate = __webpack_require__(84);
+	var utils = __webpack_require__(73);
+	var collate = __webpack_require__(87);
 	
 	function getKey(obj) {
 	  return Object.keys(obj)[0];
@@ -21303,7 +21562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 84 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21312,7 +21571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var MAGNITUDE_DIGITS = 3; // ditto
 	var SEP = ''; // set to '_' for easier debugging 
 	
-	var utils = __webpack_require__(85);
+	var utils = __webpack_require__(88);
 	
 	exports.collate = function (a, b) {
 	
@@ -21662,7 +21921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 85 */
+/* 88 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -21737,17 +21996,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 86 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var pouchCollate = __webpack_require__(84);
-	var TaskQueue = __webpack_require__(87);
+	var pouchCollate = __webpack_require__(87);
+	var TaskQueue = __webpack_require__(90);
 	var collate = pouchCollate.collate;
 	var toIndexableString = pouchCollate.toIndexableString;
 	var normalizeKey = pouchCollate.normalizeKey;
-	var createView = __webpack_require__(90);
+	var createView = __webpack_require__(93);
 	var log;
 	/* istanbul ignore else */
 	if ((typeof console !== 'undefined') && (typeof console.log === 'function')) {
@@ -21755,7 +22014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	} else {
 	  log = function () {};
 	}
-	var utils = __webpack_require__(88);
+	var utils = __webpack_require__(91);
 	var Promise = utils.Promise;
 	var persistentQueues = {};
 	var tempViewQueue = new TaskQueue();
@@ -22440,7 +22699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(54)))
 
 /***/ },
-/* 87 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22448,7 +22707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Simple task queue to sequentialize actions. Assumes callbacks will eventually fire (once).
 	 */
 	
-	var Promise = __webpack_require__(88).Promise;
+	var Promise = __webpack_require__(91).Promise;
 	
 	function TaskQueue() {
 	  this.promise = new Promise(function (fulfill) {fulfill(); });
@@ -22469,16 +22728,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 88 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	/* istanbul ignore if */
-	exports.Promise = __webpack_require__(71);
+	exports.Promise = __webpack_require__(74);
 	
-	exports.inherits = __webpack_require__(65);
-	exports.extend = __webpack_require__(73);
-	var argsarray = __webpack_require__(60);
+	exports.inherits = __webpack_require__(68);
+	exports.extend = __webpack_require__(76);
+	var argsarray = __webpack_require__(63);
 	
 	/* istanbul ignore next */
 	exports.promisedCallback = function (promise, callback) {
@@ -22566,8 +22825,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return output;
 	};
 	
-	var crypto = __webpack_require__(89);
-	var Md5 = __webpack_require__(75);
+	var crypto = __webpack_require__(92);
+	var Md5 = __webpack_require__(78);
 	
 	exports.MD5 = function (string) {
 	  /* istanbul ignore else */
@@ -22580,19 +22839,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(54)))
 
 /***/ },
-/* 89 */
+/* 92 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 90 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var upsert = __webpack_require__(91);
-	var utils = __webpack_require__(88);
+	var upsert = __webpack_require__(94);
+	var utils = __webpack_require__(91);
 	var Promise = utils.Promise;
 	
 	function stringify(input) {
@@ -22689,31 +22948,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 91 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var upsert = __webpack_require__(80).upsert;
+	var upsert = __webpack_require__(83).upsert;
 	
 	module.exports = function (db, doc, diffFun) {
 	  return upsert.apply(db, [doc, diffFun]);
 	};
 
 /***/ },
-/* 92 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	var clone = utils.clone;
-	var getIndexes = __webpack_require__(93);
-	var collate = __webpack_require__(84).collate;
-	var abstractMapper = __webpack_require__(82);
-	var planQuery = __webpack_require__(94);
-	var localUtils = __webpack_require__(83);
-	var filterInMemoryFields = __webpack_require__(95);
+	var getIndexes = __webpack_require__(96);
+	var collate = __webpack_require__(87).collate;
+	var abstractMapper = __webpack_require__(85);
+	var planQuery = __webpack_require__(97);
+	var localUtils = __webpack_require__(86);
+	var filterInMemoryFields = __webpack_require__(98);
 	var massageSelector = localUtils.massageSelector;
 	var massageSort = localUtils.massageSort;
 	var getValue = localUtils.getValue;
@@ -22850,14 +23109,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 93 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	
-	var localUtils = __webpack_require__(83);
+	var localUtils = __webpack_require__(86);
 	var massageIndexDef = localUtils.massageIndexDef;
 	
 	function getIndexes(db) {
@@ -22908,14 +23167,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 94 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	var log = utils.log;
-	var localUtils = __webpack_require__(83);
+	var localUtils = __webpack_require__(86);
 	var getKey = localUtils.getKey;
 	var getUserFields = localUtils.getUserFields;
 	
@@ -23353,7 +23612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 95 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23365,14 +23624,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	// "bar".
 	//
 	
-	var isArray = __webpack_require__(96);
-	var collate = __webpack_require__(84).collate;
-	var localUtils = __webpack_require__(83);
+	var isArray = __webpack_require__(99);
+	var collate = __webpack_require__(87).collate;
+	var localUtils = __webpack_require__(86);
 	var isCombinationalField = localUtils.isCombinationalField;
 	var getKey = localUtils.getKey;
 	var getValue = localUtils.getValue;
 	var parseField = localUtils.parseField;
-	var utils = __webpack_require__(70);
+	var utils = __webpack_require__(73);
 	var getFieldFromDoc = utils.getFieldFromDoc;
 	
 	// create a comparator based on the sort object
@@ -23643,7 +23902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 96 */
+/* 99 */
 /***/ function(module, exports) {
 
 	
@@ -23682,13 +23941,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 97 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var abstractMapper = __webpack_require__(82);
-	var upsert = __webpack_require__(91);
+	var abstractMapper = __webpack_require__(85);
+	var upsert = __webpack_require__(94);
 	
 	function deleteIndex(db, index) {
 	
@@ -23723,7 +23982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = deleteIndex;
 
 /***/ },
-/* 98 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23773,7 +24032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 99 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

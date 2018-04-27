@@ -95,19 +95,19 @@
 	
 	var intents = _interopRequireWildcard(_intents);
 	
-	var _jobs = __webpack_require__(18);
+	var _jobs = __webpack_require__(21);
 	
 	var jobs = _interopRequireWildcard(_jobs);
 	
-	var _offline = __webpack_require__(19);
+	var _offline = __webpack_require__(22);
 	
 	var offline = _interopRequireWildcard(_offline);
 	
-	var _settings = __webpack_require__(22);
+	var _settings = __webpack_require__(25);
 	
 	var settings = _interopRequireWildcard(_settings);
 	
-	var _relations = __webpack_require__(23);
+	var _relations = __webpack_require__(26);
 	
 	var relations = _interopRequireWildcard(_relations);
 	
@@ -1082,11 +1082,11 @@
 	  }
 	  var state = generateRandomState();
 	  var query = {
-	    'client_id': client.clientID,
-	    'redirect_uri': client.redirectURI,
-	    'state': state,
-	    'response_type': 'code',
-	    'scope': scopes.join(' ')
+	    client_id: client.clientID,
+	    redirect_uri: client.redirectURI,
+	    state: state,
+	    response_type: 'code',
+	    scope: scopes.join(' ')
 	  };
 	  return {
 	    url: cozy._url + ('/auth/authorize?' + (0, _utils.encodeQuery)(query)),
@@ -1115,8 +1115,8 @@
 	    return Promise.reject(new Error('Given state does not match url query state'));
 	  }
 	  return retrieveToken(cozy, client, null, {
-	    'grant_type': 'authorization_code',
-	    'code': grantQueries.code
+	    grant_type: 'authorization_code',
+	    code: grantQueries.code
 	  });
 	}
 	
@@ -1124,8 +1124,8 @@
 	// refresh_token grant type in order to refresh the given token.
 	function refreshToken(cozy, client, token) {
 	  return retrieveToken(cozy, client, token, {
-	    'grant_type': 'refresh_token',
-	    'refresh_token': token.refreshToken
+	    grant_type: 'refresh_token',
+	    refresh_token: token.refreshToken
 	  });
 	}
 	
@@ -1245,8 +1245,8 @@
 	    return Promise.reject(new Error('Client not registered'));
 	  }
 	  var body = (0, _utils.encodeQuery)(Object.assign({}, query, {
-	    'client_id': client.clientID,
-	    'client_secret': client.clientSecret
+	    client_id: client.clientID,
+	    client_secret: client.clientSecret
 	  }));
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/auth/access_token', body, {
 	    disableAuth: token === null,
@@ -1288,7 +1288,9 @@
 	  } else {
 	    try {
 	      buffer = __webpack_require__(11).randomBytes(StateSize);
-	    } catch (e) {}
+	    } catch (e) {
+	      buffer = null;
+	    }
 	  }
 	  if (!buffer) {
 	    buffer = new Array(StateSize);
@@ -1474,7 +1476,7 @@
 	    var requestUrl = error.url;
 	
 	    if (requestUrl.indexOf(currentOrigin.replace(/^(https?:\/\/\w+)-\w+\./, '$1.')) === 0) {
-	      var redirectURL = currentOrigin + '?' + (0, _utils.encodeQuery)({ 'disconnect': 1 });
+	      var redirectURL = currentOrigin + '?' + (0, _utils.encodeQuery)({ disconnect: 1 });
 	      window.location = redirectURL;
 	    }
 	  } catch (e) {
@@ -1676,7 +1678,9 @@
 	      return Promise.reject(new Error('findMany is not available on v2'));
 	    }
 	
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', {
+	      include_docs: true
+	    });
 	
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, { keys: ids }).then(function (resp) {
 	      var docs = {};
@@ -1753,7 +1757,9 @@
 	      return Promise.reject(new Error('findAll is not available on v2'));
 	    }
 	
-	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', { include_docs: true });
+	    var path = (0, _utils.createPath)(cozy, isV2, doctype, '_all_docs', {
+	      include_docs: true
+	    });
 	
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, {}).then(function (resp) {
 	      var docs = [];
@@ -1896,12 +1902,12 @@
 	var DOCTYPE_FILES = exports.DOCTYPE_FILES = 'io.cozy.files';
 	
 	var KNOWN_DOCTYPES = {
-	  'files': DOCTYPE_FILES,
-	  'folder': DOCTYPE_FILES,
-	  'contact': 'io.cozy.contacts',
-	  'event': 'io.cozy.events',
-	  'track': 'io.cozy.labs.music.track',
-	  'playlist': 'io.cozy.labs.music.playlist'
+	  files: DOCTYPE_FILES,
+	  folder: DOCTYPE_FILES,
+	  contact: 'io.cozy.contacts',
+	  event: 'io.cozy.events',
+	  track: 'io.cozy.labs.music.track',
+	  playlist: 'io.cozy.labs.music.playlist'
 	};
 	
 	var REVERSE_KNOWN = {};
@@ -2009,26 +2015,39 @@
 	// It transforms the index fields into a map reduce view.
 	function defineIndexV2(cozy, doctype, fields) {
 	  var indexName = 'by' + fields.map(capitalize).join('');
-	  var indexDefinition = { map: makeMapFunction(doctype, fields), reduce: '_count' };
+	  var indexDefinition = {
+	    map: makeMapFunction(doctype, fields),
+	    reduce: '_count'
+	  };
 	  var path = '/request/' + doctype + '/' + indexName + '/';
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'PUT', path, indexDefinition).then(function () {
-	    return { doctype: doctype, type: 'mapreduce', name: indexName, fields: fields };
+	    return {
+	      doctype: doctype,
+	      type: 'mapreduce',
+	      name: indexName,
+	      fields: fields
+	    };
 	  });
 	}
 	
 	function defineIndexV3(cozy, doctype, fields) {
 	  var path = (0, _utils.createPath)(cozy, false, doctype, '_index');
-	  var indexDefinition = { 'index': { fields: fields } };
+	  var indexDefinition = { index: { fields: fields } };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, indexDefinition).then(function (response) {
-	    var indexResult = { doctype: doctype, type: 'mango', name: response.id, fields: fields };
+	    var indexResult = {
+	      doctype: doctype,
+	      type: 'mango',
+	      name: response.id,
+	      fields: fields
+	    };
 	
 	    if (response.result === 'exists') return indexResult;
 	
 	    // indexes might not be usable right after being created; so we delay the resolving until they are
 	    var selector = {};
-	    selector[fields[0]] = { '$gt': null };
+	    selector[fields[0]] = { $gt: null };
 	
-	    var opts = getV3Options(indexResult, { 'selector': selector });
+	    var opts = getV3Options(indexResult, { selector: selector });
 	    var path = (0, _utils.createPath)(cozy, false, indexResult.doctype, '_find');
 	    return (0, _fetch.cozyFetchJSON)(cozy, 'POST', path, opts).then(function () {
 	      return indexResult;
@@ -2434,7 +2453,7 @@
 	  var query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '' + path + query, undefined, {
 	    headers: {
-	      'Date': lastModifiedDate ? lastModifiedDate.toGMTString() : ''
+	      Date: lastModifiedDate ? lastModifiedDate.toGMTString() : ''
 	    }
 	  });
 	}
@@ -2488,7 +2507,9 @@
 	
 	  var body = {
 	    data: {
-	      attributes: Object.assign({}, attrs, { name: sanitizeFileName(attrs.name) })
+	      attributes: Object.assign({}, attrs, {
+	        name: sanitizeFileName(attrs.name)
+	      })
 	    }
 	  };
 	  return (0, _fetch.cozyFetchJSON)(cozy, 'PATCH', path, body, {
@@ -2527,7 +2548,7 @@
 	
 	  if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
 	    var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-	    return Promise.all([db.get(id), db.find(Object.assign({ selector: { 'dir_id': id } }, options))]).then(function (_ref6) {
+	    return Promise.all([db.get(id), db.find(Object.assign({ selector: { dir_id: id } }, options))]).then(function (_ref6) {
 	      var _ref7 = _slicedToArray(_ref6, 2),
 	          doc = _ref7[0],
 	          children = _ref7[1];
@@ -2610,7 +2631,10 @@
 	      }
 	    }
 	  }).then(function (data) {
-	    return { sharecode: 'sharecode=' + data.attributes.codes.email, id: 'id=' + id };
+	    return {
+	      sharecode: 'sharecode=' + data.attributes.codes.email,
+	      id: 'id=' + id
+	    };
 	  });
 	}
 	
@@ -2759,7 +2783,7 @@
 	
 	          case 4:
 	            intent = _context.sent;
-	            service = pickService(intent);
+	            service = (0, _helpers.pickService)(intent);
 	
 	            if (service) {
 	              _context.next = 8;
@@ -2834,132 +2858,21 @@
 	
 	var _fetch = __webpack_require__(9);
 	
+	var _helpers = __webpack_require__(18);
+	
+	var _client = __webpack_require__(19);
+	
+	var client = _interopRequireWildcard(_client);
+	
+	var _service = __webpack_require__(20);
+	
+	var service = _interopRequireWildcard(_service);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-	
-	var intentClass = 'coz-intent';
-	
-	// helper to serialize/deserialize an error for/from postMessage
-	var errorSerializer = function () {
-	  function mapErrorProperties(from, to) {
-	    var result = Object.assign(to, from);
-	    var nativeProperties = ['name', 'message'];
-	    return nativeProperties.reduce(function (result, property) {
-	      if (from[property]) {
-	        to[property] = from[property];
-	      }
-	      return result;
-	    }, result);
-	  }
-	  return {
-	    serialize: function serialize(error) {
-	      return mapErrorProperties(error, {});
-	    },
-	    deserialize: function deserialize(data) {
-	      return mapErrorProperties(data, new Error(data.message));
-	    }
-	  };
-	}();
-	
-	// inject iframe for service in given element
-	function injectService(url, element, intent, data, onReadyCallback) {
-	  var document = element.ownerDocument;
-	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
-	
-	  var window = document.defaultView;
-	  if (!window) return Promise.reject(new Error('Cannot retrieve window object from document'));
-	
-	  var iframe = document.createElement('iframe');
-	  // if callback provided for when iframe is loaded
-	  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback;
-	  // TODO: implement 'title' attribute
-	  iframe.setAttribute('src', url);
-	  iframe.classList.add(intentClass);
-	  element.appendChild(iframe);
-	  iframe.focus();
-	
-	  // Keeps only http://domain:port/
-	  var serviceOrigin = url.split('/', 3).join('/');
-	
-	  return new Promise(function (resolve, reject) {
-	    var handshaken = false;
-	    var messageHandler = function messageHandler(event) {
-	      if (event.origin !== serviceOrigin) return;
-	
-	      var eventType = event.data.type;
-	      if (eventType === 'load') {
-	        // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
-	        // making the handshake fails.
-	        console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.');
-	        return;
-	      }
-	
-	      if (eventType === 'intent-' + intent._id + ':ready') {
-	        handshaken = true;
-	        return event.source.postMessage(data, event.origin);
-	      }
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':resize') {
-	        ['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
-	          if (event.data.transition) element.style.transition = event.data.transition;
-	          if (event.data.dimensions[prop]) element.style[prop] = event.data.dimensions[prop] + 'px';
-	        });
-	
-	        return true;
-	      }
-	
-	      window.removeEventListener('message', messageHandler);
-	      var removeIntentFrame = function removeIntentFrame() {
-	        // check if the parent node has not been already removed from the DOM
-	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
-	      };
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':exposeFrameRemoval') {
-	        return resolve({ removeIntentFrame: removeIntentFrame, doc: event.data.document });
-	      }
-	
-	      removeIntentFrame();
-	
-	      if (eventType === 'intent-' + intent._id + ':error') {
-	        return reject(errorSerializer.deserialize(event.data.error));
-	      }
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':cancel') {
-	        return resolve(null);
-	      }
-	
-	      if (handshaken && eventType === 'intent-' + intent._id + ':done') {
-	        return resolve(event.data.document);
-	      }
-	
-	      if (!handshaken) {
-	        return reject(new Error('Unexpected handshake message from intent service'));
-	      }
-	
-	      // We may be in a state where the messageHandler is still attached to then
-	      // window, but will not be needed anymore. For example, the service failed
-	      // before adding the `unload` listener, so no `intent:cancel` message has
-	      // never been sent.
-	      // So we simply ignore other messages, and this listener will stay here,
-	      // waiting for a message which will never come, forever (almost).
-	    };
-	
-	    window.addEventListener('message', messageHandler);
-	  });
-	}
-	
-	var first = function first(arr) {
-	  return arr && arr[0];
-	};
-	// In a far future, the user will have to pick the desired service from a list.
-	// For now it's our job, an easy job as we arbitrary pick the first service of
-	// the list.
-	function pickService(intent, filterServices) {
-	  var services = intent.attributes.services;
-	  var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
-	  return first(filteredServices);
-	}
 	
 	function create(cozy, action, type) {
 	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -2981,124 +2894,24 @@
 	  });
 	
 	  createPromise.start = function (element, onReadyCallback) {
+	    var options = {
+	      filteredServices: data.filteredServices,
+	      onReadyCallback: onReadyCallback
+	    };
+	
+	    delete data.filteredServices;
+	
 	    return createPromise.then(function (intent) {
-	      var service = pickService(intent, data.filterServices);
-	      var restData = Object.assign({}, data);
-	      delete restData.filterServices;
-	
-	      if (!service) {
-	        return Promise.reject(new Error('Unable to find a service'));
-	      }
-	
-	      return injectService(service.href, element, intent, restData, onReadyCallback);
+	      return client.start(cozy, intent, element, data, options);
 	    });
 	  };
 	
 	  return createPromise;
 	}
 	
-	function listenClientData(intent, window) {
-	  return new Promise(function (resolve, reject) {
-	    var messageEventListener = function messageEventListener(event) {
-	      if (event.origin !== intent.attributes.client) return;
-	
-	      window.removeEventListener('message', messageEventListener);
-	      resolve(event.data);
-	    };
-	
-	    window.addEventListener('message', messageEventListener);
-	    window.parent.postMessage({
-	      type: 'intent-' + intent._id + ':ready'
-	    }, intent.attributes.client);
-	  });
-	}
-	
-	// maximize the height of an element
-	function maximize(element) {
-	  if (element && element.style) {
-	    element.style.height = '100%';
-	  }
-	}
-	
 	// returns a service to communicate with intent client
 	function createService(cozy, intentId, serviceWindow) {
-	  serviceWindow = serviceWindow || typeof window !== 'undefined' && window;
-	  if (!serviceWindow || !serviceWindow.document) {
-	    return Promise.reject(new Error('Intent service should be used in browser'));
-	  }
-	
-	  // Maximize document, the whole iframe is handled by intents, clients and
-	  // services
-	  serviceWindow.addEventListener('load', function () {
-	    var _serviceWindow = serviceWindow,
-	        document = _serviceWindow.document;
-	    [document.documentElement, document.body].forEach(maximize);
-	  });
-	
-	  intentId = intentId || serviceWindow.location.search.split('=')[1];
-	  if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'));
-	
-	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
-	    var terminated = false;
-	
-	    var _terminate = function _terminate(message) {
-	      if (terminated) throw new Error('Intent service has already been terminated');
-	      terminated = true;
-	      serviceWindow.parent.postMessage(message, intent.attributes.client);
-	    };
-	
-	    var resizeClient = function resizeClient(dimensions, transitionProperty) {
-	      if (terminated) throw new Error('Intent service has been terminated');
-	
-	      var message = {
-	        type: 'intent-' + intent._id + ':resize',
-	        // if a dom element is passed, calculate its size
-	        dimensions: dimensions.element ? Object.assign({}, dimensions, {
-	          maxHeight: dimensions.element.clientHeight,
-	          maxWidth: dimensions.element.clientWidth
-	        }) : dimensions,
-	        transition: transitionProperty
-	      };
-	
-	      serviceWindow.parent.postMessage(message, intent.attributes.client);
-	    };
-	
-	    var cancel = function cancel() {
-	      _terminate({ type: 'intent-' + intent._id + ':cancel' });
-	    };
-	
-	    // Prevent unfulfilled client promises when this window unloads for a
-	    // reason or another.
-	    serviceWindow.addEventListener('unload', function () {
-	      if (!terminated) cancel();
-	    });
-	
-	    return listenClientData(intent, serviceWindow).then(function (data) {
-	      return {
-	        getData: function getData() {
-	          return data;
-	        },
-	        getIntent: function getIntent() {
-	          return intent;
-	        },
-	        terminate: function terminate(doc) {
-	          var eventName = data && data.exposeIntentFrameRemoval ? 'exposeFrameRemoval' : 'done';
-	          return _terminate({
-	            type: 'intent-' + intent._id + ':' + eventName,
-	            document: doc
-	          });
-	        },
-	        throw: function _throw(error) {
-	          return _terminate({
-	            type: 'intent-' + intent._id + ':error',
-	            error: errorSerializer.serialize(error)
-	          });
-	        },
-	        resizeClient: resizeClient,
-	        cancel: cancel
-	      };
-	    });
-	  });
+	  return service.start(cozy, intentId, serviceWindow);
 	}
 	
 	function isSerializable(value) {
@@ -3123,6 +2936,450 @@
 
 /***/ },
 /* 18 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.pickService = pickService;
+	// helper to serialize/deserialize an error for/from postMessage
+	var errorSerializer = exports.errorSerializer = function () {
+	  function mapErrorProperties(from, to) {
+	    var result = Object.assign(to, from);
+	    var nativeProperties = ['name', 'message'];
+	    return nativeProperties.reduce(function (result, property) {
+	      if (from[property]) {
+	        to[property] = from[property];
+	      }
+	      return result;
+	    }, result);
+	  }
+	  return {
+	    serialize: function serialize(error) {
+	      return mapErrorProperties(error, {});
+	    },
+	    deserialize: function deserialize(data) {
+	      return mapErrorProperties(data, new Error(data.message));
+	    }
+	  };
+	}();
+	
+	var first = function first(arr) {
+	  return arr && arr[0];
+	};
+	// In a far future, the user will have to pick the desired service from a list.
+	// For now it's our job, an easy job as we arbitrary pick the first service of
+	// the list.
+	function pickService(intent, filterServices) {
+	  var services = intent.attributes.services;
+	  var filteredServices = filterServices ? (services || []).filter(filterServices) : services;
+	  return first(filteredServices);
+	}
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _regenerator = __webpack_require__(17);
+	
+	var _regenerator2 = _interopRequireDefault(_regenerator);
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	exports.start = start;
+	
+	var _helpers = __webpack_require__(18);
+	
+	var _ = __webpack_require__(16);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+	
+	var intentClass = 'coz-intent';
+	
+	function hideIntentIframe(iframe) {
+	  iframe.style.display = 'none';
+	}
+	
+	function showIntentFrame(iframe) {
+	  iframe.style.display = 'block';
+	}
+	
+	function buildIntentIframe(intent, element, url) {
+	  var document = element.ownerDocument;
+	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
+	
+	  var iframe = document.createElement('iframe');
+	  // TODO: implement 'title' attribute
+	  iframe.setAttribute('id', 'intent-' + intent._id);
+	  iframe.setAttribute('src', url);
+	  iframe.classList.add(intentClass);
+	  return iframe;
+	}
+	
+	function injectIntentIframe(intent, element, url, options) {
+	  var onReadyCallback = options.onReadyCallback;
+	
+	  var iframe = buildIntentIframe(intent, element, url, options.onReadyCallback);
+	  // if callback provided for when iframe is loaded
+	  if (typeof onReadyCallback === 'function') iframe.onload = onReadyCallback;
+	  element.appendChild(iframe);
+	  iframe.focus();
+	  return iframe;
+	}
+	
+	// inject iframe for service in given element
+	function connectIntentIframe(cozy, iframe, element, intent, data) {
+	  var _this = this;
+	
+	  var compose = function () {
+	    var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, action, doctype, data) {
+	      var intent, doc;
+	      return _regenerator2.default.wrap(function _callee$(_context) {
+	        while (1) {
+	          switch (_context.prev = _context.next) {
+	            case 0:
+	              _context.next = 2;
+	              return (0, _.create)(cozy, action, doctype, data);
+	
+	            case 2:
+	              intent = _context.sent;
+	
+	              hideIntentIframe(iframe);
+	              _context.next = 6;
+	              return start(cozy, intent, element, _extends({}, data, {
+	                exposeIntentFrameRemoval: false
+	              }));
+	
+	            case 6:
+	              doc = _context.sent;
+	
+	              showIntentFrame(iframe);
+	              return _context.abrupt('return', doc);
+	
+	            case 9:
+	            case 'end':
+	              return _context.stop();
+	          }
+	        }
+	      }, _callee, this);
+	    }));
+	
+	    return function compose(_x, _x2, _x3, _x4) {
+	      return _ref.apply(this, arguments);
+	    };
+	  }();
+	
+	  var document = element.ownerDocument;
+	  if (!document) return Promise.reject(new Error('Cannot retrieve document object from given element'));
+	
+	  var window = document.defaultView;
+	  if (!window) return Promise.reject(new Error('Cannot retrieve window object from document'));
+	
+	  // Keeps only http://domain:port/
+	  var serviceOrigin = iframe.src.split('/', 3).join('/');
+	
+	  return new Promise(function (resolve, reject) {
+	    var handshaken = false;
+	    var messageHandler = function () {
+	      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(event) {
+	        var eventType, _event$data, action, doctype, _data, doc, removeIntentFrame;
+	
+	        return _regenerator2.default.wrap(function _callee2$(_context2) {
+	          while (1) {
+	            switch (_context2.prev = _context2.next) {
+	              case 0:
+	                if (!(event.origin !== serviceOrigin)) {
+	                  _context2.next = 2;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return');
+	
+	              case 2:
+	                eventType = event.data.type;
+	
+	                if (!(eventType === 'load')) {
+	                  _context2.next = 6;
+	                  break;
+	                }
+	
+	                // Safari 9.1 (At least) send a MessageEvent when the iframe loads,
+	                // making the handshake fails.
+	                console.warn && console.warn('Cozy Client ignored MessageEvent having data.type `load`.');
+	                return _context2.abrupt('return');
+	
+	              case 6:
+	                if (!(eventType === 'intent-' + intent._id + ':ready')) {
+	                  _context2.next = 9;
+	                  break;
+	                }
+	
+	                handshaken = true;
+	                return _context2.abrupt('return', event.source.postMessage(data, event.origin));
+	
+	              case 9:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':resize')) {
+	                  _context2.next = 13;
+	                  break;
+	                }
+	
+	                ;['width', 'height', 'maxWidth', 'maxHeight'].forEach(function (prop) {
+	                  if (event.data.transition) element.style.transition = event.data.transition;
+	                  if (event.data.dimensions[prop]) element.style[prop] = event.data.dimensions[prop] + 'px';
+	                });
+	
+	                return _context2.abrupt('return', true);
+	
+	              case 13:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':compose')) {
+	                  _context2.next = 19;
+	                  break;
+	                }
+	
+	                // Let start to name `type` as `doctype`, as `event.data` already have a `type` attribute.
+	                _event$data = event.data, action = _event$data.action, doctype = _event$data.doctype, _data = _event$data.data;
+	                _context2.next = 17;
+	                return compose(cozy, action, doctype, _data);
+	
+	              case 17:
+	                doc = _context2.sent;
+	                return _context2.abrupt('return', event.source.postMessage(doc, event.origin));
+	
+	              case 19:
+	
+	                window.removeEventListener('message', messageHandler);
+	
+	                removeIntentFrame = function removeIntentFrame() {
+	                  // check if the parent node has not been already removed from the DOM
+	                  iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	                };
+	
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':exposeFrameRemoval')) {
+	                  _context2.next = 23;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', resolve({ removeIntentFrame: removeIntentFrame, doc: event.data.document }));
+	
+	              case 23:
+	
+	                removeIntentFrame();
+	
+	                if (!(eventType === 'intent-' + intent._id + ':error')) {
+	                  _context2.next = 26;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', reject(_helpers.errorSerializer.deserialize(event.data.error)));
+	
+	              case 26:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':cancel')) {
+	                  _context2.next = 28;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', resolve(null));
+	
+	              case 28:
+	                if (!(handshaken && eventType === 'intent-' + intent._id + ':done')) {
+	                  _context2.next = 30;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', resolve(event.data.document));
+	
+	              case 30:
+	                if (handshaken) {
+	                  _context2.next = 32;
+	                  break;
+	                }
+	
+	                return _context2.abrupt('return', reject(new Error('Unexpected handshake message from intent service')));
+	
+	              case 32:
+	              case 'end':
+	                return _context2.stop();
+	            }
+	          }
+	        }, _callee2, _this);
+	      }));
+	
+	      return function messageHandler(_x5) {
+	        return _ref2.apply(this, arguments);
+	      };
+	    }();
+	
+	    window.addEventListener('message', messageHandler);
+	  });
+	}
+	
+	function start(cozy, intent, element) {
+	  var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+	  var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+	
+	  var service = (0, _helpers.pickService)(intent, options.filterServices);
+	
+	  if (!service) {
+	    throw new Error('Unable to find a service');
+	  }
+	
+	  var iframe = injectIntentIframe(intent, element, service.href, options);
+	
+	  return connectIntentIframe(cozy, iframe, element, intent, data, options.onReadyCallback);
+	}
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.start = start;
+	
+	var _fetch = __webpack_require__(9);
+	
+	var _helpers = __webpack_require__(18);
+	
+	function listenClientData(intent, window) {
+	  return new Promise(function (resolve) {
+	    var messageEventListener = function messageEventListener(event) {
+	      if (event.origin !== intent.attributes.client) return;
+	
+	      window.removeEventListener('message', messageEventListener);
+	      resolve(event.data);
+	    };
+	
+	    window.addEventListener('message', messageEventListener);
+	    window.parent.postMessage({
+	      type: 'intent-' + intent._id + ':ready'
+	    }, intent.attributes.client);
+	  });
+	}
+	
+	// maximize the height of an element
+	function maximize(element) {
+	  if (element && element.style) {
+	    element.style.height = '100%';
+	  }
+	}
+	
+	function start(cozy, intentId, serviceWindow) {
+	  serviceWindow = serviceWindow || typeof window !== 'undefined' && window;
+	  if (!serviceWindow || !serviceWindow.document) {
+	    return Promise.reject(new Error('Intent service should be used in browser'));
+	  }
+	
+	  // Maximize document, the whole iframe is handled by intents, clients and
+	  // services
+	  serviceWindow.addEventListener('load', function () {
+	    var _serviceWindow = serviceWindow,
+	        document = _serviceWindow.document;
+	    [document.documentElement, document.body].forEach(maximize);
+	  });
+	
+	  intentId = intentId || serviceWindow.location.search.split('=')[1];
+	  if (!intentId) return Promise.reject(new Error('Cannot retrieve intent from URL'));
+	
+	  return (0, _fetch.cozyFetchJSON)(cozy, 'GET', '/intents/' + intentId).then(function (intent) {
+	    var terminated = false;
+	
+	    var sendMessage = function sendMessage(message) {
+	      if (terminated) throw new Error('Intent service has already been terminated');
+	      serviceWindow.parent.postMessage(message, intent.attributes.client);
+	    };
+	
+	    var compose = function compose(action, doctype, data) {
+	      return new Promise(function (resolve) {
+	        var composeEventListener = function composeEventListener(event) {
+	          if (event.origin !== intent.attributes.client) return;
+	          serviceWindow.removeEventListener('message', composeEventListener);
+	          return resolve(event.data);
+	        };
+	
+	        serviceWindow.addEventListener('message', composeEventListener);
+	
+	        sendMessage({
+	          type: 'intent-' + intent._id + ':compose',
+	          action: action,
+	          doctype: doctype,
+	          data: data
+	        });
+	      });
+	    };
+	
+	    var _terminate = function _terminate(message) {
+	      sendMessage(message);
+	      terminated = true;
+	    };
+	
+	    var resizeClient = function resizeClient(dimensions, transitionProperty) {
+	      if (terminated) throw new Error('Intent service has been terminated');
+	
+	      sendMessage({
+	        type: 'intent-' + intent._id + ':resize',
+	        // if a dom element is passed, calculate its size
+	        dimensions: dimensions.element ? Object.assign({}, dimensions, {
+	          maxHeight: dimensions.element.clientHeight,
+	          maxWidth: dimensions.element.clientWidth
+	        }) : dimensions,
+	        transition: transitionProperty
+	      });
+	    };
+	
+	    var cancel = function cancel() {
+	      _terminate({ type: 'intent-' + intent._id + ':cancel' });
+	    };
+	
+	    // Prevent unfulfilled client promises when this window unloads for a
+	    // reason or another.
+	    serviceWindow.addEventListener('unload', function () {
+	      if (!terminated) cancel();
+	    });
+	
+	    return listenClientData(intent, serviceWindow).then(function (data) {
+	      return {
+	        compose: compose,
+	        getData: function getData() {
+	          return data;
+	        },
+	        getIntent: function getIntent() {
+	          return intent;
+	        },
+	        terminate: function terminate(doc) {
+	          var eventName = data && data.exposeIntentFrameRemoval ? 'exposeFrameRemoval' : 'done';
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':' + eventName,
+	            document: doc
+	          });
+	        },
+	        throw: function _throw(error) {
+	          return _terminate({
+	            type: 'intent-' + intent._id + ':error',
+	            error: _helpers.errorSerializer.serialize(error)
+	          });
+	        },
+	        resizeClient: resizeClient,
+	        cancel: cancel
+	      };
+	    });
+	  });
+	}
+
+/***/ },
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3159,7 +3416,7 @@
 	}
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3191,11 +3448,11 @@
 	
 	var _utils = __webpack_require__(4);
 	
-	var _pouchdb = __webpack_require__(20);
+	var _pouchdb = __webpack_require__(23);
 	
 	var _pouchdb2 = _interopRequireDefault(_pouchdb);
 	
-	var _pouchdbFind = __webpack_require__(21);
+	var _pouchdbFind = __webpack_require__(24);
 	
 	var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 	
@@ -3321,7 +3578,9 @@
 	
 	function createIndexes(cozy, doctype) {
 	  if (doctype === _doctypes.DOCTYPE_FILES) {
-	    return getDatabase(cozy, doctype).createIndex({ index: { fields: ['dir_id'] } });
+	    return getDatabase(cozy, doctype).createIndex({
+	      index: { fields: ['dir_id'] }
+	    });
 	  }
 	  return Promise.resolve();
 	}
@@ -3367,7 +3626,7 @@
 	      createDatabase(cozy, doctype);
 	    }
 	    if (options.live === true) {
-	      return reject(new Error('You can\'t use `live` option with Cozy couchdb.'));
+	      return reject(new Error("You can't use `live` option with Cozy couchdb."));
 	    }
 	
 	    if ((0, _utils.isOffline)()) {
@@ -3389,7 +3648,7 @@
 	
 	            (0, _auth_v.refreshToken)(cozy, client, token).then(function (newToken) {
 	              return cozy.saveCredentials(client, newToken);
-	            }).then(function (credentials) {
+	            }).then(function () {
 	              return replicateFromCozy(cozy, doctype, options);
 	            });
 	          });
@@ -3489,19 +3748,19 @@
 	}
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb");
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports) {
 
 	module.exports = require("pouchdb-find");
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3551,7 +3810,7 @@
 	}
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
