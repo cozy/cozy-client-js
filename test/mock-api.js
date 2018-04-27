@@ -708,6 +708,39 @@ const ROUTES = [
     }
   },
   {
+    name: 'CreateComposedIntent',
+    method: 'POST',
+    matcher: /intents/,
+    response: {
+      headers: {
+        'content-type': 'application/vnd.api+json'
+      },
+      body: {
+        data: {
+          id: '4279db3278734467a1627fbef99a9de1',
+          type: 'io.cozy.intents',
+          attributes: {
+            action: 'INSTALL',
+            type: 'io.cozy.apps',
+            permissions: ['GET'],
+            client: 'contacts.cozy.example.net',
+            services: [
+              {
+                slug: 'store',
+                href:
+                  'https://store.cozy.example.net/install?intent=4279db3278734467a1627fbef99a9de1'
+              }
+            ]
+          },
+          links: {
+            self: '/intents/4279db3278734467a1627fbef99a9de1',
+            permissions: '/permissions/a340d5e0-d647-11e6-b66c-5fc9ce1e17c6'
+          }
+        }
+      }
+    }
+  },
+  {
     name: 'CreateIntentWithNoService',
     method: 'POST',
     matcher: /intents/,

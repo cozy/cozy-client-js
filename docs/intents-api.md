@@ -46,6 +46,11 @@ cozy.client.intents.create('EDIT', 'io.cozy.photos', {action: 'crop', width: 100
 If `intentId` and `window` parameters are not provided the method will try to retrieve them automatically.
 
 It returns a *service* object, which provides the following methods :
+ * `compose(action, doctype, data)`: request the client to make a second intent. This returns a promise fulfilled with the second intent result.
+ ```js
+// ...
+const app = await service.compose('INSTALL', 'io.cozy.apps', { slug: 'drive' })
+ ```
  * `getData()`: returns the data passed to the service by the client.
  * `getIntent()`: returns the intent
  * `resizeClient(doc, transitionProperty)`: forces the size of the intent modale to a given width, maxWidth, height, maxHeight, or dimensions of a given element. The second optional argument `transitionProperty` can be used to add a CSS transition property on the intent in order to 'animate' the resizing.

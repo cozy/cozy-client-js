@@ -6,6 +6,11 @@ import sinon from 'sinon'
 import { Client } from '../../src'
 import mock from '../mock-api'
 
+const serviceMockHref =
+  'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+const composedServiceMockHref =
+  'https://store.cozy.example.net/install?intent=4279db3278734467a1627fbef99a9de1'
+
 function mockElement() {
   const windowMock = {
     postMessage: sinon.spy(),
@@ -14,25 +19,50 @@ function mockElement() {
   }
   const iframeMock = {
     setAttribute: sinon.spy(),
+    src: serviceMockHref,
     parentNode: {
       removeChild: sinon.stub().returns(iframeMock)
     },
     classList: {
       add: sinon.spy()
     },
-    focus: sinon.spy()
+    focus: sinon.spy(),
+    style: {}
+  }
+  const compositionIframeMock = {
+    setAttribute: sinon.spy(),
+    src: composedServiceMockHref,
+    parentNode: {
+      removeChild: sinon.stub().returns(compositionIframeMock)
+    },
+    classList: {
+      add: sinon.spy()
+    },
+    focus: sinon.spy(),
+    style: {}
+  }
+  const createElementStub = () => {
+    const stub = sinon.stub()
+    stub.onFirstCall().returns(iframeMock)
+    stub.onSecondCall().returns(compositionIframeMock)
+    return stub
   }
   const documentMock = {
     defaultView: windowMock,
-    createElement: sinon.stub().returns(iframeMock)
+    createElement: createElementStub()
   }
   const iframeWindowMock = {
     postMessage: sinon.spy()
   }
+  const compositionIframeWindowMock = {
+    postMessage: sinon.spy()
+  }
   return {
+    compositionIframeWindowMock,
     style: [],
     ownerDocument: documentMock,
     appendChild: sinon.spy(),
+    compositionIframeMock,
     iframeMock: iframeMock,
     documentMock: documentMock,
     windowMock: windowMock,
@@ -55,8 +85,7 @@ describe('Intents', function() {
       services: [
         {
           slug: 'files',
-          href:
-            'https://files.cozy.example.net/pick?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+          href: serviceMockHref
         }
       ]
     },
@@ -67,6 +96,7 @@ describe('Intents', function() {
   }
 
   const serviceUrl = 'https://files.cozy.example.net'
+  const compositionServiceUrl = 'https://store.cozy.example.net'
 
   beforeEach(() => {
     cozy.client = new Client({
@@ -109,8 +139,9 @@ describe('Intents', function() {
 
   describe('Intent.start', function() {
     beforeEach(mock.mockAPI('CreateIntent'))
+
     describe('Filtering', () => {
-      it('should filter intents', () => {
+      it('should filter intents', async () => {
         cozy.client.intents
           .create('EDIT', 'io.cozy.files', {
             filterServices: x => x.slug === 'files'
@@ -270,6 +301,101 @@ describe('Intents', function() {
       return call.should.be.rejectedWith(
         /Unexpected handshake message from intent service/
       )
+    })
+
+    it('should handle composition', function(done) {
+      const element = mockElement()
+      const {
+        compositionIframeMock,
+        compositionIframeWindowMock,
+        iframeMock,
+        iframeWindowMock,
+        windowMock
+      } = element
+
+      const handshakeEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:ready'
+        },
+        source: iframeWindowMock
+      }
+
+      const composeEventMessageMock = {
+        origin: serviceUrl,
+        data: {
+          action: 'INSTALL',
+          data: { slug: 'myapp' },
+          doctype: 'io.cozy.apps',
+          type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:compose'
+        },
+        source: iframeWindowMock
+      }
+
+      const terminateCompositionEventMessageMock = {
+        origin: compositionServiceUrl,
+        data: {
+          document: { slug: 'io.cozy.apps/myapp' },
+          type: 'intent-4279db3278734467a1627fbef99a9de1:done'
+        }
+      }
+
+      cozy.client.intents
+        .create('PICK', 'io.cozy.files', { key: 'value' })
+        .start(element)
+
+      setTimeout(() => {
+        const messageEventListener =
+          windowMock.addEventListener.firstCall.args[1]
+
+        messageEventListener(handshakeEventMessageMock)
+
+        mock.restore().mockAPI('CreateComposedIntent')()
+        messageEventListener(composeEventMessageMock)
+
+        setTimeout(() => {
+          element.appendChild
+            .withArgs(compositionIframeMock)
+            .calledOnce.should.be.true()
+
+          iframeMock.style.display.should.be.equal('none')
+
+          const compositionMessageEventListener =
+            windowMock.addEventListener.secondCall.args[1]
+
+          should(
+            windowMock.addEventListener.withArgs('message').calledTwice
+          ).be.true()
+
+          const compositionHandshakeEventMessageMock = {
+            origin: compositionServiceUrl,
+            data: {
+              type: 'intent-4279db3278734467a1627fbef99a9de1:ready'
+            },
+            source: compositionIframeWindowMock
+          }
+
+          compositionMessageEventListener(compositionHandshakeEventMessageMock)
+          compositionMessageEventListener(terminateCompositionEventMessageMock)
+
+          setTimeout(() => {
+            iframeMock.style.display.should.be.equal('block')
+
+            should(
+              windowMock.removeEventListener.withArgs(
+                'message',
+                compositionMessageEventListener
+              ).calledOnce
+            ).be.true()
+
+            compositionIframeMock.parentNode.removeChild
+              .withArgs(compositionIframeMock)
+              .calledOnce.should.be.true()
+
+            done()
+          }, 10)
+        }, 10)
+      }, 10)
     })
 
     it('should handle intent error', async function() {
@@ -836,6 +962,80 @@ describe('Intents', function() {
               }
             })
           }, /Intent service has been terminated/)
+        })
+      })
+
+      describe('Compose', function() {
+        it('should send compose message to Client', async function() {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener =
+              windowMock.addEventListener.thirdCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(
+            expectedIntent._id,
+            windowMock
+          )
+
+          service.compose('ACTION', 'io.cozy.doctype', { key: 'value' })
+
+          const messageMatch = sinon.match({
+            action: 'ACTION',
+            data: { key: 'value' },
+            doctype: 'io.cozy.doctype',
+            type: 'intent-77bcc42c-0fd8-11e7-ac95-8f605f6e8338:compose'
+          })
+
+          windowMock.parent.postMessage
+            .withArgs(messageMatch, expectedIntent.attributes.client)
+            .calledOnce.should.be.true()
+        })
+
+        it('should handle composition resolution', async function() {
+          const windowMock = mockWindow()
+
+          const clientHandshakeEventMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: { foo: 'bar' }
+          }
+
+          const result = {
+            type: 'io.cozy.things'
+          }
+
+          const composeResolutionMessageMock = {
+            origin: expectedIntent.attributes.client,
+            data: result
+          }
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const messageEventListener =
+              windowMock.addEventListener.thirdCall.args[1]
+            messageEventListener(clientHandshakeEventMessageMock)
+          })
+
+          const service = await cozy.client.intents.createService(
+            expectedIntent._id,
+            windowMock
+          )
+
+          windowMock.parent.postMessage.callsFake(() => {
+            const composeEventListener = windowMock.addEventListener.getCall(3)
+              .args[1]
+            composeEventListener(composeResolutionMessageMock)
+          })
+
+          return service
+            .compose('ACTION', 'io.cozy.doctype', { key: 'value' })
+            .should.be.fulfilledWith(result)
         })
       })
 
