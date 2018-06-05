@@ -1,5 +1,3 @@
-{% raw %}
-
 # Introduction to cozy-client-js
 
 ## Reminder about cozy architectures
@@ -140,5 +138,3 @@ Future APIs
 This is the end of what we already have implemented, if you want to do something else (manipulating binary file, sharing, ...), you will have to wait a bit :smile:.
 
 Feel free to open an issue if you see something missing, or if you disagree with the API design !
-
-{% endraw %}
