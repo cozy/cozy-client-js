@@ -124,8 +124,12 @@ cozy.client.init({
   disablePromises: false,
   version: 3,
   oauth: {
-    clientParams: {/*...*/},
-    scopes: ["io.cozy.files:GET"],
+    clientParams: {
+      redirectURI: 'http://localhost:3333/oauth/callback',
+      softwareID: 'cozy-client-js',
+      clientName: 'example',
+      scopes: ["io.cozy.files:GET"]
+    },
     onRegistered: (client, url) => { /* */ },
     storage: new cozy.auth.LocalStorage(window.localStorage)
   }
