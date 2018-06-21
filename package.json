@@ -84,5 +84,8 @@
   },
   "peerDependencies": {
     "babel-polyfill": "^6.26.0"
+  },
+  "resolutions": {
+    "leveldown": "1.4.6"
   }
 }
