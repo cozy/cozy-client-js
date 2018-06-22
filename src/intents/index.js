@@ -79,9 +79,13 @@ function buildRedirectionURL(url, data) {
   return parameterStrings.length ? `${url}?${parameterStrings.join('&')}` : url
 }
 
-export async function redirect(cozy, type, doc) {
+export async function redirect(cozy, type, doc, redirectFn) {
   if (!window)
     throw new Error('redirect() method can only be called in a browser')
   const redirectionURL = await getRedirectionURL(cozy, type, doc)
+  if (redirectFn && typeof redirectFn === 'function') {
+    return redirectFn(redirectionURL)
+  }
+
   window.location.href = redirectionURL
 }
