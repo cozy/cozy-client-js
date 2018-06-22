@@ -2818,7 +2818,7 @@
 	}();
 	
 	var redirect = exports.redirect = function () {
-	  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(cozy, type, doc) {
+	  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(cozy, type, doc, redirectFn) {
 	    var redirectionURL;
 	    return _regenerator2.default.wrap(function _callee2$(_context2) {
 	      while (1) {
@@ -2838,9 +2838,18 @@
 	          case 4:
 	            redirectionURL = _context2.sent;
 	
+	            if (!(redirectFn && typeof redirectFn === 'function')) {
+	              _context2.next = 7;
+	              break;
+	            }
+	
+	            return _context2.abrupt('return', redirectFn(redirectionURL));
+	
+	          case 7:
+	
 	            window.location.href = redirectionURL;
 	
-	          case 6:
+	          case 8:
 	          case 'end':
 	            return _context2.stop();
 	        }
@@ -2848,7 +2857,7 @@
 	    }, _callee2, this);
 	  }));
 	
-	  return function redirect(_x6, _x7, _x8) {
+	  return function redirect(_x6, _x7, _x8, _x9) {
 	    return _ref2.apply(this, arguments);
 	  };
 	}();
