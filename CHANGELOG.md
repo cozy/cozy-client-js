@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.10.0] - 2018-06-22
+
+### Changed
+
+- Pouchdb and Pouchdb-find have been upgraded to their latest versions. Pouchdb-find has changed major version.
+
+### Fixed
+
+- isomorphic-fetch has been added as a direct dependency, fixing a problem on node on macOS. 
+
 ## [v0.9.0] - 2018-04-27
 ### Added
 - Intent composition
@@ -326,7 +336,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.10.0...HEAD
+[v0.10.0]: https://github.com/cozy/cozy-client-js/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/cozy/cozy-client-js/compare/v0.8.3...v0.9.0
 [v0.8.3]: https://github.com/cozy/cozy-client-js/compare/v0.8.2...v0.8.3
 [v0.8.2]: https://github.com/cozy/cozy-client-js/compare/v0.8.1...v0.8.2
