@@ -1,61 +1,50 @@
 language: node_js
-
 node_js:
-  - "8"
-
+- '8'
 services:
-  - docker
-
+- docker
 env:
   global:
-    - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
-    - COZY_V3_DOMAIN="localhost:8080"
-    - COZY_V3_PASSPHRASE="CozyTest_1"
-
+  - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
+  - COZY_V3_DOMAIN="localhost:8080"
+  - COZY_V3_PASSPHRASE="CozyTest_1"
 cache:
   yarn: true
   directories:
-    - node_modules
-
+  - node_modules
 before_script:
-  # start couchdb 2 (docker)
-  - docker run -d -p 5984:5984 --name couch apache/couchdb:2.1
-  # go 1.10
-  - eval "$(gimme 1.10)"
-  - mkdir $GOPATH
-  # install stack v3
-  - go get -u github.com/cozy/cozy-stack
-  - go get -u github.com/rif/spark
-  # start a stack v3 instance from master (listening on 8080)
-  - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
-  - $GOPATH/bin/cozy-stack serve &
-  - sleep 1
-  - $GOPATH/bin/cozy-stack instances add --dev --passphrase "$COZY_V3_PASSPHRASE" "$COZY_V3_DOMAIN"
-  # install stack v2
-  - npm install -g coffee-script
-  # start a stack v2 from NPM (listening on 9104 & 9101)
-  - NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start &
-  - sleep 3
-  - npm explore cozy-proxy npm run postinstall
-  - NODE_ENV=test NAME=proxy TOKEN=token npm explore cozy-proxy npm run start &
-  - sleep 3
-  - npm explore cozy-data-system coffee commands.coffee test-install client-js ../../test/package.json
-  - export NAME=client-js
-  - export TOKEN=apptoken
-  # install an application and generate the associated token
-  # TODO: should use a CLI to install this application when permissions on /apps/ are added
-  - "$TRAVIS_BUILD_DIR/test/testapp-git-daemon.sh /tmp/testapp $TRAVIS_BUILD_DIR/test/testapp-manifest.json &"
-  - sleep 2
-  - sudo $GOPATH/bin/spark -port 80 /tmp/testapp &
-  - sleep 2
-  - $GOPATH/bin/cozy-stack apps install --domain "$COZY_V3_DOMAIN" mini "git://localhost/"
-  - export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "$COZY_V3_DOMAIN" "mini")
-
+- docker run -d -p 5984:5984 --name couch apache/couchdb:2.1
+- eval "$(gimme 1.10)"
+- mkdir $GOPATH
+- go get -u github.com/cozy/cozy-stack
+- go get -u github.com/rif/spark
+- curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
+- $GOPATH/bin/cozy-stack serve &
+- sleep 1
+- $GOPATH/bin/cozy-stack instances add --dev --passphrase "$COZY_V3_PASSPHRASE" "$COZY_V3_DOMAIN"
+- npm install -g coffee-script
+- NODE_ENV=test NAME=datasystem TOKEN=token npm explore cozy-data-system npm run start
+  &
+- sleep 3
+- npm explore cozy-proxy npm run postinstall
+- NODE_ENV=test NAME=proxy TOKEN=token npm explore cozy-proxy npm run start &
+- sleep 3
+- npm explore cozy-data-system coffee commands.coffee test-install client-js ../../test/package.json
+- export NAME=client-js
+- export TOKEN=apptoken
+- $TRAVIS_BUILD_DIR/test/testapp-git-daemon.sh /tmp/testapp $TRAVIS_BUILD_DIR/test/testapp-manifest.json
+  &
+- sleep 2
+- sudo $GOPATH/bin/spark -port 80 /tmp/testapp &
+- sleep 2
+- $GOPATH/bin/cozy-stack apps install --domain "$COZY_V3_DOMAIN" mini "git://localhost/"
+- export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "$COZY_V3_DOMAIN"
+  "mini")
 deploy:
   provider: npm
   email: npm@cozycloud.cc
   api_key:
-    secure: gas33bYIXJdSKZIFuJefrXieNb4uZXvcwZM0+B9ca8SuElXHKIyUsETrUYlAi9SgToWxyb2wohQYw/zKo+oZbgic//PMSJspNtC95SoFMdZAlqeKMSQKv4906Kp/hKJjJPu0MqSxF6SEcb8QziV6BfZX/sSRGRcwGTkaiHrVxa26nEC0a2478sB3IsKH/TIgoJypfZo1OX5SefxQ2AZ9SQRkj29JFRSWY8uKUn3ZvjXAGVVnfaRKXDvUNdzpqMLr9IEriZDfRg//a7cv02sWyg6bn6KxnIKBs/1qn+l3owSniXhejGuLkYBsEf+G8wbdF5sJ9/Ja2V50u/aHplWtS/FTgrWGXk8v2YHmKQQYdZqiVhBwkHTtBSti0AAvaSxr4ylJBcPqHQN30ks/ksDO4S7ZNsk+ASsYx1SbIoe4XcYkJt3OYOJw6lnu6I3TSm7I/LBcGwbXiRpNQ4kimcDFCyW0S2RQqESqILgbvjfg1D2flWRrbxzolZWcyuNCNXJWpSU9MQ2tTZVUEwj/Po+iE5vkuJJyyUD/yJwxjKlwn9raVVwFzX253OW9AFcW2ueT9BtN5AfM6uYTG6uKOc7qTrztre3i04zicP2P+yX/hpYVKu/K9itG2c64OInHPlGb1TSJT+vCfj35ieiY5RypJHsBghtoOFeN5QerqHEgEwQ=
+    secure: XC+urJ3qAbcdSKoWjTG3eBPx6DEJ2ddTa8nZarRBMIQmfKd5SlP2w6poD9XWm3E1Z9OxEWsksbWHWp+krCQaK/USKunDbEJrqvRDO6QIJnEdv/QAYCb8x9iHhZPADclV34hcQLLOGoIphVi3pBUmbsT1H4KvZadzJBX2DkeRMYGCvbH/If+PQmsLJm8yeF4zox2WXeRA4weIB/Lx9M7HJxTF1gre/lKjpAB7bDZhpVUQYC7m2IAgHaTFdZUlpNJQyZntCjuge+8Lckyjye64bHfMaomyqHYdn0q8Ik5vxcUuek0dGJfTtbEzoooaeG0eZ4m1nU0qPYdpJFwHsIvbsxAJrNN5w3baM/71zbCyG42bPkbYipHhtt4k9nvTaOlViLwq1Y2Il0iwXid5jjvRfQDCxEx79g+Jd8Os2DLy2G6x9XVI+gd9oLNvB3QPhMzUjSuN9gV2wNcjDSfsje/DhRaMxU6xTGajcgVy97cyhWtKKUKTVd1Bojhe0WwoCwIs4X5zsITmchjVGsnuzaguiUoTcyooMe5xYx7oYfmhALAtN/+9SWYmYPcNuSURl8OjUxI4A45hw6AXj8vqa+QU45AtQwol7+VMBS9kEfyiiVamFmq/tRM3E8ebTmifMblIOO8cEkKa93+uepVcrOX/omWc6my3JJDdDpyELdD7Y7g=
   on:
     tags: true
     repo: cozy/cozy-client-js
