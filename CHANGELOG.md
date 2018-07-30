@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.12.0] - 2018-07-30
+### Fixed
+- Fix issue for intents URLs computing with hash
+
+
 ## [v0.11.0] - 2018-06-22
 
 ### Added
