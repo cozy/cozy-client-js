@@ -42,6 +42,10 @@ export function createService(cozy, intentId, serviceWindow) {
   return service.start(cozy, intentId, serviceWindow)
 }
 
+function removeQueryString(url) {
+  return url.replace(/\?[^/#]*/, '')
+}
+
 // Redirect to an app able to handle the doctype
 // Redirections are more or less a hack of the intent API to retrieve an URL for
 // accessing a given doctype or a given document.
@@ -60,11 +64,8 @@ export async function getRedirectionURL(cozy, type, data) {
   // Intents cannot be deleted now
   // await deleteIntent(cozy, intent)
 
-  // ignore query string and intent id
-  const baseURL = service.href.split('?')[0]
-  // FIXME: Handle the fact that the stack encode the '#' character in the URL
-  const sanitizedURL = baseURL.replace('%23', '#')
-  return data ? buildRedirectionURL(sanitizedURL, data) : sanitizedURL
+  const baseURL = removeQueryString(service.href)
+  return data ? buildRedirectionURL(baseURL, data) : baseURL
 }
 
 function isSerializable(value) {

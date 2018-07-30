@@ -985,7 +985,11 @@ describe('Intents', function() {
             windowMock
           )
 
-          service.compose('ACTION', 'io.cozy.doctype', { key: 'value' })
+          service.compose(
+            'ACTION',
+            'io.cozy.doctype',
+            { key: 'value' }
+          )
 
           const messageMatch = sinon.match({
             action: 'ACTION',
@@ -1034,7 +1038,11 @@ describe('Intents', function() {
           })
 
           return service
-            .compose('ACTION', 'io.cozy.doctype', { key: 'value' })
+            .compose(
+              'ACTION',
+              'io.cozy.doctype',
+              { key: 'value' }
+            )
             .should.be.fulfilledWith(result)
         })
       })
@@ -1402,7 +1410,7 @@ describe('Intents', function() {
         return cozy.client.intents
           .getRedirectionURL('io.cozy.files')
           .then(url => {
-            should.equal(url, 'https://drive.cozy.example.net/#/files/')
+            should.equal(url, 'https://drive.cozy.example.net/#/files')
           })
       })
 
@@ -1416,14 +1424,14 @@ describe('Intents', function() {
           },
           ignoredArray: ['value1', 'value2']
         }
-        return cozy.client.intents
-          .getRedirectionURL('io.cozy.files', data)
-          .then(url => {
-            should.equal(
-              url,
-              'https://drive.cozy.example.net/#/files/?id=da20344a-e37f-440a-a98f-7efa73671b95&folder=a093723b-0e70-4050-9121-10394b53b966'
-            )
-          })
+        const url1 = await cozy.client.intents.getRedirectionURL(
+          'io.cozy.files',
+          data
+        )
+        should.equal(
+          url1,
+          'https://drive.cozy.example.net/#/files?id=da20344a-e37f-440a-a98f-7efa73671b95&folder=a093723b-0e70-4050-9121-10394b53b966'
+        )
       })
     })
   })

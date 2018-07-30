@@ -788,7 +788,7 @@ const ROUTES = [
               {
                 slug: 'store',
                 href:
-                  'https://drive.cozy.example.net/%23/files/?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338'
+                  'https://drive.cozy.example.net/?intent=77bcc42c-0fd8-11e7-ac95-8f605f6e8338#/files'
               }
             ]
           },
