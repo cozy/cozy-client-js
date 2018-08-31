@@ -385,8 +385,8 @@ function retrieveToken(cozy, client, token, query) {
   })
 }
 
-// getGrantCodeFromPageURL extract the state and access_code query parameters
-// from the given url
+// getGrantCodeFromPageURL extract the state and code query parameters from the
+// given url
 function getGrantCodeFromPageURL(pageURL = '') {
   if (pageURL === '' && typeof window !== 'undefined') {
     pageURL = window.location.href
@@ -397,7 +397,7 @@ function getGrantCodeFromPageURL(pageURL = '') {
   }
   return {
     state: queries['state'],
-    code: queries['access_code']
+    code: queries['code']
   }
 }
 
