@@ -1259,8 +1259,8 @@
 	  });
 	}
 	
-	// getGrantCodeFromPageURL extract the state and access_code query parameters
-	// from the given url
+	// getGrantCodeFromPageURL extract the state and code query parameters from the
+	// given url
 	function getGrantCodeFromPageURL() {
 	  var pageURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 	
@@ -1273,7 +1273,7 @@
 	  }
 	  return {
 	    state: queries['state'],
-	    code: queries['access_code']
+	    code: queries['code']
 	  };
 	}
 	
@@ -2765,7 +2765,7 @@
 	// It needs to use a special action `REDIRECT`
 	var getRedirectionURL = exports.getRedirectionURL = function () {
 	  var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, type, data) {
-	    var intent, service, baseURL, sanitizedURL;
+	    var intent, service, baseURL;
 	    return _regenerator2.default.wrap(function _callee$(_context) {
 	      while (1) {
 	        switch (_context.prev = _context.next) {
@@ -2797,14 +2797,10 @@
 	            // Intents cannot be deleted now
 	            // await deleteIntent(cozy, intent)
 	
-	            // ignore query string and intent id
-	            baseURL = service.href.split('?')[0];
-	            // FIXME: Handle the fact that the stack encode the '#' character in the URL
+	            baseURL = removeQueryString(service.href);
+	            return _context.abrupt('return', data ? buildRedirectionURL(baseURL, data) : baseURL);
 	
-	            sanitizedURL = baseURL.replace('%23', '#');
-	            return _context.abrupt('return', data ? buildRedirectionURL(sanitizedURL, data) : sanitizedURL);
-	
-	          case 11:
+	          case 10:
 	          case 'end':
 	            return _context.stop();
 	        }
@@ -2921,6 +2917,10 @@
 	// returns a service to communicate with intent client
 	function createService(cozy, intentId, serviceWindow) {
 	  return service.start(cozy, intentId, serviceWindow);
+	}
+	
+	function removeQueryString(url) {
+	  return url.replace(/\?[^/#]*/, '');
 	}
 	
 	function isSerializable(value) {
