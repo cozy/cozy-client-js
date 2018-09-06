@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [v0.12.1] - 2018-09-06
+### Fixed
+- Added missing `dist/` folder
+
+
 ## [v0.12.0] - 2018-07-30
 ### Fixed
 - Fix issue for intents URLs computing with hash
@@ -350,7 +355,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.12.1...HEAD
+[v0.12.1]: https://github.com/cozy/cozy-client-js/compare/v0.12.0...v0.12.1
+[v0.12.0]: https://github.com/cozy/cozy-client-js/compare/v0.11.0...v0.12.0
 [v0.11.0]: https://github.com/cozy/cozy-client-js/compare/v0.10.0...v0.11.0
 [v0.10.0]: https://github.com/cozy/cozy-client-js/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/cozy/cozy-client-js/compare/v0.8.3...v0.9.0
