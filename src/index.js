@@ -113,6 +113,7 @@ const offlineProto = {
   hasDatabase: offline.hasDatabase,
   getDatabase: offline.getDatabase,
   createDatabase: offline.createDatabase,
+  migrateDatabase: offline.migrateDatabase,
   destroyDatabase: offline.destroyDatabase,
   destroyAllDatabase: offline.destroyAllDatabase,
   // replication
