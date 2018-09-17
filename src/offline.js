@@ -56,6 +56,21 @@ export function setDatabase(cozy, doctype, database) {
   return getDatabase(cozy, doctype)
 }
 
+export function migrateDatabase(cozy, doctype, options = {}) {
+  const oldDb = getDatabase(cozy, doctype)
+  const newOptions = {
+    adapter: 'idb',
+    ...options
+  }
+  const newDb = new PouchDB(doctype, newOptions)
+
+  return oldDb.replicate.to(newDb).then(() => {
+    setDatabase(cozy, doctype, newDb)
+    oldDb.destroy()
+    return newDb
+  })
+}
+
 export function createDatabase(cozy, doctype, options = {}) {
   if (!pluginLoaded) {
     PouchDB.plugin(pouchdbFind)
