@@ -26,20 +26,20 @@ if (NODE_TARGET === 'web') {
 }
 
 var config = {
-  entry: ['isomorphic-fetch', path.join(__dirname, 'src', 'index.js')],
+  entry: path.join(__dirname, 'src', 'index.js'),
   devtool: 'source-map',
   target: NODE_TARGET,
   output: output,
   resolve: {
-    root: path.resolve('./src'),
-    extensions: ['', '.js']
+    modules: ['node_modules', path.resolve('./src')],
+    extensions: ['.js']
   },
   module: {
     loaders: [
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /(node_modules|bower_components)/
+        exclude: /node_modules/
       }
     ]
   },
@@ -51,14 +51,12 @@ var config = {
 if (NODE_TARGET === 'node') {
   config.externals = [nodeExternals()]
   config.plugins = [
-    new webpack.optimize.DedupePlugin(),
     new webpack.ProvidePlugin({ 'btoa': 'btoa' }),
     new webpack.EnvironmentPlugin(Object.keys(process.env))
   ]
 } else if (production) {
   config.plugins = [
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       mangle: true,
       compress: {
