@@ -2,7 +2,7 @@
 [![NPM release version shield](https://img.shields.io/npm/v/cozy-client-js.svg)](https://www.npmjs.com/package/cozy-client-js)
 [![NPM Licence shield](https://img.shields.io/npm/l/cozy-client-js.svg)](https://github.com/cozy/cozy-client-js/blob/master/LICENSE)
 
-⚠️ This is the documentation for the old version of cozy-client. [Go to the new version](http://github.com/cozy/cozy-client).
+⚠️ This is the documentation for the old version of cozy-client. [Go to the new version](http://github.com/cozy/cozy-client) ✅.
 
 
 [Cozy][cozy] Javascript Client
