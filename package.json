@@ -21,7 +21,8 @@
     "test:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
     "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
     "clean": "rm -r dist .tmp",
-    "shasum": "shasum -a 256 dist/cozy-client.min.js && shasum -a 256 dist/cozy-client.min.js.map"
+    "shasum": "shasum -a 256 dist/cozy-client.min.js && shasum -a 256 dist/cozy-client.min.js.map",
+    "prepublishOnly": "yarn build"
   },
   "repository": {
     "type": "git",
