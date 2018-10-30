@@ -228,7 +228,10 @@ class Client {
       this.offline.init(options.offline)
     }
 
-    // Exposing cozyFetchJSON to make some development easier. Should be temporary.
+    this.fetch = function _fetch(method, url, options = {}) {
+      return cozyFetch.cozyFetch(this, url, { ...options, method })
+    }
+
     this.fetchJSON = function _fetchJSON() {
       const args = [this].concat(Array.prototype.slice.call(arguments))
       return cozyFetch.cozyFetchJSON.apply(this, args)
