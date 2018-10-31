@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
+## [v0.14.0] - 2018-10-31
+### Added
+- Expose `fetch()` method
+
+
 ## [v0.13.0] - 2018-09-19
 ### Added
 - Added a function to migrate PouchDB databases from one adapter to another.
