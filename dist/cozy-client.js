@@ -4812,6 +4812,8 @@ function typedBuffer() {
 "use strict";
 
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch URL */
 
 
@@ -4831,9 +4833,9 @@ var _data = __webpack_require__(65);
 
 var data = _interopRequireWildcard(_data);
 
-var _fetch = __webpack_require__(0);
+var _fetch2 = __webpack_require__(0);
 
-var cozyFetch = _interopRequireWildcard(_fetch);
+var cozyFetch = _interopRequireWildcard(_fetch2);
 
 var _mango = __webpack_require__(66);
 
@@ -5075,7 +5077,12 @@ var Client = function () {
         this.offline.init(options.offline);
       }
 
-      // Exposing cozyFetchJSON to make some development easier. Should be temporary.
+      this.fetch = function _fetch(method, url) {
+        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        return cozyFetch.cozyFetch(this, url, _extends({}, options, { method: method }));
+      };
+
       this.fetchJSON = function _fetchJSON() {
         var args = [this].concat(Array.prototype.slice.call(arguments));
         return cozyFetch.cozyFetchJSON.apply(this, args);
