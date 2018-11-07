@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - none yet
 
 
+## [0.14.2] - 2018-11-07
+### Fixed
+- Version
+
+
+## [0.14.1] - 2018-11-07
+### Fixed
+- Travis configuration
+
+
 ## [v0.14.0] - 2018-10-31
 ### Added
 - Expose `fetch()` method
@@ -365,7 +375,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.14.2...HEAD
+[v0.14.2]: https://github.com/cozy/cozy-client-js/compare/v0.14.1...v0.14.2
+[v0.14.1]: https://github.com/cozy/cozy-client-js/compare/v0.14.0...v0.14.1
 [v0.14.0]: https://github.com/cozy/cozy-client-js/compare/v0.13.0...v0.14.0
 [v0.13.0]: https://github.com/cozy/cozy-client-js/compare/v0.12.1...v0.13.0
 [v0.12.1]: https://github.com/cozy/cozy-client-js/compare/v0.12.0...v0.12.1
