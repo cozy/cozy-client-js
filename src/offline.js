@@ -1,8 +1,7 @@
-/* global pouchdbAdapterCordovaSqlite */
 import { DOCTYPE_FILES } from './doctypes'
 import { refreshToken } from './auth_v3'
 import { isOffline } from './utils'
-import PouchDB from 'pouchdb'
+import PouchDB from 'pouchdb-browser'
 import pouchdbFind from 'pouchdb-find'
 
 export const replicationOfflineError =
@@ -74,8 +73,6 @@ export function migrateDatabase(cozy, doctype, options = {}) {
 export function createDatabase(cozy, doctype, options = {}) {
   if (!pluginLoaded) {
     PouchDB.plugin(pouchdbFind)
-    if (typeof pouchdbAdapterCordovaSqlite !== 'undefined')
-      PouchDB.plugin(pouchdbAdapterCordovaSqlite)
     pluginLoaded = true
   }
 

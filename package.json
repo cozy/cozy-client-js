@@ -54,7 +54,7 @@
     "mocha": "3.1.2",
     "mocha-webpack": "0.7.0",
     "npm-run-all": "^4.0.2",
-    "pouchdb-adapter-memory": "6.1.1",
+    "pouchdb-adapter-memory": "7.0.0",
     "prettier": "^1.12.1",
     "should": "11.1.1",
     "sinon": "^2.1.0",
@@ -65,9 +65,8 @@
   "dependencies": {
     "core-js": "^2.5.3",
     "isomorphic-fetch": "^2.2.1",
-    "pouchdb": "6.4.3",
-    "pouchdb-adapter-cordova-sqlite": "https://github.com/SnceGroup/pouchdb-adapter-cordova-sqlite.git#f3ee23009b70209c611435d57491aa77fb88802a",
-    "pouchdb-find": "6.4.3"
+    "pouchdb-browser": "7.0.0",
+    "pouchdb-find": "7.0.0"
   },
   "peerDependencies": {
     "babel-polyfill": "^6.26.0"
