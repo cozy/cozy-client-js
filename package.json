@@ -46,8 +46,6 @@
     "babel-preset-cozy-app": "^0.3.2",
     "btoa": "1.1.2",
     "chai": "3.5.0",
-    "cozy-data-system": "2.5.14",
-    "cozy-proxy": "2.5.18",
     "eslint": "^4.19.1",
     "eslint-config-cozy-app": "^0.5.1",
     "eslint-loader": "^2.0.0",
@@ -64,17 +62,6 @@
     "webpack": "3.12.0",
     "webpack-node-externals": "1.5.4"
   },
-  "/#######################################################": "",
-  "# this repo works as a cozy v2 client-side application #": "",
-  "#######################################################/": "",
-  "cozy-type": "static",
-  "cozy-displayName": "Test cozy-client-js",
-  "cozy-color": "#CCCCCC",
-  "cozy-permissions": {
-    "All": {
-      "description": "Test with any doctype."
-    }
-  },
   "dependencies": {
     "core-js": "^2.5.3",
     "isomorphic-fetch": "^2.2.1",
@@ -84,8 +71,5 @@
   },
   "peerDependencies": {
     "babel-polyfill": "^6.26.0"
-  },
-  "resolutions": {
-    "leveldown": "1.4.6"
   }
 }
