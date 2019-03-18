@@ -1,9 +1,10 @@
 /* eslint-env mocha */
 
 // eslint-disable-next-line no-unused-vars
+import 'isomorphic-fetch'
 import should from 'should'
 import { Client } from '../../src'
-import PouchDB from 'pouchdb'
+import PouchDB from 'pouchdb-browser'
 import pouchdbFind from 'pouchdb-find'
 PouchDB.plugin(require('pouchdb-adapter-memory'))
 
