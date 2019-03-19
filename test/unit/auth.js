@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 
 // eslint-disable-next-line no-unused-vars
+import 'isomorphic-fetch'
 import should from 'should'
 import { Client, MemoryStorage } from '../../src'
 import { oauthFlow, AccessToken } from '../../src/auth_v3'

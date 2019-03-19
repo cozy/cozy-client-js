@@ -3469,8 +3469,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.replicationOfflineError = undefined;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* global pouchdbAdapterCordovaSqlite */
-
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.init = init;
 exports.getDoctypes = getDoctypes;
@@ -3496,9 +3495,9 @@ var _auth_v = __webpack_require__(3);
 
 var _utils = __webpack_require__(1);
 
-var _pouchdb = __webpack_require__(21);
+var _pouchdbBrowser = __webpack_require__(21);
 
-var _pouchdb2 = _interopRequireDefault(_pouchdb);
+var _pouchdbBrowser2 = _interopRequireDefault(_pouchdbBrowser);
 
 var _pouchdbFind = __webpack_require__(22);
 
@@ -3588,7 +3587,7 @@ function migrateDatabase(cozy, doctype) {
   var newOptions = _extends({
     adapter: 'idb'
   }, options);
-  var newDb = new _pouchdb2.default(doctype, newOptions);
+  var newDb = new _pouchdbBrowser2.default(doctype, newOptions);
 
   return oldDb.replicate.to(newDb).then(function () {
     setDatabase(cozy, doctype, newDb);
@@ -3601,8 +3600,7 @@ function createDatabase(cozy, doctype) {
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   if (!pluginLoaded) {
-    _pouchdb2.default.plugin(_pouchdbFind2.default);
-    if (typeof pouchdbAdapterCordovaSqlite !== 'undefined') _pouchdb2.default.plugin(pouchdbAdapterCordovaSqlite);
+    _pouchdbBrowser2.default.plugin(_pouchdbFind2.default);
     pluginLoaded = true;
   }
 
@@ -3610,7 +3608,7 @@ function createDatabase(cozy, doctype) {
     return Promise.resolve(getDatabase(cozy, doctype));
   }
 
-  setDatabase(cozy, doctype, new _pouchdb2.default(doctype, options));
+  setDatabase(cozy, doctype, new _pouchdbBrowser2.default(doctype, options));
   return createIndexes(cozy, doctype).then(function () {
     return getDatabase(cozy, doctype);
   });
@@ -3814,7 +3812,7 @@ function stopAllRepeatedReplication(cozy) {
 /* 21 */
 /***/ (function(module, exports) {
 
-module.exports = require("pouchdb");
+module.exports = require("pouchdb-browser");
 
 /***/ }),
 /* 22 */

@@ -18,7 +18,6 @@
     "watch": "NODE_ENV=development NODE_TARGET=web webpack --watch",
     "test": "npm-run-all 'test:*'",
     "test:unit": "NODE_ENV=test NODE_TARGET=node mocha-webpack 'test/unit/**.js'",
-    "test:v2": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=2 COZY_STACK_URL=http://localhost:9104 mocha-webpack 'test/integration/**.js'",
     "test:v3": "NODE_ENV=test NODE_TARGET=node COZY_STACK_VERSION=3 COZY_STACK_URL=http://localhost:8080 mocha-webpack 'test/integration/**.js'",
     "clean": "rm -r dist .tmp",
     "shasum": "shasum -a 256 dist/cozy-client.min.js && shasum -a 256 dist/cozy-client.min.js.map"
@@ -46,8 +45,6 @@
     "babel-preset-cozy-app": "^0.3.2",
     "btoa": "1.1.2",
     "chai": "3.5.0",
-    "cozy-data-system": "2.5.14",
-    "cozy-proxy": "2.5.18",
     "eslint": "^4.19.1",
     "eslint-config-cozy-app": "^0.5.1",
     "eslint-loader": "^2.0.0",
@@ -56,7 +53,7 @@
     "mocha": "3.1.2",
     "mocha-webpack": "0.7.0",
     "npm-run-all": "^4.0.2",
-    "pouchdb-adapter-memory": "6.1.1",
+    "pouchdb-adapter-memory": "7.0.0",
     "prettier": "^1.12.1",
     "should": "11.1.1",
     "sinon": "^2.1.0",
@@ -64,28 +61,13 @@
     "webpack": "3.12.0",
     "webpack-node-externals": "1.5.4"
   },
-  "/#######################################################": "",
-  "# this repo works as a cozy v2 client-side application #": "",
-  "#######################################################/": "",
-  "cozy-type": "static",
-  "cozy-displayName": "Test cozy-client-js",
-  "cozy-color": "#CCCCCC",
-  "cozy-permissions": {
-    "All": {
-      "description": "Test with any doctype."
-    }
-  },
   "dependencies": {
     "core-js": "^2.5.3",
     "isomorphic-fetch": "^2.2.1",
-    "pouchdb": "6.4.3",
-    "pouchdb-adapter-cordova-sqlite": "https://github.com/SnceGroup/pouchdb-adapter-cordova-sqlite.git#f3ee23009b70209c611435d57491aa77fb88802a",
-    "pouchdb-find": "6.4.3"
+    "pouchdb-browser": "7.0.0",
+    "pouchdb-find": "7.0.0"
   },
   "peerDependencies": {
     "babel-polyfill": "^6.26.0"
-  },
-  "resolutions": {
-    "leveldown": "1.4.6"
   }
 }

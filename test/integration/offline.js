@@ -4,7 +4,7 @@
 import should from 'should'
 import 'isomorphic-fetch'
 import { Client } from '../../src'
-import PouchDB from 'pouchdb'
+import PouchDB from 'pouchdb-browser'
 import pouchdbFind from 'pouchdb-find'
 import { sleep } from '../../src/utils'
 PouchDB.plugin(require('pouchdb-adapter-memory'))
