@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-
 ## [Unreleased]
 ### Changed
 - none yet
@@ -18,6 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+
+## [0.15.0] - 2019-03-19
+### Changed
+- PouchDB upgrade to version 7
+- Use pouchdb-browser instead of pouchdb package to avoid leveldown in node version
 
 ## [0.14.2] - 2018-11-07
 ### Fixed
@@ -375,7 +379,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Refactoring on offline to return Promise
 
 
-[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.14.2...HEAD
+[Unreleased]: https://github.com/cozy/cozy-client-js/compare/v0.15.0...HEAD
+[v0.15.0]: https://github.com/cozy/cozy-client-js/compare/v0.14.2...v0.15.0
 [v0.14.2]: https://github.com/cozy/cozy-client-js/compare/v0.14.1...v0.14.2
 [v0.14.1]: https://github.com/cozy/cozy-client-js/compare/v0.14.0...v0.14.1
 [v0.14.0]: https://github.com/cozy/cozy-client-js/compare/v0.13.0...v0.14.0
