@@ -11,20 +11,13 @@ var output = {
   path: path.join(__dirname, '/dist')
 }
 
-if (NODE_TARGET === 'web') {
-  Object.assign(output, {
-    filename: production ? 'cozy-client.min.js' : 'cozy-client.js',
-    library: ['cozy', 'client'],
-    libraryTarget: 'umd',
-    umdNamedDefine: true,
-    path: path.join(__dirname, '/build')
-  })
-} else {
-  Object.assign(output, {
-    filename: 'cozy-client.node.js',
-    libraryTarget: 'commonjs'
-  })
-}
+Object.assign(output, {
+  filename: production ? 'cozy-client.min.js' : 'cozy-client.js',
+  library: ['cozy', 'client'],
+  libraryTarget: 'umd',
+  umdNamedDefine: true,
+  path: path.join(__dirname, '/build')
+})
 
 var config = {
   entry: path.join(__dirname, 'src', 'index.js'),
@@ -49,13 +42,7 @@ var config = {
   }
 }
 
-if (NODE_TARGET === 'node') {
-  config.externals = [nodeExternals()]
-  config.plugins = [
-    new webpack.ProvidePlugin({ 'btoa': 'btoa' }),
-    new webpack.EnvironmentPlugin(Object.keys(process.env))
-  ]
-} else if (production) {
+if (production) {
   config.plugins = [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
