@@ -16,7 +16,8 @@ if (NODE_TARGET === 'web') {
     filename: production ? 'cozy-client.min.js' : 'cozy-client.js',
     library: ['cozy', 'client'],
     libraryTarget: 'umd',
-    umdNamedDefine: true
+    umdNamedDefine: true,
+    path: path.join(__dirname, '/build')
   })
 } else {
   Object.assign(output, {

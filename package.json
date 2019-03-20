@@ -3,10 +3,11 @@
   "version": "0.15.0",
   "description": "Javascript library to interact with a cozy",
   "main": "dist/cozy-client.node.js",
-  "browser": "dist/cozy-client.js",
+  "browser": "build/cozy-client.js",
   "files": [
     "dist",
-    "docs"
+    "docs",
+    "build"
   ],
   "scripts": {
     "build:web": "NODE_TARGET=web webpack",
