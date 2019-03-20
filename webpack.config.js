@@ -28,6 +28,9 @@ var config = {
     modules: ['node_modules', path.resolve('./src')],
     extensions: ['.js']
   },
+  externals: {
+    btoa: 'btoa'
+  },
   module: {
     loaders: [
       {
