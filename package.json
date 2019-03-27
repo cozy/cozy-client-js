@@ -77,6 +77,7 @@
   },
   "dependencies": {
     "core-js": "^2.5.3",
+    "detect-node": "^2.0.4",
     "isomorphic-fetch": "^2.2.1",
     "pouchdb": "6.4.3",
     "pouchdb-adapter-cordova-sqlite": "https://github.com/SnceGroup/pouchdb-adapter-cordova-sqlite.git#f3ee23009b70209c611435d57491aa77fb88802a",

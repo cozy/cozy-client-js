@@ -10,7 +10,8 @@ import * as mango from './mango'
 import * as files from './files'
 import * as intents from './intents/'
 import * as jobs from './jobs'
-import * as offline from './offline'
+import isNode from 'detect-node'
+const offline = isNode ? require('./offline') : {}
 import * as settings from './settings'
 import * as relations from './relations'
 
