@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,7 +68,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(fetch) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -87,7 +87,7 @@ var _auth_v = __webpack_require__(3);
 
 var _utils = __webpack_require__(1);
 
-var _jsonapi = __webpack_require__(6);
+var _jsonapi = __webpack_require__(7);
 
 var _jsonapi2 = _interopRequireDefault(_jsonapi);
 
@@ -287,6 +287,7 @@ FetchError.isInvalidToken = function (err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
   return err.name === 'FetchError' && err.status === 400 && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token');
 };
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 1 */
@@ -983,7 +984,7 @@ function generateRandomState() {
     window.crypto.getRandomValues(buffer);
   } else {
     try {
-      buffer = __webpack_require__(13).randomBytes(StateSize);
+      buffer = __webpack_require__(14).randomBytes(StateSize);
     } catch (e) {
       buffer = null;
     }
@@ -996,7 +997,7 @@ function generateRandomState() {
   }
   return btoa(String.fromCharCode.apply(null, buffer)).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 4 */
@@ -1047,10 +1048,16 @@ function pickService(intent, filterServices) {
 /* 5 */
 /***/ (function(module, exports) {
 
-module.exports = require("btoa");
+module.exports = require("isomorphic-fetch");
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports) {
+
+module.exports = require("btoa");
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1117,7 +1124,7 @@ function handleTopLevel(doc) {
 exports.default = handleTopLevel;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1128,7 +1135,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.redirect = exports.getRedirectionURL = undefined;
 
-var _regenerator = __webpack_require__(8);
+var _regenerator = __webpack_require__(9);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
@@ -1240,11 +1247,11 @@ var _fetch = __webpack_require__(0);
 
 var _helpers = __webpack_require__(4);
 
-var _client = __webpack_require__(17);
+var _client = __webpack_require__(18);
 
 var client = _interopRequireWildcard(_client);
 
-var _service = __webpack_require__(18);
+var _service = __webpack_require__(19);
 
 var service = _interopRequireWildcard(_service);
 
@@ -1313,36 +1320,36 @@ function buildRedirectionURL(url, data) {
 }
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = require("babel-runtime/regenerator");
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(fetch) {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch URL */
 
 
-__webpack_require__(10);
+__webpack_require__(11);
 
 var _utils = __webpack_require__(1);
 
-var _auth_storage = __webpack_require__(11);
+var _auth_storage = __webpack_require__(12);
 
-var _auth_v = __webpack_require__(12);
+var _auth_v = __webpack_require__(13);
 
 var _auth_v2 = __webpack_require__(3);
 
 var auth = _interopRequireWildcard(_auth_v2);
 
-var _data = __webpack_require__(14);
+var _data = __webpack_require__(15);
 
 var data = _interopRequireWildcard(_data);
 
@@ -1350,31 +1357,31 @@ var _fetch2 = __webpack_require__(0);
 
 var cozyFetch = _interopRequireWildcard(_fetch2);
 
-var _mango = __webpack_require__(15);
+var _mango = __webpack_require__(16);
 
 var mango = _interopRequireWildcard(_mango);
 
-var _files = __webpack_require__(16);
+var _files = __webpack_require__(17);
 
 var files = _interopRequireWildcard(_files);
 
-var _intents = __webpack_require__(7);
+var _intents = __webpack_require__(8);
 
 var intents = _interopRequireWildcard(_intents);
 
-var _jobs = __webpack_require__(19);
+var _jobs = __webpack_require__(20);
 
 var jobs = _interopRequireWildcard(_jobs);
 
-var _offline = __webpack_require__(20);
+var _offline = __webpack_require__(21);
 
 var offline = _interopRequireWildcard(_offline);
 
-var _settings = __webpack_require__(23);
+var _settings = __webpack_require__(24);
 
 var settings = _interopRequireWildcard(_settings);
 
-var _relations = __webpack_require__(24);
+var _relations = __webpack_require__(25);
 
 var relations = _interopRequireWildcard(_relations);
 
@@ -1716,15 +1723,16 @@ function addToProto(ctx, obj, proto, disablePromises) {
 
 module.exports = new Client();
 Object.assign(module.exports, { Client: Client, LocalStorage: _auth_storage.LocalStorage, MemoryStorage: _auth_storage.MemoryStorage });
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = require("core-js/modules/es6.object.assign");
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1839,7 +1847,7 @@ var MemoryStorage = exports.MemoryStorage = function () {
 }();
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1910,16 +1918,16 @@ var AppToken = exports.AppToken = function () {
 
   return AppToken;
 }();
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2207,7 +2215,7 @@ function _delete(cozy, doctype, doc) {
 }
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2546,7 +2554,7 @@ function makeMapReduceQuery(indexRef, query) {
 }
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2586,7 +2594,7 @@ exports.destroyById = destroyById;
 
 var _fetch = __webpack_require__(0);
 
-var _jsonapi = __webpack_require__(6);
+var _jsonapi = __webpack_require__(7);
 
 var _jsonapi2 = _interopRequireDefault(_jsonapi);
 
@@ -3018,7 +3026,7 @@ function sortFiles(allFiles) {
 }
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3028,7 +3036,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _regenerator = __webpack_require__(8);
+var _regenerator = __webpack_require__(9);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
@@ -3038,7 +3046,7 @@ exports.start = start;
 
 var _helpers = __webpack_require__(4);
 
-var _ = __webpack_require__(7);
+var _ = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3279,7 +3287,7 @@ function start(cozy, intent, element) {
 }
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3420,7 +3428,7 @@ function start(cozy, intentId, serviceWindow) {
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3458,7 +3466,7 @@ function create(cozy, workerType, args, options) {
 }
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3495,11 +3503,11 @@ var _auth_v = __webpack_require__(3);
 
 var _utils = __webpack_require__(1);
 
-var _pouchdbBrowser = __webpack_require__(21);
+var _pouchdbBrowser = __webpack_require__(22);
 
 var _pouchdbBrowser2 = _interopRequireDefault(_pouchdbBrowser);
 
-var _pouchdbFind = __webpack_require__(22);
+var _pouchdbFind = __webpack_require__(23);
 
 var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 
@@ -3809,19 +3817,19 @@ function stopAllRepeatedReplication(cozy) {
 }
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = require("pouchdb-browser");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = require("pouchdb-find");
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3872,7 +3880,7 @@ function updateLastSync(cozy) {
 }
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
