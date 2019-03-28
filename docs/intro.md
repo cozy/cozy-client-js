@@ -26,12 +26,6 @@ You can also copy-paste the `dist/cozy-client.js` bundle file into your applicat
 
 If you are developing a client-side app for Cozy V3, you can import the lib directly from the stack, by using [`{{.CozyClientJS}}`](https://cozy.github.io/cozy-stack/client-app-dev.html#good-practices-for-your-application).
 
-If you are developing a nodejs app, you will need some polyfills. You can add them to your project with this command:
-
-```sh
-$ yarn add isomorphic-fetch core-js regenerator-runtime btoa
-```
-
 ## Doctypes & Permissions
 
 A doctype is a simple javascript string identifying a type of document.

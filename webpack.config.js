@@ -44,14 +44,17 @@ var config = {
     ]
   },
   node: {
-    'crypto': false
+    crypto: false
   }
 }
 
 if (NODE_TARGET === 'node') {
   config.externals = [nodeExternals()]
   config.plugins = [
-    new webpack.ProvidePlugin({ 'btoa': 'btoa' }),
+    new webpack.ProvidePlugin({
+      btoa: 'btoa',
+      fetch: 'isomorphic-fetch'
+    }),
     new webpack.EnvironmentPlugin(Object.keys(process.env))
   ]
 } else if (production) {
