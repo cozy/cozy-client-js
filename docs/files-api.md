@@ -336,28 +336,46 @@ const href = await cozy.client.files.getArchiveLinkByIds(["1592673"], "secretpro
 ### `cozy.client.data.addReferencedFiles(doc, fileIds)`
 
 `cozy.client.data.addReferencedFiles(doc, fileIds)` binds the files to the document.
-(see cozy-stack [documentation](https://cozy.github.io/cozy-stack/references-docs-in-vfs.html) for more details)
+(see cozy-stack [documentation](https://docs.cozy.io/en/cozy-stack/references-docs-in-vfs/) for more details)
 
 
 ### `cozy.client.data.removeReferencedFiles(doc, fileIds)`
 
 `cozy.client.data.removeReferencedFiles(doc, fileIds)` unbinds the files to the document.
-(see cozy-stack [documentation](https://cozy.github.io/cozy-stack/references-docs-in-vfs.html) for more details)
+(see cozy-stack [documentation](https://docs.cozy.io/en/cozy-stack/references-docs-in-vfs/) for more details)
 
 
 ### `cozy.client.data.listReferencedFiles(doc)`
 
 `cozy.client.data.listReferencedFiles(doc)` list the files bound to the document.
-(see cozy-stack [documentation](https://cozy.github.io/cozy-stack/references-docs-in-vfs.html) for more details).
+(see cozy-stack [documentation](https://docs.cozy.io/en/cozy-stack/references-docs-in-vfs/) for more details).
 
 It returns a promise for a list of filesIds. Files must then be fetched separately.
 
-### `cozy.client.data.fetchReferencedFiles(doc)`
+### `cozy.client.data.fetchReferencedFiles(doc, options, sort)`
 
-`cozy.client.data.fetchReferencedFiles(doc)` fetches the files bound to the document.
-(see cozy-stack [documentation](https://cozy.github.io/cozy-stack/references-docs-in-vfs.html) for more details).
+`cozy.client.data.fetchReferencedFiles(doc, options, sort)` fetches the files bound to the document.
+(see cozy-stack [documentation](https://docs.cozy.io/en/cozy-stack/references-docs-in-vfs/) for more details).
 
 It returns a promise for a list of files.
+
+There are 2 alternatives for pagination, that can be used through the `option` parameter: `cursor` and `skip`. For more details, see how the stack handles [pagination](https://docs.cozy.io/en/cozy-stack/jsonapi/#pagination). Note that cursor-based pagination performs way better than skip-based on large volumes.
+
+* `option` is an object with the following fields:
+  * `cursor` (recommended): specify the view's key and the starting docid. The starting docid can be empty for the first query and take the last returned docid for the next ones.
+  * `skip` (not recommended): ignore the first x results for pagination.
+  * `limit`: maximum number of results.
+* `sort` is a string which can be `datetime` (default) or `id`.
+
+```javascript
+const key = [DOCTYPE_ALBUMS, album._id]
+const cursor = [key, startDocid]
+const result = await cozyClient.data.fetchReferencedFiles(
+  album,
+  { cursor },
+  'id'
+)
+```
 
 ### `cozy.client.files.query(indexReference, query)`
 
