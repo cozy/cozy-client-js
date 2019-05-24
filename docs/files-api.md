@@ -365,7 +365,7 @@ There are 2 alternatives for pagination, that can be used through the `option` p
   * `cursor` (recommended): specify the view's key and the starting docid. The starting docid can be empty for the first query and take the last returned docid for the next ones.
   * `skip` (not recommended): ignore the first x results for pagination.
   * `limit`: maximum number of results.
-* `sort` is a string which can be `datetime` (default) or `id`.
+* `sort` is a string which can be `datetime` (default) or `id`. *Warning:*  `datetime` is not compatible with cursor-based pagination. 
 
 ```javascript
 const key = [DOCTYPE_ALBUMS, album._id]
