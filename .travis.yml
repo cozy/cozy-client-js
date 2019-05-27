@@ -13,8 +13,8 @@ cache:
   directories:
   - node_modules
 before_script:
-- docker run -d -p 5984:5984 --name couch apache/couchdb:2.1
-- eval "$(gimme 1.10)"
+- docker run -d -p 5984:5984 --name couch apache/couchdb:2.3
+- eval "$(gimme 1.12)"
 - mkdir $GOPATH
 - go get -u github.com/cozy/cozy-stack
 - go get -u github.com/rif/spark
