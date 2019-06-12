@@ -14,6 +14,7 @@ It returns a promise for the document of the file created.
   * `checksum`: the base64-encoded (with padding) MD5 digest of the file (optional).
   * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
   * `noSanitize`: by default, the filename is sanitized to remove trailing whitespace; this option disables it.
+  * `metadata`: (object) metadata associated to the file
 
 **Warning**: this API is not v2 compatible.
 
@@ -76,13 +77,17 @@ It returns a promise for the document of the file updated.
   * `checksum`: the base64-encoded (with padding) MD5 digest of the file (optional).
   * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
   * `ifMatch`: the previous revision of the file (optional). The update will be rejected if the remote revision doesn't match the given one.
+  * `metadata`: (object) metadata associated to the file
 
 ```javascript
 const updated = await cozy.client.files.updateById("654321", blob, {
   contentType: "text/plain",
   checksum: "rL0Y20zC+Fzt72VPzMSk2A==",
   lastModifiedDate: new Date(),
-  ifMatch: "1-0e6d5b72"
+  ifMatch: "1-0e6d5b72",
+  metadata: {
+    "brand": "newBrand"
+  }
 })
 ```
 
@@ -366,7 +371,7 @@ There are 2 alternatives for pagination, that can be used through the `option` p
   * `cursor` (recommended): specify the view's key and the starting docid. The starting docid can be empty for the first query and take the last returned docid for the next ones.
   * `skip` (not recommended): ignore the first x results for pagination.
   * `limit`: maximum number of results.
-* `sort` is a string which can be `datetime` (default) or `id`. *Warning:*  `datetime` is not compatible with cursor-based pagination. 
+* `sort` is a string which can be `datetime` (default) or `id`. *Warning:*  `datetime` is not compatible with cursor-based pagination.
 
 ```javascript
 const key = [DOCTYPE_ALBUMS, album._id]
