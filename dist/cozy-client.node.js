@@ -87,7 +87,7 @@ var _auth_v = __webpack_require__(3);
 
 var _utils = __webpack_require__(1);
 
-var _jsonapi = __webpack_require__(7);
+var _jsonapi = __webpack_require__(8);
 
 var _jsonapi2 = _interopRequireDefault(_jsonapi);
 
@@ -287,7 +287,7 @@ FetchError.isInvalidToken = function (err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
   return err.name === 'FetchError' && err.status === 400 && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token');
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 1 */
@@ -997,10 +997,16 @@ function generateRandomState() {
   }
   return btoa(String.fromCharCode.apply(null, buffer)).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+module.exports = require("babel-runtime/regenerator");
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1045,19 +1051,19 @@ function pickService(intent, filterServices) {
 }
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-fetch");
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = require("btoa");
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1124,7 +1130,7 @@ function handleTopLevel(doc) {
 exports.default = handleTopLevel;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1135,7 +1141,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.redirect = exports.getRedirectionURL = undefined;
 
-var _regenerator = __webpack_require__(9);
+var _regenerator = __webpack_require__(4);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
@@ -1245,13 +1251,13 @@ exports.createService = createService;
 
 var _fetch = __webpack_require__(0);
 
-var _helpers = __webpack_require__(4);
+var _helpers = __webpack_require__(5);
 
-var _client = __webpack_require__(18);
+var _client = __webpack_require__(20);
 
 var client = _interopRequireWildcard(_client);
 
-var _service = __webpack_require__(19);
+var _service = __webpack_require__(21);
 
 var service = _interopRequireWildcard(_service);
 
@@ -1320,12 +1326,6 @@ function buildRedirectionURL(url, data) {
 }
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-module.exports = require("babel-runtime/regenerator");
-
-/***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1365,23 +1365,23 @@ var _files = __webpack_require__(17);
 
 var files = _interopRequireWildcard(_files);
 
-var _intents = __webpack_require__(8);
+var _intents = __webpack_require__(9);
 
 var intents = _interopRequireWildcard(_intents);
 
-var _jobs = __webpack_require__(20);
+var _jobs = __webpack_require__(22);
 
 var jobs = _interopRequireWildcard(_jobs);
 
-var _offline = __webpack_require__(21);
+var _offline = __webpack_require__(23);
 
 var offline = _interopRequireWildcard(_offline);
 
-var _settings = __webpack_require__(24);
+var _settings = __webpack_require__(26);
 
 var settings = _interopRequireWildcard(_settings);
 
-var _relations = __webpack_require__(25);
+var _relations = __webpack_require__(27);
 
 var relations = _interopRequireWildcard(_relations);
 
@@ -1723,7 +1723,7 @@ function addToProto(ctx, obj, proto, disablePromises) {
 
 module.exports = new Client();
 Object.assign(module.exports, { Client: Client, LocalStorage: _auth_storage.LocalStorage, MemoryStorage: _auth_storage.MemoryStorage });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 11 */
@@ -1918,7 +1918,7 @@ var AppToken = exports.AppToken = function () {
 
   return AppToken;
 }();
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
 /* 14 */
@@ -2565,10 +2565,156 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TRASH_DIR_ID = exports.ROOT_DIR_ID = undefined;
 
+var _regenerator = __webpack_require__(4);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global Blob, File */
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var doUpload = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, data, method, path, options) {
+    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, lastModifiedDate, ifMatch, metadata, headers, finalpath, metadataId;
+
+    return _regenerator2.default.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            if (data) {
+              _context.next = 2;
+              break;
+            }
+
+            throw new Error('missing data argument');
+
+          case 2:
+
+            // transform any ArrayBufferView to ArrayBuffer
+            if (data.buffer && data.buffer instanceof ArrayBuffer) {
+              data = data.buffer;
+            }
+
+            isBuffer = typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer;
+            isFile = typeof File !== 'undefined' && data instanceof File;
+            isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
+            isStream = data.readable === true && typeof data.pipe === 'function';
+            isString = typeof data === 'string';
+
+            if (!(!isBuffer && !isFile && !isBlob && !isStream && !isString)) {
+              _context.next = 10;
+              break;
+            }
+
+            throw new Error('invalid data type');
+
+          case 10:
+            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata;
+
+            if (!contentType) {
+              if (isBuffer) {
+                contentType = contentTypeOctetStream;
+              } else if (isFile) {
+                contentType = data.type || getFileTypeFromName(data.name.toLowerCase()) || contentTypeOctetStream;
+                if (!lastModifiedDate) {
+                  lastModifiedDate = data.lastModifiedDate;
+                }
+              } else if (isBlob) {
+                contentType = data.type || contentTypeOctetStream;
+              } else if (isStream) {
+                contentType = contentTypeOctetStream;
+              } else if (typeof data === 'string') {
+                contentType = 'text/plain';
+              }
+            }
+
+            if (lastModifiedDate && typeof lastModifiedDate === 'string') {
+              lastModifiedDate = new Date(lastModifiedDate);
+            }
+
+            headers = {
+              'Content-Type': contentType
+            };
+
+            if (contentLength) headers['Content-Length'] = String(contentLength);
+            if (checksum) headers['Content-MD5'] = checksum;
+            if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString();
+            if (ifMatch) headers['If-Match'] = ifMatch;
+
+            finalpath = path;
+
+            if (!metadata) {
+              _context.next = 24;
+              break;
+            }
+
+            _context.next = 22;
+            return sendMetadata(cozy, metadata);
+
+          case 22:
+            metadataId = _context.sent;
+
+            if (metadataId) {
+              finalpath = addQueryString(finalpath, { MetadataID: metadataId });
+            }
+
+          case 24:
+            return _context.abrupt('return', (0, _fetch.cozyFetch)(cozy, finalpath, {
+              method: method,
+              headers: headers,
+              body: data
+            }).then(function (res) {
+              var json = res.json();
+              if (!res.ok) {
+                return json.then(function (err) {
+                  throw err;
+                });
+              } else {
+                return json.then(_jsonapi2.default);
+              }
+            }));
+
+          case 25:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, this);
+  }));
+
+  return function doUpload(_x, _x2, _x3, _x4, _x5) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+var sendMetadata = function () {
+  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(cozy, metadata) {
+    var result;
+    return _regenerator2.default.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '/files/upload/metadata', {
+              data: { type: 'io.cozy.files.metadata', attributes: metadata }
+            });
+
+          case 2:
+            result = _context2.sent;
+            return _context2.abrupt('return', result && result._id ? result._id : false);
+
+          case 4:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this);
+  }));
+
+  return function sendMetadata(_x7, _x8) {
+    return _ref3.apply(this, arguments);
+  };
+}();
 
 exports.create = create;
 exports.createDirectory = createDirectory;
@@ -2594,13 +2740,24 @@ exports.destroyById = destroyById;
 
 var _fetch = __webpack_require__(0);
 
-var _jsonapi = __webpack_require__(7);
+var _jsonapi = __webpack_require__(8);
 
 var _jsonapi2 = _interopRequireDefault(_jsonapi);
 
 var _doctypes = __webpack_require__(2);
 
+var _querystring = __webpack_require__(18);
+
+var _querystring2 = _interopRequireDefault(_querystring);
+
+var _url = __webpack_require__(19);
+
+var _url2 = _interopRequireDefault(_url);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } /* global Blob, File */
+
 
 // global variables
 var ROOT_DIR_ID = exports.ROOT_DIR_ID = 'io.cozy.files.root-dir';
@@ -2616,84 +2773,21 @@ function getFileTypeFromName(name) {
   if (/\.heic$/i.test(name)) return 'image/heic';else if (/\.heif$/i.test(name)) return 'image/heif';else return null;
 }
 
-function doUpload(cozy, data, method, path, options) {
-  if (!data) {
-    throw new Error('missing data argument');
-  }
+function addQueryString(path) {
+  var querystring = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  // transform any ArrayBufferView to ArrayBuffer
-  if (data.buffer && data.buffer instanceof ArrayBuffer) {
-    data = data.buffer;
-  }
-
-  var isBuffer = typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer;
-  var isFile = typeof File !== 'undefined' && data instanceof File;
-  var isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
-  var isStream = data.readable === true && typeof data.pipe === 'function';
-  var isString = typeof data === 'string';
-
-  if (!isBuffer && !isFile && !isBlob && !isStream && !isString) {
-    throw new Error('invalid data type');
-  }
-
-  var _ref = options || {},
-      contentType = _ref.contentType,
-      contentLength = _ref.contentLength,
-      checksum = _ref.checksum,
-      lastModifiedDate = _ref.lastModifiedDate,
-      ifMatch = _ref.ifMatch;
-
-  if (!contentType) {
-    if (isBuffer) {
-      contentType = contentTypeOctetStream;
-    } else if (isFile) {
-      contentType = data.type || getFileTypeFromName(data.name.toLowerCase()) || contentTypeOctetStream;
-      if (!lastModifiedDate) {
-        lastModifiedDate = data.lastModifiedDate;
-      }
-    } else if (isBlob) {
-      contentType = data.type || contentTypeOctetStream;
-    } else if (isStream) {
-      contentType = contentTypeOctetStream;
-    } else if (typeof data === 'string') {
-      contentType = 'text/plain';
-    }
-  }
-
-  if (lastModifiedDate && typeof lastModifiedDate === 'string') {
-    lastModifiedDate = new Date(lastModifiedDate);
-  }
-
-  var headers = {
-    'Content-Type': contentType
-  };
-  if (contentLength) headers['Content-Length'] = String(contentLength);
-  if (checksum) headers['Content-MD5'] = checksum;
-  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString();
-  if (ifMatch) headers['If-Match'] = ifMatch;
-
-  return (0, _fetch.cozyFetch)(cozy, path, {
-    method: method,
-    headers: headers,
-    body: data
-  }).then(function (res) {
-    var json = res.json();
-    if (!res.ok) {
-      return json.then(function (err) {
-        throw err;
-      });
-    } else {
-      return json.then(_jsonapi2.default);
-    }
-  });
+  var pathurl = _url2.default.parse(path);
+  var query = _querystring2.default.decode(pathurl.query);
+  Object.assign(query, querystring);
+  return pathurl.pathname + '?' + _querystring2.default.encode(query);
 }
 
 function create(cozy, data, options) {
-  var _ref2 = options || {},
-      name = _ref2.name,
-      dirID = _ref2.dirID,
-      executable = _ref2.executable,
-      noSanitize = _ref2.noSanitize;
+  var _ref4 = options || {},
+      name = _ref4.name,
+      dirID = _ref4.dirID,
+      executable = _ref4.executable,
+      noSanitize = _ref4.noSanitize;
 
   // handle case where data is a file and contains the name
 
@@ -2720,10 +2814,10 @@ function create(cozy, data, options) {
 }
 
 function createDirectory(cozy, options) {
-  var _ref3 = options || {},
-      name = _ref3.name,
-      dirID = _ref3.dirID,
-      lastModifiedDate = _ref3.lastModifiedDate;
+  var _ref5 = options || {},
+      name = _ref5.name,
+      dirID = _ref5.dirID,
+      lastModifiedDate = _ref5.lastModifiedDate;
 
   name = sanitizeFileName(name);
 
@@ -2788,8 +2882,8 @@ function doUpdateAttributes(cozy, attrs, path, options) {
     throw new Error('missing attrs argument');
   }
 
-  var _ref4 = options || {},
-      ifMatch = _ref4.ifMatch;
+  var _ref6 = options || {},
+      ifMatch = _ref6.ifMatch;
 
   var body = {
     data: {
@@ -2818,8 +2912,8 @@ function trashById(cozy, id, options) {
     throw new Error('missing id argument');
   }
 
-  var _ref5 = options || {},
-      ifMatch = _ref5.ifMatch;
+  var _ref7 = options || {},
+      ifMatch = _ref7.ifMatch;
 
   return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/' + encodeURIComponent(id), undefined, {
     headers: {
@@ -2834,10 +2928,10 @@ function statById(cozy, id) {
 
   if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
     var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-    return Promise.all([db.get(id), db.find(Object.assign({ selector: { dir_id: id } }, options))]).then(function (_ref6) {
-      var _ref7 = _slicedToArray(_ref6, 2),
-          doc = _ref7[0],
-          children = _ref7[1];
+    return Promise.all([db.get(id), db.find(Object.assign({ selector: { dir_id: id } }, options))]).then(function (_ref8) {
+      var _ref9 = _slicedToArray(_ref8, 2),
+          doc = _ref9[0],
+          children = _ref9[1];
 
       if (id === ROOT_DIR_ID) {
         children.docs = children.docs.filter(function (doc) {
@@ -2963,8 +3057,8 @@ function restoreById(cozy, id) {
 }
 
 function destroyById(cozy, id, options) {
-  var _ref8 = options || {},
-      ifMatch = _ref8.ifMatch;
+  var _ref10 = options || {},
+      ifMatch = _ref10.ifMatch;
 
   return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/trash/' + encodeURIComponent(id), undefined, {
     headers: {
@@ -3030,6 +3124,18 @@ function sortFiles(allFiles) {
 
 /***/ }),
 /* 18 */
+/***/ (function(module, exports) {
+
+module.exports = require("querystring");
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+module.exports = require("url");
+
+/***/ }),
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3039,7 +3145,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _regenerator = __webpack_require__(9);
+var _regenerator = __webpack_require__(4);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
@@ -3047,9 +3153,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.start = start;
 
-var _helpers = __webpack_require__(4);
+var _helpers = __webpack_require__(5);
 
-var _ = __webpack_require__(8);
+var _ = __webpack_require__(9);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3290,7 +3396,7 @@ function start(cozy, intent, element) {
 }
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3303,7 +3409,7 @@ exports.start = start;
 
 var _fetch = __webpack_require__(0);
 
-var _helpers = __webpack_require__(4);
+var _helpers = __webpack_require__(5);
 
 function listenClientData(intent, window) {
   return new Promise(function (resolve) {
@@ -3431,7 +3537,7 @@ function start(cozy, intentId, serviceWindow) {
 }
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3469,7 +3575,7 @@ function create(cozy, workerType, args, options) {
 }
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3506,11 +3612,11 @@ var _auth_v = __webpack_require__(3);
 
 var _utils = __webpack_require__(1);
 
-var _pouchdbBrowser = __webpack_require__(22);
+var _pouchdbBrowser = __webpack_require__(24);
 
 var _pouchdbBrowser2 = _interopRequireDefault(_pouchdbBrowser);
 
-var _pouchdbFind = __webpack_require__(23);
+var _pouchdbFind = __webpack_require__(25);
 
 var _pouchdbFind2 = _interopRequireDefault(_pouchdbFind);
 
@@ -3820,19 +3926,19 @@ function stopAllRepeatedReplication(cozy) {
 }
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = require("pouchdb-browser");
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = require("pouchdb-find");
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3883,7 +3989,7 @@ function updateLastSync(cozy) {
 }
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
