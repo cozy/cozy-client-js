@@ -6380,7 +6380,8 @@ function create(cozy, data, options) {
   var _ref2 = options || {},
       name = _ref2.name,
       dirID = _ref2.dirID,
-      executable = _ref2.executable;
+      executable = _ref2.executable,
+      noSanitize = _ref2.noSanitize;
 
   // handle case where data is a file and contains the name
 
@@ -6389,7 +6390,9 @@ function create(cozy, data, options) {
     name = data.name;
   }
 
-  name = sanitizeFileName(name);
+  if (!noSanitize) {
+    name = sanitizeFileName(name);
+  }
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument');
@@ -22338,13 +22341,17 @@ function listReferencedFiles(cozy, doc) {
   });
 }
 
-function fetchReferencedFiles(cozy, doc, options) {
+function fetchReferencedFiles(cozy, doc, options, sort) {
   if (!doc) throw new Error('missing doc argument');
   var params = Object.keys(options).map(function (key) {
-    return '&page[' + key + ']=' + options[key];
+    var value = encodeURIComponent(JSON.stringify(options[key]));
+    return '&page[' + key + ']=' + value;
   }).join('');
-  // As datetime is the only sort option available, I see no reason to not have it by default
-  return (0, _fetch.cozyFetchRawJSON)(cozy, 'GET', makeReferencesPath(doc) + '?include=files&sort=datetime' + params);
+  // Datetime is the default sort, but 'id' is also available
+  if (!sort) {
+    sort = 'datetime';
+  }
+  return (0, _fetch.cozyFetchRawJSON)(cozy, 'GET', makeReferencesPath(doc) + '?include=files&sort=' + sort + params);
 }
 
 function makeReferencesPath(doc) {
