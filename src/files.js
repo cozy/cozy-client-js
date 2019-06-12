@@ -2,6 +2,8 @@
 import { cozyFetch, cozyFetchJSON } from './fetch'
 import jsonapi from './jsonapi'
 import { DOCTYPE_FILES } from './doctypes'
+import qs from 'querystring'
+import url from 'url'
 
 // global variables
 export const ROOT_DIR_ID = 'io.cozy.files.root-dir'
@@ -19,7 +21,7 @@ function getFileTypeFromName(name) {
   else return null
 }
 
-function doUpload(cozy, data, method, path, options) {
+async function doUpload(cozy, data, method, path, options) {
   if (!data) {
     throw new Error('missing data argument')
   }
@@ -40,8 +42,14 @@ function doUpload(cozy, data, method, path, options) {
     throw new Error('invalid data type')
   }
 
-  let { contentType, contentLength, checksum, lastModifiedDate, ifMatch } =
-    options || {}
+  let {
+    contentType,
+    contentLength,
+    checksum,
+    lastModifiedDate,
+    ifMatch,
+    metadata
+  } = options || {}
   if (!contentType) {
     if (isBuffer) {
       contentType = contentTypeOctetStream
@@ -74,7 +82,15 @@ function doUpload(cozy, data, method, path, options) {
   if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString()
   if (ifMatch) headers['If-Match'] = ifMatch
 
-  return cozyFetch(cozy, path, {
+  let finalpath = path
+  if (metadata) {
+    const metadataId = await sendMetadata(cozy, metadata)
+    if (metadataId) {
+      finalpath = addQueryString(finalpath, { MetadataID: metadataId })
+    }
+  }
+
+  return cozyFetch(cozy, finalpath, {
     method: method,
     headers: headers,
     body: data
@@ -88,6 +104,20 @@ function doUpload(cozy, data, method, path, options) {
       return json.then(jsonapi)
     }
   })
+}
+
+function addQueryString(path, querystring = {}) {
+  const pathurl = url.parse(path)
+  const query = qs.decode(pathurl.query)
+  Object.assign(query, querystring)
+  return pathurl.pathname + '?' + qs.encode(query)
+}
+
+async function sendMetadata(cozy, metadata) {
+  const result = await cozyFetchJSON(cozy, 'POST', '/files/upload/metadata', {
+    data: { type: 'io.cozy.files.metadata', attributes: metadata }
+  })
+  return result && result._id ? result._id : false
 }
 
 export function create(cozy, data, options) {
