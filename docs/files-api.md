@@ -13,6 +13,7 @@ It returns a promise for the document of the file created.
   * `contentType`: specify the content type of the uploaded data. For a `File` type, it is handled automatically in browsers (default: `application/octet-stream`). For nodejs, you can rely on an external module like [mime](https://github.com/broofa/node-mime)
   * `checksum`: the base64-encoded (with padding) MD5 digest of the file (optional).
   * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
+  * `noSanitize`: by default, the filename is sanitized to remove trailing whitespace; this option disables it.
 
 **Warning**: this API is not v2 compatible.
 

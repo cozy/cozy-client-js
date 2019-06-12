@@ -91,14 +91,16 @@ function doUpload(cozy, data, method, path, options) {
 }
 
 export function create(cozy, data, options) {
-  let { name, dirID, executable } = options || {}
+  let { name, dirID, executable, noSanitize } = options || {}
 
   // handle case where data is a file and contains the name
   if (!name && typeof data.name === 'string') {
     name = data.name
   }
 
-  name = sanitizeFileName(name)
+  if (!noSanitize) {
+    name = sanitizeFileName(name)
+  }
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
