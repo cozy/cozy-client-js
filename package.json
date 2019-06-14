@@ -50,7 +50,7 @@
     "eslint-loader": "^2.0.0",
     "eslint-plugin-react": "^7.7.0",
     "fetch-mock": "5.5.0",
-    "mocha": "6.0.2",
+    "mocha": "6.1.4",
     "mocha-webpack": "1.1.0",
     "npm-run-all": "^4.0.2",
     "pouchdb-adapter-memory": "7.0.0",
