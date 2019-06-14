@@ -17,6 +17,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - none yet
 
+## [0.16.0] - 2019-06-14
+### Added
+- Allow to define any file metadata on file upload
+- Possibility to use cursor-based pagination for references
+
+### Changed
+- Add an option to not sanitize the filenames
+
+### Removed
+- Ignore dist directory in git
+
+## [0.15.1] - 2019-03-28
+### Changed
+- include isomorphic-fetch in node build
 
 ## [0.15.0] - 2019-03-19
 ### Changed
