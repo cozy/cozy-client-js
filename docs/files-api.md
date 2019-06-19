@@ -15,6 +15,9 @@ It returns a promise for the document of the file created.
   * `lastModifiedDate`: a date to specify the last modification time to use for the uploaded file. If the given `data` is a `File` instance, the `lastModifiedDate` is automatically used (not overridden).
   * `noSanitize`: by default, the filename is sanitized to remove trailing whitespace; this option disables it.
   * `metadata`: (object) metadata associated to the file
+  * `sourceAccount`: (string) allow to associate the file with the given account id in cozyMetadata
+  * `sourceAccountIdentifier`: (string) allow to associate the file with the given account
+    identifier (mostly the user login in the account) in cozyMetadata
 
 **Warning**: this API is not v2 compatible.
 
