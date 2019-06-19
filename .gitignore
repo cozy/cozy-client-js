@@ -45,6 +45,3 @@ jspm_packages
 
 # mocha-webpack tmp
 .tmp
-
-# Releases
-dist
