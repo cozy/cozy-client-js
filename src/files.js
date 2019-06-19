@@ -46,7 +46,9 @@ async function doUpload(cozy, data, method, path, options) {
     checksum,
     lastModifiedDate,
     ifMatch,
-    metadata
+    metadata,
+    sourceAccount,
+    sourceAccountIdentifier
   } = options || {}
   if (!contentType) {
     if (isBuffer) {
@@ -84,10 +86,20 @@ async function doUpload(cozy, data, method, path, options) {
   if (metadata) {
     const metadataId = await sendMetadata(cozy, metadata)
     if (metadataId) {
-      finalpath += `${
-        finalpath.includes('?') ? '&' : '?'
-      }MetadataID=${metadataId}`
+      finalpath = addQuerystringParam(finalpath, 'MetadataID', metadataId)
     }
+  }
+
+  if (sourceAccount) {
+    finalpath = addQuerystringParam(finalpath, 'SourceAccount', sourceAccount)
+  }
+
+  if (sourceAccountIdentifier) {
+    finalpath = addQuerystringParam(
+      finalpath,
+      'SourceAccountIdentifier',
+      sourceAccountIdentifier
+    )
   }
 
   return cozyFetch(cozy, finalpath, {
@@ -471,4 +483,8 @@ function sortFiles(allFiles) {
   const sort = files =>
     files.sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
   return sort(folders).concat(sort(files))
+}
+
+function addQuerystringParam(path, key, value) {
+  return path + `${path}${finalpath.includes('?') ? '&' : '?'}${key}=${value}`
 }
