@@ -486,5 +486,5 @@ function sortFiles(allFiles) {
 }
 
 function addQuerystringParam(path, key, value) {
-  return path + `${path}${path.includes('?') ? '&' : '?'}${key}=${value}`
+  return `${path}${path.includes('?') ? '&' : '?'}${key}=${value}`
 }
