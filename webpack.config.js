@@ -52,8 +52,7 @@ if (NODE_TARGET === 'node') {
   config.externals = [nodeExternals()]
   config.plugins = [
     new webpack.ProvidePlugin({
-      btoa: 'btoa',
-      fetch: 'isomorphic-fetch'
+      btoa: 'btoa'
     }),
     new webpack.EnvironmentPlugin(Object.keys(process.env))
   ]

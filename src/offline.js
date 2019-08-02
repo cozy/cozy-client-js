@@ -1,3 +1,6 @@
+// Define global `fetch` so it's made available to `pouchdb-browser`
+import 'isomorphic-fetch'
+
 import { DOCTYPE_FILES } from './doctypes'
 import { refreshToken } from './auth_v3'
 import { isOffline } from './utils'
