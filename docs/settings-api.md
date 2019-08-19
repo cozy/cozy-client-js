@@ -19,7 +19,7 @@ console.log(usage.attributes.used)
 
 ### `cozy.client.settings.getInstance()`
 
-`cozy.client.settings.getInstance` returns a promise with informations about the current Cozy instance, such as the locale or the public name. See cozy-stack [documentation](https://cozy.github.io/cozy-stack/settings.html#response-3) for more details.
+`cozy.client.settings.getInstance` returns a promise with informations about the current Cozy instance, such as the locale or the public name. See cozy-stack [documentation](https://docs.cozy.io/en/cozy-stack/settings/#response-3) for more details.
 
 ### `cozy.client.settings.updateInstance(instance)`
 
@@ -27,7 +27,7 @@ console.log(usage.attributes.used)
 
 ### `cozy.client.settings.getClients()`
 
-`cozy.client.settings.getClients` returns a promise for an array of registered clients. See the [cozy-stack documentation](https://cozy.github.io/cozy-stack/settings.html#response-5) for more details.
+`cozy.client.settings.getClients` returns a promise for an array of registered clients. See the [cozy-stack documentation](https://docs.cozy.io/en/cozy-stack/settings/#response-5) for more details.
 
 ### `cozy.client.settings.deleteClientById('123')`
 

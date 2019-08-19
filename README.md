@@ -22,7 +22,7 @@ What's cozy-client-js?
 
 `cozy-client-js` is a javascript library made by Cozy. It enables applications (client-side apps, konnectors, OAuth apps, etc.) to make requests to the cozy stack.
 
-If you are getting started on cozy application development, you should follow this [tutorial](https://docs.cozy.io/en/dev/app/). [The reference documentation](https://cozy.github.io/cozy-client-js/) is the place to see what you can do with this lib, and how to do it!
+If you are getting started on cozy application development, you should follow this [tutorial](https://docs.cozy.io/en/dev/app/). [The reference documentation](https://docs.cozy.io/en/cozy-client-js/README/) is the place to see what you can do with this lib, and how to do it!
 
 
 Contribute
