@@ -24,7 +24,7 @@ You can `import`/`require` cozy-client-js using npm & webpack.
 
 You can also copy-paste the `dist/cozy-client.js` bundle file into your application, and include it in your application `index.html` with `<script src="./cozy-client.js">`.
 
-If you are developing a client-side app for Cozy V3, you can import the lib directly from the stack, by using [`{{.CozyClientJS}}`](https://cozy.github.io/cozy-stack/client-app-dev.html#good-practices-for-your-application).
+If you are developing a client-side app for Cozy V3, you can import the lib directly from the stack, by using [`{{.CozyClientJS}}`](https://docs.cozy.io/en/cozy-stack/client-app-dev/#good-practices-for-your-application).
 
 ## Doctypes & Permissions
 

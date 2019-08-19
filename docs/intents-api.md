@@ -16,7 +16,7 @@ cozy.client.intents.create('EDIT', 'io.cozy.photos', {action: 'crop', width: 100
   .start(document.getElementById('intent-service-wrapper'))
 ```
 
-See cozy-stack [documentation](https://cozy.github.io/cozy-stack/intents.html) for more details.
+See cozy-stack [documentation](https://docs.cozy.io/en/cozy-stack/intents/) for more details.
 
 You can also use `.then` to run some code after the intents is terminated like following:
 

@@ -26,4 +26,4 @@ const job = cozy.client.jobs.create('sendmail', {
 })
 ```
 
-See [the cozy-stack documentation](https://cozy.github.io/cozy-stack/jobs.html#post-jobsqueueworker-type) for more informations
+See [the cozy-stack documentation](https://docs.cozy.io/en/cozy-stack/jobs/#post-jobsqueueworker-type) for more informations

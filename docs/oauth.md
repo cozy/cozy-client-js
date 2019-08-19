@@ -1,6 +1,6 @@
 This document describes in more details how to use this library along with OAuth.
 
-Before reading this document, to better understand how authentication and OAuth work on the cozy-stack, you should read [this document](https://cozy.github.io/cozy-stack/auth.html).
+Before reading this document, to better understand how authentication and OAuth work on the cozy-stack, you should read [this document](https://docs.cozy.io/en/cozy-stack/auth/).
 
 The library exposes internal methods to access the OAuth endpoints of the cozy-stack. See [cozy.auth.* methods](./README.md#cozyauthregisterclientclientparams). However, the library also provides a more automated way to perform de OAuth flow by implementing many details of the OAuth registration and authorization flow for you.
 
