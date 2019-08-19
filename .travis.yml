@@ -6,6 +6,7 @@ services:
 env:
   global:
   - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
+  - GO111MODULE=on
   - COZY_V3_DOMAIN="localhost:8080"
   - COZY_V3_PASSPHRASE="CozyTest_1"
 cache:
@@ -16,12 +17,12 @@ before_script:
 - docker run -d -p 5984:5984 --name couch apache/couchdb:2.3
 - eval "$(gimme 1.12)"
 - mkdir $GOPATH
-- go get -u github.com/cozy/cozy-stack
+- go get github.com/cozy/cozy-stack
 - go get -u github.com/rif/spark
 - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
 - $GOPATH/bin/cozy-stack serve &
 - sleep 1
-- $GOPATH/bin/cozy-stack instances add --dev --passphrase "$COZY_V3_PASSPHRASE" "$COZY_V3_DOMAIN"
+- $GOPATH/bin/cozy-stack instances add --passphrase "$COZY_V3_PASSPHRASE" "$COZY_V3_DOMAIN"
 - export NAME=client-js
 - export TOKEN=apptoken
 - $TRAVIS_BUILD_DIR/test/testapp-git-daemon.sh /tmp/testapp $TRAVIS_BUILD_DIR/test/testapp-manifest.json
