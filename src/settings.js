@@ -19,6 +19,10 @@ export function updateInstance(cozy, instance) {
   return cozyFetchJSON(cozy, 'PUT', `/settings/instance`, instance)
 }
 
+export function getCapabilities(cozy) {
+  return cozyFetchJSON(cozy, 'GET', `/settings/capabilities`)
+}
+
 export function getClients(cozy) {
   return cozyFetchJSON(cozy, 'GET', `/settings/clients`)
 }

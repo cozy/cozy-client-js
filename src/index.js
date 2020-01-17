@@ -133,6 +133,7 @@ const settingsProto = {
   changePassphrase: settings.changePassphrase,
   getInstance: settings.getInstance,
   updateInstance: settings.updateInstance,
+  getCapabilities: settings.getCapabilities,
   getClients: settings.getClients,
   deleteClientById: settings.deleteClientById,
   updateLastSync: settings.updateLastSync
