@@ -16,7 +16,7 @@ cache:
   - node_modules
 before_script:
 - docker run -d -p 5984:5984 --name couch apache/couchdb:2.3
-- eval "$(gimme 1.12)"
+- eval "$(gimme 1.14)"
 - mkdir $GOPATH
 - go get github.com/cozy/cozy-stack
 - go get -u github.com/rif/spark
@@ -31,7 +31,7 @@ before_script:
 - sleep 2
 - sudo $GOPATH/bin/spark -port 80 /tmp/testapp &
 - sleep 2
-- $GOPATH/bin/cozy-stack apps install --domain "$COZY_V3_DOMAIN" mini "git://localhost/"
+- $GOPATH/bin/cozy-stack apps install --domain "$COZY_V3_DOMAIN" mini "file://$(pwd)/test/webapp"
 - export COZY_STACK_TOKEN=$($GOPATH/bin/cozy-stack instances token-app "$COZY_V3_DOMAIN"
   "mini")
 script:
