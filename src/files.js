@@ -19,6 +19,10 @@ function getFileTypeFromName(name) {
   else return null
 }
 
+function dateString(date) {
+  return typeof date === 'object' ? date.toISOString() : date
+}
+
 async function doUpload(cozy, data, method, path, options) {
   if (!data) {
     throw new Error('missing data argument')
@@ -44,6 +48,9 @@ async function doUpload(cozy, data, method, path, options) {
     contentType,
     contentLength,
     checksum,
+    createdAt,
+    updatedAt,
+    executable,
     lastModifiedDate,
     ifMatch,
     metadata,
@@ -73,14 +80,12 @@ async function doUpload(cozy, data, method, path, options) {
   if (lastModifiedDate && typeof lastModifiedDate === 'string') {
     lastModifiedDate = new Date(lastModifiedDate)
   }
-
-  const headers = {
-    'Content-Type': contentType
+  if (!createdAt) {
+    createdAt = lastModifiedDate
   }
-  if (contentLength) headers['Content-Length'] = String(contentLength)
-  if (checksum) headers['Content-MD5'] = checksum
-  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString()
-  if (ifMatch) headers['If-Match'] = ifMatch
+  if (!updatedAt) {
+    updatedAt = lastModifiedDate
+  }
 
   let finalpath = path
   if (metadata) {
@@ -89,11 +94,9 @@ async function doUpload(cozy, data, method, path, options) {
       finalpath = addQuerystringParam(finalpath, 'MetadataID', metadataId)
     }
   }
-
   if (sourceAccount) {
     finalpath = addQuerystringParam(finalpath, 'SourceAccount', sourceAccount)
   }
-
   if (sourceAccountIdentifier) {
     finalpath = addQuerystringParam(
       finalpath,
@@ -101,6 +104,28 @@ async function doUpload(cozy, data, method, path, options) {
       sourceAccountIdentifier
     )
   }
+  if (createdAt) {
+    finalpath = addQuerystringParam(
+      finalpath,
+      'CreatedAt',
+      dateString(createdAt)
+    )
+  }
+  if (updatedAt) {
+    finalpath = addQuerystringParam(
+      finalpath,
+      'UpdatedAt',
+      dateString(updatedAt)
+    )
+  }
+
+  const headers = {
+    'Content-Type': contentType
+  }
+  if (contentLength) headers['Content-Length'] = String(contentLength)
+  if (checksum) headers['Content-MD5'] = checksum
+  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString()
+  if (ifMatch) headers['If-Match'] = ifMatch
 
   return cozyFetch(cozy, finalpath, {
     method: method,
@@ -153,7 +178,7 @@ export function create(cozy, data, options) {
 }
 
 export function createDirectory(cozy, options) {
-  let { name, dirID, lastModifiedDate } = options || {}
+  let { name, dirID, createdAt, updatedAt, lastModifiedDate } = options || {}
 
   name = sanitizeFileName(name)
 
@@ -164,13 +189,37 @@ export function createDirectory(cozy, options) {
   if (lastModifiedDate && typeof lastModifiedDate === 'string') {
     lastModifiedDate = new Date(lastModifiedDate)
   }
+  if (!createdAt) {
+    createdAt = lastModifiedDate
+  }
+  if (!updatedAt) {
+    updatedAt = lastModifiedDate
+  }
 
   const path = `/files/${encodeURIComponent(dirID || '')}`
   const query = `?Name=${encodeURIComponent(name)}&Type=directory`
-  return cozyFetchJSON(cozy, 'POST', `${path}${query}`, undefined, {
-    headers: {
-      Date: lastModifiedDate ? lastModifiedDate.toGMTString() : ''
-    }
+
+  let finalpath = `${path}${query}`
+  if (createdAt) {
+    finalpath = addQuerystringParam(
+      finalpath,
+      'CreatedAt',
+      dateString(createdAt)
+    )
+  }
+  if (updatedAt) {
+    finalpath = addQuerystringParam(
+      finalpath,
+      'UpdatedAt',
+      dateString(updatedAt)
+    )
+  }
+
+  const headers = {}
+  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString()
+
+  return cozyFetchJSON(cozy, 'POST', finalpath, undefined, {
+    headers
   })
 }
 
