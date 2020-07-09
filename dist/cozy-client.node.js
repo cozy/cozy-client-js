@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,7 +68,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(fetch) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -87,7 +87,7 @@ var _auth_v = __webpack_require__(3);
 
 var _utils = __webpack_require__(1);
 
-var _jsonapi = __webpack_require__(8);
+var _jsonapi = __webpack_require__(7);
 
 var _jsonapi2 = _interopRequireDefault(_jsonapi);
 
@@ -287,7 +287,6 @@ FetchError.isInvalidToken = function (err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
   return err.name === 'FetchError' && err.status === 400 && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token');
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 1 */
@@ -984,7 +983,7 @@ function generateRandomState() {
     window.crypto.getRandomValues(buffer);
   } else {
     try {
-      buffer = __webpack_require__(14).randomBytes(StateSize);
+      buffer = __webpack_require__(13).randomBytes(StateSize);
     } catch (e) {
       buffer = null;
     }
@@ -997,7 +996,7 @@ function generateRandomState() {
   }
   return btoa(String.fromCharCode.apply(null, buffer)).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 4 */
@@ -1054,16 +1053,10 @@ function pickService(intent, filterServices) {
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = require("isomorphic-fetch");
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
 module.exports = require("btoa");
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1130,7 +1123,7 @@ function handleTopLevel(doc) {
 exports.default = handleTopLevel;
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1253,11 +1246,11 @@ var _fetch = __webpack_require__(0);
 
 var _helpers = __webpack_require__(5);
 
-var _client = __webpack_require__(18);
+var _client = __webpack_require__(17);
 
 var client = _interopRequireWildcard(_client);
 
-var _service = __webpack_require__(19);
+var _service = __webpack_require__(18);
 
 var service = _interopRequireWildcard(_service);
 
@@ -1326,30 +1319,30 @@ function buildRedirectionURL(url, data) {
 }
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(fetch) {
+
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* global fetch URL */
 
 
-__webpack_require__(11);
+__webpack_require__(10);
 
 var _utils = __webpack_require__(1);
 
-var _auth_storage = __webpack_require__(12);
+var _auth_storage = __webpack_require__(11);
 
-var _auth_v = __webpack_require__(13);
+var _auth_v = __webpack_require__(12);
 
 var _auth_v2 = __webpack_require__(3);
 
 var auth = _interopRequireWildcard(_auth_v2);
 
-var _data = __webpack_require__(15);
+var _data = __webpack_require__(14);
 
 var data = _interopRequireWildcard(_data);
 
@@ -1357,23 +1350,23 @@ var _fetch2 = __webpack_require__(0);
 
 var cozyFetch = _interopRequireWildcard(_fetch2);
 
-var _mango = __webpack_require__(16);
+var _mango = __webpack_require__(15);
 
 var mango = _interopRequireWildcard(_mango);
 
-var _files = __webpack_require__(17);
+var _files = __webpack_require__(16);
 
 var files = _interopRequireWildcard(_files);
 
-var _intents = __webpack_require__(9);
+var _intents = __webpack_require__(8);
 
 var intents = _interopRequireWildcard(_intents);
 
-var _jobs = __webpack_require__(20);
+var _jobs = __webpack_require__(19);
 
 var jobs = _interopRequireWildcard(_jobs);
 
-var _offline = __webpack_require__(21);
+var _offline = __webpack_require__(20);
 
 var offline = _interopRequireWildcard(_offline);
 
@@ -1723,16 +1716,15 @@ function addToProto(ctx, obj, proto, disablePromises) {
 
 module.exports = new Client();
 Object.assign(module.exports, { Client: Client, LocalStorage: _auth_storage.LocalStorage, MemoryStorage: _auth_storage.MemoryStorage });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = require("core-js/modules/es6.object.assign");
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1847,7 +1839,7 @@ var MemoryStorage = exports.MemoryStorage = function () {
 }();
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1918,16 +1910,16 @@ var AppToken = exports.AppToken = function () {
 
   return AppToken;
 }();
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2215,7 +2207,7 @@ function _delete(cozy, doctype, doc) {
 }
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2554,7 +2546,7 @@ function makeMapReduceQuery(indexRef, query) {
 }
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2571,11 +2563,12 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global Blob, File */
+
 
 var doUpload = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, data, method, path, options) {
-    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, lastModifiedDate, ifMatch, metadata, sourceAccount, sourceAccountIdentifier, headers, finalpath, metadataId;
+    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, createdAt, updatedAt, executable, lastModifiedDate, ifMatch, metadata, sourceAccount, sourceAccountIdentifier, finalpath, metadataId, headers;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -2609,7 +2602,7 @@ var doUpload = function () {
             throw new Error('invalid data type');
 
           case 10:
-            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata, sourceAccount = _ref2.sourceAccount, sourceAccountIdentifier = _ref2.sourceAccountIdentifier;
+            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, createdAt = _ref2.createdAt, updatedAt = _ref2.updatedAt, executable = _ref2.executable, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata, sourceAccount = _ref2.sourceAccount, sourceAccountIdentifier = _ref2.sourceAccountIdentifier;
 
             if (!contentType) {
               if (isBuffer) {
@@ -2631,6 +2624,50 @@ var doUpload = function () {
             if (lastModifiedDate && typeof lastModifiedDate === 'string') {
               lastModifiedDate = new Date(lastModifiedDate);
             }
+            if (!createdAt) {
+              createdAt = lastModifiedDate;
+            }
+            if (!updatedAt) {
+              updatedAt = lastModifiedDate;
+            }
+
+            if (!executable) {
+              executable = false;
+            }
+
+            finalpath = path;
+
+            if (!metadata) {
+              _context.next = 22;
+              break;
+            }
+
+            _context.next = 20;
+            return sendMetadata(cozy, metadata);
+
+          case 20:
+            metadataId = _context.sent;
+
+            if (metadataId) {
+              finalpath = addQuerystringParam(finalpath, 'MetadataID', metadataId);
+            }
+
+          case 22:
+            if (sourceAccount) {
+              finalpath = addQuerystringParam(finalpath, 'SourceAccount', sourceAccount);
+            }
+            if (sourceAccountIdentifier) {
+              finalpath = addQuerystringParam(finalpath, 'SourceAccountIdentifier', sourceAccountIdentifier);
+            }
+            if (createdAt) {
+              finalpath = addQuerystringParam(finalpath, 'CreatedAt', dateString(createdAt));
+            }
+            if (updatedAt) {
+              finalpath = addQuerystringParam(finalpath, 'UpdatedAt', dateString(updatedAt));
+            }
+            if (executable) {
+              finalpath = addQuerystringParam(finalpath, 'Executable', executable);
+            }
 
             headers = {
               'Content-Type': contentType
@@ -2640,33 +2677,6 @@ var doUpload = function () {
             if (checksum) headers['Content-MD5'] = checksum;
             if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString();
             if (ifMatch) headers['If-Match'] = ifMatch;
-
-            finalpath = path;
-
-            if (!metadata) {
-              _context.next = 24;
-              break;
-            }
-
-            _context.next = 22;
-            return sendMetadata(cozy, metadata);
-
-          case 22:
-            metadataId = _context.sent;
-
-            if (metadataId) {
-              finalpath = addQuerystringParam(finalpath, 'MetadataID', metadataId);
-            }
-
-          case 24:
-
-            if (sourceAccount) {
-              finalpath = addQuerystringParam(finalpath, 'SourceAccount', sourceAccount);
-            }
-
-            if (sourceAccountIdentifier) {
-              finalpath = addQuerystringParam(finalpath, 'SourceAccountIdentifier', sourceAccountIdentifier);
-            }
 
             return _context.abrupt('return', (0, _fetch.cozyFetch)(cozy, finalpath, {
               method: method,
@@ -2683,7 +2693,7 @@ var doUpload = function () {
               }
             }));
 
-          case 27:
+          case 33:
           case 'end':
             return _context.stop();
         }
@@ -2749,7 +2759,7 @@ exports.destroyById = destroyById;
 
 var _fetch = __webpack_require__(0);
 
-var _jsonapi = __webpack_require__(8);
+var _jsonapi = __webpack_require__(7);
 
 var _jsonapi2 = _interopRequireDefault(_jsonapi);
 
@@ -2757,8 +2767,7 @@ var _doctypes = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; } /* global Blob, File */
-
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 // global variables
 var ROOT_DIR_ID = exports.ROOT_DIR_ID = 'io.cozy.files.root-dir';
@@ -2774,11 +2783,14 @@ function getFileTypeFromName(name) {
   if (/\.heic$/i.test(name)) return 'image/heic';else if (/\.heif$/i.test(name)) return 'image/heif';else return null;
 }
 
+function dateString(date) {
+  return (typeof date === 'undefined' ? 'undefined' : _typeof(date)) === 'object' ? date.toISOString() : date;
+}
+
 function create(cozy, data, options) {
   var _ref4 = options || {},
       name = _ref4.name,
       dirID = _ref4.dirID,
-      executable = _ref4.executable,
       noSanitize = _ref4.noSanitize;
 
   // handle case where data is a file and contains the name
@@ -2796,12 +2808,8 @@ function create(cozy, data, options) {
     throw new Error('missing name argument');
   }
 
-  if (executable === undefined) {
-    executable = false;
-  }
-
   var path = '/files/' + encodeURIComponent(dirID || '');
-  var query = '?Name=' + encodeURIComponent(name) + '&Type=file&Executable=' + executable;
+  var query = '?Name=' + encodeURIComponent(name) + '&Type=file';
   return doUpload(cozy, data, 'POST', '' + path + query, options);
 }
 
@@ -2809,6 +2817,8 @@ function createDirectory(cozy, options) {
   var _ref5 = options || {},
       name = _ref5.name,
       dirID = _ref5.dirID,
+      createdAt = _ref5.createdAt,
+      updatedAt = _ref5.updatedAt,
       lastModifiedDate = _ref5.lastModifiedDate;
 
   name = sanitizeFileName(name);
@@ -2820,13 +2830,29 @@ function createDirectory(cozy, options) {
   if (lastModifiedDate && typeof lastModifiedDate === 'string') {
     lastModifiedDate = new Date(lastModifiedDate);
   }
+  if (!createdAt) {
+    createdAt = lastModifiedDate;
+  }
+  if (!updatedAt) {
+    updatedAt = lastModifiedDate;
+  }
 
   var path = '/files/' + encodeURIComponent(dirID || '');
   var query = '?Name=' + encodeURIComponent(name) + '&Type=directory';
-  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', '' + path + query, undefined, {
-    headers: {
-      Date: lastModifiedDate ? lastModifiedDate.toGMTString() : ''
-    }
+
+  var finalpath = '' + path + query;
+  if (createdAt) {
+    finalpath = addQuerystringParam(finalpath, 'CreatedAt', dateString(createdAt));
+  }
+  if (updatedAt) {
+    finalpath = addQuerystringParam(finalpath, 'UpdatedAt', dateString(updatedAt));
+  }
+
+  var headers = {};
+  if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString();
+
+  return (0, _fetch.cozyFetchJSON)(cozy, 'POST', finalpath, undefined, {
+    headers: headers
   });
 }
 
@@ -3119,7 +3145,7 @@ function addQuerystringParam(path, key, value) {
 }
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3139,7 +3165,7 @@ exports.start = start;
 
 var _helpers = __webpack_require__(5);
 
-var _ = __webpack_require__(9);
+var _ = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3380,7 +3406,7 @@ function start(cozy, intent, element) {
 }
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3521,7 +3547,7 @@ function start(cozy, intentId, serviceWindow) {
 }
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3559,7 +3585,7 @@ function create(cozy, workerType, args, options) {
 }
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3570,7 +3596,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.replicationOfflineError = undefined;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; // Define global `fetch` so it's made available to `pouchdb-browser`
+
 
 exports.init = init;
 exports.getDoctypes = getDoctypes;
@@ -3589,6 +3616,8 @@ exports.hasRepeatedReplication = hasRepeatedReplication;
 exports.startRepeatedReplication = startRepeatedReplication;
 exports.stopRepeatedReplication = stopRepeatedReplication;
 exports.stopAllRepeatedReplication = stopAllRepeatedReplication;
+
+__webpack_require__(21);
 
 var _doctypes = __webpack_require__(2);
 
@@ -3908,6 +3937,12 @@ function stopAllRepeatedReplication(cozy) {
   };
   return Promise.all(doctypes.map(stop));
 }
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+module.exports = require("isomorphic-fetch");
 
 /***/ }),
 /* 22 */
