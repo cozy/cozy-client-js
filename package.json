@@ -62,7 +62,7 @@
     "webpack-node-externals": "1.7.2"
   },
   "dependencies": {
-    "core-js": "^2.5.3",
+    "core-js": "^3.6.5",
     "isomorphic-fetch": "^2.2.1",
     "pouchdb-browser": "7.0.0",
     "pouchdb-find": "7.0.0"
