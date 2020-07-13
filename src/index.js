@@ -1,5 +1,4 @@
 /* global fetch URL */
-import 'core-js/modules/es6.object.assign'
 import { unpromiser, retry, warn } from './utils'
 import { LocalStorage, MemoryStorage } from './auth_storage'
 import { AppToken as AppTokenV2, getAppToken as getAppTokenV2 } from './auth_v2'
