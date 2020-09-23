@@ -3935,7 +3935,7 @@ function stopAllRepeatedReplication(cozy) {
 /* 20 */
 /***/ (function(module, exports) {
 
-module.exports = require("isomorphic-fetch");
+module.exports = require("cross-fetch/polyfill");
 
 /***/ }),
 /* 21 */
