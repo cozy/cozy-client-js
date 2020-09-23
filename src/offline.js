@@ -1,5 +1,5 @@
 // Define global `fetch` so it's made available to `pouchdb-browser`
-import 'isomorphic-fetch'
+import 'cross-fetch/polyfill'
 
 import { DOCTYPE_FILES } from './doctypes'
 import { refreshToken } from './auth_v3'

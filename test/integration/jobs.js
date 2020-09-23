@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import 'isomorphic-fetch'
+import 'cross-fetch/polyfill'
 import { Client } from '../../src'
 
 const COZY_STACK_URL = (process.env && process.env.COZY_STACK_URL) || ''

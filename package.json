@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "isomorphic-fetch": "^2.2.1",
+    "cross-fetch": "^3.0.6",
     "pouchdb-browser": "7.0.0",
     "pouchdb-find": "7.0.0"
   },

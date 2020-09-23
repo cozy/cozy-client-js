@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 
 // eslint-disable-next-line no-unused-vars
-import 'isomorphic-fetch'
+import 'cross-fetch/polyfill'
 import should from 'should'
 import { Client } from '../../src'
 import mock from '../mock-api'
