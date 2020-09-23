@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line no-unused-vars
 import should from 'should'
-import 'isomorphic-fetch'
+import 'cross-fetch/polyfill'
 import { Client } from '../../src'
 import mockTokenRetrieve from '../mock-iframe-token'
 
