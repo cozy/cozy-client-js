@@ -2560,7 +2560,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var doUpload = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, data, method, path, options) {
-    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, createdAt, updatedAt, executable, lastModifiedDate, ifMatch, metadata, sourceAccount, sourceAccountIdentifier, finalpath, metadataId, headers;
+    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, createdAt, updatedAt, executable, lastModifiedDate, ifMatch, metadata, sourceAccount, sourceAccountIdentifier, signal, finalpath, metadataId, headers;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -2594,7 +2594,7 @@ var doUpload = function () {
             throw new Error('invalid data type');
 
           case 10:
-            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, createdAt = _ref2.createdAt, updatedAt = _ref2.updatedAt, executable = _ref2.executable, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata, sourceAccount = _ref2.sourceAccount, sourceAccountIdentifier = _ref2.sourceAccountIdentifier;
+            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, createdAt = _ref2.createdAt, updatedAt = _ref2.updatedAt, executable = _ref2.executable, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata, sourceAccount = _ref2.sourceAccount, sourceAccountIdentifier = _ref2.sourceAccountIdentifier, signal = _ref2.signal;
 
             if (!contentType) {
               if (isBuffer) {
@@ -2673,7 +2673,8 @@ var doUpload = function () {
             return _context.abrupt('return', (0, _fetch.cozyFetch)(cozy, finalpath, {
               method: method,
               headers: headers,
-              body: data
+              body: data,
+              signal: signal
             }).then(function (res) {
               var json = res.json();
               if (!res.ok) {

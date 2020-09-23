@@ -3056,12 +3056,6 @@ EventEmitter.prototype._maxListeners = undefined;
 // added to it. This is a useful default which helps finding memory leaks.
 var defaultMaxListeners = 10;
 
-function checkListener(listener) {
-  if (typeof listener !== 'function') {
-    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-  }
-}
-
 Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
   enumerable: true,
   get: function() {
@@ -3096,14 +3090,14 @@ EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
   return this;
 };
 
-function _getMaxListeners(that) {
+function $getMaxListeners(that) {
   if (that._maxListeners === undefined)
     return EventEmitter.defaultMaxListeners;
   return that._maxListeners;
 }
 
 EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
-  return _getMaxListeners(this);
+  return $getMaxListeners(this);
 };
 
 EventEmitter.prototype.emit = function emit(type) {
@@ -3155,7 +3149,9 @@ function _addListener(target, type, listener, prepend) {
   var events;
   var existing;
 
-  checkListener(listener);
+  if (typeof listener !== 'function') {
+    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+  }
 
   events = target._events;
   if (events === undefined) {
@@ -3192,7 +3188,7 @@ function _addListener(target, type, listener, prepend) {
     }
 
     // Check for listener leak
-    m = _getMaxListeners(target);
+    m = $getMaxListeners(target);
     if (m > 0 && existing.length > m && !existing.warned) {
       existing.warned = true;
       // No error code for this since it is a Warning
@@ -3224,12 +3220,12 @@ EventEmitter.prototype.prependListener =
     };
 
 function onceWrapper() {
+  var args = [];
+  for (var i = 0; i < arguments.length; i++) args.push(arguments[i]);
   if (!this.fired) {
     this.target.removeListener(this.type, this.wrapFn);
     this.fired = true;
-    if (arguments.length === 0)
-      return this.listener.call(this.target);
-    return this.listener.apply(this.target, arguments);
+    ReflectApply(this.listener, this.target, args);
   }
 }
 
@@ -3242,14 +3238,18 @@ function _onceWrap(target, type, listener) {
 }
 
 EventEmitter.prototype.once = function once(type, listener) {
-  checkListener(listener);
+  if (typeof listener !== 'function') {
+    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+  }
   this.on(type, _onceWrap(this, type, listener));
   return this;
 };
 
 EventEmitter.prototype.prependOnceListener =
     function prependOnceListener(type, listener) {
-      checkListener(listener);
+      if (typeof listener !== 'function') {
+        throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+      }
       this.prependListener(type, _onceWrap(this, type, listener));
       return this;
     };
@@ -3259,7 +3259,9 @@ EventEmitter.prototype.removeListener =
     function removeListener(type, listener) {
       var list, events, position, i, originalListener;
 
-      checkListener(listener);
+      if (typeof listener !== 'function') {
+        throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+      }
 
       events = this._events;
       if (events === undefined)
@@ -5658,7 +5660,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var doUpload = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(cozy, data, method, path, options) {
-    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, createdAt, updatedAt, executable, lastModifiedDate, ifMatch, metadata, sourceAccount, sourceAccountIdentifier, finalpath, metadataId, headers;
+    var isBuffer, isFile, isBlob, isStream, isString, _ref2, contentType, contentLength, checksum, createdAt, updatedAt, executable, lastModifiedDate, ifMatch, metadata, sourceAccount, sourceAccountIdentifier, signal, finalpath, metadataId, headers;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -5692,7 +5694,7 @@ var doUpload = function () {
             throw new Error('invalid data type');
 
           case 10:
-            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, createdAt = _ref2.createdAt, updatedAt = _ref2.updatedAt, executable = _ref2.executable, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata, sourceAccount = _ref2.sourceAccount, sourceAccountIdentifier = _ref2.sourceAccountIdentifier;
+            _ref2 = options || {}, contentType = _ref2.contentType, contentLength = _ref2.contentLength, checksum = _ref2.checksum, createdAt = _ref2.createdAt, updatedAt = _ref2.updatedAt, executable = _ref2.executable, lastModifiedDate = _ref2.lastModifiedDate, ifMatch = _ref2.ifMatch, metadata = _ref2.metadata, sourceAccount = _ref2.sourceAccount, sourceAccountIdentifier = _ref2.sourceAccountIdentifier, signal = _ref2.signal;
 
             if (!contentType) {
               if (isBuffer) {
@@ -5771,7 +5773,8 @@ var doUpload = function () {
             return _context.abrupt('return', (0, _fetch.cozyFetch)(cozy, finalpath, {
               method: method,
               headers: headers,
-              body: data
+              body: data,
+              signal: signal
             }).then(function (res) {
               var json = res.json();
               if (!res.ok) {
@@ -7825,16 +7828,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["Response"] = Response;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DOMException", function() { return DOMException; });
 /* harmony export (immutable) */ __webpack_exports__["fetch"] = fetch;
-var global = (function(self) {
-  return self
-  // eslint-disable-next-line no-invalid-this
-})(typeof self !== 'undefined' ? self : this)
 var support = {
-  searchParams: 'URLSearchParams' in global,
-  iterable: 'Symbol' in global && 'iterator' in Symbol,
+  searchParams: 'URLSearchParams' in self,
+  iterable: 'Symbol' in self && 'iterator' in Symbol,
   blob:
-    'FileReader' in global &&
-    'Blob' in global &&
+    'FileReader' in self &&
+    'Blob' in self &&
     (function() {
       try {
         new Blob()
@@ -7843,8 +7842,8 @@ var support = {
         return false
       }
     })(),
-  formData: 'FormData' in global,
-  arrayBuffer: 'ArrayBuffer' in global
+  formData: 'FormData' in self,
+  arrayBuffer: 'ArrayBuffer' in self
 }
 
 function isDataView(obj) {
@@ -7875,7 +7874,7 @@ function normalizeName(name) {
   if (typeof name !== 'string') {
     name = String(name)
   }
-  if (/[^a-z0-9\-#$%&'*+.^_`|~!]/i.test(name) || name === '') {
+  if (/[^a-z0-9\-#$%&'*+.^_`|~]/i.test(name)) {
     throw new TypeError('Invalid character in header field name')
   }
   return name.toLowerCase()
@@ -8040,17 +8039,6 @@ function Body() {
   this.bodyUsed = false
 
   this._initBody = function(body) {
-    /*
-      fetch-mock wraps the Response object in an ES6 Proxy to
-      provide useful test harness features such as flush. However, on
-      ES5 browsers without fetch or Proxy support pollyfills must be used;
-      the proxy-pollyfill is unable to proxy an attribute unless it exists
-      on the object before the Proxy is created. This change ensures
-      Response.bodyUsed exists on the instance, while maintaining the
-      semantic of setting Request.bodyUsed in the constructor before
-      _initBody is called.
-    */
-    this.bodyUsed = this.bodyUsed
     this._bodyInit = body
     if (!body) {
       this._bodyText = ''
@@ -8185,21 +8173,6 @@ function Request(input, options) {
     throw new TypeError('Body not allowed for GET or HEAD requests')
   }
   this._initBody(body)
-
-  if (this.method === 'GET' || this.method === 'HEAD') {
-    if (options.cache === 'no-store' || options.cache === 'no-cache') {
-      // Search for a '_' parameter in the query string
-      var reParamSearch = /([?&])_=[^&]*/
-      if (reParamSearch.test(this.url)) {
-        // If it already exists then set the value with the current time
-        this.url = this.url.replace(reParamSearch, '$1_=' + new Date().getTime())
-      } else {
-        // Otherwise add a new '_' parameter to the end with the current time
-        var reQueryString = /\?/
-        this.url += (reQueryString.test(this.url) ? '&' : '?') + '_=' + new Date().getTime()
-      }
-    }
-  }
 }
 
 Request.prototype.clone = function() {
@@ -8248,7 +8221,7 @@ function Response(bodyInit, options) {
   this.type = 'default'
   this.status = options.status === undefined ? 200 : options.status
   this.ok = this.status >= 200 && this.status < 300
-  this.statusText = 'statusText' in options ? options.statusText : ''
+  this.statusText = 'statusText' in options ? options.statusText : 'OK'
   this.headers = new Headers(options.headers)
   this.url = options.url || ''
   this._initBody(bodyInit)
@@ -8281,9 +8254,10 @@ Response.redirect = function(url, status) {
   return new Response(null, {status: status, headers: {location: url}})
 }
 
-var DOMException = global.DOMException
-
-if (typeof DOMException !== 'function') {
+var DOMException = self.DOMException
+try {
+  new DOMException()
+} catch (err) {
   DOMException = function(message, name) {
     this.message = message
     this.name = name
@@ -8316,38 +8290,22 @@ function fetch(input, init) {
       }
       options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
       var body = 'response' in xhr ? xhr.response : xhr.responseText
-      setTimeout(function() {
-        resolve(new Response(body, options))
-      }, 0)
+      resolve(new Response(body, options))
     }
 
     xhr.onerror = function() {
-      setTimeout(function() {
-        reject(new TypeError('Network request failed'))
-      }, 0)
+      reject(new TypeError('Network request failed'))
     }
 
     xhr.ontimeout = function() {
-      setTimeout(function() {
-        reject(new TypeError('Network request failed'))
-      }, 0)
+      reject(new TypeError('Network request failed'))
     }
 
     xhr.onabort = function() {
-      setTimeout(function() {
-        reject(new DOMException('Aborted', 'AbortError'))
-      }, 0)
+      reject(new DOMException('Aborted', 'AbortError'))
     }
 
-    function fixUrl(url) {
-      try {
-        return url === '' && global.location.href ? global.location.href : url
-      } catch (e) {
-        return url
-      }
-    }
-
-    xhr.open(request.method, fixUrl(request.url), true)
+    xhr.open(request.method, request.url, true)
 
     if (request.credentials === 'include') {
       xhr.withCredentials = true
@@ -8355,16 +8313,8 @@ function fetch(input, init) {
       xhr.withCredentials = false
     }
 
-    if ('responseType' in xhr) {
-      if (support.blob) {
-        xhr.responseType = 'blob'
-      } else if (
-        support.arrayBuffer &&
-        request.headers.get('Content-Type') &&
-        request.headers.get('Content-Type').indexOf('application/octet-stream') !== -1
-      ) {
-        xhr.responseType = 'arraybuffer'
-      }
+    if ('responseType' in xhr && support.blob) {
+      xhr.responseType = 'blob'
     }
 
     request.headers.forEach(function(value, name) {
@@ -8388,11 +8338,11 @@ function fetch(input, init) {
 
 fetch.polyfill = true
 
-if (!global.fetch) {
-  global.fetch = fetch
-  global.Headers = Headers
-  global.Request = Request
-  global.Response = Response
+if (!self.fetch) {
+  self.fetch = fetch
+  self.Headers = Headers
+  self.Request = Request
+  self.Response = Response
 }
 
 

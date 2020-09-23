@@ -55,7 +55,8 @@ async function doUpload(cozy, data, method, path, options) {
     ifMatch,
     metadata,
     sourceAccount,
-    sourceAccountIdentifier
+    sourceAccountIdentifier,
+    signal // AbortController signal
   } = options || {}
   if (!contentType) {
     if (isBuffer) {
@@ -137,7 +138,8 @@ async function doUpload(cozy, data, method, path, options) {
   return cozyFetch(cozy, finalpath, {
     method: method,
     headers: headers,
-    body: data
+    body: data,
+    signal
   }).then(res => {
     const json = res.json()
     if (!res.ok) {
