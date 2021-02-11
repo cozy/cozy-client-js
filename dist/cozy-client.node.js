@@ -2812,9 +2812,12 @@ function createDirectory(cozy, options) {
       dirID = _ref5.dirID,
       createdAt = _ref5.createdAt,
       updatedAt = _ref5.updatedAt,
-      lastModifiedDate = _ref5.lastModifiedDate;
+      lastModifiedDate = _ref5.lastModifiedDate,
+      noSanitize = _ref5.noSanitize;
 
-  name = sanitizeFileName(name);
+  if (!noSanitize) {
+    name = sanitizeFileName(name);
+  }
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument');
@@ -2849,10 +2852,15 @@ function createDirectory(cozy, options) {
   });
 }
 
-function getDirectoryOrCreate(cozy, name, parentDirectory) {
+function getDirectoryOrCreate(cozy, name, parentDirectory, options) {
   if (parentDirectory && !parentDirectory.attributes) throw new Error('Malformed parent directory');
 
-  name = sanitizeFileName(name);
+  var _ref6 = options || {},
+      noSanitize = _ref6.noSanitize;
+
+  if (!noSanitize) {
+    name = sanitizeFileName(name);
+  }
 
   var path = (parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path) + '/' + name;
 
@@ -2870,7 +2878,7 @@ function getDirectoryOrCreate(cozy, name, parentDirectory) {
   });
 }
 
-function createDirectoryByPath(cozy, path, offline) {
+function createDirectoryByPath(cozy, path, offline, options) {
   var parts = path.split('/').filter(function (part) {
     return part !== '';
   });
@@ -2879,7 +2887,7 @@ function createDirectoryByPath(cozy, path, offline) {
 
   return parts.length ? parts.reduce(function (parentDirectoryPromise, part) {
     return parentDirectoryPromise.then(function (parentDirectory) {
-      return getDirectoryOrCreate(cozy, part, parentDirectory);
+      return getDirectoryOrCreate(cozy, part, parentDirectory, options);
     });
   }, rootDirectoryPromise) : rootDirectoryPromise;
 }
@@ -2893,13 +2901,19 @@ function doUpdateAttributes(cozy, attrs, path, options) {
     throw new Error('missing attrs argument');
   }
 
-  var _ref6 = options || {},
-      ifMatch = _ref6.ifMatch;
+  var _ref7 = options || {},
+      ifMatch = _ref7.ifMatch,
+      noSanitize = _ref7.noSanitize;
+
+  var name = attrs.name;
+  if (!noSanitize) {
+    name = sanitizeFileName(name);
+  }
 
   var body = {
     data: {
       attributes: Object.assign({}, attrs, {
-        name: sanitizeFileName(attrs.name)
+        name: name
       })
     }
   };
@@ -2923,8 +2937,8 @@ function trashById(cozy, id, options) {
     throw new Error('missing id argument');
   }
 
-  var _ref7 = options || {},
-      ifMatch = _ref7.ifMatch;
+  var _ref8 = options || {},
+      ifMatch = _ref8.ifMatch;
 
   return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/' + encodeURIComponent(id), undefined, {
     headers: {
@@ -2939,10 +2953,10 @@ function statById(cozy, id) {
 
   if (offline && cozy.offline.hasDatabase(_doctypes.DOCTYPE_FILES)) {
     var db = cozy.offline.getDatabase(_doctypes.DOCTYPE_FILES);
-    return Promise.all([db.get(id), db.find(Object.assign({ selector: { dir_id: id } }, options))]).then(function (_ref8) {
-      var _ref9 = _slicedToArray(_ref8, 2),
-          doc = _ref9[0],
-          children = _ref9[1];
+    return Promise.all([db.get(id), db.find(Object.assign({ selector: { dir_id: id } }, options))]).then(function (_ref9) {
+      var _ref10 = _slicedToArray(_ref9, 2),
+          doc = _ref10[0],
+          children = _ref10[1];
 
       if (id === ROOT_DIR_ID) {
         children.docs = children.docs.filter(function (doc) {
@@ -3068,8 +3082,8 @@ function restoreById(cozy, id) {
 }
 
 function destroyById(cozy, id, options) {
-  var _ref10 = options || {},
-      ifMatch = _ref10.ifMatch;
+  var _ref11 = options || {},
+      ifMatch = _ref11.ifMatch;
 
   return (0, _fetch.cozyFetchJSON)(cozy, 'DELETE', '/files/trash/' + encodeURIComponent(id), undefined, {
     headers: {
