@@ -181,9 +181,12 @@ export function create(cozy, data, options) {
 }
 
 export function createDirectory(cozy, options) {
-  let { name, dirID, createdAt, updatedAt, lastModifiedDate } = options || {}
+  let { name, dirID, createdAt, updatedAt, lastModifiedDate, noSanitize } =
+    options || {}
 
-  name = sanitizeFileName(name)
+  if (!noSanitize) {
+    name = sanitizeFileName(name)
+  }
 
   if (typeof name !== 'string' || name === '') {
     throw new Error('missing name argument')
@@ -226,11 +229,15 @@ export function createDirectory(cozy, options) {
   })
 }
 
-function getDirectoryOrCreate(cozy, name, parentDirectory) {
+function getDirectoryOrCreate(cozy, name, parentDirectory, options) {
   if (parentDirectory && !parentDirectory.attributes)
     throw new Error('Malformed parent directory')
 
-  name = sanitizeFileName(name)
+  const { noSanitize } = options || {}
+
+  if (!noSanitize) {
+    name = sanitizeFileName(name)
+  }
 
   const path = `${
     parentDirectory._id === ROOT_DIR_ID ? '' : parentDirectory.attributes.path
@@ -250,7 +257,7 @@ function getDirectoryOrCreate(cozy, name, parentDirectory) {
   })
 }
 
-export function createDirectoryByPath(cozy, path, offline) {
+export function createDirectoryByPath(cozy, path, offline, options) {
   const parts = path.split('/').filter(part => part !== '')
 
   const rootDirectoryPromise = cozy.files.statById(ROOT_DIR_ID, offline)
@@ -258,7 +265,7 @@ export function createDirectoryByPath(cozy, path, offline) {
   return parts.length
     ? parts.reduce((parentDirectoryPromise, part) => {
         return parentDirectoryPromise.then(parentDirectory =>
-          getDirectoryOrCreate(cozy, part, parentDirectory)
+          getDirectoryOrCreate(cozy, part, parentDirectory, options)
         )
       }, rootDirectoryPromise)
     : rootDirectoryPromise
@@ -279,11 +286,17 @@ function doUpdateAttributes(cozy, attrs, path, options) {
     throw new Error('missing attrs argument')
   }
 
-  const { ifMatch } = options || {}
+  const { ifMatch, noSanitize } = options || {}
+
+  let name = attrs.name
+  if (!noSanitize) {
+    name = sanitizeFileName(name)
+  }
+
   const body = {
     data: {
       attributes: Object.assign({}, attrs, {
-        name: sanitizeFileName(attrs.name)
+        name
       })
     }
   }
