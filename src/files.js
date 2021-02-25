@@ -130,7 +130,10 @@ async function doUpload(cozy, data, method, path, options) {
   const headers = {
     'Content-Type': contentType
   }
-  if (contentLength) headers['Content-Length'] = String(contentLength)
+  if (contentLength) {
+    headers['Content-Length'] = String(contentLength)
+    finalpath = addQuerystringParam(finalpath, 'Size', String(contentLength))
+  }
   if (checksum) headers['Content-MD5'] = checksum
   if (lastModifiedDate) headers['Date'] = lastModifiedDate.toGMTString()
   if (ifMatch) headers['If-Match'] = ifMatch
