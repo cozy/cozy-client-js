@@ -89,15 +89,13 @@ export function findMany(cozy, doctype, ids) {
   })
 }
 
-export function findAll(cozy, doctype) {
+export function findAll(cozy, doctype, options = { include_docs: true }) {
   return cozy.isV2().then(isV2 => {
     if (isV2) {
       return Promise.reject(new Error('findAll is not available on v2'))
     }
 
-    const path = createPath(cozy, isV2, doctype, '_all_docs', {
-      include_docs: true
-    })
+    const path = createPath(cozy, isV2, doctype, '_all_docs', options)
 
     return cozyFetchJSON(cozy, 'POST', path, {})
       .then(resp => {
