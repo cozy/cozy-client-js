@@ -181,7 +181,7 @@ export function replicateFromCozy(cozy, doctype, options = {}) {
               options.onComplete && options.onComplete(info)
             })
             .on('error', err => {
-              if (err.error === 'code=400, message=Expired token') {
+              if (/Expired token/.test(err.error)) {
                 cozy.authorize().then(({ client, token }) => {
                   refreshToken(cozy, client, token)
                     .then(newToken => cozy.saveCredentials(client, newToken))

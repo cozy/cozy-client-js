@@ -184,7 +184,7 @@ FetchError.isInvalidToken = function(err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
   return (
     err.name === 'FetchError' &&
-    err.status === 400 &&
+    (err.status === 400 || err.status === 401) &&
     err.reason &&
     (err.reason.error === 'Invalid JWT token' ||
       err.reason.error === 'Expired token')
