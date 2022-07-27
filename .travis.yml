@@ -16,7 +16,7 @@ before_script:
   - docker run -d -p 5984:5984 --name couch apache/couchdb:2.3
   - eval "$(gimme 1.18)"
   - mkdir $GOPATH
-  - git clone git@github.com:cozy/cozy-stack.git
+  - git clone https://github.com/cozy/cozy-stack.git
   - pushd cozy-stack && make && popd
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   - $GOPATH/bin/cozy-stack serve &
