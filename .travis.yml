@@ -16,9 +16,9 @@ cache:
     - node_modules
 before_script:
   - docker run -d -p 5984:5984 --name couch apache/couchdb:2.3
-  - eval "$(gimme 1.15)"
+  - eval "$(gimme 1.18)"
   - mkdir $GOPATH
-  - go get github.com/cozy/cozy-stack
+  - go install github.com/cozy/cozy-stack@latest
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   - $GOPATH/bin/cozy-stack serve &
   - sleep 1
