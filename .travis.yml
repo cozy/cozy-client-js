@@ -6,8 +6,6 @@ services:
 env:
   global:
     - GOPATH=${TRAVIS_BUILD_DIR}/_workspace
-    - GOPROXY="https://proxy.golang.org"
-    - GO111MODULE="on"
     - COZY_V3_DOMAIN="localhost:8080"
     - COZY_V3_PASSPHRASE="CozyTest_1"
 cache:
@@ -16,9 +14,10 @@ cache:
     - node_modules
 before_script:
   - docker run -d -p 5984:5984 --name couch apache/couchdb:2.3
-  - eval "$(gimme 1.15)"
+  - eval "$(gimme 1.18)"
   - mkdir $GOPATH
-  - go get github.com/cozy/cozy-stack
+  - git clone git@github.com:cozy/cozy-stack.git
+  - pushd cozy-stack && make && popd
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
   - $GOPATH/bin/cozy-stack serve &
   - sleep 1
