@@ -13,7 +13,7 @@ cache:
   directories:
     - node_modules
 before_script:
-  - docker run -d -p 5984:5984 --name couch -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password apache/couchdb:3.2.2
+  - docker run -d -p 5984:5984 --name couch -e COUCHDB_USER= -e COUCHDB_PASSWORD= apache/couchdb:3.2.2
   - eval "$(gimme 1.18)"
   - mkdir $GOPATH
   - git clone https://github.com/cozy/cozy-stack.git
