@@ -19,7 +19,7 @@ before_script:
   - git clone https://github.com/cozy/cozy-stack.git
   - pushd cozy-stack && make && popd
   - curl -X PUT http://127.0.0.1:5984/{_users,_replicator,_global_changes}
-  - $GOPATH/bin/cozy-stack serve &
+  - $GOPATH/bin/cozy-stack serve --host 127.0.0.1 --admin-host 127.0.0.1 &
   - sleep 1
   - $GOPATH/bin/cozy-stack instances add --passphrase "$COZY_V3_PASSPHRASE" "$COZY_V3_DOMAIN"
   - $GOPATH/bin/cozy-stack apps install --domain "$COZY_V3_DOMAIN" mini "file://$(pwd)/test/webapp"
