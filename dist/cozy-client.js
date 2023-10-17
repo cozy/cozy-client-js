@@ -295,7 +295,7 @@ FetchError.isNotFound = function (err) {
 
 FetchError.isInvalidToken = function (err) {
   // XXX We can't use err instanceof FetchError because of the caveats of babel
-  return err.name === 'FetchError' && err.status === 400 && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token');
+  return err.name === 'FetchError' && (err.status === 400 || err.status === 401) && err.reason && (err.reason.error === 'Invalid JWT token' || err.reason.error === 'Expired token');
 };
 
 /***/ }),
@@ -7773,7 +7773,7 @@ function replicateFromCozy(cozy, doctype) {
         resolve(info);
         options.onComplete && options.onComplete(info);
       }).on('error', function (err) {
-        if (err.error === 'code=400, message=Expired token') {
+        if (/Expired token/.test(err.error)) {
           cozy.authorize().then(function (_ref2) {
             var client = _ref2.client,
                 token = _ref2.token;
